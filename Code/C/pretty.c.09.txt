@@ -1,0 +1,100 @@
+		break;
+	default:
+		break;
+	}
+	if (magic != NO_MAGIC)
+		placeholder++;
+
+	orig_len = sb->len;
+	consumed = format_commit_one(sb, placeholder, context);
+	if (magic == NO_MAGIC)
+		return consumed;
+
+	if ((orig_len == sb->len) && magic == DEL_LF_BEFORE_EMPTY) {
+		while (sb->len && sb->buf[sb->len - 1] == '\n')
+			strbuf_setlen(sb, sb->len - 1);
+	} else if ((orig_len != sb->len) && magic == ADD_LF_BEFORE_NON_EMPTY) {
+		strbuf_insert(sb, orig_len, "\n", 1);
+	}
+	return consumed + 1;
+}
+
+void format_commit_message(const struct commit *commit,
+			   const char *format, struct strbuf *sb,
+			   const struct pretty_print_context *pretty_ctx)
+{
+	struct format_commit_context context;
+
+	memset(&context, 0, sizeof(context));
+	context.commit = commit;
+	context.pretty_ctx = pretty_ctx;
+	context.wrap_start = sb->len;
+	strbuf_expand(sb, format, format_commit_item, &context);
+	rewrap_message_tail(sb, &context, 0, 0, 0);
+}
+
+static void pp_header(enum cmit_fmt fmt,
+		      int abbrev,
+		      enum date_mode dmode,
+		      const char *encoding,
+		      const struct commit *commit,
+		      const char **msg_p,
+		      struct strbuf *sb)
+{
+	int parents_shown = 0;
+
+	for (;;) {
+		const char *line = *msg_p;
+		int linelen = get_one_line(*msg_p);
+
+		if (!linelen)
+			return;
+		*msg_p += linelen;
+
+		if (linelen == 1)
+			
+			return;
+
+		if (fmt == CMIT_FMT_RAW) {
+			strbuf_add(sb, line, linelen);
+			continue;
+		}
+
+		if (!memcmp(line, "parent ", 7)) {
+			if (linelen != 48)
+				die("bad parent line in commit");
+			continue;
+		}
+
+		if (!parents_shown) {
+			struct commit_list *parent;
+			int num;
+			for (parent = commit->parents, num = 0;
+			     parent;
+			     parent = parent->next, num++)
+				;
+			
+			strbuf_grow(sb, num * 50 + 20);
+			add_merge_info(fmt, sb, commit, abbrev);
+			parents_shown = 1;
+		}
+
+		if (!memcmp(line, "author ", 7)) {
+			strbuf_grow(sb, linelen + 80);
+			pp_user_info("Author", fmt, sb, line + 7, dmode, encoding);
+		}
+		if (!memcmp(line, "committer ", 10) &&
+		    (fmt == CMIT_FMT_FULL || fmt == CMIT_FMT_FULLER)) {
+			strbuf_grow(sb, linelen + 80);
+			pp_user_info("Commit", fmt, sb, line + 10, dmode, encoding);
+		}
+	}
+}
+
+void pp_title_line(enum cmit_fmt fmt,
+		   const char **msg_p,
+		   struct strbuf *sb,
+		   const char *subject,
+		   const char *after_subject,
+		   const char *encoding,
+		   int need_8bit_cte)

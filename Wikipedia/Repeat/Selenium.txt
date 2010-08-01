@@ -1,0 +1,9 @@
+Selenium
+
+Selenium is a chemical element with the atomic number 34, represented by the chemical symbol Se, an atomic mass of 78.96. It is a nonmetal, chemically related to sulfur and tellurium, and rarely occurs in its elemental state in nature.
+
+Isolated selenium occurs in several different forms, the most stable of which is a dense purplish-gray semi-metal (semiconductor) form that is structurally a trigonal polymer chain. It conducts electricity better in the light than in the dark, and is used in photocells. Selenium also exists in many non-conductive forms: a black glass-like allotrope, as well as several red crystalline forms built of eight-membered ring molecules, like its lighter cousin sulfur.
+
+Selenium is found in economic quantities in sulfide ores such as pyrite, partially replacing the sulfur in the ore matrix. Minerals that are selenide or selenate compounds are also known, but all are rare. The chief commercial present uses for selenium are in glassmaking and in chemicals and pigments. Electronic uses for selenium, once important, have been supplanted by silicon semiconductor devices.
+
+Selenium salts are toxic in large amounts, but trace amounts of the element are necessary for cellular function in most, if not all, animals, forming the active center of the enzymes glutathione peroxidase and thioredoxin reductase (which indirectly reduce certain oxidized molecules in animals and some plants) and three known deiodinase enzymes (which convert one thyroid hormone to another). Selenium requirements in plants differ by species, with some plants apparently requiring none.

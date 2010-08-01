@@ -1,0 +1,50 @@
+        (<+>) :: a b c -> a b c -> a b c
+
+instance MonadPlus m => ArrowPlus (Kleisli m) where
+        Kleisli f <+> Kleisli g = Kleisli (\x -> f x `mplus` g x)
+
+class Arrow a => ArrowChoice a where
+
+        left :: a b c -> a (Either b d) (Either c d)
+
+        right :: a b c -> a (Either d b) (Either d c)
+        right f = arr mirror >>> left f >>> arr mirror
+                        where   mirror (Left x) = Right x
+                                mirror (Right y) = Left y
+
+        (+++) :: a b c -> a b' c' -> a (Either b b') (Either c c')
+        f +++ g = left f >>> right g
+
+        (|||) :: a b d -> a c d -> a (Either b c) d
+        f ||| g = f +++ g >>> arr untag
+                        where   untag (Left x) = x
+                                untag (Right y) = y
+
+{-# RULES
+"left/arr"      forall f .
+                left (arr f) = arr (left f)
+"right/arr"     forall f .
+                right (arr f) = arr (right f)
+"sum/arr"       forall f g .
+                arr f +++ arr g = arr (f +++ g)
+"fanin/arr"     forall f g .
+                arr f ||| arr g = arr (f ||| g)
+"compose/left"  forall f g .
+                left f . left g = left (f . g)
+"compose/right" forall f g .
+                right f . right g = right (f . g)
+ #-}
+
+instance ArrowChoice (->) where
+        left f = f +++ id
+        right f = id +++ f
+        f +++ g = (Left . f) ||| (Right . g)
+        (|||) = either
+
+instance Monad m => ArrowChoice (Kleisli m) where
+        left f = f +++ arr id
+        right f = arr id +++ f
+        f +++ g = (f >>> arr Left) ||| (g >>> arr Right)
+        Kleisli f ||| Kleisli g = Kleisli (either f g)
+
+class Arrow a => ArrowApply a where

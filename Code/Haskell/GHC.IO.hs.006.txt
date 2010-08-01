@@ -1,0 +1,49 @@
+lazyReadBuffered :: Handle -> Handle__ -> FD -> IORef Buffer -> Buffer
+                 -> IO (Handle__, [Char])
+lazyReadBuffered h handle_ fd ref buf = do
+   catch 
+        (do buf' <- fillReadBuffer fd True (haIsStream handle_) buf
+            lazyReadHaveBuffer h handle_ fd ref buf'
+        )
+        (\_ -> do (handle_', _) <- hClose_help handle_
+                  return (handle_', "")
+        )
+
+lazyReadHaveBuffer :: Handle -> Handle__ -> FD -> IORef Buffer -> Buffer -> IO (Handle__, [Char])
+lazyReadHaveBuffer h handle_ _ ref buf = do
+   more <- lazyRead h
+   writeIORef ref buf{ bufRPtr=0, bufWPtr=0 }
+   s <- unpackAcc (bufBuf buf) (bufRPtr buf) (bufWPtr buf) more
+   return (handle_, s)
+
+unpackAcc :: RawBuffer -> Int -> Int -> [Char] -> IO [Char]
+unpackAcc _   _      0        acc  = return acc
+unpackAcc buf (I# r) (I# len) acc0 = IO $ \s -> unpackRB acc0 (len -# 1#) s
+   where
+    unpackRB acc i s
+     | i <# r  = (# s, acc #)
+     | otherwise = 
+          case readCharArray# buf i s of
+          (# s', ch #) -> unpackRB (C# ch : acc) (i -# 1#) s'
+
+hPutChar :: Handle -> Char -> IO ()
+hPutChar handle c = do
+    c `seq` return ()
+    wantWritableHandle "hPutChar" handle $ \ handle_  -> do
+    let fd = haFD handle_
+    case haBufferMode handle_ of
+        LineBuffering    -> hPutcBuffered handle_ True  c
+        BlockBuffering _ -> hPutcBuffered handle_ False c
+        NoBuffering      ->
+                with (castCharToCChar c) $ \buf -> do
+                  writeRawBufferPtr "hPutChar" fd (haIsStream handle_) buf 0 1
+                  return ()
+
+hPutcBuffered :: Handle__ -> Bool -> Char -> IO ()
+hPutcBuffered handle_ is_line c = do
+  let ref = haBuffer handle_
+  buf <- readIORef ref
+  let w = bufWPtr buf
+  w'  <- writeCharIntoBuffer (bufBuf buf) w c
+  let new_buf = buf{ bufWPtr = w' }
+  if bufferFull new_buf || is_line && c == '\n'

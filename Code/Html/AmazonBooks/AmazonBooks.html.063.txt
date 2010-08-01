@@ -1,0 +1,30 @@
+              jQuery("#zgTopFreeList_" + widgetID).show();
+              },
+              displayPricePopover: function(anchor, title) {
+              if (ZeitgeistFVP.popover) {
+              ZeitgeistFVP.popover.close();
+              }
+              ZeitgeistFVP.popover = jQuery.AmazonPopover.displayPopover({
+              literalContent: ZeitgeistFVP.popoverText,
+              location: "bottom",
+              locationAlign: "center",
+              locationElement: anchor,
+              modal: false,
+              showCloseButton: true,
+              title: title,
+              closeText: "close",
+              width: 316
+              });
+              }
+              }
+            </script>
+
+            <link rel="stylesheet" type="text/css" href="http://z-ecx.images-amazon.com/images/G/01/zeitgeist/css/zeitgeist-chart/zeitgeist-chart.1._V192897553_.css" />
+            <div class="unified_widget" id="zgChart_ns_1RVCMGP6WPZF34Z5GVPD_123_">
+
+              <div class="zgChart">
+                <h2>Bestsellers</h2>
+                <div class="storeTitle">
+                  <a href="/gp/bestsellers/digital-text/ref=pd_ts_zgc_kinc_digital-text_mot2?pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD">Kindle Store: Top 100</a>
+                </div>
+                <div class="subheadText">Updated hourly</div>

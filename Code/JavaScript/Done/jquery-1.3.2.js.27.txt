@@ -1,0 +1,100 @@
+	toggle: function( fn ) {
+		var args = arguments, i = 1;
+
+		while( i < args.length )
+			jQuery.event.proxy( fn, args[i++] );
+
+		return this.click( jQuery.event.proxy( fn, function(event) {
+			this.lastToggle = ( this.lastToggle || 0 ) % i;
+
+			event.preventDefault();
+
+			return args[ this.lastToggle++ ].apply( this, arguments ) || false;
+		}));
+	},
+
+	hover: function(fnOver, fnOut) {
+		return this.mouseenter(fnOver).mouseleave(fnOut);
+	},
+
+	ready: function(fn) {
+		bindReady();
+
+		if ( jQuery.isReady )
+			fn.call( document, jQuery );
+
+		else
+			jQuery.readyList.push( fn );
+
+		return this;
+	},
+	
+	live: function( type, fn ){
+		var proxy = jQuery.event.proxy( fn );
+		proxy.guid += this.selector + type;
+
+		jQuery(document).bind( liveConvert(type, this.selector), this.selector, proxy );
+
+		return this;
+	},
+	
+	die: function( type, fn ){
+		jQuery(document).unbind( liveConvert(type, this.selector), fn ? { guid: fn.guid + this.selector + type } : null );
+		return this;
+	}
+});
+
+function liveHandler( event ){
+	var check = RegExp("(^|\\.)" + event.type + "(\\.|$)"),
+		stop = true,
+		elems = [];
+
+	jQuery.each(jQuery.data(this, "events").live || [], function(i, fn){
+		if ( check.test(fn.type) ) {
+			var elem = jQuery(event.target).closest(fn.data)[0];
+			if ( elem )
+				elems.push({ elem: elem, fn: fn });
+		}
+	});
+
+	elems.sort(function(a,b) {
+		return jQuery.data(a.elem, "closest") - jQuery.data(b.elem, "closest");
+	});
+	
+	jQuery.each(elems, function(){
+		if ( this.fn.call(this.elem, event, this.fn.data) === false )
+			return (stop = false);
+	});
+
+	return stop;
+}
+
+function liveConvert(type, selector){
+	return ["live", type, selector.replace(/\./g, "`").replace(/ /g, "|")].join(".");
+}
+
+jQuery.extend({
+	isReady: false,
+	readyList: [],
+	ready: function() {
+		if ( !jQuery.isReady ) {
+			jQuery.isReady = true;
+
+			if ( jQuery.readyList ) {
+				jQuery.each( jQuery.readyList, function(){
+					this.call( document, jQuery );
+				});
+
+				jQuery.readyList = null;
+			}
+
+			jQuery(document).triggerHandler("ready");
+		}
+	}
+});
+
+var readyBound = false;
+
+function bindReady(){
+	if ( readyBound ) return;
+	readyBound = true;

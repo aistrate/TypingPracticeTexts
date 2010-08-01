@@ -1,0 +1,53 @@
+			var projection = new SqlFunctionProjection(arithmaticOperation, types[0], joinedProjections.ToArray());
+			_projections.Add(projection);
+		}
+
+		#endregion
+
+		protected override Expression VisitUnary(UnaryExpression expr)
+		{
+			if (expr.NodeType == ExpressionType.Convert)
+			{
+				var visitor = new SelectArgumentsVisitor(_rootCriteria, _session);
+				visitor.Visit(expr.Operand);
+
+				ProjectionList list = NHProjections.ProjectionList();
+				foreach (IProjection proj in visitor._projections)
+					list.Add(proj);
+
+				var projection = new CastProjection(NHibernateUtil.GuessType(expr.Type), list);
+				_projections.Add(projection);
+			}
+
+			return expr;
+		}
+
+		protected override Expression VisitEntity(EntityExpression expr)
+		{
+			if (_rootCriteria.GetCriteriaByAlias(expr.Alias) != null)
+			{
+				_transformer = new LinqJoinResultsTransformer(expr.Type);
+			}
+
+			return expr;
+		}
+
+		protected override Expression VisitMemberAccess(MemberExpression expr)
+		{
+			IProjection projection = _rootCriteria.GetProjection();
+			if (projection != null && projection.IsGrouped)
+			{
+				_projections.Add(NHProjections.Alias(projection, expr.Member.Name));
+			}
+
+			return expr;
+		}
+
+		protected override Expression VisitPropertyAccess(PropertyAccessExpression expr)
+		{
+			string memberName = MemberNameVisitor.GetMemberName(_rootCriteria, expr);
+			_projections.Add(NHProjections.Property(memberName));
+			return expr;
+		}
+	}
+}

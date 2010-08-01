@@ -1,0 +1,33 @@
+1. Regular expression search (C-M-s):
+^[A-Z][^:
+]+?:$
+
+2. Eval (C-:):
+(setq last-kbd-macro [?\C-\M-s ?\C-\M-s ?\C-a return ?\C-e ?\C-d ?\C-n ?\C-a])
+
+3. Execute macro (C-x e)
+
+
+
+
+
+
+
+C-a
+RET
+C-e
+C-d
+C-n
+C-a
+
+
+(setq last-kbd-macro [?\C-\M-s ?\C-\M-s ?\C-a return ?\C-e ?\C-d ?\C-n ?\C-a])
+
+OR:
+
+(fset 'mv-line [?\C-\M-s ?\C-\M-s ?\C-a return ?\C-e ?\C-d ?\C-n ?\C-a])
+
+
+
+;; [A-Z][a-z\-/ ]+:
+;; ^[A-Z][^:]+?:$

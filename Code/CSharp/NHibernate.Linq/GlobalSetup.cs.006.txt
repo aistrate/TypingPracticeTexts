@@ -1,0 +1,45 @@
+			animals[5].Mother = animals[4];
+
+			animals[1].Children = new[] { animals[5] }.ToList();
+
+			using (ISession session = CreateSession())
+			{
+				session.Delete("from Role");
+				session.Delete("from User");
+				session.Delete("from Timesheet");
+				session.Delete("from Animal");
+				session.Delete("from Physician");
+				session.Delete("from Patient");
+				session.Flush();
+
+				foreach (Role role in roles)
+					session.Save(role);
+
+				foreach (User user in users)
+					session.Save(user);
+
+				foreach (Timesheet timesheet in timesheets)
+					session.Save(timesheet);
+
+				foreach (Animal animal in animals)
+					session.Save(animal);
+
+				CreatePatientData(session);
+
+				session.Flush();
+			}
+		}
+
+		#endregion
+
+		public static ISession CreateSession()
+		{
+			return factory.OpenSession();
+		}
+
+		public static ISession CreateSession(IDbConnection con)
+		{
+			return factory.OpenSession(con);
+		}
+	}
+}

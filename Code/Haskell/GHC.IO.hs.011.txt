@@ -1,0 +1,50 @@
+                         is_stream
+#endif
+                                   ptr bytes0 = loop 0 bytes0
+ where
+  loop :: Int -> Int -> IO Int
+  loop off bytes | bytes <= 0 = return off
+  loop off bytes = do
+#ifndef mingw32_HOST_OS
+    ssize <- c_write fd (ptr `plusPtr` off) (fromIntegral bytes)
+    let r = fromIntegral ssize :: Int
+    if (r == -1)
+      then do errno <- getErrno
+              if (errno == eAGAIN || errno == eWOULDBLOCK)
+                 then return off
+                 else throwErrno "writeChunk"
+      else loop (off + r) (bytes - r)
+#else
+    (ssize, rc) <- asyncWrite (fromIntegral fd)
+                              (fromIntegral $ fromEnum is_stream)
+                                 (fromIntegral bytes)
+                                 (ptr `plusPtr` off)
+    let r = fromIntegral ssize :: Int
+    if r == (-1)
+      then ioError (errnoToIOError "hPutBufNonBlocking" (Errno (fromIntegral rc)) Nothing Nothing)
+      else loop (off + r) (bytes - r)
+#endif
+
+hGetBuf :: Handle -> Ptr a -> Int -> IO Int
+hGetBuf h ptr count
+  | count == 0 = return 0
+  | count <  0 = illegalBufferSize h "hGetBuf" count
+  | otherwise = 
+      wantReadableHandle "hGetBuf" h $ 
+        \ Handle__{ haFD=fd, haBuffer=ref, haIsStream=is_stream } -> do
+            bufRead fd ref is_stream ptr 0 count
+
+bufRead :: FD -> IORef Buffer -> Bool -> Ptr a -> Int -> Int -> IO Int
+bufRead fd ref is_stream ptr so_far count =
+  seq fd $ seq so_far $ seq count $ do
+  buf@Buffer{ bufBuf=raw, bufWPtr=w, bufRPtr=r, bufSize=sz } <- readIORef ref
+  if bufferEmpty buf
+     then if count > sz
+                then do rest <- readChunk fd is_stream ptr count
+                        return (so_far + rest)
+                else do mb_buf <- maybeFillReadBuffer fd True is_stream buf
+                        case mb_buf of
+                          Nothing -> return so_far
+                          Just buf' -> do
+                                writeIORef ref buf'
+                                bufRead fd ref is_stream ptr so_far count

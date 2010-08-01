@@ -1,0 +1,30 @@
+                $("#ns_1RVCMGP6WPZF34Z5GVPD_12239_-shoveler-div").s9shoveler( 20 );
+                })(jQuery);
+                });
+                }
+              </script>
+              <div id="ns_1RVCMGP6WPZF34Z5GVPD_12239_-shoveler-div" class="s9-shoveler">
+                <div class="shoveler-header">
+                  <div class="shoveler-title">
+                    <h2 style="padding-right: 6.5em;">Summer Reading in Mystery &amp; Thrillers</h2>
+                  </div>
+                  <div class="shoveler-pagination" style="display: none;">
+                    <span>
+                      Page <span class="page-number">???</span> of <span class="num-pages">???</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="shoveler-main">
+                  <div class="shoveler-content">
+                    <a title="Back" href="#" class="prev-button button"></a>
+                    <div style="clear: both; width: 410px; height: 1px; margin: 0; padding: 0; overflow: hidden;"></div>
+                    <ul class="optional-disabled shoveler-images">
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative">
+                          <a href="/gp/product/0399156496/ref=s9_al_bw_i0?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Storm Prey">
+                            <div style="margin-bottom: 4px; ">
+                              <img src="http://ecx.images-amazon.com/images/I/51BD-Fm4daL._SL120_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12239_Image0" class="productImage" />
+                            </div>Storm Prey
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>

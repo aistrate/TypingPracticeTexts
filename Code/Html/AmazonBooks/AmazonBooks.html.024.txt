@@ -1,0 +1,30 @@
+                    <a class="navSaChildItem" href="/MP3-Music-Download/b/ref=sa_menu_dmusic2?ie=UTF8&node=163856011">MP3 Downloads</a>
+                  </li>
+                  <li class="navSaChildItem">
+                    <div class="navSprite navSaChildOrangeArrow"></div>
+                    <a class="navSaChildItem" href="/Game-Downloads/b/ref=sa_menu_gdown2?ie=UTF8&node=979455011">Game Downloads</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li id="navSaMenuItem_3" class="navSaMenuItem navSaMenuItemMiddle">
+              <a class="navSaMenuItem">Kindle</a>
+              <div class="navSaChild">
+                <ul id="navSaChild_3" class="navbar navSaChild">
+                  <li class="navSaChildItem">
+                    <div class="navSprite navSaChildOrangeArrow"></div>
+                    <a class="navSaChildItem" href="/Kindle-Wireless-Reading-Display-Generation/dp/B0015T963C/ref=sa_menu_kdp2i3">Kindle</a>
+                    <div class="navSaTagLine tiny">Amazon's 6&quot; wireless reading device</div>
+                  </li>
+                  <li class="navSaChildItem">
+                    <div class="navSprite navSaChildOrangeArrow"></div>
+                    <a class="navSaChildItem" href="/Kindle-Wireless-Reading-Display-Generation/dp/B0015TG12Q/ref=sa_menu_kdxi3">Kindle DX</a>
+                    <div class="navSaTagLine tiny">Amazon's 9.7&quot; wireless reading device</div>
+                  </li>
+                  <li class="navSaChildItem">
+                    <div class="navSprite navSaChildOrangeArrow"></div>
+                    <a class="navSaChildItem" href="/gp/feature.html/ref=sa_menu_karl3?ie=UTF8&docId=1000493771">Free Kindle Apps</a>
+                    <div class="navSaTagLine tiny">For PC, Mac, iPhone, iPad and more</div>
+                  </li>
+                  <li class="navSaChildItem">
+                    <div class="navSprite navSaChildOrangeArrow"></div>

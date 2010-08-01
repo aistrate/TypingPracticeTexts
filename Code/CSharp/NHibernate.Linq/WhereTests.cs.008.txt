@@ -1,0 +1,49 @@
+		}
+
+		[Test]
+		public void UsersWithListNotContains()
+		{
+			var names = new List<string>() { "ayende", "rahien" };
+
+			var query = (from user in session.Linq<User>()
+						 where !names.Contains(user.Name)
+						 select user).ToList();
+
+			Assert.AreEqual(1, query.Count);
+		}
+
+		[Test]
+		public void TimesheetsWithCollectionNotContains()
+		{
+			TimesheetEntry entry = session.Get<TimesheetEntry>(1);
+
+			var query = (from sheet in session.Linq<Timesheet>()
+						 where !sheet.Entries.Contains(entry)
+						 select sheet).ToList();
+
+			Assert.AreEqual(2, query.Count);
+		}
+
+		[Test]
+		public void TimesheetsWithEnumerableContains()
+		{
+			User user = session.Get<User>(1);
+
+			var query = (from sheet in session.Linq<Timesheet>()
+						 where sheet.Users.Contains(user)
+						 select sheet).ToList();
+
+			Assert.AreEqual(2, query.Count);
+		}
+
+		[Test]
+		public void WhereWithConstantFalse()
+		{
+			User user = session.Get<User>(1);
+
+			var query = (from sheet in session.Linq<Timesheet>()
+						 where false
+						 select sheet).ToList();
+
+			Assert.AreEqual(0, query.Count);
+		}

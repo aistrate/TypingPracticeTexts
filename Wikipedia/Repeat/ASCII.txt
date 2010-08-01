@@ -1,0 +1,9 @@
+ASCII
+
+The American Standard Code for Information Interchange (acronym: ASCII; pronounced ASS-kee) is a character-encoding scheme based on the ordering of the English alphabet. ASCII codes represent text in computers, communications equipment, and other devices that use text. Most modern character-encoding schemes, which support many more characters than did the original, are based on ASCII.
+
+US-ASCII is the IANA preferred charset name for ASCII.
+
+Historically, ASCII developed from telegraphic codes. Its first commercial use was as a seven-bit teleprinter code promoted by Bell data services. Work on ASCII formally began October 6, 1960, with the first meeting of the American Standards Association's (ASA) X3.2 subcommittee. The first edition of the standard was published during 1963, a major revision during 1967, and the most recent update during 1986. Compared to earlier telegraph codes, the proposed Bell code and ASCII were both ordered for more convenient sorting (i.e., alphabetization) of lists, and added features for devices other than teleprinters.
+
+ASCII includes definitions for 128 characters: 33 are non-printing control characters (now mostly obsolete) that affect how text and space is processed; 94 are printable characters, and the space is considered an invisible graphic. The most commonly used character encoding on the World Wide Web was US-ASCII until 2008, when it was surpassed by UTF-8.

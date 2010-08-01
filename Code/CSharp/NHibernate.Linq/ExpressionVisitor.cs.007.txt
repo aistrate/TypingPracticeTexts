@@ -1,0 +1,49 @@
+			return original;
+		}
+
+		protected virtual Expression VisitLambda(LambdaExpression lambda)
+		{
+			Expression body = Visit(lambda.Body);
+			if (body != lambda.Body)
+			{
+				return Expression.Lambda(lambda.Type, body, lambda.Parameters);
+			}
+			return lambda;
+		}
+
+		protected virtual NewExpression VisitNew(NewExpression nex)
+		{
+			IEnumerable<Expression> args = VisitList(nex.Arguments);
+			if (args != nex.Arguments)
+			{
+				if (nex.Members != null)
+					return Expression.New(nex.Constructor, args, nex.Members);
+				else
+					return Expression.New(nex.Constructor, args);
+			}
+
+			return nex;
+		}
+
+		protected virtual Expression VisitMemberInit(MemberInitExpression init)
+		{
+			NewExpression n = VisitNew(init.NewExpression);
+			IEnumerable<MemberBinding> bindings = VisitBindingList(init.Bindings);
+
+			if (n != init.NewExpression || bindings != init.Bindings)
+			{
+				return Expression.MemberInit(n, bindings);
+			}
+
+			return init;
+		}
+
+		protected virtual Expression VisitListInit(ListInitExpression init)
+		{
+			NewExpression n = VisitNew(init.NewExpression);
+			IEnumerable<ElementInit> initializers = VisitElementInitializerList(init.Initializers);
+
+			if (n != init.NewExpression || initializers != init.Initializers)
+			{
+				return Expression.ListInit(n, initializers);
+			}

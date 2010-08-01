@@ -1,0 +1,50 @@
+				string typeName = "DynamicClass" + (classCount + 1);
+#if ENABLE_LINQ_PARTIAL_TRUST
+                new ReflectionPermission(PermissionState.Unrestricted).Assert();
+#endif
+				try
+				{
+					TypeBuilder tb = this.module.DefineType(typeName, TypeAttributes.Class |
+						TypeAttributes.Public, typeof(DynamicClass));
+					FieldInfo[] fields = GenerateProperties(tb, properties);
+					GenerateEquals(tb, fields);
+					GenerateGetHashCode(tb, fields);
+					Type result = tb.CreateType();
+					classCount++;
+					return result;
+				}
+				finally
+				{
+#if ENABLE_LINQ_PARTIAL_TRUST
+                    PermissionSet.RevertAssert();
+#endif
+				}
+			}
+			finally
+			{
+				rwLock.DowngradeFromWriterLock(ref cookie);
+			}
+		}
+
+		FieldInfo[] GenerateProperties(TypeBuilder tb, DynamicProperty[] properties)
+		{
+			FieldInfo[] fields = new FieldBuilder[properties.Length];
+			for (int i = 0; i < properties.Length; i++)
+			{
+				DynamicProperty dp = properties[i];
+				FieldBuilder fb = tb.DefineField("_" + dp.Name, dp.Type, FieldAttributes.Private);
+				PropertyBuilder pb = tb.DefineProperty(dp.Name, PropertyAttributes.HasDefault, dp.Type, null);
+				MethodBuilder mbGet = tb.DefineMethod("get_" + dp.Name,
+					MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+					dp.Type, Type.EmptyTypes);
+				ILGenerator genGet = mbGet.GetILGenerator();
+				genGet.Emit(OpCodes.Ldarg_0);
+				genGet.Emit(OpCodes.Ldfld, fb);
+				genGet.Emit(OpCodes.Ret);
+				MethodBuilder mbSet = tb.DefineMethod("set_" + dp.Name,
+					MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+					null, new Type[] { dp.Type });
+				ILGenerator genSet = mbSet.GetILGenerator();
+				genSet.Emit(OpCodes.Ldarg_0);
+				genSet.Emit(OpCodes.Ldarg_1);
+				genSet.Emit(OpCodes.Stfld, fb);

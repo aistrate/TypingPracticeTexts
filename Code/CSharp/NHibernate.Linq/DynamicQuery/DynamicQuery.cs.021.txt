@@ -1,0 +1,50 @@
+				if (!UInt64.TryParse(text, out value))
+					throw ParseError(Res.InvalidIntegerLiteral, text);
+				NextToken();
+				if (value <= (ulong)Int32.MaxValue) return CreateLiteral((int)value, text);
+				if (value <= (ulong)UInt32.MaxValue) return CreateLiteral((uint)value, text);
+				if (value <= (ulong)Int64.MaxValue) return CreateLiteral((long)value, text);
+				return CreateLiteral(value, text);
+			}
+			else
+			{
+				long value;
+				if (!Int64.TryParse(text, out value))
+					throw ParseError(Res.InvalidIntegerLiteral, text);
+				NextToken();
+				if (value >= Int32.MinValue && value <= Int32.MaxValue)
+					return CreateLiteral((int)value, text);
+				return CreateLiteral(value, text);
+			}
+		}
+
+		Expression ParseRealLiteral()
+		{
+			ValidateToken(TokenId.RealLiteral);
+			string text = token.text;
+			object value = null;
+			char last = text[text.Length - 1];
+			if (last == 'F' || last == 'f')
+			{
+				float f;
+				if (Single.TryParse(text.Substring(0, text.Length - 1), out f)) value = f;
+			}
+			else
+			{
+				double d;
+				if (Double.TryParse(text, out d)) value = d;
+			}
+			if (value == null) throw ParseError(Res.InvalidRealLiteral, text);
+			NextToken();
+			return CreateLiteral(value, text);
+		}
+
+		Expression CreateLiteral(object value, string text)
+		{
+			ConstantExpression expr = Expression.Constant(value);
+			literals.Add(expr, text);
+			return expr;
+		}
+
+		Expression ParseParenExpression()
+		{

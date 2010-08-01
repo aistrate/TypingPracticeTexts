@@ -1,0 +1,49 @@
+            }
+        }
+
+        public static int[] GetHighestValueInstrumentIds(int accountId, int count)
+        {
+            using (IDalSession session = NHSessionFactory.CreateSession())
+            {
+                return (from p in getOwnedFundPositions(session, accountId)
+                        orderby p.CurrentBaseValue.Quantity descending
+                        select p)
+                       .Take(count)
+                       .Select(p => p.InstrumentOfPosition.Key)
+                       .ToArray();
+            }
+        }
+
+        public static List<SeriesInfo> GetPositionSeriesInfoList(int accountId)
+        {
+            using (IDalSession session = NHSessionFactory.CreateSession())
+            {
+                return getOwnedFundPositions(session, accountId)
+                            .ConvertAll(p => new SeriesInfo(p.InstrumentOfPosition.Key, p.InstrumentOfPosition.DisplayName, 
+                                                            DateTime.Today, DateTime.Today));
+            }
+        }
+
+        public static void RetrieveStartEndDates(List<SeriesInfo> positionSeriesInfos, int accountId)
+        {
+            using (IDalSession session = NHSessionFactory.CreateSession())
+            {
+                if (positionSeriesInfos.Count() > 0)
+                {
+                    List<IFundPosition> relatedPositions = SecurityLayerAdapter.GetOwnedFundPositionsByParentInstrument(session, 
+                                                                  accountId, positionSeriesInfos.Select(ps => ps.Key).ToArray(), PositionsView.All);
+
+                    foreach (SeriesInfo positionSeriesInfo in positionSeriesInfos)
+                    {
+                        var currentInstrRelatedPositions = relatedPositions.Where(p =>
+                                p.Size.Underlying.TopParentInstrument.Key == positionSeriesInfo.Key);
+
+                        if (currentInstrRelatedPositions.Count() > 0)
+                        {
+                            positionSeriesInfo.StartDate = currentInstrRelatedPositions.Min(p => p.OpenDate.Date);
+                            positionSeriesInfo.EndDate = currentInstrRelatedPositions.Max(p => p.LastValuation != null ? p.LastValuation.Date.Date : DateTime.Today);
+                        }
+                    }
+                }
+            }
+        }

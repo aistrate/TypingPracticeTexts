@@ -1,0 +1,50 @@
+					NextChar();
+					if (ch == '|')
+					{
+						NextChar();
+						t = TokenId.DoubleBar;
+					}
+					else
+					{
+						t = TokenId.Bar;
+					}
+					break;
+				case '"':
+				case '\'':
+					char quote = ch;
+					do
+					{
+						NextChar();
+						while (textPos < textLen && ch != quote) NextChar();
+						if (textPos == textLen)
+							throw ParseError(textPos, Res.UnterminatedStringLiteral);
+						NextChar();
+					} while (ch == quote);
+					t = TokenId.StringLiteral;
+					break;
+				default:
+					if (Char.IsLetter(ch) || ch == '@' || ch == '_')
+					{
+						do
+						{
+							NextChar();
+						} while (Char.IsLetterOrDigit(ch) || ch == '_');
+						t = TokenId.Identifier;
+						break;
+					}
+					if (Char.IsDigit(ch))
+					{
+						t = TokenId.IntegerLiteral;
+						do
+						{
+							NextChar();
+						} while (Char.IsDigit(ch));
+						if (ch == '.')
+						{
+							t = TokenId.RealLiteral;
+							NextChar();
+							ValidateDigit();
+							do
+							{
+								NextChar();
+							} while (Char.IsDigit(ch));

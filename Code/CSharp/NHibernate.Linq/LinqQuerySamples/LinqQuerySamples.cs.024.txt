@@ -1,0 +1,50 @@
+					 "any Discontinued products.")]
+		public void DLinq53d()
+		{
+			var q =
+				from c in db.Categories
+				where !c.Products.Cast<Product>().Any(p => !p.Discontinued)
+				select c;
+
+			ObjectDumper.Write(q);
+
+			foreach (Category c in q)
+				Assert.IsTrue(!c.Products.Cast<Product>().Any(p => !p.Discontinued));
+		}
+
+		[Category("EXISTS/IN/ANY/ALL")]
+		[Test(Description = "This sample uses All to return Customers whom all of their orders " +
+					 "have been shipped to their own city or whom have no orders.")]
+		[Ignore("TODO")]
+		public void DLinq54()
+		{
+			var q =
+				from c in db.Customers
+				where c.Orders.Cast<Order>().All(o => o.ShipCity == c.City)
+				select c;
+
+			ObjectDumper.Write(q);
+
+			foreach (Customer c in q)
+				Assert.IsTrue(c.Orders.Cast<Order>().All(o => o.ShipCity == c.City));
+		}
+
+		#endregion Exists/In/Any/All Methods
+
+		#region Union Methods
+
+		[Category("UNION ALL/UNION/INTERSECT")]
+		[Test(Description = "This sample uses Concat to return a sequence of all Customer and Employee " +
+					 "phone/fax numbers.")]
+		[Ignore("TODO")]
+		public void DLinq55()
+		{
+			var q = (
+						from c in db.Customers
+						select c.Phone
+					).Concat(
+				from c in db.Customers
+				select c.Fax
+				).Concat(
+				from e in db.Employees
+				select e.HomePhone

@@ -1,0 +1,49 @@
+hPutBuf':: Handle
+        -> Ptr a
+        -> Int
+        -> Bool
+        -> IO Int
+hPutBuf' handle ptr count can_block
+  | count == 0 = return 0
+  | count <  0 = illegalBufferSize handle "hPutBuf" count
+  | otherwise = 
+    wantWritableHandle "hPutBuf" handle $ 
+      \ Handle__{ haFD=fd, haBuffer=ref, haIsStream=is_stream } -> 
+          bufWrite fd ref is_stream ptr count can_block
+
+bufWrite :: FD -> IORef Buffer -> Bool -> Ptr a -> Int -> Bool -> IO Int
+bufWrite fd ref is_stream ptr count can_block =
+  seq count $ seq fd $ do
+  old_buf@Buffer{ bufBuf=old_raw, bufWPtr=w, bufSize=size }
+     <- readIORef ref
+
+  if (size - w > count)
+        then do memcpy_baoff_ptr old_raw (fromIntegral w) ptr (fromIntegral count)
+                writeIORef ref old_buf{ bufWPtr = w + count }
+                return count
+
+        else do flushed_buf <- flushWriteBuffer fd is_stream old_buf
+                writeIORef ref flushed_buf
+                if count < size
+                   then bufWrite fd ref is_stream ptr count can_block
+                   else if can_block
+                           then do writeChunk fd is_stream (castPtr ptr) count
+                                   return count
+                           else writeChunkNonBlocking fd is_stream ptr count
+
+writeChunk :: FD -> Bool -> Ptr CChar -> Int -> IO ()
+writeChunk fd is_stream ptr bytes0 = loop 0 bytes0
+ where
+  loop :: Int -> Int -> IO ()
+  loop _   bytes | bytes <= 0 = return ()
+  loop off bytes = do
+    r <- fromIntegral `liftM`
+           writeRawBufferPtr "writeChunk" fd is_stream ptr
+                             off (fromIntegral bytes)
+    loop (off + r) (bytes - r)
+
+writeChunkNonBlocking :: FD -> Bool -> Ptr a -> Int -> IO Int
+writeChunkNonBlocking fd
+#ifndef mingw32_HOST_OS
+                         _
+#else

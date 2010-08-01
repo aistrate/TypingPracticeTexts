@@ -1,0 +1,9 @@
+Molecule
+
+A molecule is defined as an electrically neutral group of at least two atoms in a definite arrangement held together by very strong (covalent) chemical bonds. Molecules are distinguished from polyatomic ions in this strict sense. In organic chemistry and biochemistry, the term molecule is used less strictly and also is applied to charged organic molecules and biomolecules.
+
+In the kinetic theory of gases, the term molecule is often used for any gaseous particle regardless of its composition. According to this definition noble gas atoms are considered molecules despite the fact that they are composed of a single non-bonded atom.
+
+A molecule may consist of atoms of a single chemical element, as with oxygen (O2), or of different elements, as with water (H2O). Atoms and complexes connected by non-covalent bonds such as hydrogen bonds or ionic bonds are generally not considered single molecules.
+
+No typical molecule can be defined for ionic crystals (salts) and covalent crystals (network solids), although these are often composed of repeating unit cells that extend either in a plane (such as in graphene) or three-dimensionally (such as in diamond or sodium chloride). The theme of repeated unit-cellular-structure also holds for most condensed phases with metallic bonding. In glasses (solids that exist in a vitreous disordered state), atoms may also be held together by chemical bonds without any definable molecule, but also without any of the regularity of repeating units that characterises crystals.

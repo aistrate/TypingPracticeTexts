@@ -1,0 +1,29 @@
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Between-Katie-Parker-Production-ebook/dp/B001QTXF2O/ref=pd_ts_zgc_kinc_digital-text-f_9_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="In Between: A Katie Parker Production (Act I)">
+                              <img src="http://ecx.images-amazon.com/images/I/51z1LczD%2BhL._SL75_.jpg" alt="In Between" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "noDil">
+                              <span class="rank">9.</span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText"></span>
+                            </div>
+                            <a href="http://www.amazon.com/Between-Katie-Parker-Production-ebook/dp/B001QTXF2O/ref=pd_ts_zgc_kinc_digital-text-f_9?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="In Between: A Katie Parker Production (Act I)" class="titleLink">In Between: A Katie Parker Production (Act I)</a>
+                            <div class="tiny byline">
+                              <span class="carat"></span>Jenny B. Jones (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock ">
+                              <span class="listprice"></span>
+                              <strong class="price">Free</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>

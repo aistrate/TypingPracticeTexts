@@ -1,0 +1,7 @@
+Brownian motion
+
+Brownian motion (named after the Scottish botanist Robert Brown) or pedesis is the seemingly random movement of particles suspended in a fluid (i.e. a liquid such as water or air) or the mathematical model used to describe such random movements, often called a particle theory.
+
+The mathematical model of Brownian motion has several real-world applications. An often quoted example is stock market fluctuations. However, movements in share prices may arise due to unforeseen events which do not repeat themselves, and physical and economic phenomena are not comparable.
+
+Brownian motion is among the simplest of the continuous-time stochastic (or random) processes, and it is a limit of both simpler and more complicated stochastic processes. This universality is closely related to the universality of the normal distribution. In both cases, it is often mathematical convenience rather than the accuracy of the models that motivates their use.

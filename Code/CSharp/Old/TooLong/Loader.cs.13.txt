@@ -1,0 +1,100 @@
+				result = DoQueryAndInitializeNonLazyCollections(
+					session,
+					new QueryParameters(types, ids, optionalObject, optionalEntityName == null ? null : optionalEntityName, optionalId),
+					false
+					);
+			}
+			catch (HibernateException)
+			{
+				throw;
+			}
+			catch (Exception sqle)
+			{
+				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle,
+				                                 "could not load an entity batch: "
+				                                 + MessageHelper.InfoString(persister, ids, Factory), SqlString);
+			}
+
+			log.Debug("done entity batch load");
+			return result;
+		}
+
+		public void LoadCollection(
+			ISessionImplementor session,
+			object id,
+			IType type)
+		{
+			if (log.IsDebugEnabled)
+			{
+				log.Debug(
+					"loading collection: " +
+					MessageHelper.InfoString(CollectionPersisters[0], id)
+					);
+			}
+
+			object[] ids = new object[] {id};
+			try
+			{
+				DoQueryAndInitializeNonLazyCollections(
+					session,
+					new QueryParameters(new IType[] {type}, ids, ids),
+					true
+					);
+			}
+			catch (HibernateException)
+			{
+				throw;
+			}
+			catch (Exception sqle)
+			{
+				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle,
+				                                 "could not initialize a collection: "
+				                                 + MessageHelper.InfoString(CollectionPersisters[0], id), SqlString);
+			}
+
+			log.Debug("done loading collection");
+		}
+
+		public void LoadCollectionBatch(
+			ISessionImplementor session,
+			object[] ids,
+			IType type)
+		{
+			if (log.IsDebugEnabled)
+			{
+				log.Debug(
+					"batch loading collection: " +
+					MessageHelper.InfoString(CollectionPersisters[0], ids)
+					);
+			}
+
+			IType[] idTypes = ArrayHelper.FillArray(type, ids.Length);
+			try
+			{
+				DoQueryAndInitializeNonLazyCollections(
+					session,
+					new QueryParameters(idTypes, ids, ids),
+					true
+					);
+			}
+			catch (HibernateException)
+			{
+				throw;
+			}
+			catch (Exception sqle)
+			{
+				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle,
+				                                 "could not initialize a collection batch: "
+				                                 + MessageHelper.InfoString(CollectionPersisters[0], ids), SqlString);
+			}
+
+			log.Debug("done batch load");
+		}
+
+		protected void LoadCollectionSubselect(
+			ISessionImplementor session,
+			object[] ids,
+			object[] parameterValues,
+			IType[] parameterTypes,
+			IDictionary namedParameters,
+			IType type)

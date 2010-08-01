@@ -1,0 +1,11 @@
+Algae
+
+Algae (singular alga, Latin for "seaweed") are a large and diverse group of simple, typically autotrophic organisms, ranging from unicellular to multicellular forms. The largest and most complex marine forms are called seaweeds. They are photosynthetic, like plants, and "simple" because they lack the many distinct organs found in land plants.
+
+Though the prokaryotic Cyanobacteria (commonly referred to as blue-green algae) were traditionally included as "algae" in older textbooks, many modern sources regard this as outdated as they are now considered to be closely related to bacteria. The term algae is now restricted to eukaryotic organisms. All true algae therefore have a nucleus enclosed within a membrane and chloroplasts bound in one or more membranes. Algae constitute a paraphyletic and polyphyletic group, as they do not include all the descendants of the last universal ancestor nor do they all descend from a common algal ancestor, although their chloroplasts seem to have a single origin.
+
+Algae lack the various structures that characterize land plants, such as phyllids (leaves) and rhizoids in nonvascular plants, or leaves, roots, and other organs that are found in tracheophytes (vascular plants). Many are photoautotrophic, although some groups contain members that are mixotrophic, deriving energy both from photosynthesis and uptake of organic carbon either by osmotrophy, myzotrophy, or phagotrophy. Some unicellular species rely entirely on external energy sources and have limited or no photosynthetic apparatus.
+
+Nearly all algae have photosynthetic machinery ultimately derived from the Cyanobacteria, and so produce oxygen as a by-product of photosynthesis, unlike other photosynthetic bacteria such as purple and green sulfur bacteria. Fossilized filamentous algae from the Vindhya basin have been dated back to 1.6 to 1.7 billion years ago.
+
+The first alga to have its genome sequenced was Cyanidioschyzon merolae.

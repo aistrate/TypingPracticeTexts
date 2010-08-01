@@ -1,0 +1,50 @@
+		[Category("EXISTS/IN/ANY/ALL")]
+		[Test(Description = "This sample uses Any to return only Categories that have " +
+					 "at least one Discontinued product.")]
+		public void DLinq53()
+		{
+			var q =
+				from c in db.Categories
+				where c.Products.Cast<Product>().Any(p => p.Discontinued)
+				select c;
+
+			ObjectDumper.Write(q);
+
+			foreach (Category c in q)
+				Assert.IsTrue(c.Products.Cast<Product>().Any(p => p.Discontinued));
+		}
+
+		[Category("EXISTS/IN/ANY/ALL")]
+		[Test(Description = "This sample uses Any to return only Categories that have " +
+					 "zero Discontinued products.")]
+		public void DLinq53b()
+		{
+			var q =
+				from c in db.Categories
+				where c.Products.Cast<Product>().Any(p => !p.Discontinued)
+				select c;
+
+			ObjectDumper.Write(q);
+
+			foreach (Category c in q)
+				Assert.IsTrue(c.Products.Cast<Product>().Any(p => !p.Discontinued));
+		}
+
+		[Category("EXISTS/IN/ANY/ALL")]
+		[Test(Description = "This sample uses Any to return only Categories that does not have " +
+					 "at least one Discontinued product.")]
+		public void DLinq53c()
+		{
+			var q =
+				from c in db.Categories
+				where !c.Products.Cast<Product>().Any(p => p.Discontinued)
+				select c;
+
+			ObjectDumper.Write(q);
+
+			foreach (Category c in q)
+				Assert.IsTrue(!c.Products.Cast<Product>().Any(p => p.Discontinued));
+		}
+
+		[Category("EXISTS/IN/ANY/ALL")]
+		[Test(Description = "This sample uses Any to return only Categories that does not have " +

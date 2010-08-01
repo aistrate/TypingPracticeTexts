@@ -1,0 +1,7 @@
+Turbojet
+
+Turbojets are the oldest kind of general-purpose jet engines. Two engineers, Frank Whittle in the United Kingdom and Hans von Ohain in Germany, developed the concept independently into practical engines during the late 1930s, although credit for the first turbojet is given to Whittle who was first to conceive, first to formally describe, first to patent and first to build a working engine. Von Ohain, in comparison, was first to get a turbojet into the air powering an aircraft.
+
+Turbojets consist of an air inlet, an air compressor, a combustion chamber, a gas turbine (that drives the air compressor) and a nozzle. The air is compressed into the chamber, heated and expanded by the fuel combustion and then allowed to expand out through the turbine into the nozzle where it is accelerated to high speed to provide propulsion.
+
+Turbojets are quite inefficient (if flown below about Mach 2) and very noisy. Most modern aircraft use turbofans instead for economic reasons. Turbojets are still very common in medium range cruise missiles, due to their high exhaust speed, low frontal area and relative simplicity.

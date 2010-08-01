@@ -1,0 +1,50 @@
+                                buf{ bufWPtr=0, bufRPtr=0 }
+             case maybe_buf of
+                Nothing -> do
+                     writeIORef ref buf{ bufRPtr=0, bufWPtr=0 }
+                     let str = concat (reverse (xs:xss))
+                     if not (null str)
+                        then return str
+                        else ioe_EOF
+                Just new_buf ->
+                     hGetLineBufferedLoop handle_ ref new_buf (xs:xss)
+
+maybeFillReadBuffer :: FD -> Bool -> Bool -> Buffer -> IO (Maybe Buffer)
+maybeFillReadBuffer fd is_line is_stream buf
+  = catch 
+     (do buf' <- fillReadBuffer fd is_line is_stream buf
+         return (Just buf')
+     )
+     (\e -> do if isEOFError e 
+                  then return Nothing 
+                  else ioError e)
+
+unpack :: RawBuffer -> Int -> Int -> IO [Char]
+unpack _   _      0        = return ""
+unpack buf (I# r) (I# len) = IO $ \s -> unpackRB [] (len -# 1#) s
+   where
+    unpackRB acc i s
+     | i <# r  = (# s, acc #)
+     | otherwise = 
+          case readCharArray# buf i s of
+          (# s', ch #) -> unpackRB (C# ch : acc) (i -# 1#) s'
+
+hGetLineUnBuffered :: Handle -> IO String
+hGetLineUnBuffered h = do
+  c <- hGetChar h
+  if c == '\n' then
+     return ""
+   else do
+    l <- getRest
+    return (c:l)
+ where
+  getRest = do
+    c <- 
+      catch 
+        (hGetChar h)
+        (\ err -> do
+          if isEOFError err then
+             return '\n'
+           else
+             ioError err)
+    if c == '\n' then

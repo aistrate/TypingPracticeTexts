@@ -1,0 +1,50 @@
+								g.Key,
+								MaxPrice = g.Max(p => p.UnitPrice)
+							};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses group by and Min " +
+					 "to find the minimum unit price for each CategoryID.")]
+		public void DLinq44()
+		{
+			var q =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								g.Key,
+								MinPrice = g.Min(p => p.UnitPrice)
+							};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses group by and Average " +
+					 "to find the average UnitPrice for each CategoryID.")]
+		public void DLinq45()
+		{
+			var q =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								g.Key,
+								AveragePrice = g.Average(p => p.UnitPrice)
+							};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses group by and Sum " +
+					 "to find the total UnitPrice for each CategoryID.")]
+		public void DLinq46()
+		{
+			var q =
+				from p in db.Products

@@ -1,0 +1,50 @@
+				);
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("UNION ALL/UNION/INTERSECT")]
+		[Test(Description = "This sample uses Concat to return a sequence of all Customer and Employee " +
+					 "name and phone number mappings.")]
+		[Ignore("TODO")]
+		public void DLinq56()
+		{
+			var q = (
+						from c in db.Customers
+						select new { Name = c.CompanyName, c.Phone }
+					).Concat(
+				from e in db.Employees
+				select new { Name = e.FirstName + " " + e.LastName, Phone = e.HomePhone }
+				);
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("UNION ALL/UNION/INTERSECT")]
+		[Test(Description = "This sample uses Union to return a sequence of all countries that either " +
+					 "Customers or Employees are in.")]
+		[Ignore("TODO")]
+		public void DLinq57()
+		{
+			var q = (
+						from c in db.Customers
+						select c.Country
+					).Union(
+				from e in db.Employees
+				select e.Country
+				);
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("UNION ALL/UNION/INTERSECT")]
+		[Test(Description = "This sample uses Intersect to return a sequence of all countries that both " +
+					 "Customers and Employees live in.")]
+		[Ignore("TODO")]
+		public void DLinq58()
+		{
+			var q = (
+						from c in db.Customers
+						select c.Country
+					).Intersect(
+				from e in db.Employees

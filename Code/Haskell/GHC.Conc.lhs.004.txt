@@ -1,0 +1,50 @@
+  action_plus = catchException action childHandler
+
+numCapabilities :: Int
+numCapabilities = unsafePerformIO $  do 
+                    n <- peek n_capabilities
+                    return (fromIntegral n)
+
+foreign import ccall "&n_capabilities" n_capabilities :: Ptr CInt
+
+childHandler :: SomeException -> IO ()
+childHandler err = catchException (real_handler err) childHandler
+
+real_handler :: SomeException -> IO ()
+real_handler se@(SomeException ex) =
+  case cast ex of
+  Just BlockedOnDeadMVar                -> return ()
+  _ -> case cast ex of
+       Just BlockedIndefinitely         -> return ()
+       _ -> case cast ex of
+            Just ThreadKilled           -> return ()
+            _ -> case cast ex of
+                 Just StackOverflow     -> reportStackOverflow
+                 _                      -> reportError se
+
+killThread :: ThreadId -> IO ()
+killThread tid = throwTo tid ThreadKilled
+
+throwTo :: Exception e => ThreadId -> e -> IO ()
+throwTo (ThreadId tid) ex = IO $ \ s ->
+   case (killThread# tid (toException ex) s) of s1 -> (# s1, () #)
+
+myThreadId :: IO ThreadId
+myThreadId = IO $ \s ->
+   case (myThreadId# s) of (# s1, tid #) -> (# s1, ThreadId tid #)
+
+yield :: IO ()
+yield = IO $ \s -> 
+   case (yield# s) of s1 -> (# s1, () #)
+
+labelThread :: ThreadId -> String -> IO ()
+labelThread (ThreadId t) str = IO $ \ s ->
+   let ps  = packCString# str
+       adr = byteArrayContents# ps in
+     case (labelThread# t adr s) of s1 -> (# s1, () #)
+
+{-# INLINE pseq  #-}
+pseq :: a -> b -> b
+pseq  x y = x `seq` lazy y
+
+{-# INLINE par  #-}

@@ -1,0 +1,99 @@
+    def keys(self):
+        
+        return [k for k, v in self._headers]
+
+    def values(self):
+        
+        return [v for k, v in self._headers]
+
+    def items(self):
+        
+        return self._headers[:]
+
+    def __repr__(self):
+        return "Headers(%s)" % `self._headers`
+
+    def __str__(self):
+        
+        return '\r\n'.join(["%s: %s" % kv for kv in self._headers]+['',''])
+
+    def setdefault(self,name,value):
+        
+        result = self.get(name)
+        if result is None:
+            self._headers.append((name,value))
+            return value
+        else:
+            return result
+
+    def add_header(self, _name, _value, **_params):
+        
+        parts = []
+        if _value is not None:
+            parts.append(_value)
+        for k, v in _params.items():
+            if v is None:
+                parts.append(k.replace('_', '-'))
+            else:
+                parts.append(_formatparam(k.replace('_', '-'), v))
+        self._headers.append((_name, "; ".join(parts)))
+
+def guess_scheme(environ):
+    
+    if environ.get("HTTPS") in ('yes','on','1'):
+        return 'https'
+    else:
+        return 'http'
+
+_hop_headers = {
+    'connection':1, 'keep-alive':1, 'proxy-authenticate':1,
+    'proxy-authorization':1, 'te':1, 'trailers':1, 'transfer-encoding':1,
+    'upgrade':1
+}
+
+def is_hop_by_hop(header_name):
+    
+    return header_name.lower() in _hop_headers
+
+class ServerHandler(object):
+    
+    wsgi_version = (1,0)
+    wsgi_multithread = True
+    wsgi_multiprocess = True
+    wsgi_run_once = False
+
+    origin_server = True
+    http_version  = "1.0"
+    server_software = software_version
+
+    os_environ = dict(os.environ.items())
+
+    wsgi_file_wrapper = FileWrapper
+    headers_class = Headers
+
+    traceback_limit = None
+    error_status = "500 INTERNAL SERVER ERROR"
+    error_headers = [('Content-Type','text/plain')]
+
+    status = result = None
+    headers_sent = False
+    headers = None
+    bytes_sent = 0
+
+    def __init__(self, stdin, stdout, stderr, environ, multithread=True,
+        multiprocess=False):
+        self.stdin = stdin
+        self.stdout = stdout
+        self.stderr = stderr
+        self.base_env = environ
+        self.wsgi_multithread = multithread
+        self.wsgi_multiprocess = multiprocess
+
+    def run(self, application):
+        
+        try:
+            self.setup_environ()
+            self.result = application(self.environ, self.start_response)
+            self.finish_response()
+        except:
+            try:

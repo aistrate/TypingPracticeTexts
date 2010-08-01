@@ -1,0 +1,49 @@
+    toUPrintf = UString . map toChar
+
+instance PrintfArg Int where
+    toUPrintf = uInteger
+
+instance PrintfArg Int8 where
+    toUPrintf = uInteger
+
+instance PrintfArg Int16 where
+    toUPrintf = uInteger
+
+instance PrintfArg Int32 where
+    toUPrintf = uInteger
+
+instance PrintfArg Int64 where
+    toUPrintf = uInteger
+
+#ifndef __NHC__
+instance PrintfArg Word where
+    toUPrintf = uInteger
+#endif
+
+instance PrintfArg Word8 where
+    toUPrintf = uInteger
+
+instance PrintfArg Word16 where
+    toUPrintf = uInteger
+
+instance PrintfArg Word32 where
+    toUPrintf = uInteger
+
+instance PrintfArg Word64 where
+    toUPrintf = uInteger
+
+instance PrintfArg Integer where
+    toUPrintf = UInteger 0
+
+instance PrintfArg Float where
+    toUPrintf = UFloat
+
+instance PrintfArg Double where
+    toUPrintf = UDouble
+
+uInteger :: (Integral a, Bounded a) => a -> UPrintf
+uInteger x = UInteger (toInteger $ minBound `asTypeOf` x) (toInteger x)
+
+class IsChar c where
+    toChar :: c -> Char
+    fromChar :: Char -> c

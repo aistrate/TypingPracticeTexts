@@ -1,0 +1,50 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude -#include "HsBase.h" #-}
+{-# OPTIONS_HADDOCK hide #-}
+
+#undef DEBUG_DUMP
+
+module GHC.IO ( 
+   hWaitForInput, hGetChar, hGetLine, hGetContents, hPutChar, hPutStr,
+   commitBuffer',
+   hGetcBuffered,
+   hGetBuf, hGetBufNonBlocking, hPutBuf, hPutBufNonBlocking, slurpFile,
+   memcpy_ba_baoff,
+   memcpy_ptr_baoff,
+   memcpy_baoff_ba,
+   memcpy_baoff_ptr,
+ ) where
+
+import Foreign
+import Foreign.C
+
+import System.IO.Error
+import Data.Maybe
+import Control.Monad
+#ifndef mingw32_HOST_OS
+import System.Posix.Internals
+#endif
+
+import GHC.Enum
+import GHC.Base
+import GHC.IOBase
+import GHC.Handle
+import GHC.Real
+import GHC.Num
+import GHC.Show
+import GHC.List
+
+#ifdef mingw32_HOST_OS
+import GHC.Conc
+#endif
+
+hWaitForInput :: Handle -> Int -> IO Bool
+hWaitForInput h msecs = do
+  wantReadableHandle "hWaitForInput" h $ \ handle_ -> do
+  let ref = haBuffer handle_
+  buf <- readIORef ref
+
+  if not (bufferEmpty buf)
+        then return True
+        else do
+
+  if msecs < 0 

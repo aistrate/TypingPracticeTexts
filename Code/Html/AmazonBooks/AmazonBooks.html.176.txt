@@ -1,0 +1,30 @@
+          height: 21em;
+          overflow: hidden;
+          }
+          .rhfWrapper .shoveler li p {
+          text-align: left;
+          }
+          .rhfWrapper .shoveler li p.reason-text {
+          margin-top: .3em;
+          }
+          .rhfWrapper .shoveler ul li.shoveler-progress {
+          background: no-repeat center 45px url('http://g-ecx.images-amazon.com/images/G/01/x-locale/personalization/shoveler/loading-indicator._V192185253_.gif');
+          }
+          .rhfWrapper .shoveler .product-image {
+          margin-bottom:.45em;
+          }
+          .rhfWrapper .shoveler .rating-price {
+          margin-top:.25em;
+          }
+          .rhfWrapper .shoveler .rating-price .price {
+          margin-left:.25em;
+          white-space:nowrap;
+          }
+          .rhfWrapper .shoveler .rating-stars {
+          font-size: 80%;
+          }
+          .rhfWrapper .shoveler .rating-stars a {
+          text-decoration:none;
+          }
+          .rhfWrapper .shoveler .rating-stars img {
+          padding-bottom:1px;

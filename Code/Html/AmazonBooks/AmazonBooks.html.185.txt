@@ -1,0 +1,30 @@
+                        <li>
+                          <a href="https://affiliate-program.amazon.com">Join Associates</a>
+                        </li>
+                        <li>
+                          <a href="/gp/seller-account/mm-summary-page.html?ie=UTF8&ld=AZFooterSelfPublish&topic=200260520">Self-publish with Us</a>
+                        </li>
+                        <li>
+                          <span class="navFooterRightArrowBullet">&rsaquo;</span>
+                          <a href="/gp/seller-account/mm-landing.html/ref=footer_seeall?ie=UTF8&ld=AZSOAviewallMakeM">See all</a>
+                        </li>
+                      </ul>
+                    </td>
+                    <td class="navFooterColSpacerInner"></td>
+                    <td class="navFooterLinkCol">
+                      <div class="navFooterColHead">Let Us Help You</div>
+                      <ul>
+                        <li>
+                          <a href="/gp/help/customer/display.html/ref=footer_shiprates?ie=UTF8&nodeId=468520">Shipping Rates & Policies</a>
+                        </li>
+                        <li>
+                          <a href="/gp/subs/primeclub/signup/main.html">Amazon Prime</a>
+                        </li>
+                        <li>
+                          <a href="/gp/help/customer/display.html/ref=hy_f_4?ie=UTF8&nodeId=901888">Returns</a>
+                        </li>
+                        <li>
+                          <a href="/gp/help/customer/display.html/ref=gw_m_b_he?ie=UTF8&nodeId=508510">Help</a>
+                        </li>
+                      </ul>
+                    </td>

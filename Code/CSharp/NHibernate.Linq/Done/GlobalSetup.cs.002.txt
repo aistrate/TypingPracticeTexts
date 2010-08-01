@@ -1,0 +1,50 @@
+			};
+			Physician drWatson = new Physician
+			{
+				Name = "Dr Watson"
+			};
+
+			PatientRecord bobBarkerRecord = new PatientRecord
+			{
+				Name = new PatientName
+				{
+					FirstName = "Bob",
+					LastName = "Barker"
+				},
+				Address = new Address
+				{
+					AddressLine1 = "123 Main St",
+					City = "New York",
+					State = newYork,
+					ZipCode = "10001"
+				},
+				BirthDate = new DateTime(1930, 1, 1),
+				Gender = Gender.Male
+			};
+
+			PatientRecord johnDoeRecord1 = new PatientRecord
+			{
+				Name = new PatientName
+				{
+					FirstName = "John",
+					LastName = "Doe"
+				},
+				Address = new Address
+				{
+					AddressLine1 = "123 Main St",
+					City = "Tampa",
+					State = florida,
+					ZipCode = "33602"
+				},
+				BirthDate = new DateTime(1969, 1, 1),
+				Gender = Gender.Male
+			};
+
+			PatientRecord johnDoeRecord2 = new PatientRecord
+			{
+				Name = new PatientName
+				{
+					FirstName = "John",
+					LastName = "Doe"
+				},
+				Address = new Address

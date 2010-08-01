@@ -1,0 +1,50 @@
+					source.Expression, Expression.Quote(keyLambda), Expression.Quote(elementLambda)));
+		}
+
+		public static bool Any(this IQueryable source)
+		{
+			if (source == null) throw new ArgumentNullException("source");
+			return (bool)source.Provider.Execute(
+				Expression.Call(
+					typeof(Queryable), "Any",
+					new Type[] { source.ElementType }, source.Expression));
+		}
+
+		public static int Count(this IQueryable source)
+		{
+			if (source == null) throw new ArgumentNullException("source");
+			return (int)source.Provider.Execute(
+				Expression.Call(
+					typeof(Queryable), "Count",
+					new Type[] { source.ElementType }, source.Expression));
+		}
+	}
+
+	public abstract class DynamicClass
+	{
+		public override string ToString()
+		{
+			PropertyInfo[] props = this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+			StringBuilder sb = new StringBuilder();
+			sb.Append("{");
+			for (int i = 0; i < props.Length; i++)
+			{
+				if (i > 0) sb.Append(", ");
+				sb.Append(props[i].Name);
+				sb.Append("=");
+				sb.Append(props[i].GetValue(this, null));
+			}
+			sb.Append("}");
+			return sb.ToString();
+		}
+	}
+
+	public class DynamicProperty
+	{
+		string name;
+		Type type;
+
+		public DynamicProperty(string name, Type type)
+		{
+			if (name == null) throw new ArgumentNullException("name");
+			if (type == null) throw new ArgumentNullException("type");

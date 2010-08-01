@@ -1,0 +1,50 @@
+intersectBy             :: (a -> a -> Bool) -> [a] -> [a] -> [a]
+intersectBy eq xs ys    =  [x | x <- xs, any (eq x) ys]
+
+intersperse             :: a -> [a] -> [a]
+intersperse _   []      = []
+intersperse _   [x]     = [x]
+intersperse sep (x:xs)  = x : sep : intersperse sep xs
+
+intercalate :: [a] -> [[a]] -> [a]
+intercalate xs xss = concat (intersperse xs xss)
+
+transpose               :: [[a]] -> [[a]]
+transpose []             = []
+transpose ([]   : xss)   = transpose xss
+transpose ((x:xs) : xss) = (x : [h | (h:_) <- xss]) : transpose (xs : [ t | (_:t) <- xss])
+
+partition               :: (a -> Bool) -> [a] -> ([a],[a])
+{-# INLINE partition #-}
+partition p xs = foldr (select p) ([],[]) xs
+
+select :: (a -> Bool) -> a -> ([a], [a]) -> ([a], [a])
+select p x ~(ts,fs) | p x       = (x:ts,fs)
+                    | otherwise = (ts, x:fs)
+
+mapAccumL :: (acc -> x -> (acc, y))
+          -> acc
+          -> [x]
+          -> (acc, [y])
+mapAccumL _ s []        =  (s, [])
+mapAccumL f s (x:xs)    =  (s'',y:ys)
+                           where (s', y ) = f s x
+                                 (s'',ys) = mapAccumL f s' xs
+
+mapAccumR :: (acc -> x -> (acc, y))
+            -> acc
+            -> [x]
+            -> (acc, [y])
+mapAccumR _ s []        =  (s, [])
+mapAccumR f s (x:xs)    =  (s'', y:ys)
+                           where (s'',y ) = f s' x
+                                 (s', ys) = mapAccumR f s xs
+
+insert :: Ord a => a -> [a] -> [a]
+insert e ls = insertBy (compare) e ls
+
+insertBy :: (a -> a -> Ordering) -> a -> [a] -> [a]
+insertBy _   x [] = [x]
+insertBy cmp x ys@(y:ys')
+ = case cmp x y of
+     GT -> y : insertBy cmp x ys'

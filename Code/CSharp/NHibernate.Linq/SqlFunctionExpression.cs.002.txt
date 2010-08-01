@@ -1,0 +1,50 @@
+		public int PropertyPosition { get; private set; }
+
+		protected virtual string Op
+		{
+			get
+			{
+				if (String.IsNullOrEmpty(op))
+				{
+					op = InnerCriterion.GetType().GetProperty("Op", BindingFlags.NonPublic | BindingFlags.Instance)
+							.GetValue(InnerCriterion, null) as String;
+				}
+
+				return op;
+			}
+		}
+
+		#region ICriterion Members
+
+		public virtual TypedValue[] GetTypedValues(ICriteria criteria, ICriteriaQuery criteriaQuery)
+		{
+			var values = new List<TypedValue>();
+			if (ParameterValues != null)
+			{
+				for (int i = 0; i < ParameterValues.Length; i++)
+				{
+					values.Add(new TypedValue(TypeFactory.HeuristicType(ParameterTypes[i].Name), ParameterValues[i], EntityMode.Poco));
+				}
+			}
+			if (ReturnType != null && InnerCriterion is SimpleExpression)
+			{
+				var simple = InnerCriterion as SimpleExpression;
+				values.Add(new TypedValue(TypeFactory.HeuristicType(ReturnType.Name), simple.Value, EntityMode.Poco));
+			}
+			if (RightFunction != null)
+			{
+				values.AddRange(RightFunction.GetTypedValues(criteria, criteriaQuery));
+			}
+
+			return values.ToArray();
+		}
+
+		public virtual SqlString ToSqlString(ICriteria criteria, ICriteriaQuery criteriaQuery,
+											 IDictionary<string, IFilter> enabledFilters)
+		{
+			var sql = new SqlStringBuilder();
+			string leftPropertyName = null;
+			string rightPropertyName = null;
+
+			if (InnerCriterion is SimpleExpression)
+			{

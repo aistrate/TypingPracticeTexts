@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq.Expressions;
+
+namespace NHibernate.Linq.Visitors
+{
+	[DebuggerStepThrough, DebuggerNonUserCode]
+	public abstract class ExpressionVisitor
+	{
+		public virtual Expression Visit(Expression exp)
+		{
+			if (exp == null) return exp;
+
+			switch (exp.NodeType)
+			{
+				case ExpressionType.Negate:
+				case ExpressionType.NegateChecked:
+				case ExpressionType.Not:
+				case ExpressionType.Convert:
+				case ExpressionType.ConvertChecked:
+				case ExpressionType.ArrayLength:
+				case ExpressionType.Quote:
+				case ExpressionType.TypeAs:
+					return VisitUnary((UnaryExpression)exp);
+				case ExpressionType.Add:
+				case ExpressionType.AddChecked:
+				case ExpressionType.Subtract:
+				case ExpressionType.SubtractChecked:
+				case ExpressionType.Multiply:
+				case ExpressionType.MultiplyChecked:
+				case ExpressionType.Divide:
+				case ExpressionType.Modulo:
+				case ExpressionType.And:
+				case ExpressionType.AndAlso:
+				case ExpressionType.Or:
+				case ExpressionType.OrElse:
+				case ExpressionType.LessThan:
+				case ExpressionType.LessThanOrEqual:
+				case ExpressionType.GreaterThan:
+				case ExpressionType.GreaterThanOrEqual:
+				case ExpressionType.Equal:
+				case ExpressionType.NotEqual:
+				case ExpressionType.Coalesce:
+				case ExpressionType.ArrayIndex:
+				case ExpressionType.RightShift:
+				case ExpressionType.LeftShift:
+				case ExpressionType.ExclusiveOr:
+					return VisitBinary((BinaryExpression)exp);

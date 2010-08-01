@@ -1,0 +1,47 @@
+Transportation :: NETHERLANDS
+
+Airports:
+27 (2009)
+country comparison to the world: 124
+
+Airports - with paved runways:
+total: 20
+over 3,047 m: 2
+2,438 to 3,047 m: 9
+1,524 to 2,437 m: 3
+914 to 1,523 m: 5
+under 914 m: 1 (2009)
+
+Airports - with unpaved runways:
+total: 7
+914 to 1,523 m: 3
+under 914 m: 4 (2009)
+
+Heliports:
+1 (2009)
+
+Pipelines:
+gas 3,816 km; oil 365 km; refined products 716 km (2009)
+
+Railways:
+total: 2,896 km
+country comparison to the world: 58
+standard gauge: 2,896 km 1.435-m gauge (2,064 km electrified) (2009)
+
+Roadways:
+total: 136,827 km (includes 2,582 km of expressways) (2008)
+country comparison to the world: 35
+
+Waterways:
+6,215 km (navigable for ships of 50 tons) (2007)
+country comparison to the world: 22
+
+Merchant marine:
+total: 622
+country comparison to the world: 18
+by type: bulk carrier 9, cargo 381, carrier 19, chemical tanker 44, container 76, liquefied gas 15, passenger 16, passenger/cargo 15, petroleum tanker 11, refrigerated cargo 10, roll on/roll off 23, specialized tanker 3
+foreign-owned: 203 (Belgium 2, Cyprus 8, Denmark 29, Finland 14, France 1, Germany 75, Ireland 10, Italy 1, South Korea 1, Norway 12, Sweden 28, Turkey 1, UAE 5, UK 2, US 14)
+registered in other countries: 178 (Antigua and Barbuda 20, Australia 2, Austria 2, Bahamas 9, Cambodia 1, Canada 1, Cyprus 22, Germany 1, Gibraltar 21, Isle of Man 1, Liberia 6, Luxembourg 2, Marshall Islands 8, Netherlands Antilles 38, Panama 14, Paraguay 1, Philippines 23, Portugal 1, Saint Vincent and the Grenadines 3, US 1, unknown 1) (2008)
+
+Ports and terminals:
+Amsterdam, IJmuiden, Rotterdam, Terneuzen, Vlissingen

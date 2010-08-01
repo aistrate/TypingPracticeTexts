@@ -1,0 +1,50 @@
+            endDate = endDate.Date;
+
+            if (increment == 0 || startDate > endDate)
+                return new DateTime[] {};
+            
+            List<DateTime> dates = new List<DateTime>();
+            for (DateTime date = startDate; date <= endDate.Date; date = date.AddDays(increment))
+                dates.Add(date.Date);
+
+            if (dates.Last() < endDate)
+                dates.Add(endDate);
+
+            return dates.Reverse<DateTime>().Take(maxDateCount).Reverse()
+                        .ToArray();
+        }
+
+        #endregion
+
+        #region Portfolio Chart
+
+        public static List<SeriesInfo> GetAccountSeriesInfoList(int contactId)
+        {
+            using (IDalSession session = NHSessionFactory.CreateSession())
+            {
+                return SecurityLayerAdapter.GetOwnedContactAccounts(session, contactId, true)
+                                           .ConvertAll(a => new SeriesInfo(a.Key, a.Number, a.FirstTransactionDate, a.LastValuationDate));
+            }
+        }
+
+        public static DataTable GetValuationsTotalPortfolio(int accountId, DateTime[] dates)
+        {
+            using (IDalSession session = NHSessionFactory.CreateSession())
+            {
+                return SecurityLayerAdapter.GetOwnedValuationsTotalPortfolio(session, accountId, dates)
+                                           .Select(v => new { v.Date, TotalValueQuantity = v.TotalValue.Quantity })
+                                           .ToDataTable("Series");
+            }
+        }
+
+        #endregion
+
+        #region Positions Chart
+
+        public static DataSet GetAccountPositions(int accountId)
+        {
+            using (IDalSession session = NHSessionFactory.CreateSession())
+            {
+                return getOwnedFundPositions(session, accountId)
+                            .Select(p => new { InstrumentId = p.InstrumentOfPosition.Key, p.InstrumentDescription })
+                            .ToDataSet();

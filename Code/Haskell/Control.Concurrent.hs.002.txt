@@ -1,0 +1,50 @@
+import GHC.Conc         ( ThreadId(..), myThreadId, killThread, yield,
+                          threadDelay, forkIO, childHandler )
+import qualified GHC.Conc
+import GHC.IOBase       ( IO(..) )
+import GHC.IOBase       ( unsafeInterleaveIO )
+import GHC.IOBase       ( newIORef, readIORef, writeIORef )
+import GHC.Base
+
+import System.Posix.Types ( Fd )
+import Foreign.StablePtr
+import Foreign.C.Types  ( CInt )
+import Control.Monad    ( when )
+
+#ifdef mingw32_HOST_OS
+import Foreign.C
+import System.IO
+import GHC.Handle
+#endif
+#endif
+
+#ifdef __HUGS__
+import Hugs.ConcBase
+#endif
+
+import Control.Concurrent.MVar
+import Control.Concurrent.Chan
+import Control.Concurrent.QSem
+import Control.Concurrent.QSemN
+import Control.Concurrent.SampleVar
+
+#ifdef __HUGS__
+type ThreadId = ()
+#endif
+
+#ifndef __HUGS__
+max_buff_size :: Int
+max_buff_size = 1
+
+mergeIO :: [a] -> [a] -> IO [a]
+nmergeIO :: [[a]] -> IO [a]
+
+mergeIO ls rs
+ = newEmptyMVar                >>= \ tail_node ->
+   newMVar tail_node           >>= \ tail_list ->
+   newQSem max_buff_size       >>= \ e ->
+   newMVar 2                   >>= \ branches_running ->
+   let
+    buff = (tail_list,e)
+   in
+    forkIO (suckIO branches_running buff ls) >>

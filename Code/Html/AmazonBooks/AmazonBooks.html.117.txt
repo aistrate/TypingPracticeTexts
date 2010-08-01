@@ -1,0 +1,30 @@
+                      </li>
+                      <li>
+                        <a href="/Paranormal-Romance-Books/b/ref=bhp_9p2_para_06?ie=UTF8&node=1285981011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">More in Paranormal Romance</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="h_rule"></div>
+            </div>
+            <div class="unified_widget rcm widget">
+              <script type="text/javascript">
+                if (typeof S9MultiPackLayout == "undefined") {
+                document.write('<scr' + 'ipt='' src="http://z-ecx.images-amazon.com/images/G/01/s9-campaigns/s9-multipack-layout._V192754440_.js"></scr' + 'ipt>');
+                }
+              </script>
+              <h2>Related to Items You've Viewed</h2>
+              <div class="row" id="ns_1RVCMGP6WPZF34Z5GVPD_12229_ItemRow">
+                <div style="clear: both; width: 455px; height: 1px; margin: 0; padding: 0; overflow: hidden;"></div>
+                <div class="ns_1RVCMGP6WPZF34Z5GVPD_12229_seedItem s9SeedItem" id="ns_1RVCMGP6WPZF34Z5GVPD_12229_SeedItem" style="float: left; width: 33%;">
+                  <div id="ns_1RVCMGP6WPZF34Z5GVPD_12229_SeedItemHeaderContainer" class="ns_1RVCMGP6WPZF34Z5GVPD_12229_itemHeaderContainer" style="padding-bottom: 3px; height: 2.3em;">
+                    <div id="ns_1RVCMGP6WPZF34Z5GVPD_12229_SeedItemHeader" class="ns_1RVCMGP6WPZF34Z5GVPD_12229_textContainerWrapper">
+                      <div>
+                        You viewed
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12229_ItemElement0" style="width: 99%; margin-bottom: 0px; ">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12229_TitleContainer0" style="position: relative">

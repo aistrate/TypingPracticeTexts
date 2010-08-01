@@ -1,0 +1,9 @@
+Rocket
+
+A rocket or rocket vehicle is a missile, spacecraft, aircraft or other vehicle which obtains thrust by the reaction of the rocket to the ejection of a jet of fast moving fluid exhaust from a rocket engine. Chemical rockets create their exhaust by the combustion of rocket propellant. The action of the exhaust against the inside of combustion chambers and expansion nozzles is able to accelerate the gas to hypersonic speed, and this exerts a large reactive thrust on the rocket (an equal and opposite reaction in accordance with Newton's third law).
+
+Rockets, in the form of military and recreational uses, date back to at least the 13th century. Widespread military, scientific, and industrial use did not occur until the 20th century, when rocketry was the enabling technology of the Space Age, including setting foot on the moon.
+
+Rockets are used for fireworks, weaponry, ejection seats, launch vehicles for artificial satellites, human spaceflight and exploration of other planets. While comparatively inefficient for low speed use, they are very lightweight and powerful, capable of generating large accelerations and of attaining extremely high speeds with reasonable efficiency.
+
+Chemical rockets store a large amount of energy in an easily-released form, and can be very dangerous. However, careful design, testing, construction and use minimizes risks.

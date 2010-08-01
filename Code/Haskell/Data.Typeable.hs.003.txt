@@ -1,0 +1,50 @@
+data TyCon = TyCon !Key String
+
+instance Eq TyCon where
+  (TyCon t1 _) == (TyCon t2 _) = t1 == t2
+#endif
+
+typeRepKey :: TypeRep -> IO Int
+typeRepKey (TypeRep (Key i) _ _) = return i
+
+mkTyConApp  :: TyCon -> [TypeRep] -> TypeRep
+mkTyConApp tc@(TyCon tc_k _) args 
+  = TypeRep (appKeys tc_k arg_ks) tc args
+  where
+    arg_ks = [k | TypeRep k _ _ <- args]
+
+mkFunTy  :: TypeRep -> TypeRep -> TypeRep
+mkFunTy f a = mkTyConApp funTc [f,a]
+
+splitTyConApp :: TypeRep -> (TyCon,[TypeRep])
+splitTyConApp (TypeRep _ tc trs) = (tc,trs)
+
+funResultTy :: TypeRep -> TypeRep -> Maybe TypeRep
+funResultTy trFun trArg
+  = case splitTyConApp trFun of
+      (tc, [t1,t2]) | tc == funTc && t1 == trArg -> Just t2
+      _ -> Nothing
+
+mkAppTy :: TypeRep -> TypeRep -> TypeRep
+mkAppTy (TypeRep tr_k tc trs) arg_tr
+  = let (TypeRep arg_k _ _) = arg_tr
+     in  TypeRep (appKey tr_k arg_k) tc (trs++[arg_tr])
+
+mkTyCon :: String
+        -> TyCon
+mkTyCon str = TyCon (mkTyConKey str) str
+
+typeRepTyCon :: TypeRep -> TyCon
+typeRepTyCon (TypeRep _ tc _) = tc
+
+typeRepArgs :: TypeRep -> [TypeRep]
+typeRepArgs (TypeRep _ _ args) = args
+
+tyConString :: TyCon   -> String
+tyConString  (TyCon _ str) = str
+
+instance Show TypeRep where
+  showsPrec p (TypeRep _ tycon tys) =
+    case tys of
+      [] -> showsPrec p tycon
+      [x]   | tycon == listTc -> showChar '[' . shows x . showChar ']'

@@ -1,0 +1,30 @@
+<html>
+  <head>
+
+    <link href='http://z-ecx.images-amazon.com/images/G/01/nav2/gamma/websiteGlobalCSS/websiteGlobalCSS-websiteGlobal-10346._V190228205_.css' type='text/css' rel='stylesheet'>
+      <style type="text/css">
+        <!--
+.sans, .small, .h1, .h3color, .big, .tiny, .tinyprice, .highlight, .eyebrow, a:active, a:visited, a:link, div.unified_widget p.seeMore, div.unified_widget .carat, div.left_nav .carat, div.left_nav, div.left_nav h2, div.left_nav h3, div.left_nav a:link, div.left_nav a:visited, .popover-tiny, .horizontal-search, .horizontal-websearch, .topnav, .topnav-active a:link, .tabon a, .tabon a:visited, .taboff a, .taboff a:visited div.leftnav_popover h2{
+  font-family: verdana,arial,helvetica,sans-serif;
+}
+.listprice {
+  font-family: arial,verdana,helvetica,sans-serif;
+}
+.price {
+  font-family: arial,verdana,helvetica,sans-serif;
+}
+.serif, .sans, .h1, div.unified_widget .headline{
+  font-size: medium;
+}
+.big {
+  font-size: xx-large;
+}
+.small, .h3color, .highlight, .horizontal-search {
+  font-size: small;
+}
+.tiny, .tinyprice, .popover-tiny, .horizontal-websearch {
+  font-size: x-small;
+}
+body, td, th {
+  font-family: verdana,arial,helvetica,sans-serif;
+  font-size: small;

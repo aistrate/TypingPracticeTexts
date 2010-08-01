@@ -1,0 +1,50 @@
+				{
+					AddressLine1 = "123 Main St",
+					AddressLine2 = "Apt 2",
+					City = "Tampa",
+					State = florida,
+					ZipCode = "33602"
+				},
+				BirthDate = new DateTime(1969, 1, 1)
+			};
+
+			Patient bobBarker = new Patient(new[] { bobBarkerRecord }, false, drDobbs);
+			Patient johnDoe = new Patient(new[] { johnDoeRecord1, johnDoeRecord2 }, true, drWatson);
+
+			session.Save(newYork);
+			session.Save(florida);
+			session.Save(drDobbs);
+			session.Save(drWatson);
+			session.Save(bobBarker);
+			session.Save(johnDoe);
+		}
+
+		private static void CreateTestData()
+		{
+			var roles = new[]
+            {
+                new Role()
+                {
+                    Name = "Admin",
+                    IsActive = true,
+                    Entity = new AnotherEntity()
+                    {
+                        Output = "this is output..."
+                    }
+                },
+                new Role()
+                {
+                    Name = "User",
+                    IsActive = false
+                }
+            };
+
+			var users = new[]
+        	{
+        		new User("ayende", DateTime.Today)
+                {
+                    Role = roles[0],
+                    InvalidLoginAttempts = 4,
+                    Enum1 = EnumStoredAsString.Medium,
+                    Enum2 = EnumStoredAsInt32.High,
+                    Component = new UserComponent()

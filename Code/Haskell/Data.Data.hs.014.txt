@@ -1,0 +1,50 @@
+  dataTypeOf _ = orderingDataType
+
+leftConstr :: Constr
+leftConstr     = mkConstr eitherDataType "Left"  [] Prefix
+
+rightConstr :: Constr
+rightConstr    = mkConstr eitherDataType "Right" [] Prefix
+
+eitherDataType :: DataType
+eitherDataType = mkDataType "Prelude.Either" [leftConstr,rightConstr]
+
+instance (Data a, Data b) => Data (Either a b) where
+  gfoldl f z (Left a)   = z Left  `f` a
+  gfoldl f z (Right a)  = z Right `f` a
+  toConstr (Left _)  = leftConstr
+  toConstr (Right _) = rightConstr
+  gunfold k z c = case constrIndex c of
+                    1 -> k (z Left)
+                    2 -> k (z Right)
+                    _ -> error "gunfold"
+  dataTypeOf _ = eitherDataType
+  dataCast2 f  = gcast2 f
+
+tuple0Constr :: Constr
+tuple0Constr = mkConstr tuple0DataType "()" [] Prefix
+
+tuple0DataType :: DataType
+tuple0DataType = mkDataType "Prelude.()" [tuple0Constr]
+
+instance Data () where
+  toConstr ()   = tuple0Constr
+  gunfold _ z c | constrIndex c == 1 = z ()
+  gunfold _ _ _ = error "gunfold"
+  dataTypeOf _  = tuple0DataType
+
+tuple2Constr :: Constr
+tuple2Constr = mkConstr tuple2DataType "(,)" [] Infix
+
+tuple2DataType :: DataType
+tuple2DataType = mkDataType "Prelude.(,)" [tuple2Constr]
+
+instance (Data a, Data b) => Data (a,b) where
+  gfoldl f z (a,b) = z (,) `f` a `f` b
+  toConstr (_,_) = tuple2Constr
+  gunfold k z c | constrIndex c == 1 = k (k (z (,)))
+  gunfold _ _ _ = error "gunfold"
+  dataTypeOf _  = tuple2DataType
+  dataCast2 f   = gcast2 f
+
+tuple3Constr :: Constr

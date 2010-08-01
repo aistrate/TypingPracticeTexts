@@ -1,0 +1,100 @@
+#include "cache.h"
+#include "commit.h"
+#include "utf8.h"
+#include "diff.h"
+#include "revision.h"
+#include "string-list.h"
+#include "mailmap.h"
+#include "log-tree.h"
+#include "notes.h"
+#include "color.h"
+#include "reflog-walk.h"
+
+static char *user_format;
+
+static void save_user_format(struct rev_info *rev, const char *cp, int is_tformat)
+{
+	free(user_format);
+	user_format = xstrdup(cp);
+	if (is_tformat)
+		rev->use_terminator = 1;
+	rev->commit_format = CMIT_FMT_USERFORMAT;
+}
+
+void get_commit_format(const char *arg, struct rev_info *rev)
+{
+	int i;
+	static struct cmt_fmt_map {
+		const char *n;
+		size_t cmp_len;
+		enum cmit_fmt v;
+	} cmt_fmts[] = {
+		{ "raw",	1,	CMIT_FMT_RAW },
+		{ "medium",	1,	CMIT_FMT_MEDIUM },
+		{ "short",	1,	CMIT_FMT_SHORT },
+		{ "email",	1,	CMIT_FMT_EMAIL },
+		{ "full",	5,	CMIT_FMT_FULL },
+		{ "fuller",	5,	CMIT_FMT_FULLER },
+		{ "oneline",	1,	CMIT_FMT_ONELINE },
+	};
+
+	rev->use_terminator = 0;
+	if (!arg || !*arg) {
+		rev->commit_format = CMIT_FMT_DEFAULT;
+		return;
+	}
+	if (!prefixcmp(arg, "format:") || !prefixcmp(arg, "tformat:")) {
+		save_user_format(rev, strchr(arg, ':') + 1, arg[0] == 't');
+		return;
+	}
+	for (i = 0; i < ARRAY_SIZE(cmt_fmts); i++) {
+		if (!strncmp(arg, cmt_fmts[i].n, cmt_fmts[i].cmp_len) &&
+		    !strncmp(arg, cmt_fmts[i].n, strlen(arg))) {
+			if (cmt_fmts[i].v == CMIT_FMT_ONELINE)
+				rev->use_terminator = 1;
+			rev->commit_format = cmt_fmts[i].v;
+			return;
+		}
+	}
+	if (strchr(arg, '%')) {
+		save_user_format(rev, arg, 1);
+		return;
+	}
+
+	die("invalid --pretty format: %s", arg);
+}
+
+static int get_one_line(const char *msg)
+{
+	int ret = 0;
+
+	for (;;) {
+		char c = *msg++;
+		if (!c)
+			break;
+		ret++;
+		if (c == '\n')
+			break;
+	}
+	return ret;
+}
+
+int non_ascii(int ch)
+{
+	return !isascii(ch) || ch == '\033';
+}
+
+int has_non_ascii(const char *s)
+{
+	int ch;
+	if (!s)
+		return 0;
+	while ((ch = *s++) != '\0') {
+		if (non_ascii(ch))
+			return 1;
+	}
+	return 0;
+}
+
+static int is_rfc2047_special(char ch)
+{

@@ -1,0 +1,49 @@
+module Data.Monoid (
+        Monoid(..),
+        Dual(..),
+        Endo(..),
+        All(..),
+        Any(..),
+        Sum(..),
+        Product(..),
+        First(..),
+        Last(..)
+  ) where
+
+import Prelude
+
+class Monoid a where
+        mempty  :: a
+        mappend :: a -> a -> a
+        mconcat :: [a] -> a
+
+        mconcat = foldr mappend mempty
+
+instance Monoid [a] where
+        mempty  = []
+        mappend = (++)
+
+instance Monoid b => Monoid (a -> b) where
+        mempty _ = mempty
+        mappend f g x = f x `mappend` g x
+
+instance Monoid () where
+        mempty        = ()
+        _ `mappend` _ = ()
+        mconcat _     = ()
+
+instance (Monoid a, Monoid b) => Monoid (a,b) where
+        mempty = (mempty, mempty)
+        (a1,b1) `mappend` (a2,b2) =
+                (a1 `mappend` a2, b1 `mappend` b2)
+
+instance (Monoid a, Monoid b, Monoid c) => Monoid (a,b,c) where
+        mempty = (mempty, mempty, mempty)
+        (a1,b1,c1) `mappend` (a2,b2,c2) =
+                (a1 `mappend` a2, b1 `mappend` b2, c1 `mappend` c2)
+
+instance (Monoid a, Monoid b, Monoid c, Monoid d) => Monoid (a,b,c,d) where
+        mempty = (mempty, mempty, mempty, mempty)
+        (a1,b1,c1,d1) `mappend` (a2,b2,c2,d2) =
+                (a1 `mappend` a2, b1 `mappend` b2,
+                 c1 `mappend` c2, d1 `mappend` d2)

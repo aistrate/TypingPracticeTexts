@@ -1,0 +1,30 @@
+                      <td valign="top">
+                        <div class="rhfHistoryWrapper">
+                          <p>After viewing product detail pages or search results, look here to find an easy way to navigate back to pages you are interested in.</p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div style="padding:10px 10px 0 10px; text-align:left;">
+                          <b>
+                            <span style="color: rgb(204, 153, 0); font-weight: bold; font-size: 13px;"> &#8250; </span>
+                            <a href="/gp/yourstore/pym/ref=pd_pyml_rhf">View and edit your browsing history</a>
+                          </b>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+              <td class="rhf-box-sides-sprite rhf-box-r" width="10"></td>
+            </tr>
+            <tr>
+              <td class="rhf-box-corner-sprite rhf-box-bl" width="10">&nbsp;</td>
+              <td class="rhf-box-corner-sprite rhf-box-bc">&nbsp;</td>
+              <td class="rhf-box-corner-sprite rhf-box-br" width="10">&nbsp;</td>
+            </tr>
+          </table>
+        </div>
+        <br />
+        <div id="navFooter">

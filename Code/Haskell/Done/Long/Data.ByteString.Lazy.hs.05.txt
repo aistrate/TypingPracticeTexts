@@ -1,0 +1,99 @@
+replicate :: Int64 -> Word8 -> ByteString
+replicate n w
+    | n <= 0             = Empty
+    | n < fromIntegral smallChunkSize = Chunk (S.replicate (fromIntegral n) w) Empty
+    | r == 0             = cs
+    | otherwise          = Chunk (S.unsafeTake (fromIntegral r) c) cs
+ where
+    c      = S.replicate smallChunkSize w
+    cs     = nChunks q
+    (q, r) = quotRem n (fromIntegral smallChunkSize)
+    nChunks 0 = Empty
+    nChunks m = Chunk c (nChunks (m-1))
+
+cycle :: ByteString -> ByteString
+cycle Empty = errorEmptyList "cycle"
+cycle cs    = cs' where cs' = foldrChunks Chunk cs' cs
+
+unfoldr :: (a -> Maybe (Word8, a)) -> a -> ByteString
+unfoldr f s0 = unfoldChunk 32 s0
+  where unfoldChunk n s =
+          case S.unfoldrN n f s of
+            (c, Nothing)
+              | S.null c  -> Empty
+              | otherwise -> Chunk c Empty
+            (c, Just s')  -> Chunk c (unfoldChunk (n*2) s')
+
+take :: Int64 -> ByteString -> ByteString
+take i _ | i <= 0 = Empty
+take i cs0         = take' i cs0
+  where take' 0 _            = Empty
+        take' _ Empty        = Empty
+        take' n (Chunk c cs) =
+          if n < fromIntegral (S.length c)
+            then Chunk (S.take (fromIntegral n) c) Empty
+            else Chunk c (take' (n - fromIntegral (S.length c)) cs)
+
+drop  :: Int64 -> ByteString -> ByteString
+drop i p | i <= 0 = p
+drop i cs0 = drop' i cs0
+  where drop' 0 cs           = cs
+        drop' _ Empty        = Empty
+        drop' n (Chunk c cs) =
+          if n < fromIntegral (S.length c)
+            then Chunk (S.drop (fromIntegral n) c) cs
+            else drop' (n - fromIntegral (S.length c)) cs
+
+splitAt :: Int64 -> ByteString -> (ByteString, ByteString)
+splitAt i cs0 | i <= 0 = (Empty, cs0)
+splitAt i cs0 = splitAt' i cs0
+  where splitAt' 0 cs           = (Empty, cs)
+        splitAt' _ Empty        = (Empty, Empty)
+        splitAt' n (Chunk c cs) =
+          if n < fromIntegral (S.length c)
+            then (Chunk (S.take (fromIntegral n) c) Empty 
+                 ,Chunk (S.drop (fromIntegral n) c) cs)
+            else let (cs', cs'') = splitAt' (n - fromIntegral (S.length c)) cs
+                   in (Chunk c cs', cs'')
+
+takeWhile :: (Word8 -> Bool) -> ByteString -> ByteString
+takeWhile f cs0 = takeWhile' cs0
+  where takeWhile' Empty        = Empty
+        takeWhile' (Chunk c cs) =
+          case findIndexOrEnd (not . f) c of
+            0                  -> Empty
+            n | n < S.length c -> Chunk (S.take n c) Empty
+              | otherwise      -> Chunk c (takeWhile' cs)
+
+dropWhile :: (Word8 -> Bool) -> ByteString -> ByteString
+dropWhile f cs0 = dropWhile' cs0
+  where dropWhile' Empty        = Empty
+        dropWhile' (Chunk c cs) =
+          case findIndexOrEnd (not . f) c of
+            n | n < S.length c -> Chunk (S.drop n c) cs
+              | otherwise      -> dropWhile' cs
+
+break :: (Word8 -> Bool) -> ByteString -> (ByteString, ByteString)
+break f cs0 = break' cs0
+  where break' Empty        = (Empty, Empty)
+        break' (Chunk c cs) =
+          case findIndexOrEnd f c of
+            0                  -> (Empty, Chunk c cs)
+            n | n < S.length c -> (Chunk (S.take n c) Empty
+                                  ,Chunk (S.drop n c) cs)
+              | otherwise      -> let (cs', cs'') = break' cs
+                                   in (Chunk c cs', cs'')
+
+span :: (Word8 -> Bool) -> ByteString -> (ByteString, ByteString)
+span p = break (not . p)
+
+splitWith :: (Word8 -> Bool) -> ByteString -> [ByteString]
+splitWith _ Empty          = []
+splitWith p (Chunk c0 cs0) = comb [] (S.splitWith p c0) cs0
+
+  where comb :: [S.ByteString] -> [S.ByteString] -> ByteString -> [ByteString]
+        comb acc (s:[]) Empty        = revChunks (s:acc) : []
+        comb acc (s:[]) (Chunk c cs) = comb (s:acc) (S.splitWith p c) cs
+        comb acc (s:ss) cs           = revChunks (s:acc) : comb [] ss cs
+
+{-# INLINE splitWith #-}

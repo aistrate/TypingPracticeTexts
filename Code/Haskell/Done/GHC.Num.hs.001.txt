@@ -1,0 +1,49 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_HADDOCK hide #-}
+
+#include "MachDeps.h"
+#if SIZEOF_HSWORD == 4
+#define DIGITS       9
+#define BASE         1000000000
+#elif SIZEOF_HSWORD == 8
+#define DIGITS       18
+#define BASE         1000000000000000000
+#else
+#error Please define DIGITS and BASE
+#endif
+
+module GHC.Num (module GHC.Num, module GHC.Integer) where
+
+import GHC.Base
+import GHC.Enum
+import GHC.Show
+import GHC.Integer
+
+infixl 7  *
+infixl 6  +, -
+
+default ()
+class  (Eq a, Show a) => Num a  where
+    (+), (-), (*)       :: a -> a -> a
+    negate              :: a -> a
+    abs                 :: a -> a
+    signum              :: a -> a
+    fromInteger         :: Integer -> a
+
+    x - y               = x + negate y
+    negate x            = 0 - x
+
+{-# INLINE subtract #-}
+subtract :: (Num a) => a -> a -> a
+subtract x y = y - x
+instance  Num Int  where
+    (+)    = plusInt
+    (-)    = minusInt
+    negate = negateInt
+    (*)    = timesInt
+    abs n  = if n `geInt` 0 then n else negateInt n
+
+    signum n | n `ltInt` 0 = negateInt 1
+             | n `eqInt` 0 = 0
+             | otherwise   = 1

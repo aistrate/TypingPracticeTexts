@@ -1,0 +1,7 @@
+Gallium
+
+Gallium is a chemical element that has the symbol Ga and atomic number 31. Elemental gallium does not occur in nature, but as the gallium(III) salt in trace amounts in bauxite and zinc ores. A soft silvery metallic poor metal, elemental gallium is a brittle solid at low temperatures. As it liquefies slightly above room temperature, it will melt in the hand. Its melting point is used as a temperature reference point, and from its discovery in 1875 to the semiconductor era, its primary uses were in high-temperature thermometric applications and in preparation of metal alloys with unusual properties of stability, or ease of melting; some being liquid at room temperature or below. The alloy Galinstan (68.5% Ga, 21.5% In, 10% Sn) has a melting point of about -19 C (-2.2 F).
+
+In semiconductors, an important application is in the compounds gallium arsenide and gallium nitride, used most notably in light-emitting diodes (LEDs). Semiconductor use is now almost the entire (> 95%) world market for gallium, but new uses in alloys and fuel cells continue to be discovered.
+
+Gallium is not known to be essential in biology, but because of the biological handling of gallium's primary ionic salt gallium(III) as though it were iron(III), the gallium ion localizes to and interacts with many processes in the body in which iron(III) is manipulated. As these processes include inflammation, which is a marker for many disease states, several gallium salts are used, or are in development, as both pharmaceuticals and radiopharmaceuticals in medicine.

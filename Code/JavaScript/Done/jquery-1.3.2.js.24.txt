@@ -1,0 +1,99 @@
+			for ( ret in events ) break;
+			if ( !ret ) {
+				var handle = jQuery.data( elem, "handle" );
+				if ( handle ) handle.elem = null;
+				jQuery.removeData( elem, "events" );
+				jQuery.removeData( elem, "handle" );
+			}
+		}
+	},
+
+	trigger: function( event, data, elem, bubbling ) {
+		var type = event.type || event;
+
+		if( !bubbling ){
+			event = typeof event === "object" ?
+				event[expando] ? event :
+				jQuery.extend( jQuery.Event(type), event ) :
+				jQuery.Event(type);
+
+			if ( type.indexOf("!") >= 0 ) {
+				event.type = type = type.slice(0, -1);
+				event.exclusive = true;
+			}
+
+			if ( !elem ) {
+				event.stopPropagation();
+				if ( this.global[type] )
+					jQuery.each( jQuery.cache, function(){
+						if ( this.events && this.events[type] )
+							jQuery.event.trigger( event, data, this.handle.elem );
+					});
+			}
+
+			if ( !elem || elem.nodeType == 3 || elem.nodeType == 8 )
+				return undefined;
+			
+			event.result = undefined;
+			event.target = elem;
+			
+			data = jQuery.makeArray(data);
+			data.unshift( event );
+		}
+
+		event.currentTarget = elem;
+
+		var handle = jQuery.data(elem, "handle");
+		if ( handle )
+			handle.apply( elem, data );
+
+		if ( (!elem[type] || (jQuery.nodeName(elem, 'a') && type == "click")) && elem["on"+type] && elem["on"+type].apply( elem, data ) === false )
+			event.result = false;
+
+		if ( !bubbling && elem[type] && !event.isDefaultPrevented() && !(jQuery.nodeName(elem, 'a') && type == "click") ) {
+			this.triggered = true;
+			try {
+				elem[ type ]();
+			} catch (e) {}
+		}
+
+		this.triggered = false;
+
+		if ( !event.isPropagationStopped() ) {
+			var parent = elem.parentNode || elem.ownerDocument;
+			if ( parent )
+				jQuery.event.trigger(event, data, parent, true);
+		}
+	},
+
+	handle: function(event) {
+		var all, handlers;
+
+		event = arguments[0] = jQuery.event.fix( event || window.event );
+		event.currentTarget = this;
+		
+		var namespaces = event.type.split(".");
+		event.type = namespaces.shift();
+
+		all = !namespaces.length && !event.exclusive;
+		
+		var namespace = RegExp("(^|\\.)" + namespaces.slice().sort().join(".*\\.") + "(\\.|$)");
+
+		handlers = ( jQuery.data(this, "events") || {} )[event.type];
+
+		for ( var j in handlers ) {
+			var handler = handlers[j];
+
+			if ( all || namespace.test(handler.type) ) {
+				event.handler = handler;
+				event.data = handler.data;
+
+				var ret = handler.apply(this, arguments);
+
+				if( ret !== undefined ){
+					event.result = ret;
+					if ( ret === false ) {
+						event.preventDefault();
+						event.stopPropagation();
+					}
+				}

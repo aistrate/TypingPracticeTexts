@@ -1,0 +1,10 @@
+Lumina
+
+Lumina este stimulul care actionind asupra retinei din ochi produce la omul sanatos senzatia vizuala. Din punct de vedere fizic, lumina este o radiatie electromagnetica; pentru a fi perceputa de om ea trebuie sa aiba anumite caracteristici: frecventa trebuie sa fie cuprinsa intre limitele sensibilitatii vizuale ale receptorilor fotosensibili din retina, iar intensitatea trebuie sa depaseasca pragul de sensibilitate al acestora. In sens larg se poate folosi termenul de "lumina" si pentru radiatii electromagnetice invizibile pentru om, ca de exemplu lumina infrarosie sau cea ultravioleta. Lumina impreuna cu temperatura face parte din factorii ecologici.
+
+Atit lumina provenind direct de la o sursa de lumina, cit si cea transmisa, reflectata, imprastiata sau difractata de diferite corpuri, are pentru ochiul uman o serie de caracteristici, printre care:
+
+- intensitate luminoasa, determinata de puterea transportata de radiatie si de sensibilitatea retinei;
+- culoare, determinata de spectrul de frecvente ale radiatiei incidente pe retina;
+- polarizare, determinata de planurile sau planul de oscilatie al undelor electromagnetice;
+- coerenta, determinata de faza oscilatiilor.

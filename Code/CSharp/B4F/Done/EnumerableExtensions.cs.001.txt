@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using B4F.TotalGiro.Utils.Tuple;
+
+namespace B4F.TotalGiro.Utils.Linq
+{
+    public static class EnumerableExtensions
+    {
+        public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, int subsequenceLength)
+        {
+            for (IEnumerable<T> subseq = source.Take(subsequenceLength), rest = source.Skip(subsequenceLength);
+                 subseq.Count() > 0;
+                 subseq = rest.Take(subsequenceLength), rest = rest.Skip(subsequenceLength))
+                yield return subseq;
+        }
+
+        public static IEnumerable<T> ConcatMany<T, Col>(this IEnumerable<Col> source)
+            where Col : IEnumerable<T>
+        {
+            return source.Cast<IEnumerable<T>>().SelectMany(subSeq => subSeq);
+        }
+
+        public static IEnumerable<T> ConcatMany<T>(this IEnumerable<IEnumerable<T>> source)
+        {
+            return source.ConcatMany<T, IEnumerable<T>>();
+        }
+
+        public static IEnumerable<T> ConcatMany<T>(this IEnumerable<T[]> source)
+        {
+            return source.ConcatMany<T, T[]>();
+        }
+
+        public static IEnumerable<T> ConcatMany<T>(this IEnumerable<List<T>> source)
+        {
+            return source.ConcatMany<T, List<T>>();
+        }
+
+        public static IEnumerable<Tuple<A, B>> Zip<A, B>(this IEnumerable<A> a, IEnumerable<B> b)
+        {
+            return a.Zip(b, (aa, bb) => Tuple.Tuple.Create(aa, bb));
+        }
+
+        public static IEnumerable<R> Zip<A, B, R>(this IEnumerable<A> a, IEnumerable<B> b,
+                                                  Func<A, B, R> func)
+        {
+            IEnumerator<A> enumA = a.GetEnumerator();
+            IEnumerator<B> enumB = b.GetEnumerator();
+
+            while (enumA.MoveNext() && enumB.MoveNext())

@@ -1,0 +1,49 @@
+instance Data Int32 where
+  toConstr x = mkIntConstr int32Type (fromIntegral x)
+  gunfold _ z c = case constrRep c of
+                    (IntConstr x) -> z (fromIntegral x)
+                    _ -> error "gunfold"
+  dataTypeOf _ = int32Type
+
+int64Type :: DataType
+int64Type = mkIntType "Data.Int.Int64"
+
+instance Data Int64 where
+  toConstr x = mkIntConstr int64Type (fromIntegral x)
+  gunfold _ z c = case constrRep c of
+                    (IntConstr x) -> z (fromIntegral x)
+                    _ -> error "gunfold"
+  dataTypeOf _ = int64Type
+
+wordType :: DataType
+wordType = mkIntType "Data.Word.Word"
+
+instance Data Word where
+  toConstr x = mkIntConstr wordType (fromIntegral x)
+  gunfold _ z c = case constrRep c of
+                    (IntConstr x) -> z (fromIntegral x)
+                    _ -> error "gunfold"
+  dataTypeOf _ = wordType
+
+word8Type :: DataType
+word8Type = mkIntType "Data.Word.Word8"
+
+instance Data Word8 where
+  toConstr x = mkIntConstr word8Type (fromIntegral x)
+  gunfold _ z c = case constrRep c of
+                    (IntConstr x) -> z (fromIntegral x)
+                    _ -> error "gunfold"
+  dataTypeOf _ = word8Type
+
+word16Type :: DataType
+word16Type = mkIntType "Data.Word.Word16"
+
+instance Data Word16 where
+  toConstr x = mkIntConstr word16Type (fromIntegral x)
+  gunfold _ z c = case constrRep c of
+                    (IntConstr x) -> z (fromIntegral x)
+                    _ -> error "gunfold"
+  dataTypeOf _ = word16Type
+
+word32Type :: DataType
+word32Type = mkIntType "Data.Word.Word32"

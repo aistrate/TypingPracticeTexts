@@ -1,0 +1,100 @@
+require 'active_support/core_ext/hash/keys'
+require 'active_support/core_ext/class/inheritable_attributes'
+
+module ActiveModel
+  class MissingAttributeError < NoMethodError
+  end
+
+  module AttributeMethods
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+      def define_attr_method(name, value=nil, &block)
+        sing = metaclass
+        sing.send :alias_method, "original_#{name}", name
+        if block_given?
+          sing.send :define_method, name, &block
+        else
+          sing.class_eval "def #{name}; #{value.to_s.inspect}; end"
+        end
+      end
+
+      def attribute_method_prefix(*prefixes)
+        attribute_method_matchers.concat(prefixes.map { |prefix| AttributeMethodMatcher.new :prefix => prefix })
+        undefine_attribute_methods
+      end
+
+      def attribute_method_suffix(*suffixes)
+        attribute_method_matchers.concat(suffixes.map { |suffix| AttributeMethodMatcher.new :suffix => suffix })
+        undefine_attribute_methods
+      end
+
+      def attribute_method_affix(*affixes)
+        attribute_method_matchers.concat(affixes.map { |affix| AttributeMethodMatcher.new :prefix => affix[:prefix], :suffix => affix[:suffix] })
+        undefine_attribute_methods
+      end
+
+      def alias_attribute(new_name, old_name)
+        attribute_method_matchers.each do |matcher|
+          module_eval <<-STR, __FILE__, __LINE__+1
+            def #{matcher.method_name(new_name)}(*args)
+              send(:#{matcher.method_name(old_name)}, *args)
+            end
+          STR
+        end
+      end
+
+      def define_attribute_methods(attr_names)
+        return if attribute_methods_generated?
+        attr_names.each do |attr_name|
+          attribute_method_matchers.each do |matcher|
+            unless instance_method_already_implemented?(matcher.method_name(attr_name))
+              generate_method = "define_method_#{matcher.prefix}attribute#{matcher.suffix}"
+
+              if respond_to?(generate_method)
+                send(generate_method, attr_name)
+              else
+                generated_attribute_methods.module_eval <<-STR, __FILE__, __LINE__+1
+                  def #{matcher.method_name(attr_name)}(*args)
+                    send(:#{matcher.method_missing_target}, '#{attr_name}', *args)
+                  end
+                STR
+              end
+            end
+          end
+        end
+        @attribute_methods_generated = true
+      end
+
+      def undefine_attribute_methods
+        generated_attribute_methods.module_eval do
+          instance_methods.each { |m| undef_method(m) }
+        end
+        @attribute_methods_generated = nil
+      end
+
+      def generated_attribute_methods #:nodoc:
+        @generated_attribute_methods ||= begin
+          mod = Module.new
+          include mod
+          mod
+        end
+      end
+
+      def attribute_methods_generated?
+        @attribute_methods_generated ||= nil
+      end
+
+      protected
+        def instance_method_already_implemented?(method_name)
+          method_defined?(method_name)
+        end
+
+      private
+        class AttributeMethodMatcher
+          attr_reader :prefix, :suffix
+
+          AttributeMethodMatch = Struct.new(:target, :attr_name)
+
+          def initialize(options = {})
+            options.symbolize_keys!

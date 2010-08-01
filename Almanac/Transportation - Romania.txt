@@ -1,0 +1,48 @@
+Transportation :: ROMANIA
+
+Airports:
+53 (2009)
+country comparison to the world: 89
+
+Airports - with paved runways:
+total: 25
+over 3,047 m: 4
+2,438 to 3,047 m: 10
+1,524 to 2,437 m: 11 (2009)
+
+Airports - with unpaved runways:
+total: 28
+914 to 1,523 m: 7
+under 914 m: 21 (2009)
+
+Heliports:
+2 (2009)
+
+Pipelines:
+gas 3,588 km; oil 2,424 km (2009)
+
+Railways:
+total: 10,788 km
+country comparison to the world: 21
+broad gauge: 57 km 1.524-m gauge
+standard gauge: 10,731 km 1.435-m gauge (3,965 km electrified) (2008)
+
+Roadways:
+total: 198,817 km
+country comparison to the world: 26
+paved: 60,043 km (includes 228 km of expressways)
+unpaved: 138,774 km (2004)
+
+Waterways:
+1,731 km
+country comparison to the world: 48
+note: includes 1,075 km on Danube River, 524 km on secondary branches, and 132 km on canals (2006)
+
+Merchant marine:
+total: 17
+country comparison to the world: 103
+by type: cargo 11, passenger 1, passenger/cargo 2, petroleum tanker 2, roll on/roll off 1
+registered in other countries: 49 (Cambodia 1, Georgia 16, North Korea 4, Liberia 2, Malta 8, Marshall Islands 1, Moldova 3, Panama 7, Saint Kitts and Nevis 1, Saint Vincent and the Grenadines 1, Sierra Leone 3, Syria 2) (2008)
+
+Ports and terminals:
+Braila, Constanta, Galati, Tulcea

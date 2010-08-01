@@ -1,0 +1,11 @@
+Photographic film
+
+Photographic film is a sheet of plastic (polyester, nitrocellulose or cellulose acetate) coated with an emulsion containing light-sensitive silver halide salts (bonded by gelatin) with variable crystal sizes that determine the sensitivity, contrast and resolution of the film. When the emulsion is sufficiently exposed to light (or other forms of electromagnetic radiation such as X-rays), it forms a latent (invisible) image. Chemical processes can then be applied to the film to create a visible image, in a process called film developing.
+
+In black-and-white photographic film there is usually one layer of silver salts. When the exposed grains are developed, the silver salts are converted to metallic silver, which block light and appear as the black part of the film negative.
+
+Color film uses at least three layers. Dyes, which adsorb to the surface of the silver salts, make the crystals sensitive to different colors. Typically the blue-sensitive layer is on top, followed by the green and red layers. During development, the exposed silver salts are converted to metallic silver, just as with black and white film. But in a color film, the by-products of the development reaction simultaneously combine with chemicals known as color couplers that are included either in the film itself or in the developer solution to form colored dyes. Because the by-products are created in direct proportion to the amount of exposure and development, the dye clouds formed are also in proportion to the exposure and development. Following development, the silver is converted back to silver salts in the bleach step. It is removed from the film in the fix step. This leaves behind only the formed color dyes, which combine to make up the colored visible image.
+
+Newer color films, like Kodacolor II, have as many as 12 emulsion layers, with upwards of 20 different chemicals in each layer.
+
+Due to film photography's long history of widespread use, there are now around one trillion pictures on photographic film or photographic paper in the world, enough to cover an area of around ten thousand square kilometres (4000 square miles), about half the size of Wales.

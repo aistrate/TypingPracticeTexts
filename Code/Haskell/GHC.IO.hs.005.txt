@@ -1,0 +1,50 @@
+       return ""
+     else do
+       s <- getRest
+       return (c:s)
+
+hGetContents :: Handle -> IO String
+hGetContents handle = 
+    withHandle "hGetContents" handle $ \handle_ ->
+    case haType handle_ of 
+      ClosedHandle         -> ioe_closedHandle
+      SemiClosedHandle     -> ioe_closedHandle
+      AppendHandle         -> ioe_notReadable
+      WriteHandle          -> ioe_notReadable
+      _ -> do xs <- lazyRead handle
+              return (handle_{ haType=SemiClosedHandle}, xs )
+
+lazyRead :: Handle -> IO String
+lazyRead handle = 
+   unsafeInterleaveIO $
+        withHandle "lazyRead" handle $ \ handle_ -> do
+        case haType handle_ of
+          ClosedHandle     -> return (handle_, "")
+          SemiClosedHandle -> lazyRead' handle handle_
+          _ -> ioException 
+                  (IOError (Just handle) IllegalOperation "lazyRead"
+                        "illegal handle type" Nothing)
+
+lazyRead' :: Handle -> Handle__ -> IO (Handle__, [Char])
+lazyRead' h handle_ = do
+  let ref = haBuffer handle_
+      fd  = haFD handle_
+
+  buf <- readIORef ref
+  if not (bufferEmpty buf)
+        then lazyReadHaveBuffer h handle_ fd ref buf
+        else do
+
+  case haBufferMode handle_ of
+     NoBuffering      -> do
+        let raw = bufBuf buf
+        r <- readRawBuffer "lazyRead" fd (haIsStream handle_) raw 0 1
+        if r == 0
+           then do (handle_', _) <- hClose_help handle_ 
+                   return (handle_', "")
+           else do (c,_) <- readCharFromBuffer raw 0
+                   rest <- lazyRead h
+                   return (handle_, c : rest)
+
+     LineBuffering    -> lazyReadBuffered h handle_ fd ref buf
+     BlockBuffering _ -> lazyReadBuffered h handle_ fd ref buf

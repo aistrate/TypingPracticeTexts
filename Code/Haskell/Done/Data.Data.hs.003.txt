@@ -1,0 +1,49 @@
+  gunfold :: (forall b r. Data b => c (b -> r) -> c r)
+          -> (forall r. r -> c r)
+          -> Constr
+          -> c a
+
+  toConstr   :: a -> Constr
+
+  dataTypeOf  :: a -> DataType
+
+  dataCast1 :: Typeable1 t
+            => (forall d. Data d => c (t d))
+            -> Maybe (c a)
+  dataCast1 _ = Nothing
+
+  dataCast2 :: Typeable2 t
+            => (forall d e. (Data d, Data e) => c (t d e))
+            -> Maybe (c a)
+  dataCast2 _ = Nothing
+
+  gmapT :: (forall b. Data b => b -> b) -> a -> a
+
+  gmapT f x0 = unID (gfoldl k ID x0)
+    where
+      k (ID c) x = ID (c (f x))
+
+  gmapQl :: (r -> r' -> r) -> r -> (forall d. Data d => d -> r') -> a -> r
+  gmapQl o r f = unCONST . gfoldl k z
+    where
+      k c x = CONST $ (unCONST c) `o` f x
+      z _   = CONST r
+
+  gmapQr :: (r' -> r -> r) -> r -> (forall d. Data d => d -> r') -> a -> r
+  gmapQr o r0 f x0 = unQr (gfoldl k (const (Qr id)) x0) r0
+    where
+      k (Qr c) x = Qr (\r -> c (f x `o` r))
+
+  gmapQ :: (forall d. Data d => d -> u) -> a -> [u]
+  gmapQ f = gmapQr (:) [] f
+
+  gmapQi :: Int -> (forall d. Data d => d -> u) -> a -> u
+  gmapQi i f x = case gfoldl k z x of { Qi _ q -> fromJust q }
+    where
+      k (Qi i' q) a = Qi (i'+1) (if i==i' then Just (f a) else q)
+      z _           = Qi 0 Nothing
+
+  gmapM   :: Monad m => (forall d. Data d => d -> m d) -> a -> m a
+
+  gmapM f = gfoldl k return
+    where

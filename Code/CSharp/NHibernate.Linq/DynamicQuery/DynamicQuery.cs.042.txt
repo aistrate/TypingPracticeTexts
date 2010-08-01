@@ -1,0 +1,50 @@
+						NextChar();
+						t = TokenId.LessThanEqual;
+					}
+					else if (ch == '>')
+					{
+						NextChar();
+						t = TokenId.LessGreater;
+					}
+					else
+					{
+						t = TokenId.LessThan;
+					}
+					break;
+				case '=':
+					NextChar();
+					if (ch == '=')
+					{
+						NextChar();
+						t = TokenId.DoubleEqual;
+					}
+					else
+					{
+						t = TokenId.Equal;
+					}
+					break;
+				case '>':
+					NextChar();
+					if (ch == '=')
+					{
+						NextChar();
+						t = TokenId.GreaterThanEqual;
+					}
+					else
+					{
+						t = TokenId.GreaterThan;
+					}
+					break;
+				case '?':
+					NextChar();
+					t = TokenId.Question;
+					break;
+				case '[':
+					NextChar();
+					t = TokenId.OpenBracket;
+					break;
+				case ']':
+					NextChar();
+					t = TokenId.CloseBracket;
+					break;
+				case '|':

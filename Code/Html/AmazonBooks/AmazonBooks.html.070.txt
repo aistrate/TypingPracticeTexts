@@ -1,0 +1,30 @@
+                            </div>
+                            <a href="http://www.amazon.com/Rules-of-Deception-ebook/dp/B0011UCOCK/ref=pd_ts_zgc_kinc_digital-text_6?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Rules of Deception" class="titleLink">Rules of Deception</a>
+                            <div class="tiny byline">
+                              <span class="carat"></span>Christopher Reich (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock ">
+                              <span class="listprice"></span>
+                              <strong class="price">$0.79</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/One-Day-ebook/dp/B0036S4CTS/ref=pd_ts_zgc_kinc_digital-text_7_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="One Day">
+                              <img src="http://ecx.images-amazon.com/images/I/41Q-DLhDgML._SL75_.jpg" alt="One Day" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">7.</span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">11 days in the top 100</span>
+                            </div>
+                            <a href="http://www.amazon.com/One-Day-ebook/dp/B0036S4CTS/ref=pd_ts_zgc_kinc_digital-text_7?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="One Day" class="titleLink">One Day</a>

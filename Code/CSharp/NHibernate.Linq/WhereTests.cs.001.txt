@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using NHibernate.Linq.Tests.Entities;
+using NUnit.Framework;
+
+namespace NHibernate.Linq.Tests
+{
+	[TestFixture]
+	public class WhereTests : BaseTest
+	{
+		protected override ISession CreateSession()
+		{
+			return GlobalSetup.CreateSession();
+		}
+
+		[Test]
+		public void NoWhereClause()
+		{
+			var query = (from user in nhib.Users
+						 select user).ToList();
+			Assert.AreEqual(3, query.Count);
+		}
+
+		[Test]
+		public void OrWithTrueReducesTo1Eq1Clause()
+		{
+			var query = (from user in nhib.Users
+						 where user.Name == "ayende" || true
+						 select user).ToList();
+			Assert.AreEqual(3, query.Count);
+		}
+		[Test]
+		public void AndWithTrueReducesTo1Eq0Clause()
+		{
+			var query = (from user in nhib.Users
+						 where user.Name == "ayende" && false
+						 select user).ToList();
+			Assert.AreEqual(0, query.Count);
+		}
+
+		[Test]
+		public void WhereWithConstantExpression()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.Name == "ayende"
+						 select user).ToList();
+			Assert.AreEqual(1, query.Count);
+		}

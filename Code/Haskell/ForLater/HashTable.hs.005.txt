@@ -1,0 +1,49 @@
+data Inserts = CanInsert
+             | Can'tInsert
+             deriving (Eq)
+
+{-# INLINE updatingBucket #-}
+
+updatingBucket :: Inserts -> ([(key,val)] -> ([(key,val)], Int32, a)) ->
+                  HashTable key val -> key ->
+                  IO a
+updatingBucket canEnlarge bucketFn
+               ht@HashTable{ tab=ref, hash_fn=hash } key = do
+  (table@HT{ kcount=k, buckets=bkts, bmask=b },
+   indx, bckt) <- findBucket ht key
+  (bckt', inserts, result) <- return $ bucketFn bckt
+  let k' = k + inserts
+      table1 = table { kcount=k' }
+  bkts' <- thawArray bkts
+  writeMutArray bkts' indx bckt'
+  freezeArray bkts'
+  table2 <- if canEnlarge == CanInsert && inserts > 0 then do
+               recordIns inserts k' bckt'
+               if tooBig k' b
+                  then expandHashTable hash table1
+                  else return table1
+            else return table1
+  writeIORef ref table2
+  return result
+
+expandHashTable :: (key -> Int32) -> HT key val -> IO (HT key val)
+expandHashTable hash table@HT{ buckets=bkts, bmask=mask } = do
+   let
+      oldsize = mask + 1
+      newmask = mask + mask + 1
+   recordResize oldsize (newmask+1)
+   if newmask > tABLE_MAX-1
+      then return table
+      else do
+    newbkts' <- newMutArray (0,newmask) []
+
+    let
+     splitBucket oldindex = do
+       bucket <- readHTArray bkts oldindex
+       let (oldb,newb) =
+              partition ((oldindex==). bucketIndex newmask . hash . fst) bucket
+       writeMutArray newbkts' oldindex oldb
+       writeMutArray newbkts' (oldindex + oldsize) newb
+    mapM_ splitBucket [0..mask]
+
+    newbkts <- freezeArray newbkts'

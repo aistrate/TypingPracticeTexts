@@ -1,0 +1,30 @@
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ItemElement1" style="width: 33%; margin-bottom: 0px; ">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0TitleContainer1" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Title1">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ImageContainer1">
+                            <a href="/gp/product/1591027713/ref=s9_qpick_bw_ir02?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="The Joy of Chemistry: The Amazing Science of Familiar Things">
+                              <div class="imageContainer">
+                                <img src="http://ecx.images-amazon.com/images/I/51J55hr%2Bh8L._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="90" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Image1" />
+                              </div>The Joy of Chemistry: The Amazing...
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Cathy-Cobb/e/B001IR3GFK/ref=s9_qpick_bw_al2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155">Cathy Cobb</a>
+                          </div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$19.00</span>
+                          <span class="red t14">$12.92</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec2?ie=UTF8&0198503407.order=0&ASIN=1591027713&reason=0198503407&reason=0691001448&0691001448.order=1&isRecommendedItem=1&0691001448.source=Purchase&0198503407.source=Purchase&isPopup=0&pf_rd_i=283155&pf_rd_s=center-13&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec2?ie=UTF8&0198503407.order=0&ASIN=1591027713&reason=0198503407&reason=0691001448&0691001448.order=1&isRecommendedItem=1&0691001448.source=Purchase&0198503407.source=Purchase&isPopup=1&pf_rd_i=283155&pf_rd_s=center-13&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ItemElement2" style="width: 33%; margin-bottom: 0px; ">

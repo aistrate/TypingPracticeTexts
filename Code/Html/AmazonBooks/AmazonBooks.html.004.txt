@@ -1,0 +1,30 @@
+                /* Everything else -- sprited */
+                .ap_popover_sprited .ap_body .ap_left,
+                .ap_popover_sprited .ap_body .ap_right {
+                background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/light/sprite-v._V219326283_.png);
+                }
+                .ap_popover_sprited .ap_header .ap_left,
+                .ap_popover_sprited .ap_header .ap_right,
+                .ap_popover_sprited .ap_header .ap_middle,
+                .ap_popover_sprited .ap_footer .ap_left,
+                .ap_popover_sprited .ap_footer .ap_right,
+                .ap_popover_sprited .ap_footer .ap_middle,
+                .ap_popover_sprited .ap_closebutton {
+                background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/light/sprite-h._V219326280_.png);
+                }
+                .ap_popover_sprited .ap_body .ap_right-arrow, .ap_popover_sprited .ap_body .ap_left-arrow {
+                background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/light/sprite-arrow-v._V219326286_.png);
+                }
+              </style>
+              <script type="text/javascript">
+                var amznJQ = {
+                _a: [], _s: [], _d: [], _l: [], _o: [], _c: [], _cs: [],
+                addLogical: function() {
+                this._l.push(arguments)
+                },
+                addStyle: function() {
+                this._s.push(arguments)
+                },
+                declareAvailable: function() {
+                this._d.push(arguments)
+                },

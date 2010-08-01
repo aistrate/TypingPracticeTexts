@@ -1,0 +1,100 @@
+		{
+			try
+			{
+				DoQueryAndInitializeNonLazyCollections(
+					session,
+					new QueryParameters(parameterTypes, parameterValues, namedParameters, ids),
+					true
+					);
+			}
+			catch (HibernateException)
+			{
+				throw;
+			}
+			catch (Exception sqle)
+			{
+				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle,
+				                                 "could not load collection by subselect: "
+				                                 + MessageHelper.InfoString(CollectionPersisters[0], ids), SqlString,
+				                                 parameterValues, namedParameters);
+			}
+		}
+
+		protected IList List(
+			ISessionImplementor session,
+			QueryParameters queryParameters,
+			ISet<string> querySpaces,
+			IType[] resultTypes)
+		{
+			bool cacheable = factory.IsQueryCacheEnabled &&
+			                 queryParameters.Cacheable;
+
+			if (cacheable)
+			{
+				return ListUsingQueryCache(session, queryParameters, querySpaces, resultTypes);
+			}
+			else
+			{
+				return ListIgnoreQueryCache(session, queryParameters);
+			}
+		}
+
+		private IList ListIgnoreQueryCache(ISessionImplementor session, QueryParameters queryParameters)
+		{
+			return GetResultList(DoList(session, queryParameters), queryParameters.ResultTransformer);
+		}
+
+		private IList ListUsingQueryCache(
+			ISessionImplementor session,
+			QueryParameters queryParameters,
+			ISet<string> querySpaces,
+			IType[] resultTypes)
+		{
+			IQueryCache queryCache = factory.GetQueryCache(queryParameters.CacheRegion);
+
+			ISet filterKeys = FilterKey.CreateFilterKeys(session.EnabledFilters, session.EntityMode);
+			QueryKey key = new QueryKey(Factory, SqlString, queryParameters, filterKeys);
+
+			IList result = GetResultFromQueryCache(session, queryParameters, querySpaces, resultTypes, queryCache, key);
+
+			if (result == null)
+			{
+				result = DoList(session, queryParameters);
+				PutResultInQueryCache(session, resultTypes, queryCache, key, result);
+			}
+
+			return GetResultList(result, queryParameters.ResultTransformer);
+		}
+
+		private void PutResultInQueryCache(ISessionImplementor session, IType[] resultTypes, IQueryCache queryCache, QueryKey key, IList result)
+		{
+			if ((session.CacheMode & CacheMode.Put) == CacheMode.Put)
+			{
+				bool put = queryCache.Put(key, resultTypes, result, session);
+				if (put && factory.Statistics.IsStatisticsEnabled)
+				{
+					factory.StatisticsImplementor.QueryCachePut(QueryIdentifier, queryCache.RegionName);
+				}
+			}		
+		}
+
+		private IList GetResultFromQueryCache(ISessionImplementor session, QueryParameters queryParameters,
+																								 ISet<string> querySpaces, IType[] resultTypes, IQueryCache queryCache,
+		                                             QueryKey key)
+		{
+			IList result = null;
+			if ((!queryParameters.ForceCacheRefresh) && (session.CacheMode & CacheMode.Get) == CacheMode.Get)
+			{
+				result= queryCache.Get(key, resultTypes, querySpaces, session);
+				if (factory.Statistics.IsStatisticsEnabled)
+				{
+					if (result == null)
+					{
+						factory.StatisticsImplementor.QueryCacheMiss(QueryIdentifier, queryCache.RegionName);
+					}
+					else
+					{
+						factory.StatisticsImplementor.QueryCacheHit(QueryIdentifier, queryCache.RegionName);
+					}
+				}
+			}

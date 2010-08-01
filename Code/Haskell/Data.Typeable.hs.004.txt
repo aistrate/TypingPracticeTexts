@@ -1,0 +1,50 @@
+      [a,r] | tycon == funTc  -> showParen (p > 8) $
+                                 showsPrec 9 a .
+                                 showString " -> " .
+                                 showsPrec 8 r
+      xs | isTupleTyCon tycon -> showTuple xs
+         | otherwise         ->
+            showParen (p > 9) $
+            showsPrec p tycon . 
+            showChar ' '      . 
+            showArgs tys
+
+showsTypeRep :: TypeRep -> ShowS
+showsTypeRep = shows
+
+instance Show TyCon where
+  showsPrec _ (TyCon _ s) = showString s
+
+isTupleTyCon :: TyCon -> Bool
+isTupleTyCon (TyCon _ ('(':',':_)) = True
+isTupleTyCon _                     = False
+
+showArgs :: Show a => [a] -> ShowS
+showArgs [] = id
+showArgs [a] = showsPrec 10 a
+showArgs (a:as) = showsPrec 10 a . showString " " . showArgs as 
+
+showTuple :: [TypeRep] -> ShowS
+showTuple args = showChar '('
+               . (foldr (.) id $ intersperse (showChar ',') 
+                               $ map (showsPrec 10) args)
+               . showChar ')'
+
+class Typeable a where
+  typeOf :: a -> TypeRep
+
+class Typeable1 t where
+  typeOf1 :: t a -> TypeRep
+
+typeOfDefault :: (Typeable1 t, Typeable a) => t a -> TypeRep
+typeOfDefault x = typeOf1 x `mkAppTy` typeOf (argType x)
+ where
+   argType :: t a -> a
+   argType =  undefined
+
+class Typeable2 t where
+  typeOf2 :: t a b -> TypeRep
+
+typeOf1Default :: (Typeable2 t, Typeable a) => t a b -> TypeRep
+typeOf1Default x = typeOf2 x `mkAppTy` typeOf (argType x)
+ where

@@ -1,0 +1,30 @@
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/51BWgdzkEOL._SL120_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12239_Image7" class="productImage" />
+                            </div>Caught
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Harlan-Coben/e/B000APCH7Y/ref=s9_al_bw_al8?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Harlan Coben</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$27.95</span>
+                            <span class="red t14">$12.91</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0446554960/ref=s9_al_bw_i8?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Fever Dream">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/513lUubPhaL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL120_OU01_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12239_Image8" class="productImage" />
+                            </div>Fever Dream
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span><a class="noLinkDecoration" href="/Lincoln-Child/e/B000APYNUI/ref=s9_al_bw_al9?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Lincoln Child</a>, <a class="noLinkDecoration" href="/Douglas-Preston/e/B000AQ0AWW/ref=s9_al_bw_al9?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Douglas Preston</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$26.99</span>
+                            <span class="red t14">$14.84</span>
+                          </span>

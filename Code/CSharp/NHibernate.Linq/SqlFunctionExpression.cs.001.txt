@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using NHibernate.Criterion;
+using NHibernate.Engine;
+using NHibernate.SqlCommand;
+using NHibernate.Type;
+
+namespace NHibernate.Linq.Expressions
+{
+	public class SqlFunctionExpression : ICriterion
+	{
+		private String op;
+
+		public SqlFunctionExpression(String functionName, System.Type returnType, ICriterion innerCriterion)
+			: this(functionName, returnType, null, null, innerCriterion, 0, null)
+		{
+		}
+
+		public SqlFunctionExpression(String functionName, System.Type returnType, Object[] paramValues,
+									 System.Type[] paramTypes, ICriterion innerCriterion)
+			: this(functionName, returnType, paramValues, paramTypes, innerCriterion, 0, null)
+		{
+		}
+
+		public SqlFunctionExpression(String functionName, System.Type returnType, Object[] paramValues,
+									 System.Type[] paramTypes, ICriterion innerCriterion, int propertyPosition)
+			: this(functionName, returnType, paramValues, paramTypes, innerCriterion, propertyPosition, null)
+		{
+		}
+
+		public SqlFunctionExpression(String functionName, System.Type returnType, Object[] paramValues,
+									 System.Type[] paramTypes, ICriterion innerCriterion, int propertyPosition,
+									 SqlFunctionExpression rightFunction)
+		{
+			FunctionName = functionName;
+			ReturnType = returnType;
+			ParameterValues = paramValues;
+			ParameterTypes = paramTypes;
+			InnerCriterion = innerCriterion;
+			PropertyPosition = propertyPosition;
+			RightFunction = rightFunction;
+		}
+
+		private SqlFunctionExpression RightFunction { get; set; }
+		public ICriterion InnerCriterion { get; set; }
+		public String FunctionName { get; private set; }
+		public System.Type ReturnType { get; private set; }
+		public Object[] ParameterValues { get; private set; }
+		public System.Type[] ParameterTypes { get; private set; }

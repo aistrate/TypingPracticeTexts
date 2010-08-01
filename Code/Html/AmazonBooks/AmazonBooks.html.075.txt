@@ -1,0 +1,30 @@
+                              <span class="tiny dilText"></span>
+                            </div>
+                            <a href="http://www.amazon.com/Violet-Dawn-ebook/dp/B000SEVA02/ref=pd_ts_zgc_kinc_digital-text-f_1?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Violet Dawn" class="titleLink">Violet Dawn</a>
+                            <div class="tiny byline">
+                              <span class="carat"></span>Brandilyn Collins (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock ">
+                              <span class="listprice"></span>
+                              <strong class="price">Free</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Critical-Care-Mercy-Hospital-ebook/dp/B0024NJVZQ/ref=pd_ts_zgc_kinc_digital-text-f_2_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Critical Care (Mercy Hospital, Book 1)">
+                              <img src="http://ecx.images-amazon.com/images/I/51gHT3YMFcL._SL75_.jpg" alt="Critical Care" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "noDil">
+                              <span class="rank">2.</span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText"></span>
+                            </div>

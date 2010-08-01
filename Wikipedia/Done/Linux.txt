@@ -1,0 +1,7 @@
+Linux
+
+Linux (commonly pronounced LI-nuks in English, also pronounced LI-nooks) is a generic term referring to Unix-like computer operating systems based on the Linux kernel. Their development is one of the most prominent examples of free and open source software collaboration; typically all the underlying source code can be used, freely modified, and redistributed, both commercially and non-commercially, by anyone under licenses such as the GNU GPL.
+
+Linux is predominantly known for its use in servers, although can be installed on a wide variety of computer hardware, ranging from embedded devices, mobile phones and even some watches to mainframes and supercomputers. Linux distributions, installed on both desktop and laptop computers, have become increasingly commonplace in recent years, partly owing to the popular Ubuntu distribution and the emergence of netbooks.
+
+The name "Linux" comes from the Linux kernel, originally written in 1991 by Linus Torvalds. The rest of the system usually comprises components such as the Apache HTTP Server, the X Window System, the GNOME and KDE desktop environments, and utilities and libraries from the GNU Project (announced in 1983 by Richard Stallman). Commonly-used applications with desktop Linux systems include the Mozilla Firefox web-browser and the OpenOffice.org office application suite. The GNU contribution is the basis for the Free Software Foundation's preferred name GNU/Linux.

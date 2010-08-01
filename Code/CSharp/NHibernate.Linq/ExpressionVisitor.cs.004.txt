@@ -1,0 +1,50 @@
+			Expression ifFalse = Visit(c.IfFalse);
+
+			if (test != c.Test || ifTrue != c.IfTrue || ifFalse != c.IfFalse)
+			{
+				return Expression.Condition(test, ifTrue, ifFalse);
+			}
+
+			return c;
+		}
+
+		protected virtual Expression VisitParameter(ParameterExpression p)
+		{
+			return p;
+		}
+
+		protected virtual Expression VisitMemberAccess(MemberExpression m)
+		{
+			Expression exp = Visit(m.Expression);
+			if (exp != m.Expression)
+			{
+				return Expression.MakeMemberAccess(exp, m.Member);
+			}
+			return m;
+		}
+
+		protected virtual Expression VisitMethodCall(MethodCallExpression m)
+		{
+			Expression obj = Visit(m.Object);
+			IEnumerable<Expression> args = VisitList(m.Arguments);
+
+			if (obj != m.Object || args != m.Arguments)
+			{
+				return Expression.Call(obj, m.Method, args);
+			}
+
+			return m;
+		}
+
+		protected virtual ReadOnlyCollection<Expression> VisitList(ReadOnlyCollection<Expression> original)
+		{
+			List<Expression> list = null;
+			for (int i = 0, n = original.Count; i < n; i++)
+			{
+				Expression p = Visit(original[i]);
+				if (list != null)
+				{
+					list.Add(p);
+				}
+				else if (p != original[i])
+				{

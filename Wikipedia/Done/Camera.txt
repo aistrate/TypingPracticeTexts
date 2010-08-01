@@ -1,0 +1,7 @@
+Camera
+
+A camera is a device that records images, either as a still photograph or as moving images known as videos or movies. The term comes from the camera obscura (Latin for "dark chamber"), an early mechanism of projecting images where an entire room functioned as a real-time imaging system; the modern camera evolved from the camera obscura.
+
+Cameras may work with the light of the visible spectrum or with other portions of the electromagnetic spectrum. A camera generally consists of an enclosed hollow with an opening (aperture) at one end for light to enter, and a recording or viewing surface for capturing the light at the other end. A majority of cameras have a lens positioned in front of the camera's opening to gather the incoming light and focus all or part of the image on the recording surface. Most 20th century cameras used photographic film as a recording surface, while modern ones use an electronic camera sensor. The diameter of the aperture is often controlled by a diaphragm mechanism, but some cameras have a fixed-size aperture.
+
+A typical still camera takes one photo each time the user presses the shutter button. A typical movie camera continuously takes 24 film frames per second as long as the user holds down the shutter button, or until the shutter button is pressed a second time.

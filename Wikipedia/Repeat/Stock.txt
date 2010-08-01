@@ -1,0 +1,11 @@
+Stock
+
+The stock or capital stock of a business entity represents the original capital paid or invested into the business by its founders. It serves as a security for the creditors of a business since it cannot be withdrawn to the detriment of the creditors. Stock is distinct from the property and the assets of a business which may fluctuate in quantity and value.
+
+The stock of a business is divided into shares, the total of which must be stated at the time of business formation. Given the total amount of money invested into the business, a share has a certain declared face value, commonly known as the par value of a share. The par value is the de minimis (minimum) amount of money that a business may issue and sell shares for in many jurisdictions and it is the value represented as capital in the accounting of the business. In other jurisdictions, however, shares may not have an associated par value at all. Such stock is often called non-par stock. Shares represent a fraction of ownership in a business. A business may declare different types (classes) of shares, each having distinctive ownership rules, privileges, or share values.
+
+Ownership of shares is documented by issuance of a stock certificate. A stock certificate is a legal document that specifies the amount of shares owned by the shareholder, and other specifics of the shares, such as the par value, if any, or the class of the shares.
+
+Used in the plural, stocks is often used as a synonym for shares. Traditionalist demands that the plural stocks be used only when referring to stock of more than one company are rarely heard nowadays.
+
+In the United Kingdom, South Africa, and Australia, stock can also refer to completely different financial instruments such as government bonds or, less commonly, to all kinds of marketable securities.

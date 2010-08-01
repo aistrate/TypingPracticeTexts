@@ -1,0 +1,99 @@
+            , updateMinWithKey
+            , updateMaxWithKey
+            , minView
+            , maxView
+            , minViewWithKey
+            , maxViewWithKey
+            
+            , showTree
+            , showTreeWith
+            , valid
+            ) where
+
+import Prelude hiding (lookup,map,filter,foldr,foldl,null)
+import qualified Data.Set as Set
+import qualified Data.List as List
+import Data.Monoid (Monoid(..))
+import Control.Applicative (Applicative(..), (<$>))
+import Data.Traversable (Traversable(traverse))
+import Data.Foldable (Foldable(foldMap))
+#ifndef __GLASGOW_HASKELL__
+import Data.Typeable ( Typeable, typeOf, typeOfDefault
+                     , Typeable1, typeOf1, typeOf1Default)
+#endif
+import Data.Typeable (Typeable2(..), TyCon, mkTyCon, mkTyConApp)
+
+#if __GLASGOW_HASKELL__
+import Text.Read
+import Data.Data (Data(..), mkNorepType, gcast2)
+#endif
+
+infixl 9 !,\\
+
+(!) :: Ord k => Map k a -> k -> a
+m ! k    = find k m
+
+(\\) :: Ord k => Map k a -> Map k b -> Map k a
+m1 \\ m2 = difference m1 m2
+
+data Map k a  = Tip 
+              | Bin {-# UNPACK #-} !Size !k a !(Map k a) !(Map k a) 
+
+type Size     = Int
+
+instance (Ord k) => Monoid (Map k v) where
+    mempty  = empty
+    mappend = union
+    mconcat = unions
+
+#if __GLASGOW_HASKELL__
+
+instance (Data k, Data a, Ord k) => Data (Map k a) where
+  gfoldl f z m   = z fromList `f` toList m
+  toConstr _     = error "toConstr"
+  gunfold _ _    = error "gunfold"
+  dataTypeOf _   = mkNorepType "Data.Map.Map"
+  dataCast2 f    = gcast2 f
+
+#endif
+
+null :: Map k a -> Bool
+null t
+  = case t of
+      Tip    -> True
+      Bin {} -> False
+
+size :: Map k a -> Int
+size t
+  = case t of
+      Tip             -> 0
+      Bin sz _ _ _ _  -> sz
+
+lookup :: Ord k => k -> Map k a -> Maybe a
+lookup k t
+  = case t of
+      Tip -> Nothing
+      Bin _ kx x l r
+          -> case compare k kx of
+               LT -> lookup k l
+               GT -> lookup k r
+               EQ -> Just x       
+
+lookupAssoc :: Ord k => k -> Map k a -> Maybe (k,a)
+lookupAssoc  k t
+  = case t of
+      Tip -> Nothing
+      Bin _ kx x l r
+          -> case compare k kx of
+               LT -> lookupAssoc k l
+               GT -> lookupAssoc k r
+               EQ -> Just (kx,x)
+
+member :: Ord k => k -> Map k a -> Bool
+member k m
+  = case lookup k m of
+      Nothing -> False
+      Just _  -> True
+
+notMember :: Ord k => k -> Map k a -> Bool
+notMember k m = not $ member k m

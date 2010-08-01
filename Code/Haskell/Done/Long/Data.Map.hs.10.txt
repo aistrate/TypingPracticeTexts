@@ -1,0 +1,99 @@
+  | size ry < ratio*size ly = singleR k x l r
+  | otherwise               = doubleR k x l r
+rotateR _ _ Tip _ = error "rotateR Tip"
+
+singleL, singleR :: a -> b -> Map a b -> Map a b -> Map a b
+singleL k1 x1 t1 (Bin _ k2 x2 t2 t3)  = bin k2 x2 (bin k1 x1 t1 t2) t3
+singleL _ _ _ Tip = error "singleL Tip"
+singleR k1 x1 (Bin _ k2 x2 t1 t2) t3  = bin k2 x2 t1 (bin k1 x1 t2 t3)
+singleR _ _ Tip _ = error "singleR Tip"
+
+doubleL, doubleR :: a -> b -> Map a b -> Map a b -> Map a b
+doubleL k1 x1 t1 (Bin _ k2 x2 (Bin _ k3 x3 t2 t3) t4) = bin k3 x3 (bin k1 x1 t1 t2) (bin k2 x2 t3 t4)
+doubleL _ _ _ _ = error "doubleL"
+doubleR k1 x1 (Bin _ k2 x2 t1 (Bin _ k3 x3 t2 t3)) t4 = bin k3 x3 (bin k2 x2 t1 t2) (bin k1 x1 t3 t4)
+doubleR _ _ _ _ = error "doubleR"
+
+bin :: k -> a -> Map k a -> Map k a -> Map k a
+bin k x l r
+  = Bin (size l + size r + 1) k x l r
+
+instance (Eq k,Eq a) => Eq (Map k a) where
+  t1 == t2  = (size t1 == size t2) && (toAscList t1 == toAscList t2)
+
+instance (Ord k, Ord v) => Ord (Map k v) where
+    compare m1 m2 = compare (toAscList m1) (toAscList m2)
+
+instance Functor (Map k) where
+  fmap f m  = map f m
+
+instance Traversable (Map k) where
+  traverse _ Tip = pure Tip
+  traverse f (Bin s k v l r)
+    = flip (Bin s k) <$> traverse f l <*> f v <*> traverse f r
+
+instance Foldable (Map k) where
+  foldMap _f Tip = mempty
+  foldMap f (Bin _s _k v l r)
+    = foldMap f l `mappend` f v `mappend` foldMap f r
+
+instance (Ord k, Read k, Read e) => Read (Map k e) where
+#ifdef __GLASGOW_HASKELL__
+  readPrec = parens $ prec 10 $ do
+    Ident "fromList" <- lexP
+    xs <- readPrec
+    return (fromList xs)
+
+  readListPrec = readListPrecDefault
+#else
+  readsPrec p = readParen (p > 10) $ \ r -> do
+    ("fromList",s) <- lex r
+    (xs,t) <- reads s
+    return (fromList xs,t)
+#endif
+
+instance (Show k, Show a) => Show (Map k a) where
+  showsPrec d m  = showParen (d > 10) $
+    showString "fromList " . shows (toList m)
+
+showTree :: (Show k,Show a) => Map k a -> String
+showTree m
+  = showTreeWith showElem True False m
+  where
+    showElem k x  = show k ++ ":=" ++ show x
+
+showTreeWith :: (k -> a -> String) -> Bool -> Bool -> Map k a -> String
+showTreeWith showelem hang wide t
+  | hang      = (showsTreeHang showelem wide [] t) ""
+  | otherwise = (showsTree showelem wide [] [] t) ""
+
+showsTree :: (k -> a -> String) -> Bool -> [String] -> [String] -> Map k a -> ShowS
+showsTree showelem wide lbars rbars t
+  = case t of
+      Tip -> showsBars lbars . showString "|\n"
+      Bin _ kx x Tip Tip
+          -> showsBars lbars . showString (showelem kx x) . showString "\n" 
+      Bin _ kx x l r
+          -> showsTree showelem wide (withBar rbars) (withEmpty rbars) r .
+             showWide wide rbars .
+             showsBars lbars . showString (showelem kx x) . showString "\n" .
+             showWide wide lbars .
+             showsTree showelem wide (withEmpty lbars) (withBar lbars) l
+
+showsTreeHang :: (k -> a -> String) -> Bool -> [String] -> Map k a -> ShowS
+showsTreeHang showelem wide bars t
+  = case t of
+      Tip -> showsBars bars . showString "|\n" 
+      Bin _ kx x Tip Tip
+          -> showsBars bars . showString (showelem kx x) . showString "\n" 
+      Bin _ kx x l r
+          -> showsBars bars . showString (showelem kx x) . showString "\n" . 
+             showWide wide bars .
+             showsTreeHang showelem wide (withBar bars) l .
+             showWide wide bars .
+             showsTreeHang showelem wide (withEmpty bars) r
+
+showWide :: Bool -> [String] -> String -> String
+showWide wide bars 
+  | wide      = showString (concat (reverse bars)) . showString "|\n" 
+  | otherwise = id

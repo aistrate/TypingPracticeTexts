@@ -1,0 +1,30 @@
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="clear: left; width: 100%; height: 1px; margin: 0; padding: 0; overflow: hidden"></div>
+              <script type="text/javascript">
+                if (typeof S9MultiPackLayout != "undefined") {
+                var ns_1RVCMGP6WPZF34Z5GVPD_12235_r0_S9MultiPackLayout = new S9MultiPackLayout(
+                "ns_1RVCMGP6WPZF34Z5GVPD_12235_r0", 3, 7, 155);
+                }
+              </script>
+              <div class="action">
+                <span class="carat">&rsaquo;</span>
+                <a href="/gp/yourstore/nr/ref=s9_newr_bw_clnk?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155">See more new releases</a>
+              </div>
+              <div class="h_rule"></div>
+            </div>
+            <div class="unified_widget rcm widget">
+              <script type="text/javascript">
+                if( typeof jQuery != 'undefined' ) {   amznJQ.onReady('s9shoveler', function() {
+                (function($) {
+                $("#ns_1RVCMGP6WPZF34Z5GVPD_12231_-shoveler-div").s9shoveler( 10 );
+                })(jQuery);
+                });
+                }
+              </script>
+              <div id="ns_1RVCMGP6WPZF34Z5GVPD_12231_-shoveler-div" class="s9-shoveler">
+                <div class="shoveler-header">
+                  <div class="shoveler-title">
+                    <h2 style="padding-right: 6.5em;">The Best Books of 2009: Editors&#39; Top 10 in Picture Books</h2>

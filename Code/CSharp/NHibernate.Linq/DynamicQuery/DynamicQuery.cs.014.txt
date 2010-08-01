@@ -1,0 +1,50 @@
+				if (!String.IsNullOrEmpty(pe.Name))
+					AddSymbol(pe.Name, pe);
+			if (parameters.Length == 1 && String.IsNullOrEmpty(parameters[0].Name))
+				it = parameters[0];
+		}
+
+		void ProcessValues(object[] values)
+		{
+			for (int i = 0; i < values.Length; i++)
+			{
+				object value = values[i];
+				if (i == values.Length - 1 && value is IDictionary<string, object>)
+				{
+					externals = (IDictionary<string, object>)value;
+				}
+				else
+				{
+					AddSymbol("@" + i.ToString(System.Globalization.CultureInfo.InvariantCulture), value);
+				}
+			}
+		}
+
+		void AddSymbol(string name, object value)
+		{
+			if (symbols.ContainsKey(name))
+				throw ParseError(Res.DuplicateIdentifier, name);
+			symbols.Add(name, value);
+		}
+
+		public Expression Parse(Type resultType)
+		{
+			int exprPos = token.pos;
+			Expression expr = ParseExpression();
+			if (resultType != null)
+				if ((expr = PromoteExpression(expr, resultType, true)) == null)
+					throw ParseError(exprPos, Res.ExpressionTypeMismatch, GetTypeName(resultType));
+			ValidateToken(TokenId.End, Res.SyntaxError);
+			return expr;
+		}
+
+#pragma warning disable 0219
+		public IEnumerable<DynamicOrdering> ParseOrdering()
+		{
+			List<DynamicOrdering> orderings = new List<DynamicOrdering>();
+			while (true)
+			{
+				Expression expr = ParseExpression();
+				bool ascending = true;
+				if (TokenIdentifierIs("asc") || TokenIdentifierIs("ascending"))
+				{

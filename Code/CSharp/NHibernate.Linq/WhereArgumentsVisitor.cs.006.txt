@@ -1,0 +1,50 @@
+		}
+
+		protected override Expression VisitUnary(UnaryExpression expr)
+		{
+			switch (expr.NodeType)
+			{
+				case ExpressionType.Quote:
+					Visit(expr.Operand);
+					break;
+
+				case ExpressionType.Not:
+					VisitNotExpression(expr);
+					break;
+			}
+
+			return expr;
+		}
+
+		private void VisitNotExpression(UnaryExpression expr)
+		{
+			var criterions = GetCriterion(rootCriteria, session, expr.Operand);
+
+			Conjunction conjunction = Restrictions.Conjunction();
+			foreach (var criterion in criterions)
+				conjunction.Add(criterion);
+
+			CurrentCriterions.Add(Restrictions.Not(conjunction));
+		}
+
+		protected override Expression VisitPropertyAccess(PropertyAccessExpression expr)
+		{
+			if (expr.Type == typeof(bool))
+			{
+				string name = MemberNameVisitor.GetMemberName(rootCriteria, expr);
+				CurrentCriterions.Add(Restrictions.Eq(name, true));
+			}
+
+			return expr;
+		}
+
+		private ICriterion GetExistsCriteria(MethodCallExpression expr)
+		{
+			EntityExpression rootEntity = EntityExpressionVisitor.FirstEntity(expr);
+			string propertyName = MemberNameVisitor.GetMemberName(rootCriteria, expr);
+
+			DetachedCriteria query = DetachedCriteria.For(rootEntity.Type)
+				.SetProjection(Projections.Id())
+				.Add(Restrictions.IsNotEmpty(propertyName));
+
+			if (expr.Arguments.Count > 1)

@@ -1,0 +1,50 @@
+genericLength (_:l)     =  1 + genericLength l
+
+genericTake             :: (Integral i) => i -> [a] -> [a]
+genericTake n _ | n <= 0 = []
+genericTake _ []        =  []
+genericTake n (x:xs)    =  x : genericTake (n-1) xs
+
+genericDrop             :: (Integral i) => i -> [a] -> [a]
+genericDrop n xs | n <= 0 = xs
+genericDrop _ []        =  []
+genericDrop n (_:xs)    =  genericDrop (n-1) xs
+
+genericSplitAt          :: (Integral i) => i -> [b] -> ([b],[b])
+genericSplitAt n xs | n <= 0 =  ([],xs)
+genericSplitAt _ []     =  ([],[])
+genericSplitAt n (x:xs) =  (x:xs',xs'') where
+    (xs',xs'') = genericSplitAt (n-1) xs
+
+genericIndex :: (Integral a) => [b] -> a -> b
+genericIndex (x:_)  0 = x
+genericIndex (_:xs) n
+ | n > 0     = genericIndex xs (n-1)
+ | otherwise = error "List.genericIndex: negative argument."
+genericIndex _ _      = error "List.genericIndex: index too large."
+
+genericReplicate        :: (Integral i) => i -> a -> [a]
+genericReplicate n x    =  genericTake n (repeat x)
+
+zip4                    :: [a] -> [b] -> [c] -> [d] -> [(a,b,c,d)]
+zip4                    =  zipWith4 (,,,)
+
+zip5                    :: [a] -> [b] -> [c] -> [d] -> [e] -> [(a,b,c,d,e)]
+zip5                    =  zipWith5 (,,,,)
+
+zip6                    :: [a] -> [b] -> [c] -> [d] -> [e] -> [f] ->
+                              [(a,b,c,d,e,f)]
+zip6                    =  zipWith6 (,,,,,)
+
+zip7                    :: [a] -> [b] -> [c] -> [d] -> [e] -> [f] ->
+                              [g] -> [(a,b,c,d,e,f,g)]
+zip7                    =  zipWith7 (,,,,,,)
+
+zipWith4                :: (a->b->c->d->e) -> [a]->[b]->[c]->[d]->[e]
+zipWith4 z (a:as) (b:bs) (c:cs) (d:ds)
+                        =  z a b c d : zipWith4 z as bs cs ds
+zipWith4 _ _ _ _ _      =  []
+
+zipWith5                :: (a->b->c->d->e->f) ->
+                           [a]->[b]->[c]->[d]->[e]->[f]
+zipWith5 z (a:as) (b:bs) (c:cs) (d:ds) (e:es)

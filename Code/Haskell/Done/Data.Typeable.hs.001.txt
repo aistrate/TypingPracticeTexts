@@ -1,0 +1,50 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude -XOverlappingInstances -funbox-strict-fields #-}
+
+module Data.Typeable
+  (
+
+        Typeable( typeOf ),
+
+        cast,
+        gcast,
+
+        TypeRep,
+        TyCon,
+        showsTypeRep,
+
+        mkTyCon,
+        mkTyConApp,
+        mkAppTy,
+        mkFunTy,
+
+        splitTyConApp,
+        funResultTy,
+        typeRepTyCon,
+        typeRepArgs,
+        tyConString,
+        typeRepKey,
+
+        Typeable1( typeOf1 ),
+        Typeable2( typeOf2 ),
+        Typeable3( typeOf3 ),
+        Typeable4( typeOf4 ),
+        Typeable5( typeOf5 ),
+        Typeable6( typeOf6 ),
+        Typeable7( typeOf7 ),
+        gcast1,
+        gcast2,
+
+        typeOfDefault,
+        typeOf1Default,
+        typeOf2Default,
+        typeOf3Default,
+        typeOf4Default,
+        typeOf5Default,
+        typeOf6Default
+
+  ) where
+
+import qualified Data.HashTable as HT
+import Data.Maybe
+import Data.Int
+import Data.Word

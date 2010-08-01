@@ -1,0 +1,30 @@
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0843960906/ref=s9_al_bw_i19?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-12&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266676542&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Urban Gothic">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/51cyb-YkJuL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL120_OU01_.jpg" alt="" width="75" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12233_Image19" class="productImage" />
+                            </div>Urban Gothic
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Brian-Keene/e/B001IQW9KY/ref=s9_al_bw_al20?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-12&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266676542&pf_rd_i=283155">Brian Keene</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Mass Market Paperback</div>
+                            <span class="red t14">$7.99</span>
+                          </span>
+                        </div>
+                      </li>
+                    </ul>
+                    <a title="Next" href="#" class="next-button button"></a>
+                  </div>
+                </div>
+              </div>
+              <div class="action">
+                <span class="carat">&rsaquo;</span>
+                <a href="/gp/feature.html/ref=s9_al_bw_feat?ie=UTF8&docId=1000519971&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-12&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266676542&pf_rd_i=283155">See more featured 4-for-3 Mystery &amp; Thrillers</a>
+              </div>
+            </div>
+            <div class="unified_widget rcm widget">

@@ -1,0 +1,30 @@
+              <div style="clear: left; width: 100%; height: 1px; margin: 0; padding: 0; overflow: hidden"></div>
+              <script type="text/javascript">
+                if (typeof S9MultiPackLayout != "undefined") {
+                var ns_1RVCMGP6WPZF34Z5GVPD_12237_r0_S9MultiPackLayout = new S9MultiPackLayout(
+                "ns_1RVCMGP6WPZF34Z5GVPD_12237_r0", 3, 7, 155);
+                }
+              </script>
+              <div class="action">
+                <span class="carat">&rsaquo;</span>
+                <a href="/gp/yourstore/recs/ref=s9_qpick_bw_clnk?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155">See more recommendations</a>
+              </div>
+              <div class="h_rule"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="page-footer">
+
+        <style type="text/css">
+          .rhf-box-corner-sprite {
+          background-image: url('http://g-ecx.images-amazon.com/images/G/01/x-locale/personalization/yourstore/bluebox/bluebox-corners._V192187813_.gif');
+          }
+          .rhf-box-sides-sprite {
+          background-image: url('http://g-ecx.images-amazon.com/images/G/01/x-locale/personalization/yourstore/bluebox/bluebox-sides._V192187807_.gif');
+          }
+          .rhf-box-tl {
+          background-position: 0px 0px;
+          background-repeat:no-repeat;
+          }
+          .rhf-box-tc {

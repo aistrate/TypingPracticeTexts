@@ -1,0 +1,54 @@
+for :: (Traversable t, Applicative f) => t a -> (a -> f b) -> f (t b)
+{-# INLINE for #-}
+for = flip traverse
+
+forM :: (Traversable t, Monad m) => t a -> (a -> m b) -> m (t b)
+{-# INLINE forM #-}
+forM = flip mapM
+
+newtype StateL s a = StateL { runStateL :: s -> (s, a) }
+
+instance Functor (StateL s) where
+        fmap f (StateL k) = StateL $ \ s ->
+                let (s', v) = k s in (s', f v)
+
+instance Applicative (StateL s) where
+        pure x = StateL (\ s -> (s, x))
+        StateL kf <*> StateL kv = StateL $ \ s ->
+                let (s', f) = kf s
+                    (s'', v) = kv s'
+                in (s'', f v)
+
+mapAccumL :: Traversable t => (a -> b -> (a, c)) -> a -> t b -> (a, t c)
+mapAccumL f s t = runStateL (traverse (StateL . flip f) t) s
+
+newtype StateR s a = StateR { runStateR :: s -> (s, a) }
+
+instance Functor (StateR s) where
+        fmap f (StateR k) = StateR $ \ s ->
+                let (s', v) = k s in (s', f v)
+
+instance Applicative (StateR s) where
+        pure x = StateR (\ s -> (s, x))
+        StateR kf <*> StateR kv = StateR $ \ s ->
+                let (s', v) = kv s
+                    (s'', f) = kf s'
+                in (s'', f v)
+
+mapAccumR :: Traversable t => (a -> b -> (a, c)) -> a -> t b -> (a, t c)
+mapAccumR f s t = runStateR (traverse (StateR . flip f) t) s
+
+fmapDefault :: Traversable t => (a -> b) -> t a -> t b
+fmapDefault f = getId . traverse (Id . f)
+
+foldMapDefault :: (Traversable t, Monoid m) => (a -> m) -> t a -> m
+foldMapDefault f = getConst . traverse (Const . f)
+
+newtype Id a = Id { getId :: a }
+
+instance Functor Id where
+        fmap f (Id x) = Id (f x)
+
+instance Applicative Id where
+        pure = Id
+        Id f <*> Id x = Id (f x)

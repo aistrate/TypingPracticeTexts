@@ -1,0 +1,50 @@
+				new[] { left, right });
+		}
+
+		MethodInfo GetStaticMethod(string methodName, Expression left, Expression right)
+		{
+			return left.Type.GetMethod(methodName, new[] { left.Type, right.Type });
+		}
+
+		Expression GenerateStaticMethodCall(string methodName, Expression left, Expression right)
+		{
+			return Expression.Call(null, GetStaticMethod(methodName, left, right), new[] { left, right });
+		}
+
+		void SetTextPos(int pos)
+		{
+			textPos = pos;
+			ch = textPos < textLen ? text[textPos] : '\0';
+		}
+
+		void NextChar()
+		{
+			if (textPos < textLen) textPos++;
+			ch = textPos < textLen ? text[textPos] : '\0';
+		}
+
+		void NextToken()
+		{
+			while (Char.IsWhiteSpace(ch)) NextChar();
+			TokenId t;
+			int tokenPos = textPos;
+			switch (ch)
+			{
+				case '!':
+					NextChar();
+					if (ch == '=')
+					{
+						NextChar();
+						t = TokenId.ExclamationEqual;
+					}
+					else
+					{
+						t = TokenId.Exclamation;
+					}
+					break;
+				case '%':
+					NextChar();
+					t = TokenId.Percent;
+					break;
+				case '&':
+					NextChar();

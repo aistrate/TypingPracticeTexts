@@ -1,0 +1,50 @@
+					{
+						case TypeCode.UInt32:
+						case TypeCode.Int64:
+						case TypeCode.UInt64:
+						case TypeCode.Single:
+						case TypeCode.Double:
+						case TypeCode.Decimal:
+							return true;
+					}
+					break;
+				case TypeCode.Int64:
+					switch (tc)
+					{
+						case TypeCode.Int64:
+						case TypeCode.Single:
+						case TypeCode.Double:
+						case TypeCode.Decimal:
+							return true;
+					}
+					break;
+				case TypeCode.UInt64:
+					switch (tc)
+					{
+						case TypeCode.UInt64:
+						case TypeCode.Single:
+						case TypeCode.Double:
+						case TypeCode.Decimal:
+							return true;
+					}
+					break;
+				case TypeCode.Single:
+					switch (tc)
+					{
+						case TypeCode.Single:
+						case TypeCode.Double:
+							return true;
+					}
+					break;
+				default:
+					if (st == tt) return true;
+					break;
+			}
+			return false;
+		}
+
+		static bool IsBetterThan(Expression[] args, MethodData m1, MethodData m2)
+		{
+			bool better = false;
+			for (int i = 0; i < args.Length; i++)
+			{

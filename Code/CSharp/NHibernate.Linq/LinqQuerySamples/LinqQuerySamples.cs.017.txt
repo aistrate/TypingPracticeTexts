@@ -1,0 +1,50 @@
+		{
+			var q =
+				from p in db.Products
+				orderby p.UnitPrice descending
+				select p;
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("ORDER BY")]
+		[Test(Description = "This sample uses a compound orderby to sort Customers " +
+					 "by city and then contact name.")]
+		public void DLinq39()
+		{
+			var q =
+				from c in db.Customers
+				orderby c.City, c.ContactName
+				select c;
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("ORDER BY")]
+		[Test(Description = "This sample uses orderby to sort Orders from EmployeeID 1 " +
+					 "by ship-to country, and then by freight from highest to lowest.")]
+		public void DLinq40()
+		{
+			var q =
+				from o in db.Orders
+				where o.Employee.EmployeeID == 1
+				orderby o.ShipCountry, o.Freight descending
+				select o;
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("ORDER BY")]
+		[Test(Description = "This sample uses Orderby, Max and Group By to find the Products that have " +
+					 "the highest unit price in each category, and sorts the group by category id.")]
+		[Ignore("TODO")]
+		public void DLinq41()
+		{
+			var categories =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					orderby g.Key
+					select new
+							{
+								g.Key,

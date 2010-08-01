@@ -1,0 +1,50 @@
+#endif
+import GHC.Exception    ( SomeException(..), throw )
+import GHC.Pack         ( packCString# )
+import GHC.Ptr          ( Ptr(..) )
+import GHC.STRef
+import GHC.Show         ( Show(..), showString )
+import Data.Typeable
+import GHC.Err
+
+infixr 0 `par`, `pseq`
+data ThreadId = ThreadId ThreadId# deriving( Typeable )
+
+instance Show ThreadId where
+   showsPrec d t = 
+        showString "ThreadId " . 
+        showsPrec d (getThreadId (id2TSO t))
+
+foreign import ccall unsafe "rts_getThreadId" getThreadId :: ThreadId# -> CInt
+
+id2TSO :: ThreadId -> ThreadId#
+id2TSO (ThreadId t) = t
+
+foreign import ccall unsafe "cmp_thread" cmp_thread :: ThreadId# -> ThreadId# -> CInt
+
+cmpThread :: ThreadId -> ThreadId -> Ordering
+cmpThread t1 t2 = 
+   case cmp_thread (id2TSO t1) (id2TSO t2) of
+      -1 -> LT
+      0  -> EQ
+      _  -> GT
+
+instance Eq ThreadId where
+   t1 == t2 = 
+      case t1 `cmpThread` t2 of
+         EQ -> True
+         _  -> False
+
+instance Ord ThreadId where
+   compare = cmpThread
+
+forkIO :: IO () -> IO ThreadId
+forkIO action = IO $ \ s -> 
+   case (fork# action_plus s) of (# s1, tid #) -> (# s1, ThreadId tid #)
+ where
+  action_plus = catchException action childHandler
+
+forkOnIO :: Int -> IO () -> IO ThreadId
+forkOnIO (I# cpu) action = IO $ \ s -> 
+   case (forkOn# cpu action_plus s) of (# s1, tid #) -> (# s1, ThreadId tid #)
+ where

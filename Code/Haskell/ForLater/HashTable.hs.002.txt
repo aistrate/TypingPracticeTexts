@@ -1,0 +1,49 @@
+thawArray    :: HTArray a -> IO (MutArray a)
+newMutArray   :: (Int32, Int32) -> a -> IO (MutArray a)
+#if defined(DEBUG) || defined(__NHC__)
+type MutArray a = IOArray Int32 a
+type HTArray a = MutArray a
+newMutArray = newIOArray
+readHTArray  = readIOArray
+writeMutArray = writeIOArray
+freezeArray = return
+thawArray = return
+#else
+type MutArray a = IOArray Int32 a
+type HTArray a = MutArray a
+newMutArray = newIOArray
+readHTArray arr i = readMutArray arr i
+readMutArray  :: MutArray a -> Int32 -> IO a
+readMutArray arr i = unsafeReadIOArray arr (fromIntegral i)
+writeMutArray arr i x = unsafeWriteIOArray arr (fromIntegral i) x
+freezeArray = return
+thawArray = return
+#endif
+
+data HashTable key val = HashTable {
+                                     cmp     :: !(key -> key -> Bool),
+                                     hash_fn :: !(key -> Int32),
+                                     tab     :: !(IORef (HT key val))
+                                   }
+
+data HT key val
+  = HT {
+        kcount  :: !Int32,
+        bmask   :: !Int32,
+        buckets :: !(HTArray [(key,val)])
+       }
+
+modifyIORef :: IORef a -> (a -> a) -> IO ()
+modifyIORef r f = do
+  v <- readIORef r
+  let z = f v in z `seq` writeIORef r z
+
+data HashData = HD {
+  tables :: !Integer,
+  insertions :: !Integer,
+  lookups :: !Integer,
+  totBuckets :: !Integer,
+  maxEntries :: !Int32,
+  maxChain :: !Int,
+  maxBuckets :: !Int32
+} deriving (Eq, Show)

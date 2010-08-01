@@ -1,0 +1,49 @@
+type HANDLE       = Ptr ()
+type DWORD        = Word32
+
+iNFINITE :: DWORD
+iNFINITE = 0xFFFFFFFF
+
+foreign import ccall unsafe "getIOManagerEvent"
+  c_getIOManagerEvent :: IO HANDLE
+
+foreign import ccall unsafe "readIOManagerEvent"
+  c_readIOManagerEvent :: IO Word32
+
+foreign import ccall unsafe "sendIOManagerEvent"
+  c_sendIOManagerEvent :: Word32 -> IO ()
+
+foreign import ccall unsafe "maperrno"
+   c_maperrno :: IO ()
+
+foreign import stdcall "WaitForSingleObject"
+   c_WaitForSingleObject :: HANDLE -> DWORD -> IO DWORD
+
+#else
+
+startIOManagerThread :: IO ()
+startIOManagerThread = do
+        allocaArray 2 $ \fds -> do
+        throwErrnoIfMinus1 "startIOManagerThread" (c_pipe fds)
+        rd_end <- peekElemOff fds 0
+        wr_end <- peekElemOff fds 1
+        writeIORef stick (fromIntegral wr_end)
+        c_setIOManagerPipe wr_end
+        forkIO $ do
+            allocaBytes sizeofFdSet   $ \readfds -> do
+            allocaBytes sizeofFdSet   $ \writefds -> do 
+            allocaBytes sizeofTimeVal $ \timeval -> do
+            service_loop (fromIntegral rd_end) readfds writefds timeval [] []
+        return ()
+
+service_loop
+   :: Fd
+   -> Ptr CFdSet
+   -> Ptr CFdSet
+   -> Ptr CTimeVal
+   -> [IOReq]
+   -> [DelayReq]
+   -> IO ()
+service_loop wakeup readfds writefds ptimeval old_reqs old_delays = do
+
+  new_reqs <- atomicModifyIORef pendingEvents (\a -> ([],a))

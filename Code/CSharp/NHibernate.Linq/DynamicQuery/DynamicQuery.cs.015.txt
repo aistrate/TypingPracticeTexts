@@ -1,0 +1,50 @@
+					NextToken();
+				}
+				else if (TokenIdentifierIs("desc") || TokenIdentifierIs("descending"))
+				{
+					NextToken();
+					ascending = false;
+				}
+				orderings.Add(new DynamicOrdering { Selector = expr, Ascending = ascending });
+				if (token.id != TokenId.Comma) break;
+				NextToken();
+			}
+			ValidateToken(TokenId.End, Res.SyntaxError);
+			return orderings;
+		}
+#pragma warning restore 0219
+
+		Expression ParseExpression()
+		{
+			int errorPos = token.pos;
+			Expression expr = ParseLogicalOr();
+			if (token.id == TokenId.Question)
+			{
+				NextToken();
+				Expression expr1 = ParseExpression();
+				ValidateToken(TokenId.Colon, Res.ColonExpected);
+				NextToken();
+				Expression expr2 = ParseExpression();
+				expr = GenerateConditional(expr, expr1, expr2, errorPos);
+			}
+			return expr;
+		}
+
+		Expression ParseLogicalOr()
+		{
+			Expression left = ParseLogicalAnd();
+			while (token.id == TokenId.DoubleBar || TokenIdentifierIs("or"))
+			{
+				Token op = token;
+				NextToken();
+				Expression right = ParseLogicalAnd();
+				CheckAndPromoteOperands(typeof(ILogicalSignatures), op.text, ref left, ref right, op.pos);
+				left = Expression.OrElse(left, right);
+			}
+			return left;
+		}
+
+		Expression ParseLogicalAnd()
+		{
+			Expression left = ParseComparison();
+			while (token.id == TokenId.DoubleAmphersand || TokenIdentifierIs("and"))

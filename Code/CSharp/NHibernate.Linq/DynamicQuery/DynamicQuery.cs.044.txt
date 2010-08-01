@@ -1,0 +1,49 @@
+						}
+						if (ch == 'E' || ch == 'e')
+						{
+							t = TokenId.RealLiteral;
+							NextChar();
+							if (ch == '+' || ch == '-') NextChar();
+							ValidateDigit();
+							do
+							{
+								NextChar();
+							} while (Char.IsDigit(ch));
+						}
+						if (ch == 'F' || ch == 'f') NextChar();
+						break;
+					}
+					if (textPos == textLen)
+					{
+						t = TokenId.End;
+						break;
+					}
+					throw ParseError(textPos, Res.InvalidCharacter, ch);
+			}
+			token.id = t;
+			token.text = text.Substring(tokenPos, textPos - tokenPos);
+			token.pos = tokenPos;
+		}
+
+		bool TokenIdentifierIs(string id)
+		{
+			return token.id == TokenId.Identifier && String.Equals(id, token.text, StringComparison.OrdinalIgnoreCase);
+		}
+
+		string GetIdentifier()
+		{
+			ValidateToken(TokenId.Identifier, Res.IdentifierExpected);
+			string id = token.text;
+			if (id.Length > 1 && id[0] == '@') id = id.Substring(1);
+			return id;
+		}
+
+		void ValidateDigit()
+		{
+			if (!Char.IsDigit(ch)) throw ParseError(textPos, Res.DigitExpected);
+		}
+
+		void ValidateToken(TokenId t, string errorMessage)
+		{
+			if (token.id != t) throw ParseError(errorMessage);
+		}

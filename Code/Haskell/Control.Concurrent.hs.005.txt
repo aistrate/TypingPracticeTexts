@@ -1,0 +1,50 @@
+    | rtsSupportsBoundThreads = do
+        bound <- isCurrentThreadBound
+        if bound
+            then action
+            else do
+                ref <- newIORef undefined
+                let action_plus = Exception.try action >>= writeIORef ref
+                resultOrException <-
+                    bracket (newStablePtr action_plus)
+                            freeStablePtr
+                            (\cEntry -> forkOS_entry_reimported cEntry >> readIORef ref)
+                case resultOrException of
+                    Left exception -> Exception.throw (exception :: SomeException)
+                    Right result -> return result
+    | otherwise = failNonThreaded
+
+runInUnboundThread :: IO a -> IO a
+
+runInUnboundThread action = do
+    bound <- isCurrentThreadBound
+    if bound
+        then do
+            mv <- newEmptyMVar
+            forkIO (Exception.try action >>= putMVar mv)
+            takeMVar mv >>= \ei -> case ei of
+                Left exception -> Exception.throw (exception :: SomeException)
+                Right result -> return result
+        else action
+
+#endif /* __GLASGOW_HASKELL__ */
+
+#ifdef __GLASGOW_HASKELL__
+
+threadWaitRead :: Fd -> IO ()
+threadWaitRead fd
+#ifdef mingw32_HOST_OS
+  | threaded  = withThread (waitFd fd 0)
+  | otherwise = case fd of
+                  0 -> do hWaitForInput stdin (-1); return ()
+                  _ -> error "threadWaitRead requires -threaded on Windows, or use System.IO.hWaitForInput"
+#else
+  = GHC.Conc.threadWaitRead fd
+#endif
+
+threadWaitWrite :: Fd -> IO ()
+threadWaitWrite fd
+#ifdef mingw32_HOST_OS
+  | threaded  = withThread (waitFd fd 1)
+  | otherwise = error "threadWaitWrite requires -threaded on Windows"
+#else

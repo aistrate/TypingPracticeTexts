@@ -1,0 +1,13 @@
+Pigment
+
+A pigment is a material that changes the color of reflected or transmitted light as the result of wavelength-selective absorption. This physical process differs from fluorescence, phosphorescence, and other forms of luminescence, in which a material emits light.
+
+Many materials selectively absorb certain wavelengths of light. Materials that humans have chosen and developed for use as pigments usually have special properties that make them ideal for coloring other materials. A pigment must have a high tinting strength relative to the materials it colors. It must be stable in solid form at ambient temperatures.
+
+For industrial applications, as well as in the arts, permanence and stability are desirable properties. Pigments that are not permanent are called fugitive. Fugitive pigments fade over time, or with exposure to light, while some eventually blacken.
+
+Pigments are used for coloring paint, ink, plastic, fabric, cosmetics, food and other materials. Most pigments used in manufacturing and the visual arts are dry colourants, usually ground into a fine powder. This powder is added to a vehicle (or matrix), a relatively neutral or colorless material that acts as a binder.
+
+The worldwide market for inorganic, organic and special pigments had a total volume of around 7.4 million tons in 2006. Asia has the highest rate on a quantity basis followed by Europe and North America. In 2006, a turnover of 17.6 billion US$ (13 billion Euro) was reached mostly in Europe, followed by North America and Asia.
+
+A distinction is usually made between a pigment, which is insoluble in the vehicle (resulting in a suspension), and a dye, which either is itself a liquid or is soluble in its vehicle (resulting in a solution). The term biological pigment is used for all colored substances independent of their solubility. A colorant can be both a pigment and a dye depending on the vehicle it is used in. In some cases, a pigment can be manufactured from a dye by precipitating a soluble dye with a metallic salt. The resulting pigment is called a lake pigment.

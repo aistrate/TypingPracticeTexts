@@ -1,0 +1,50 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude #-}
+
+module Data.Bits ( 
+  Bits(
+    (.&.), (.|.), xor,
+    complement,
+    shift,
+    rotate,
+    bit,
+    setBit,
+    clearBit,
+    complementBit,
+    testBit,
+    bitSize,
+    isSigned,
+    shiftL, shiftR,
+    rotateL, rotateR
+  )
+
+ ) where
+
+#if defined(__GLASGOW_HASKELL__) || defined(__HUGS__)
+#include "MachDeps.h"
+#endif
+
+#ifdef __GLASGOW_HASKELL__
+import GHC.Num
+import GHC.Real
+import GHC.Base
+#endif
+
+#ifdef __HUGS__
+import Hugs.Bits
+#endif
+
+infixl 8 `shift`, `rotate`, `shiftL`, `shiftR`, `rotateL`, `rotateR`
+infixl 7 .&.
+infixl 6 `xor`
+infixl 5 .|.
+
+class Num a => Bits a where
+    (.&.) :: a -> a -> a
+
+    (.|.) :: a -> a -> a
+
+    xor :: a -> a -> a
+
+    complement        :: a -> a
+
+    shift             :: a -> Int -> a

@@ -1,0 +1,50 @@
+module Text.Printf(
+   printf, hPrintf,
+   PrintfType, HPrintfType, PrintfArg, IsChar
+) where
+
+import Prelude
+import Data.Char
+import Data.Int
+import Data.Word
+import Numeric(showEFloat, showFFloat, showGFloat)
+import System.IO
+
+printf :: (PrintfType r) => String -> r
+printf fmts = spr fmts []
+
+hPrintf :: (HPrintfType r) => Handle -> String -> r
+hPrintf hdl fmts = hspr hdl fmts []
+
+class PrintfType t where
+    spr :: String -> [UPrintf] -> t
+
+class HPrintfType t where
+    hspr :: Handle -> String -> [UPrintf] -> t
+
+instance (IsChar c) => PrintfType [c] where
+    spr fmts args = map fromChar (uprintf fmts (reverse args))
+
+instance PrintfType (IO a) where
+    spr fmts args = do
+	putStr (uprintf fmts (reverse args))
+	return undefined
+
+instance HPrintfType (IO a) where
+    hspr hdl fmts args = do
+	hPutStr hdl (uprintf fmts (reverse args))
+	return undefined
+
+instance (PrintfArg a, PrintfType r) => PrintfType (a -> r) where
+    spr fmts args = \ a -> spr fmts (toUPrintf a : args)
+
+instance (PrintfArg a, HPrintfType r) => HPrintfType (a -> r) where
+    hspr hdl fmts args = \ a -> hspr hdl fmts (toUPrintf a : args)
+
+class PrintfArg a where
+    toUPrintf :: a -> UPrintf
+
+instance PrintfArg Char where
+    toUPrintf c = UChar c
+
+instance (IsChar c) => PrintfArg [c] where

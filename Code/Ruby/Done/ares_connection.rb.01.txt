@@ -1,0 +1,100 @@
+require 'active_support/core_ext/benchmark'
+require 'net/https'
+require 'date'
+require 'time'
+require 'uri'
+
+module ActiveResource
+  class Connection
+
+    HTTP_FORMAT_HEADER_NAMES = {  :get => 'Accept',
+      :put => 'Content-Type',
+      :post => 'Content-Type',
+      :delete => 'Accept',
+      :head => 'Accept'
+    }
+
+    attr_reader :site, :user, :password, :auth_type, :timeout, :proxy, :ssl_options
+    attr_accessor :format
+
+    class << self
+      def requests
+        @@requests ||= []
+      end
+    end
+
+    def initialize(site, format = ActiveResource::Formats::XmlFormat)
+      raise ArgumentError, 'Missing site URI' unless site
+      @user = @password = nil
+      @uri_parser = URI.const_defined?(:Parser) ? URI::Parser.new : URI
+      self.site = site
+      self.format = format
+    end
+
+    def site=(site)
+      @site = site.is_a?(URI) ? site : @uri_parser.parse(site)
+      @user = @uri_parser.unescape(@site.user) if @site.user
+      @password = @uri_parser.unescape(@site.password) if @site.password
+    end
+
+    def proxy=(proxy)
+      @proxy = proxy.is_a?(URI) ? proxy : @uri_parser.parse(proxy)
+    end
+
+    def user=(user)
+      @user = user
+    end
+
+    def password=(password)
+      @password = password
+    end
+
+    def auth_type=(auth_type)
+      @auth_type = legitimize_auth_type(auth_type)
+    end
+
+    def timeout=(timeout)
+      @timeout = timeout
+    end
+
+    def ssl_options=(opts={})
+      @ssl_options = opts
+    end
+
+    def get(path, headers = {})
+      with_auth { format.decode(request(:get, path, build_request_headers(headers, :get, self.site.merge(path))).body) }
+    end
+
+    def delete(path, headers = {})
+      with_auth { request(:delete, path, build_request_headers(headers, :delete, self.site.merge(path))) }
+    end
+
+    def put(path, body = '', headers = {})
+      with_auth { request(:put, path, body.to_s, build_request_headers(headers, :put, self.site.merge(path))) }
+    end
+
+    def post(path, body = '', headers = {})
+      with_auth { request(:post, path, body.to_s, build_request_headers(headers, :post, self.site.merge(path))) }
+    end
+
+    def head(path, headers = {})
+      with_auth { request(:head, path, build_request_headers(headers, :head, self.site.merge(path))) }
+    end
+
+    private
+      def request(method, path, *arguments)
+        logger.info "#{method.to_s.upcase} #{site.scheme}://#{site.host}:#{site.port}#{path}" if logger
+        result = nil
+        ms = Benchmark.ms { result = http.send(method, path, *arguments) }
+        logger.info "--> %d %s (%d %.0fms)" % [result.code, result.message, result.body ? result.body.length : 0, ms] if logger
+        handle_response(result)
+      rescue Timeout::Error => e
+        raise TimeoutError.new(e.message)
+      rescue OpenSSL::SSL::SSLError => e
+        raise SSLError.new(e.message)
+      end
+
+      def handle_response(response)
+        case response.code.to_i
+          when 301,302
+            raise(Redirection.new(response))

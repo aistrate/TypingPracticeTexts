@@ -1,0 +1,49 @@
+                        =  z a b c d e : zipWith5 z as bs cs ds es
+zipWith5 _ _ _ _ _ _    = []
+
+zipWith6                :: (a->b->c->d->e->f->g) ->
+                           [a]->[b]->[c]->[d]->[e]->[f]->[g]
+zipWith6 z (a:as) (b:bs) (c:cs) (d:ds) (e:es) (f:fs)
+                        =  z a b c d e f : zipWith6 z as bs cs ds es fs
+zipWith6 _ _ _ _ _ _ _  = []
+
+zipWith7                :: (a->b->c->d->e->f->g->h) ->
+                           [a]->[b]->[c]->[d]->[e]->[f]->[g]->[h]
+zipWith7 z (a:as) (b:bs) (c:cs) (d:ds) (e:es) (f:fs) (g:gs)
+                   =  z a b c d e f g : zipWith7 z as bs cs ds es fs gs
+zipWith7 _ _ _ _ _ _ _ _ = []
+
+unzip4                  :: [(a,b,c,d)] -> ([a],[b],[c],[d])
+unzip4                  =  foldr (\(a,b,c,d) ~(as,bs,cs,ds) ->
+                                        (a:as,b:bs,c:cs,d:ds))
+                                 ([],[],[],[])
+
+unzip5                  :: [(a,b,c,d,e)] -> ([a],[b],[c],[d],[e])
+unzip5                  =  foldr (\(a,b,c,d,e) ~(as,bs,cs,ds,es) ->
+                                        (a:as,b:bs,c:cs,d:ds,e:es))
+                                 ([],[],[],[],[])
+
+unzip6                  :: [(a,b,c,d,e,f)] -> ([a],[b],[c],[d],[e],[f])
+unzip6                  =  foldr (\(a,b,c,d,e,f) ~(as,bs,cs,ds,es,fs) ->
+                                        (a:as,b:bs,c:cs,d:ds,e:es,f:fs))
+                                 ([],[],[],[],[],[])
+
+unzip7          :: [(a,b,c,d,e,f,g)] -> ([a],[b],[c],[d],[e],[f],[g])
+unzip7          =  foldr (\(a,b,c,d,e,f,g) ~(as,bs,cs,ds,es,fs,gs) ->
+                                (a:as,b:bs,c:cs,d:ds,e:es,f:fs,g:gs))
+                         ([],[],[],[],[],[],[])
+
+deleteFirstsBy          :: (a -> a -> Bool) -> [a] -> [a] -> [a]
+deleteFirstsBy eq       =  foldl (flip (deleteBy eq))
+
+group                   :: Eq a => [a] -> [[a]]
+group                   =  groupBy (==)
+
+groupBy                 :: (a -> a -> Bool) -> [a] -> [[a]]
+groupBy _  []           =  []
+groupBy eq (x:xs)       =  (x:ys) : groupBy eq zs
+                           where (ys,zs) = span (eq x) xs
+
+inits                   :: [a] -> [[a]]
+inits []                =  [[]]
+inits (x:xs)            =  [[]] ++ map (x:) (inits xs)

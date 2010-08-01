@@ -1,0 +1,47 @@
+    sum' []     a = a
+    sum' (x:xs) a = sum' xs (a+x)
+product l       = prod l 1
+  where
+    prod []     a = a
+    prod (x:xs) a = prod xs (a*x)
+#endif
+
+lines                   :: String -> [String]
+lines ""                =  []
+lines s                 =  let (l, s') = break (== '\n') s
+                           in  l : case s' of
+                                        []      -> []
+                                        (_:s'') -> lines s''
+
+unlines                 :: [String] -> String
+#ifdef USE_REPORT_PRELUDE
+unlines                 =  concatMap (++ "\n")
+#else
+unlines [] = []
+unlines (l:ls) = l ++ '\n' : unlines ls
+#endif
+
+words                   :: String -> [String]
+words s                 =  case dropWhile isSpace s of
+                                "" -> []
+                                s' -> w : words s''
+                                      where (w, s'') =
+                                             break isSpace s'
+
+unwords                 :: [String] -> String
+#ifdef USE_REPORT_PRELUDE
+unwords []              =  ""
+unwords ws              =  foldr1 (\w s -> w ++ ' ':s) ws
+#else
+unwords []              =  ""
+unwords [w]             = w
+unwords (w:ws)          = w ++ ' ' : unwords ws
+#endif
+
+#else  /* !__GLASGOW_HASKELL__ */
+
+errorEmptyList :: String -> a
+errorEmptyList fun =
+  error ("Prelude." ++ fun ++ ": empty list")
+
+#endif /* !__GLASGOW_HASKELL__ */

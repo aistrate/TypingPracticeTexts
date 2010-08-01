@@ -1,0 +1,100 @@
+			elem = window;
+
+		if ( !handler.guid )
+			handler.guid = this.guid++;
+
+		if ( data !== undefined ) {
+			var fn = handler;
+
+			handler = this.proxy( fn );
+
+			handler.data = data;
+		}
+
+		var events = jQuery.data(elem, "events") || jQuery.data(elem, "events", {}),
+			handle = jQuery.data(elem, "handle") || jQuery.data(elem, "handle", function(){
+				return typeof jQuery !== "undefined" && !jQuery.event.triggered ?
+					jQuery.event.handle.apply(arguments.callee.elem, arguments) :
+					undefined;
+			});
+		handle.elem = elem;
+
+		jQuery.each(types.split(/\s+/), function(index, type) {
+			var namespaces = type.split(".");
+			type = namespaces.shift();
+			handler.type = namespaces.slice().sort().join(".");
+
+			var handlers = events[type];
+			
+			if ( jQuery.event.specialAll[type] )
+				jQuery.event.specialAll[type].setup.call(elem, data, namespaces);
+
+			if (!handlers) {
+				handlers = events[type] = {};
+
+				if ( !jQuery.event.special[type] || jQuery.event.special[type].setup.call(elem, data, namespaces) === false ) {
+					if (elem.addEventListener)
+						elem.addEventListener(type, handle, false);
+					else if (elem.attachEvent)
+						elem.attachEvent("on" + type, handle);
+				}
+			}
+
+			handlers[handler.guid] = handler;
+
+			jQuery.event.global[type] = true;
+		});
+
+		elem = null;
+	},
+
+	guid: 1,
+	global: {},
+
+	remove: function(elem, types, handler) {
+		if ( elem.nodeType == 3 || elem.nodeType == 8 )
+			return;
+
+		var events = jQuery.data(elem, "events"), ret, index;
+
+		if ( events ) {
+			if ( types === undefined || (typeof types === "string" && types.charAt(0) == ".") )
+				for ( var type in events )
+					this.remove( elem, type + (types || "") );
+			else {
+				if ( types.type ) {
+					handler = types.handler;
+					types = types.type;
+				}
+
+				jQuery.each(types.split(/\s+/), function(index, type){
+					var namespaces = type.split(".");
+					type = namespaces.shift();
+					var namespace = RegExp("(^|\\.)" + namespaces.slice().sort().join(".*\\.") + "(\\.|$)");
+
+					if ( events[type] ) {
+						if ( handler )
+							delete events[type][handler.guid];
+
+						else
+							for ( var handle in events[type] )
+								if ( namespace.test(events[type][handle].type) )
+									delete events[type][handle];
+									
+						if ( jQuery.event.specialAll[type] )
+							jQuery.event.specialAll[type].teardown.call(elem, namespaces);
+
+						for ( ret in events[type] ) break;
+						if ( !ret ) {
+							if ( !jQuery.event.special[type] || jQuery.event.special[type].teardown.call(elem, namespaces) === false ) {
+								if (elem.removeEventListener)
+									elem.removeEventListener(type, jQuery.data(elem, "handle"), false);
+								else if (elem.detachEvent)
+									elem.detachEvent("on" + type, jQuery.data(elem, "handle"));
+							}
+							ret = null;
+							delete events[type];
+						}
+					}
+				});
+			}

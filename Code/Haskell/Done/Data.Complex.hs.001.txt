@@ -1,0 +1,49 @@
+module Data.Complex
+        (
+          Complex((:+))
+
+        , realPart
+        , imagPart
+        , mkPolar
+        , cis
+        , polar
+        , magnitude
+        , phase
+        , conjugate
+
+        )  where
+
+import Prelude
+
+import Data.Typeable
+#ifdef __GLASGOW_HASKELL__
+import Data.Data (Data)
+#endif
+
+#ifdef __HUGS__
+import Hugs.Prelude(Num(fromInt), Fractional(fromDouble))
+#endif
+
+infix  6  :+
+
+data (RealFloat a) => Complex a
+  = !a :+ !a
+# if __GLASGOW_HASKELL__
+        deriving (Eq, Show, Read, Data)
+# else
+        deriving (Eq, Show, Read)
+# endif
+
+realPart :: (RealFloat a) => Complex a -> a
+realPart (x :+ _) =  x
+
+imagPart :: (RealFloat a) => Complex a -> a
+imagPart (_ :+ y) =  y
+
+{-# SPECIALISE conjugate :: Complex Double -> Complex Double #-}
+conjugate        :: (RealFloat a) => Complex a -> Complex a
+conjugate (x:+y) =  x :+ (-y)
+
+{-# SPECIALISE mkPolar :: Double -> Double -> Complex Double #-}
+mkPolar          :: (RealFloat a) => a -> a -> Complex a
+mkPolar r theta  =  r * cos theta :+ r * sin theta

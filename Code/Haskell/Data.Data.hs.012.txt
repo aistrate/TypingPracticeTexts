@@ -1,0 +1,49 @@
+instance Data Word32 where
+  toConstr x = mkIntConstr word32Type (fromIntegral x)
+  gunfold _ z c = case constrRep c of
+                    (IntConstr x) -> z (fromIntegral x)
+                    _ -> error "gunfold"
+  dataTypeOf _ = word32Type
+
+word64Type :: DataType
+word64Type = mkIntType "Data.Word.Word64"
+
+instance Data Word64 where
+  toConstr x = mkIntConstr word64Type (fromIntegral x)
+  gunfold _ z c = case constrRep c of
+                    (IntConstr x) -> z (fromIntegral x)
+                    _ -> error "gunfold"
+  dataTypeOf _ = word64Type
+
+ratioConstr :: Constr
+ratioConstr = mkConstr ratioDataType ":%" [] Infix
+
+ratioDataType :: DataType
+ratioDataType = mkDataType "GHC.Real.Ratio" [ratioConstr]
+
+instance (Data a, Integral a) => Data (Ratio a) where
+  gfoldl k z (a :% b) = z (:%) `k` a `k` b
+  toConstr _ = ratioConstr
+  gunfold k z c | constrIndex c == 1 = k (k (z (:%)))
+  gunfold _ _ _ = error "gunfold"
+  dataTypeOf _  = ratioDataType
+
+nilConstr :: Constr
+nilConstr    = mkConstr listDataType "[]" [] Prefix
+consConstr :: Constr
+consConstr   = mkConstr listDataType "(:)" [] Infix
+
+listDataType :: DataType
+listDataType = mkDataType "Prelude.[]" [nilConstr,consConstr]
+
+instance Data a => Data [a] where
+  gfoldl _ z []     = z []
+  gfoldl f z (x:xs) = z (:) `f` x `f` xs
+  toConstr []    = nilConstr
+  toConstr (_:_) = consConstr
+  gunfold k z c = case constrIndex c of
+                    1 -> z []
+                    2 -> k (k (z (:)))
+                    _ -> error "gunfold"
+  dataTypeOf _ = listDataType
+  dataCast1 f  = gcast1 f

@@ -1,0 +1,11 @@
+Gregorian calendar
+
+The Gregorian calendar is the internationally accepted civil calendar. It was introduced by Pope Gregory XIII, after whom the calendar was named, by a decree signed on 24 February 1582, a papal bull known by its opening words Inter gravissimas. The reformed calendar was adopted later that year by a handful of countries, with other countries adopting it over the following centuries.
+
+The Gregorian calendar reform contained two parts, a reform of the Julian calendar as used up to Pope Gregory's time, together with a reform of the lunar cycle used by the Church along with the Julian calendar for calculating dates of Easter. The reform was a modification of a proposal made by the Calabrian doctor Aloysius Lilius (or Lilio). Lilius' proposal included reducing the number of leap years in four centuries from 100 to 97, by making 3 out of 4 centurial years common instead of leap years: this part of the proposal had been suggested before, e.g. by Pietro Pitati. Lilio also produced an original and practical scheme for adjusting the epacts of the moon for completing the calculation of Easter dates, solving a longstanding difficulty that had faced proposers of calendar reform.
+
+Gregory's bull does not ordain any particular year-numbering system, but uses the Anno Domini system which counts years from the traditional Incarnation of Jesus, and which had spread throughout Europe during the Middle Ages. That is the same year-numbering system that is the de facto international standard today.
+
+The Gregorian calendar modifies the Julian calendar's regular cycle of leap years, years exactly divisible by four, including all centurial years, as follows:
+
+Every year that is exactly divisible by four is a leap year, except for years that are exactly divisible by 100; the centurial years that are exactly divisible by 400 are still leap years. For example, the year 1900 is not a leap year; the year 2000 is a leap year.

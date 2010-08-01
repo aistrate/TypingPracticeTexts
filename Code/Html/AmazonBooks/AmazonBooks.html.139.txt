@@ -1,0 +1,30 @@
+                <a href="/b/ref=s9_al_bw_brwse?_encoding=UTF8&node=1285981011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">See more in our Paranormal Romance Store</a>
+              </div>
+            </div>
+            <div class="unified_widget rcm widget">
+              <script type="text/javascript">
+                if (typeof S9MultiPackLayout == "undefined") {
+                document.write('<scr' + 'ipt='' src="http://z-ecx.images-amazon.com/images/G/01/s9-campaigns/s9-multipack-layout._V192754440_.js"></scr' + 'ipt>');
+                }
+              </script>
+              <h2>
+                New For You<sup class="tiny" style="font-weight: normal">&reg;</sup>
+              </h2>
+              <div class="row" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ItemRow">
+                <div style="clear: both; width: 455px; height: 1px; margin: 0; padding: 0; overflow: hidden;"></div>
+                <div class="s9OtherItems" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0OtherItems" style="float: left; width: 99%;">
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ItemElement0" style="width: 33%; margin-bottom: 0px; ">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0TitleContainer0" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0Title0">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ImageContainer0">
+                            <a href="/gp/product/0393072223/ref=s9_newr_bw_ir01?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="The Shallows: What the Internet Is Doing to Our Brains">
+                              <div class="imageContainer">
+                                <img src="http://ecx.images-amazon.com/images/I/41li7oQqEIL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="101" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0Image0" />
+                              </div>The Shallows: What the Internet Is...
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Nicholas-Carr/e/B001JS2HYY/ref=s9_newr_bw_al1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155">Nicholas Carr</a>
+                          </div>

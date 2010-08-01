@@ -1,0 +1,50 @@
+     then do 
+        flushed_buf <- flushWriteBuffer (haFD handle_) (haIsStream handle_) new_buf
+        writeIORef ref flushed_buf
+     else do 
+        writeIORef ref new_buf
+
+hPutChars :: Handle -> [Char] -> IO ()
+hPutChars _      [] = return ()
+hPutChars handle (c:cs) = hPutChar handle c >> hPutChars handle cs
+
+hPutStr :: Handle -> String -> IO ()
+hPutStr handle str = do
+    buffer_mode <- wantWritableHandle "hPutStr" handle 
+                        (\ handle_ -> do getSpareBuffer handle_)
+    case buffer_mode of
+       (NoBuffering, _) -> do
+            hPutChars handle str
+       (LineBuffering, buf) -> do
+            writeLines handle buf str
+       (BlockBuffering _, buf) -> do
+            writeBlocks handle buf str
+
+getSpareBuffer :: Handle__ -> IO (BufferMode, Buffer)
+getSpareBuffer Handle__{haBuffer=ref, 
+                        haBuffers=spare_ref,
+                        haBufferMode=mode}
+ = do
+   case mode of
+     NoBuffering -> return (mode, error "no buffer!")
+     _ -> do
+          bufs <- readIORef spare_ref
+          buf  <- readIORef ref
+          case bufs of
+            BufferListCons b rest -> do
+                writeIORef spare_ref rest
+                return ( mode, newEmptyBuffer b WriteBuffer (bufSize buf))
+            BufferListNil -> do
+                new_buf <- allocateBuffer (bufSize buf) WriteBuffer
+                return (mode, new_buf)
+
+writeLines :: Handle -> Buffer -> String -> IO ()
+writeLines hdl Buffer{ bufBuf=raw, bufSize=len } s =
+  let
+   shoveString :: Int -> [Char] -> IO ()
+   shoveString n cs | n == len = do
+        new_buf <- commitBuffer hdl raw len n True False
+        writeLines hdl new_buf cs
+   shoveString n [] = do
+        commitBuffer hdl raw len n False True
+        return ()

@@ -1,0 +1,9 @@
+Mac OS X
+
+Mac OS X is a line of computer operating systems developed, marketed, and sold by Apple Inc., and since 2002 has been included with all new Macintosh computer systems. It is the successor to Mac OS 9, the final release of the "classic" Mac OS, which had been Apple's primary operating system since 1984.
+
+Mac OS X, whose "X" represents the Roman numeral for "10" and is a prominent part of its brand identity, is a Unix-based operating system, built on technologies developed at NeXT between the second half of the 1980s and Apple's purchase of the company in late 1996. Its sixth release Mac OS X v10.5 "Leopard" gained UNIX 03 certification while running on Intel processors.
+
+The first version released was Mac OS X Server 1.0 in 1999, and a desktop-oriented version, Mac OS X v10.0 "Cheetah" followed on March 24, 2001. Releases of Mac OS X are named after big cats: for example, Mac OS X v10.6 is usually referred to by Apple and users as "Snow Leopard". The server edition, Mac OS X Server, is architecturally identical to its desktop counterpart, and includes tools to facilitate management of workgroups of Mac OS X machines, and to provide access to network services. These tools include a mail transfer agent, a Samba server, an LDAP server, a domain name server, and others. It is pre-loaded on Apple's Xserve server hardware, but can be run on almost all of Apple's current selling computer models.
+
+Apple also produces specialized versions of Mac OS X for use on three of its consumer devices: the iPhone OS for the iPhone and iPod Touch, and an unnamed version for the Apple TV.

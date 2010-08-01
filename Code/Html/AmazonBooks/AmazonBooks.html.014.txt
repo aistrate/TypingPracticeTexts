@@ -1,0 +1,30 @@
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table id="navCrossshop" border="0" cellpadding="0" cellspacing="0" height="22">
+              <tr>
+                <td>
+                  <a href='/gp/yourstore/home/ref=topnav_ys' class='navCrossshopLink'>Adrian's Amazon.com</a>
+                  <span class="navCrossshopBar">&nbsp;|&nbsp;</span>
+                  <a href='/gp/goldbox/ref=cs_top_nav_gb27' class='navCrossshopLink'>
+                    <span class="navSprite navGBIcon">
+                      <span style="visibility:hidden">&nbsp; &nbsp; &nbsp; &nbsp; </span>
+                    </span>Today's Deals
+                  </a>
+                  <span class="navCrossshopBar">&nbsp;|&nbsp;</span>
+                  <a href='/gp/gift-central/ref=cm_gift_button_gc_lp' class='navCrossshopLink'>Gifts & Wish Lists</a>
+                  <span class="navCrossshopBar">&nbsp;|&nbsp;</span>
+                  <a href='/gp/gc/ref=topnav_giftcert' class='navCrossshopLink'>Gift Cards</a>
+                </td>
+                <td width="100%">&nbsp;</td>
+                <td>
+                  <a href='/gp/css/homepage.html/ref=topnav_ya' class='navCrossshopYALink'>Your Account</a>
+                  <span class="navCrossshopBar">&nbsp;|&nbsp;</span>
+                  <a href='/Help/b/ref=topnav_help?ie=UTF8&node=508510' class='navCrossshopYALink'>Help</a>
+                </td>
+
+              </tr>
+            </table>
+          </td>
+        </tr>

@@ -1,0 +1,125 @@
+#ifdef __GLASGOW_HASKELL__
+    hShow,                      -- :: Handle -> IO String
+#endif
+
+    -- * Text input and output
+
+    -- ** Text input
+
+    hWaitForInput,             -- :: Handle -> Int -> IO Bool
+    hReady,                    -- :: Handle -> IO Bool
+    hGetChar,                  -- :: Handle -> IO Char
+    hGetLine,                  -- :: Handle -> IO [Char]
+    hLookAhead,                -- :: Handle -> IO Char
+    hGetContents,              -- :: Handle -> IO [Char]
+
+    -- ** Text output
+
+    hPutChar,                  -- :: Handle -> Char -> IO ()
+    hPutStr,                   -- :: Handle -> [Char] -> IO ()
+    hPutStrLn,                 -- :: Handle -> [Char] -> IO ()
+    hPrint,                    -- :: Show a => Handle -> a -> IO ()
+
+    -- ** Special cases for standard input and output
+
+    -- | These functions are also exported by the "Prelude".
+
+    interact,                  -- :: (String -> String) -> IO ()
+    putChar,                   -- :: Char   -> IO ()
+    putStr,                    -- :: String -> IO () 
+    putStrLn,                  -- :: String -> IO ()
+    print,                     -- :: Show a => a -> IO ()
+    getChar,                   -- :: IO Char
+    getLine,                   -- :: IO String
+    getContents,               -- :: IO String
+    readIO,                    -- :: Read a => String -> IO a
+    readLn,                    -- :: Read a => IO a
+
+    -- * Binary input and output
+
+    withBinaryFile,
+    openBinaryFile,            -- :: FilePath -> IOMode -> IO Handle
+    hSetBinaryMode,            -- :: Handle -> Bool -> IO ()
+    hPutBuf,                   -- :: Handle -> Ptr a -> Int -> IO ()
+    hGetBuf,                   -- :: Handle -> Ptr a -> Int -> IO Int
+#if !defined(__NHC__) && !defined(__HUGS__)
+    hPutBufNonBlocking,        -- :: Handle -> Ptr a -> Int -> IO Int
+    hGetBufNonBlocking,        -- :: Handle -> Ptr a -> Int -> IO Int
+#endif
+
+    -- * Temporary files
+
+    openTempFile,
+    openBinaryTempFile,
+  ) where
+
+import Control.Exception.Base
+
+#ifndef __NHC__
+import Data.Bits
+import Data.List
+import Data.Maybe
+import Foreign.C.Error
+import Foreign.C.String
+import Foreign.C.Types
+import System.Posix.Internals
+#endif
+
+#ifdef __GLASGOW_HASKELL__
+import GHC.Base
+import GHC.IOBase       -- Together these four Prelude modules define
+import GHC.Handle       -- all the stuff exported by IO for the GHC version
+import GHC.IO
+import GHC.Exception
+import GHC.Num
+import Text.Read
+import GHC.Show
+#endif
+
+#ifdef __HUGS__
+import Hugs.IO
+import Hugs.IOExts
+import Hugs.IORef
+import System.IO.Unsafe ( unsafeInterleaveIO )
+#endif
+
+#ifdef __NHC__
+import IO
+  ( Handle ()
+  , HandlePosn ()
+  , IOMode (ReadMode,WriteMode,AppendMode,ReadWriteMode)
+  , BufferMode (NoBuffering,LineBuffering,BlockBuffering)
+  , SeekMode (AbsoluteSeek,RelativeSeek,SeekFromEnd)
+  , stdin, stdout, stderr
+  , openFile                  -- :: FilePath -> IOMode -> IO Handle
+  , hClose                    -- :: Handle -> IO ()
+  , hFileSize                 -- :: Handle -> IO Integer
+  , hIsEOF                    -- :: Handle -> IO Bool
+  , isEOF                     -- :: IO Bool
+  , hSetBuffering             -- :: Handle -> BufferMode -> IO ()
+  , hGetBuffering             -- :: Handle -> IO BufferMode
+  , hFlush                    -- :: Handle -> IO ()
+  , hGetPosn                  -- :: Handle -> IO HandlePosn
+  , hSetPosn                  -- :: HandlePosn -> IO ()
+  , hSeek                     -- :: Handle -> SeekMode -> Integer -> IO ()
+  , hWaitForInput             -- :: Handle -> Int -> IO Bool
+  , hGetChar                  -- :: Handle -> IO Char
+  , hGetLine                  -- :: Handle -> IO [Char]
+  , hLookAhead                -- :: Handle -> IO Char
+  , hGetContents              -- :: Handle -> IO [Char]
+  , hPutChar                  -- :: Handle -> Char -> IO ()
+  , hPutStr                   -- :: Handle -> [Char] -> IO ()
+  , hPutStrLn                 -- :: Handle -> [Char] -> IO ()
+  , hPrint                    -- :: Handle -> [Char] -> IO ()
+  , hReady                    -- :: Handle -> [Char] -> IO ()
+  , hIsOpen, hIsClosed        -- :: Handle -> IO Bool
+  , hIsReadable, hIsWritable  -- :: Handle -> IO Bool
+  , hIsSeekable               -- :: Handle -> IO Bool
+  , bracket
+
+  , IO ()
+  , FilePath                  -- :: String
+  )
+import NHC.IOExtras (fixIO, hPutBuf, hGetBuf)
+import NHC.FFI (Ptr)
+#endif

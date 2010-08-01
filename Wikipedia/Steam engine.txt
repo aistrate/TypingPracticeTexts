@@ -1,0 +1,9 @@
+Steam engine
+
+A steam engine is a heat engine that performs mechanical work using steam as its working fluid.
+
+The idea of using boiling water to produce mechanical motion has a long history, going back about 2,000 years. Early devices were not practical power producers, but more advanced designs producing usable power have become a major source of mechanical power over the last 300 years, enabling the Industrial Revolution, beginning with applications for mine water removal using vacuum engines. Subsequent developments using pressurized steam and converting to rotational motion enabled the powering of a wide range of manufacturing machinery anywhere water and coal or wood fuel could be obtained, previously restricted only to locations where water wheels or windmills could be used. Significantly, this power source would later be applied to prime movers, mobile devices such as steam tractors and railway locomotives. Modern steam turbines generate about 80 percent of the electric power in the world using a variety of heat sources.
+
+Steam engines are typically external combustion engines, although other external sources of heat such as solar power, nuclear power or geothermal energy may be used. The heat cycle is known as the Rankine cycle.
+
+In general usage, the term 'steam engine' can refer to integrated steam plants such as railway steam locomotives and portable engines, or may refer to the machinery alone, as in the beam engine and stationary steam engine. Specialized devices such as steam hammers and steam pile drivers are dependent on steam supplied from a separate boiler.

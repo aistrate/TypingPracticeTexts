@@ -1,0 +1,7 @@
+Induction motor
+
+An induction motor or asynchronous motor is a type of alternating current motor where power is supplied to the rotor by means of electromagnetic induction.
+
+An electric motor converts electrical power to mechanical power in its rotor (rotating part). There are several ways to supply power to the rotor. In a DC motor this power is supplied to the armature directly from a DC source, while in an induction motor this power is induced in the rotating device. An induction motor is sometimes called a rotating transformer because the stator (stationary part) is essentially the primary side of the transformer and the rotor (rotating part) is the secondary side. Unlike the normal transformer which changes the current by using time varying flux, induction motors use rotating magnetic fields to transform the voltage. The primary side's current creates an electromagnetic field which interacts with the secondary side's electromagnetic field to produce a resultant torque, thereby transforming the electrical energy into mechanical energy. Induction motors are widely used, especially polyphase induction motors, which are frequently used in industrial drives.
+
+Induction motors are now the preferred choice for industrial motors due to their rugged construction, absence of brushes (which are required in most DC motors) and--thanks to modern power electronics--the ability to control the speed of the motor.

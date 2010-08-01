@@ -1,0 +1,30 @@
+                      <img src="http://ecx.images-amazon.com/images/P/0345504968.01._SL110_PIsitb-sticker-arrow-sm,TopRight,10,-13_PE46_OU01_SCLZZZZZZZ_V191087038_.jpg" width="86" alt="The Passage" height="133" border="0" />
+                    </a>
+                  </div>
+                  <div class="asinTextBlock">
+                    <div class="title">
+                      <a href="/Best-Books-of-the-Month/b/ref=bhp_9p2_botm_02?ie=UTF8&node=390919011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Best Books of the Month</a>
+                    </div>
+                    <ul>
+                      <li>
+                        <a href="/Passage-Justin-Cronin/dp/0345504968/ref=bhp_9p2_botm_03?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                          Spotlight: <i>The Passage</i> by Justin Cronin
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Anthropology-American-Hilary-Thayer-Hamann/dp/0385527144/ref=bhp_9p2_botm_04?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                          <i>Anthropology of an American Girl</i> by Hilary Thayer Hamann
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Blind-Descent-Quest-Discover-Deepest/dp/1400067677/ref=bhp_9p2_botm_05?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                          <i>Blind Descent</i> by James M. Tabor
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Best-Books-of-the-Month/b/ref=bhp_9p2_botm_06?ie=UTF8&node=390919011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">See more Best Books of the Month for June</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="asinItem">

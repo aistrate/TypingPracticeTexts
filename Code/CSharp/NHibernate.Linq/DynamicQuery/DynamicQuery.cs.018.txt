@@ -1,0 +1,50 @@
+				Expression right = ParseMultiplicative();
+				switch (op.id)
+				{
+					case TokenId.Plus:
+						if (left.Type == typeof(string) || right.Type == typeof(string))
+							goto case TokenId.Amphersand;
+						CheckAndPromoteOperands(typeof(IAddSignatures), op.text, ref left, ref right, op.pos);
+						left = GenerateAdd(left, right);
+						break;
+					case TokenId.Minus:
+						CheckAndPromoteOperands(typeof(ISubtractSignatures), op.text, ref left, ref right, op.pos);
+						left = GenerateSubtract(left, right);
+						break;
+					case TokenId.Amphersand:
+						left = GenerateStringConcat(left, right);
+						break;
+				}
+			}
+			return left;
+		}
+
+		Expression ParseMultiplicative()
+		{
+			Expression left = ParseUnary();
+			while (token.id == TokenId.Asterisk || token.id == TokenId.Slash ||
+				token.id == TokenId.Percent || TokenIdentifierIs("mod"))
+			{
+				Token op = token;
+				NextToken();
+				Expression right = ParseUnary();
+				CheckAndPromoteOperands(typeof(IArithmeticSignatures), op.text, ref left, ref right, op.pos);
+				switch (op.id)
+				{
+					case TokenId.Asterisk:
+						left = Expression.Multiply(left, right);
+						break;
+					case TokenId.Slash:
+						left = Expression.Divide(left, right);
+						break;
+					case TokenId.Percent:
+					case TokenId.Identifier:
+						left = Expression.Modulo(left, right);
+						break;
+				}
+			}
+			return left;
+		}
+
+		Expression ParseUnary()
+		{

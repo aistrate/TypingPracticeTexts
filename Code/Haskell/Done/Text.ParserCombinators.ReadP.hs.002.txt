@@ -1,0 +1,49 @@
+#ifdef __GLASGOW_HASKELL__
+#ifndef __HADDOCK__
+import {-# SOURCE #-} GHC.Unicode ( isSpace  )
+#endif
+import GHC.List ( replicate )
+import GHC.Base
+#else
+import Data.Char( isSpace )
+#endif
+
+infixr 5 +++, <++
+
+#ifdef __GLASGOW_HASKELL__
+
+type ReadS a = String -> [(a,String)]
+#endif
+
+data P a
+  = Get (Char -> P a)
+  | Look (String -> P a)
+  | Fail
+  | Result a (P a)
+  | Final [(a,String)]
+
+instance Monad P where
+  return x = Result x Fail
+
+  (Get f)      >>= k = Get (\c -> f c >>= k)
+  (Look f)     >>= k = Look (\s -> f s >>= k)
+  Fail         >>= _ = Fail
+  (Result x p) >>= k = k x `mplus` (p >>= k)
+  (Final r)    >>= k = final [ys' | (x,s) <- r, ys' <- run (k x) s]
+
+  fail _ = Fail
+
+instance MonadPlus P where
+  mzero = Fail
+
+  Get f1     `mplus` Get f2     = Get (\c -> f1 c `mplus` f2 c)
+  
+  Result x p `mplus` q          = Result x (p `mplus` q)
+  p          `mplus` Result x q = Result x (p `mplus` q)
+
+  Fail       `mplus` p          = p
+  p          `mplus` Fail       = p
+
+  Final r    `mplus` Final t    = Final (r ++ t)
+  Final r    `mplus` Look f     = Look (\s -> Final (r ++ run (f s) s))
+  Final r    `mplus` p          = Look (\s -> Final (r ++ run p s))

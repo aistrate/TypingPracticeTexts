@@ -1,0 +1,30 @@
+              <script type="text/javascript">
+                if (typeof S9MultiPackLayout == "undefined") {
+                document.write('<scr' + 'ipt='' src="http://z-ecx.images-amazon.com/images/G/01/s9-campaigns/s9-multipack-layout._V192754440_.js"></scr' + 'ipt>');
+                }
+              </script>
+              <h2>Recommended for You</h2>
+              <div class="row" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ItemRow">
+                <div style="clear: both; width: 455px; height: 1px; margin: 0; padding: 0; overflow: hidden;"></div>
+                <div class="s9OtherItems" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0OtherItems" style="float: left; width: 99%;">
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ItemElement0" style="width: 33%; margin-bottom: 0px; ">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0TitleContainer0" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Title0">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ImageContainer0">
+                            <a href="/gp/product/032163537X/ref=s9_qpick_bw_ir01?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Elements of Programming">
+                              <div class="imageContainer">
+                                <img src="http://ecx.images-amazon.com/images/I/41tqyuCfwLL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="93" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Image0" />
+                              </div>Elements of Programming
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Alexander-A.-Stepanov/e/B001KDNNOG/ref=s9_qpick_bw_al1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155">Alexander A. Stepanov</a>
+                          </div>
+                          <div class="gry t11 nt">Hardcover</div>
+                          <span class="listprice gry t11">$39.99</span>
+                          <span class="red t14">$31.19</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec1?ie=UTF8&ASIN=032163537X&reason=1848000693&reason=1430219483&1848000693.order=0&1848000693.source=Purchase&isRecommendedItem=1&1430219483.order=1&1430219483.source=Purchase&isPopup=0&pf_rd_i=283155&pf_rd_s=center-13&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec1?ie=UTF8&ASIN=032163537X&reason=1848000693&reason=1430219483&1848000693.order=0&1848000693.source=Purchase&isRecommendedItem=1&1430219483.order=1&1430219483.source=Purchase&isPopup=1&pf_rd_i=283155&pf_rd_s=center-13&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>

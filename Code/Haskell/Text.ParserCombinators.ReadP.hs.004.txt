@@ -1,0 +1,50 @@
+(<++) :: ReadP a -> ReadP a -> ReadP a
+#else
+(<++) :: ReadPN a a -> ReadPN a a -> ReadPN a a
+#endif
+#ifdef __GLASGOW_HASKELL__
+R f0 <++ q =
+  do s <- look
+     probe (f0 return) s 0#
+ where
+  probe (Get f)        (c:s) n = probe (f c) s (n+#1#)
+  probe (Look f)       s     n = probe (f s) s n
+  probe p@(Result _ _) _     n = discard n >> R (p >>=)
+  probe (Final r)      _     _ = R (Final r >>=)
+  probe _              _     _ = q
+
+  discard 0# = return ()
+  discard n  = get >> discard (n-#1#)
+#else
+R f <++ q =
+  do s <- look
+     probe (f return) s 0
+ where
+  probe (Get f)        (c:s) n = probe (f c) s (n+1)
+  probe (Look f)       s     n = probe (f s) s n
+  probe p@(Result _ _) _     n = discard n >> R (p >>=)
+  probe (Final r)      _     _ = R (Final r >>=)
+  probe _              _     _ = q
+
+  discard 0 = return ()
+  discard n  = get >> discard (n-1)
+#endif
+
+#ifndef __NHC__
+gather :: ReadP a -> ReadP (String, a)
+#else
+#endif
+gather (R m) =
+  R (\k -> gath id (m (\a -> return (\s -> k (s,a)))))  
+ where
+  gath l (Get f)      = Get (\c -> gath (l.(c:)) (f c))
+  gath _ Fail         = Fail
+  gath l (Look f)     = Look (\s -> gath l (f s))
+  gath l (Result k p) = k (l []) `mplus` gath l p
+  gath _ (Final _)    = error "do not use readS_to_P in gather!"
+
+satisfy :: (Char -> Bool) -> ReadP Char
+satisfy p = do c <- get; if p c then return c else pfail
+
+char :: Char -> ReadP Char
+char c = satisfy (c ==)

@@ -1,0 +1,50 @@
+			var q =
+				from c in db.Customers
+				from o in c.Orders.Cast<Order>()
+				select o.OrderDate;
+
+			var list = q.ToList();
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "from clause to select all orders for customers.")]
+		public void DLinqJoin1e()
+		{
+			var q =
+				from c in db.Customers
+				from o in c.Orders.Cast<Order>()
+				select c;
+
+			var list = q.ToList();
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "where clause to filter for Products whose Supplier is in the USA " +
+					 "that are out of stock.")]
+		public void DLinqJoin2()
+		{
+			var q =
+				from p in db.Products
+				where p.Supplier.Country == "USA" && p.UnitsInStock == 0
+				select p;
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "from clause to filter for employees in Seattle, " +
+					 "and also list their territories.")]
+		[Ignore("TODO")]
+		public void DLinqJoin3()
+		{
+			var q =
+				from e in db.Employees
+				from et in e.EmployeeTerritories.Cast<EmployeeTerritory>()
+				where e.City == "Seattle"

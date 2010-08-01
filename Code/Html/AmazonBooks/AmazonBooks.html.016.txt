@@ -1,0 +1,30 @@
+                                    <option value="search-alias=baby-products">Baby</option>
+                                    <option value="search-alias=beauty">Beauty</option>
+                                    <option value="search-alias=us-stripbooks-tree" selected="selected">Books</option>
+                                    <option value="search-alias=wireless-aps">Cell Phones & Service</option>
+                                    <option value="search-alias=apparel">Clothing & Accessories</option>
+                                    <option value="search-alias=electronics">Electronics</option>
+                                    <option value="search-alias=grocery">Grocery & Gourmet Food</option>
+                                    <option value="search-alias=hpc">Health & Personal Care</option>
+                                    <option value="search-alias=garden">Home & Garden</option>
+                                    <option value="search-alias=industrial">Industrial & Scientific</option>
+                                    <option value="search-alias=jewelry">Jewelry</option>
+                                    <option value="search-alias=digital-text">Kindle Store</option>
+                                    <option value="search-alias=magazines">Magazine Subscriptions</option>
+                                    <option value="search-alias=dvd">Movies & TV</option>
+                                    <option value="search-alias=digital-music">MP3 Downloads</option>
+                                    <option value="search-alias=popular">Music</option>
+                                    <option value="search-alias=mi">Musical Instruments</option>
+                                    <option value="search-alias=office-products">Office Products & Supplies</option>
+                                    <option value="search-alias=shoes">Shoes</option>
+                                    <option value="search-alias=software">Software</option>
+                                    <option value="search-alias=sporting">Sports & Outdoors</option>
+                                    <option value="search-alias=tools">Tools & Home Improvement</option>
+                                    <option value="search-alias=toys-and-games">Toys & Games</option>
+                                    <option value="search-alias=vhs">VHS</option>
+                                    <option value="search-alias=videogames">Video Games</option>
+                                    <option value="search-alias=amazontv">Video On Demand</option>
+                                    <option value="search-alias=watches">Watches</option>
+                                  </select>
+                                </div>
+                              </td>

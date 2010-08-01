@@ -1,0 +1,30 @@
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ImageContainer2">
+                            <a href="/gp/product/3937526005/ref=s9_simv_bw_p14_i3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Successful Lisp: How to Understand and Use Common Lisp">
+                              <div class="imageContainer">
+                                <img src="http://ecx.images-amazon.com/images/I/413jzMH6X7L._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="84" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Image2" />
+                              </div>Successful Lisp: How to Understand...
+                            </a>
+                          </span>
+                          <div class="t11">David B. Lamkins</div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$42.00</span>
+                          <span class="red t14">$33.10</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ItemElement3" style="width: 49%; margin-bottom: 0px; display: none;">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_TitleContainer3" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Title3">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ImageContainer3">
+                            <a href="/gp/product/0130305529/ref=s9_simv_bw_p14_i4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="On LISP: Advanced Techniques for Common LISP">
+                              <div class="imageContainer">
+                                <img url="http://ecx.images-amazon.com/images/I/412T69YKAXL._SL135_.jpg" alt="" width="88" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Image3" />
+                              </div>On LISP: Advanced Techniques for...
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Paul-Graham/e/B001ILHE5O/ref=s9_simv_bw_p14_al4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155">Paul Graham</a>
+                          </div>

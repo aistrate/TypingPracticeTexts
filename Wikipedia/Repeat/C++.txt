@@ -1,0 +1,9 @@
+C++
+
+C++ (pronounced "See plus plus") is a statically typed, free-form, multi-paradigm, compiled, general-purpose programming language. It is regarded as a middle-level language, as it comprises a combination of both high-level and low-level language features. It was developed by Bjarne Stroustrup starting in 1979 at Bell Labs as an enhancement to the C programming language and originally named "C with Classes". It was renamed to C++ in 1983.
+
+C++ is widely used in the software industry, and remains one of the most popular languages ever created. Some of its application domains include systems software, application software, device drivers, embedded software, high-performance server and client applications, and entertainment software such as video games. Several groups provide both free and proprietary C++ compiler software, including the GNU Project, Microsoft, Intel, Borland and others.
+
+C++ is also used for hardware design, where design is initially described in C++, then analyzed, architecturally constrained, and scheduled to create a register transfer level hardware description language via high-level synthesis.
+
+The language began as enhancements to C, first adding classes, then virtual functions, operator overloading, multiple inheritance, templates, and exception handling among other features. After years of development, the C++ programming language standard was ratified in 1998 as ISO/IEC 14882:1998. That standard is still current, but is amended by the 2003 technical corrigendum, ISO/IEC 14882:2003. The next standard version (known informally as C++0x) is in development.

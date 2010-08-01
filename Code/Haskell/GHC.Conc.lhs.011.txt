@@ -1,0 +1,50 @@
+  was_set <- atomicModifyIORef prodding (\a -> (True,a))
+  if (not (was_set)) then wakeupIOManager else return ()
+
+#ifdef mingw32_HOST_OS
+
+startIOManagerThread :: IO ()
+startIOManagerThread = do
+  wakeup <- c_getIOManagerEvent
+  forkIO $ service_loop wakeup []
+  return ()
+
+service_loop :: HANDLE
+             -> [DelayReq]
+             -> IO ()
+
+service_loop wakeup old_delays = do
+  new_delays <- atomicModifyIORef pendingDelays (\a -> ([],a))
+  let  delays = foldr insertDelay old_delays new_delays
+
+  now <- getUSecOfDay
+  (delays', timeout) <- getDelay now delays
+
+  r <- c_WaitForSingleObject wakeup timeout
+  case r of
+    0xffffffff -> do c_maperrno; throwErrno "service_loop"
+    0 -> do
+        r2 <- c_readIOManagerEvent
+        exit <- 
+              case r2 of
+                _ | r2 == io_MANAGER_WAKEUP -> return False
+                _ | r2 == io_MANAGER_DIE    -> return True
+                0 -> return False
+                _ -> do start_console_handler (r2 `shiftR` 1); return False
+        if exit
+          then return ()
+          else service_cont wakeup delays'
+
+    _other -> service_cont wakeup delays'
+
+service_cont :: HANDLE -> [DelayReq] -> IO ()
+service_cont wakeup delays = do
+  atomicModifyIORef prodding (\_ -> (False,False))
+  service_loop wakeup delays
+
+io_MANAGER_WAKEUP, io_MANAGER_DIE :: Word32
+io_MANAGER_WAKEUP = 0xffffffff
+io_MANAGER_DIE    = 0xfffffffe
+
+data ConsoleEvent
+ = ControlC

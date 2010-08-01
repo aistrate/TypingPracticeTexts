@@ -1,0 +1,50 @@
+		protected virtual IEnumerable<MemberBinding> VisitBindingList(ReadOnlyCollection<MemberBinding> original)
+		{
+			List<MemberBinding> list = null;
+			for (int i = 0, n = original.Count; i < n; i++)
+			{
+				MemberBinding b = VisitBinding(original[i]);
+				if (list != null)
+				{
+					list.Add(b);
+				}
+				else if (b != original[i])
+				{
+					list = new List<MemberBinding>(n);
+					for (int j = 0; j < i; j++)
+					{
+						list.Add(original[j]);
+					}
+					list.Add(b);
+				}
+			}
+
+			if (list != null)
+				return list;
+
+			return original;
+		}
+
+		protected virtual IEnumerable<ElementInit> VisitElementInitializerList(ReadOnlyCollection<ElementInit> original)
+		{
+			List<ElementInit> list = null;
+			for (int i = 0, n = original.Count; i < n; i++)
+			{
+				ElementInit init = VisitElementInitializer(original[i]);
+				if (list != null)
+				{
+					list.Add(init);
+				}
+				else if (init != original[i])
+				{
+					list = new List<ElementInit>(n);
+					for (int j = 0; j < i; j++)
+					{
+						list.Add(original[j]);
+					}
+					list.Add(init);
+				}
+			}
+
+			if (list != null)
+				return list;

@@ -1,0 +1,15 @@
+Petrochemical
+
+Petrochemicals are chemical products made from raw materials of petroleum or other hydrocarbon origin. Although some of the chemical compounds that originate from petroleum may also be derived from other sources (such as coal or natural gas), petroleum is a major source of many.
+
+This article is mainly intended to discuss organic compounds or materials that are not burned as fuel (see also Petroleum product).
+
+The two main classes of petrochemical raw materials are olefins (including ethylene and propylene) and aromatics (including benzene and xylene isomers), both of which are produced in very large quantities. At oil refineries, olefins are produced mainly from hydrocarbons by processes such as fluid catalytic cracking and steam cracking. At oil refineries, aromatic hydrocarbons are mainly produced by catalytic reforming or similar processes. From these basic building blocks is made a very wide range of chemicals and other materials used in industry - monomers, solvents, detergents, and adhesives. From the monomers, polymers or oligomers are produced for plastics, resins, fibers, elastomers, certain lubricants, and gels.
+
+World production of ethylene is around 110 million tonnes per annum, of propylene 65 million tonnes, and of aromatic raw materials 70 million tonnes. The largest petrochemical industries are to be found in the USA and Western Europe, though the major growth in new production capacity is in the Middle East and Asia. There is a substantial inter-regional trade in petrochemicals of all kinds.
+
+Primary petrochemicals are divided into three groups depending on their chemical structure:
+
+ * Olefins: include ethylene, propylene, and butadiene. Ethylene and propylene are important sources of industrial chemicals and plastics products. Butadiene is used in making synthetic rubber.
+ * Aromatic Petrochemicals: include benzene, toluene, and xylenes. Benzene is used in the manufacture of dyes and synthetic detergents. Toluene is used in making explosives. Manufacturers use xylenes in making plastics and synthetic fibres.
+ * Synthesis gas: is a mixture of carbon monoxide and hydrogen, and is used to make the petrochemicals ammonia and methanol. Ammonia is used in making fertilizers and explosives whereas methanol serves as a source for other chemicals.

@@ -1,0 +1,50 @@
+				select new { c.ContactName, ords = ords.Count(), emps = emps.Count() };
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample shows how to get LEFT OUTER JOIN by using DefaultIfEmpty(). The DefaultIfEmpty() method returns null when there is no Order for the Employee.")]
+		[Ignore("TODO")]
+		public void DLinqJoin7()
+		{
+			var q =
+				from e in db.Employees
+				join o in db.Orders on e equals o.Employee into ords
+				from o in ords.DefaultIfEmpty()
+				select new { e.FirstName, e.LastName, Order = o };
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample projects a 'let' expression resulting from a join.")]
+		[Ignore("TODO")]
+		public void DLinqJoin8()
+		{
+			var q =
+				from c in db.Customers
+				join o in db.Orders on c.CustomerID equals o.Customer.CustomerID into ords
+				let z = c.City + c.Country
+				from o in ords
+				select new { c.ContactName, o.OrderID, z };
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample shows a join with a composite key.")]
+		[Ignore("TODO")]
+		public void DLinqJoin9()
+		{
+			var q =
+				from o in db.Orders
+				from p in db.Products
+				join d in db.OrderDetails
+					on new { o.OrderID, p.ProductID } equals new { d.PK_Order_Details.Order.OrderID, d.PK_Order_Details.Product.ProductID }
+					into details
+				from d in details
+				select new { o.OrderID, p.ProductID, d.UnitPrice };
+
+			ObjectDumper.Write(q);
+		}

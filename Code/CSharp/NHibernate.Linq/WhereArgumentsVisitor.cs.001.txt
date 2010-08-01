@@ -1,0 +1,50 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using NHibernate.Criterion;
+using NHibernate.Linq.Expressions;
+using NHibernate.Linq.Util;
+using NHibernate.Persister.Entity;
+using Expression = System.Linq.Expressions.Expression;
+
+namespace NHibernate.Linq.Visitors
+{
+	public class WhereArgumentsVisitor : NHibernateExpressionVisitor
+	{
+		private readonly Stack<IList<ICriterion>> criterionStack = new Stack<IList<ICriterion>>();
+		private readonly ICriteria rootCriteria;
+		private readonly ISession session;
+
+		public WhereArgumentsVisitor(ICriteria rootCriteria, ISession session)
+		{
+			criterionStack.Push(new List<ICriterion>());
+			this.rootCriteria = rootCriteria;
+			this.session = session;
+		}
+
+		public static IEnumerable<ICriterion> GetCriterion(ICriteria rootCriteria, ISession session, Expression expression)
+		{
+			var visitor = new WhereArgumentsVisitor(rootCriteria, session);
+			visitor.Visit(expression);
+			return visitor.CurrentCriterions;
+		}
+
+		public IList<ICriterion> CurrentCriterions
+		{
+			get { return criterionStack.Peek(); }
+		}
+
+		public static bool SupportsMethod(string methodName)
+		{
+			return "Any".Equals(methodName)
+				|| "StartsWith".Equals(methodName)
+				|| "EndsWith".Equals(methodName)
+				|| "Contains".Equals(methodName)
+				|| "Equals".Equals(methodName);
+		}
+
+		protected override Expression VisitConstant(ConstantExpression expr)
+		{
+			if (expr.Type == typeof(bool))
+			{

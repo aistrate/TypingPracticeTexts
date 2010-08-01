@@ -1,0 +1,49 @@
+   argType :: t a b -> a
+   argType =  undefined
+
+class Typeable3 t where
+  typeOf3 :: t a b c -> TypeRep
+
+typeOf2Default :: (Typeable3 t, Typeable a) => t a b c -> TypeRep
+typeOf2Default x = typeOf3 x `mkAppTy` typeOf (argType x)
+ where
+   argType :: t a b c -> a
+   argType =  undefined
+
+class Typeable4 t where
+  typeOf4 :: t a b c d -> TypeRep
+
+typeOf3Default :: (Typeable4 t, Typeable a) => t a b c d -> TypeRep
+typeOf3Default x = typeOf4 x `mkAppTy` typeOf (argType x)
+ where
+   argType :: t a b c d -> a
+   argType =  undefined
+
+class Typeable5 t where
+  typeOf5 :: t a b c d e -> TypeRep
+
+typeOf4Default :: (Typeable5 t, Typeable a) => t a b c d e -> TypeRep
+typeOf4Default x = typeOf5 x `mkAppTy` typeOf (argType x)
+ where
+   argType :: t a b c d e -> a
+   argType =  undefined
+
+class Typeable6 t where
+  typeOf6 :: t a b c d e f -> TypeRep
+
+typeOf5Default :: (Typeable6 t, Typeable a) => t a b c d e f -> TypeRep
+typeOf5Default x = typeOf6 x `mkAppTy` typeOf (argType x)
+ where
+   argType :: t a b c d e f -> a
+   argType =  undefined
+
+class Typeable7 t where
+  typeOf7 :: t a b c d e f g -> TypeRep
+
+typeOf6Default :: (Typeable7 t, Typeable a) => t a b c d e f g -> TypeRep
+typeOf6Default x = typeOf7 x `mkAppTy` typeOf (argType x)
+ where
+   argType :: t a b c d e f g -> a
+   argType =  undefined
+
+#ifdef __GLASGOW_HASKELL__

@@ -1,0 +1,100 @@
+{-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -fno-warn-incomplete-patterns -fno-warn-orphans #-}
+
+module Data.ByteString.Lazy (
+
+        ByteString,
+
+        empty,
+        singleton,
+        pack,
+        unpack,
+        fromChunks,
+        toChunks,
+
+        cons,
+        cons',
+        snoc,
+        append,
+        head,
+        uncons,
+        last,
+        tail,
+        init,
+        null,
+        length,
+
+        map,
+        reverse,
+        intersperse,
+        intercalate,
+        transpose,
+
+        foldl,
+        foldl',
+        foldl1,
+        foldl1',
+        foldr,
+        foldr1,
+
+        concat,
+        concatMap,
+        any,
+        all,
+        maximum,
+        minimum,
+
+        scanl,
+
+        mapAccumL,
+        mapAccumR,
+
+        repeat,
+        replicate,
+        cycle,
+        iterate,
+
+        unfoldr,
+
+        take,
+        drop,
+        splitAt,
+        takeWhile,
+        dropWhile,
+        span,
+        break,
+        group,
+        groupBy,
+        inits,
+        tails,
+
+        split,
+        splitWith,
+
+        isPrefixOf,
+        isSuffixOf,
+
+        elem,
+        notElem,
+
+        find,
+        filter,
+        partition,
+
+        index,
+        elemIndex,
+        elemIndices,
+        findIndex,
+        findIndices,
+        count,
+
+        zip,
+        zipWith,
+        unzip,
+
+        copy,
+
+        getContents,
+        putStr,
+        putStrLn,
+        interact,

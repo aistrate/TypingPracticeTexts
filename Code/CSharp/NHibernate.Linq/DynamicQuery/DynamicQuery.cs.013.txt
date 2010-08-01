@@ -1,0 +1,50 @@
+            typeof(UInt32),
+            typeof(Int64),
+            typeof(UInt64),
+            typeof(Single),
+            typeof(Double),
+            typeof(Decimal),
+            typeof(DateTime),
+            typeof(TimeSpan),
+            typeof(Guid),
+            typeof(Math),
+            typeof(Convert)
+        };
+
+		static readonly Expression trueLiteral = Expression.Constant(true);
+		static readonly Expression falseLiteral = Expression.Constant(false);
+		static readonly Expression nullLiteral = Expression.Constant(null);
+
+		static readonly string keywordIt = "it";
+		static readonly string keywordIif = "iif";
+		static readonly string keywordNew = "new";
+
+		static Dictionary<string, object> keywords;
+
+		Dictionary<string, object> symbols;
+		IDictionary<string, object> externals;
+		Dictionary<Expression, string> literals;
+		ParameterExpression it;
+		string text;
+		int textPos;
+		int textLen;
+		char ch;
+		Token token;
+
+		public ExpressionParser(ParameterExpression[] parameters, string expression, object[] values)
+		{
+			if (expression == null) throw new ArgumentNullException("expression");
+			if (keywords == null) keywords = CreateKeywords();
+			symbols = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+			literals = new Dictionary<Expression, string>();
+			if (parameters != null) ProcessParameters(parameters);
+			if (values != null) ProcessValues(values);
+			text = expression;
+			textLen = text.Length;
+			SetTextPos(0);
+			NextToken();
+		}
+
+		void ProcessParameters(ParameterExpression[] parameters)
+		{
+			foreach (ParameterExpression pe in parameters)

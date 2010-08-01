@@ -1,0 +1,7 @@
+Unix
+
+Unix (officially trademarked as UNIX, sometimes also written as Unix with small caps) is a computer operating system originally developed in 1969 by a group of AT&T employees at Bell Labs, including Ken Thompson, Dennis Ritchie, Brian Kernighan, Douglas McIlroy, and Joe Ossanna. Today the term Unix is used to describe any operating system that conforms to Unix standards, meaning the core operating system operates the same as the original Unix operating system. Today's Unix systems are split into various branches, developed over time by AT&T as well as various commercial vendors and non-profit organizations.
+
+As of 2007, the owner of the trademark is The Open Group, an industry standards consortium. Only systems fully compliant with and certified according to the Single UNIX Specification are qualified to use the trademark; others are called "Unix system-like" or "Unix-like".
+
+During the late 1970s and early 1980s, the influence of Unix in academic circles led to large-scale adoption of Unix (particularly of the BSD variant, originating from the University of California, Berkeley) by commercial startups, the most notable of which are Solaris, HP-UX and AIX. Today, in addition to certified Unix systems such as those already mentioned, Unix-like operating systems such as Linux and BSD are commonly encountered. The term "traditional Unix" may be used to describe a Unix or an operating system that has the characteristics of either Version 7 Unix or UNIX System V.

@@ -1,0 +1,30 @@
+                  <b>Best Books of the Month</b>
+                </td>
+                <td style="width: 20px"></td>
+                <td style="text-align: left; font-family: arial,sans-serif; color: #e47911; font-size: medium;">
+                  <b>Best Books of the Year</b>
+                </td>
+              </tr>
+              <tr style="vertical-align: top;">
+                <td style="width: 50%; border-right: 1px solid; border-bottom: 0px solid;border-color: #afd1d2; padding: 5px;">
+                  <a href="/Passage-Justin-Cronin/dp/0345504968/ref=bhp_2pac_botm1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-3&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266170142&pf_rd_i=283155">
+                    <img src="http://ecx.images-amazon.com/images/P/0345504968.01._SL110_PIsitb-sticker-arrow-sm,TopRight,10,-13_PE46_OU01_SCLZZZZZZZ_V191087038_.jpg" width="86" align="left" alt="The Passage" height="133" border="0" />
+                  </a>
+                  Find our editors' picks for the best books of the month--including our Spotlight selection, <a href="/Passage-Justin-Cronin/dp/0345504968/ref=bhp_2pac_botm2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-3&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266170142&pf_rd_i=283155">
+                    <i>The Passage</i>
+                  </a>, an ambitious epic by <a href="/gp/entity/store/B001H6J17E/ref=bhp_2pac_botm4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-3&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266170142&pf_rd_i=283155">Justin Cronin</a> about a virus that nearly destroys the world--and more new releases not to miss in June.
+                </td>
+                <td style="width: 20px"></td>
+                <td style="width: 50%; border-bottom: 0px solid; border-color: #afd1d2; padding: 5px;">
+                  <a href="/Let-Great-World-Spin-Novel/dp/0812973992/ref=bhp_2pac_boty1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-3&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266170142&pf_rd_i=283155">
+                    <img src="http://ecx.images-amazon.com/images/P/0812973992.01._SL110_PIsitb-sticker-arrow-sm,TopRight,10,-13_PE40_OU01_SCLZZZZZZZ_V216524412_.jpg" width="85" align="left" alt="Let the Great World Spin" height="133" border="0" />
+                  </a>
+                  Look back on the best of a year's worth of reading in our <a href="/Best-2009-Books-Holidays-Seasonal/b/ref=bhp_2pac_boty2?ie=UTF8&node=2233760011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-3&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266170142&pf_rd_i=283155">Best of 2009 Store</a>, including our choice for the best book of the year, Colum McCann's <a href="/Let-Great-World-Spin-Novel/dp/0812973992/ref=bhp_2pac_boty3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-3&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266170142&pf_rd_i=283155">
+                    <i>Let the Great World Spin</i>
+                  </a>.
+                </td>
+              </tr>
+              <tr style="vertical-align: top;">
+                <td style="width: 50%; border-right: 1px solid; border-bottom: 0px solid;border-color: #afd1d2; padding: 5px;">
+                  <img src="http://g-ecx.images-amazon.com/images/G/01/x-locale/common/orange-arrow._V192240581_.gif" width="10" align="left" alt="" height="9" border="0" />
+                  <a href="/Best-Books-of-the-Month/b/ref=bhp_2pac_botm3?ie=UTF8&node=390919011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-3&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1266170142&pf_rd_i=283155">See all the best books of the month</a>

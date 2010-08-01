@@ -1,0 +1,50 @@
+		object IUpdatable.ResetResource(object resource)
+		{
+			IUpdatable update = this;
+
+			IClassMetadata metadata = session.SessionFactory.GetClassMetadata(resource.GetType().ToString());
+			object tempCopy = metadata.Instantiate(null, EntityMode.Poco);
+
+			foreach (string propName in metadata.PropertyNames)
+			{
+				object value = metadata.GetPropertyValue(tempCopy, propName, EntityMode.Poco);
+				update.SetValue(resource, propName, value);
+			}
+
+			return resource;
+		}
+
+		object IUpdatable.ResolveResource(object resource)
+		{
+			return resource;
+		}
+
+		void IUpdatable.SaveChanges()
+		{
+			using (ITransaction tx = Session.BeginTransaction())
+			{
+				try
+				{
+					if (_updateCache != null)
+					{
+						_updateCache.ForEach(o => session.SaveOrUpdate(o));
+						_updateCache.Clear();
+					}
+
+					session.Flush();
+
+					tx.Commit();
+				}
+				catch (Exception ex)
+				{
+					tx.Rollback();
+
+					throw new DataServiceException("Failed to save changes.  See inner exception for details", ex);
+				}
+			}
+		}
+
+		void IUpdatable.SetReference(object targetResource, string propertyName, object propertyValue)
+		{
+			((IUpdatable)this).SetValue(targetResource, propertyName, propertyValue);
+		}

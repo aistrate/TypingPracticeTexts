@@ -1,0 +1,30 @@
+                            <a href="http://www.amazon.com/The-Lion-ebook/dp/B0035II952/ref=pd_ts_zgc_kinc_digital-text_8?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Lion" class="titleLink">The Lion</a>
+                            <div class="tiny byline">
+                              <span class="carat"></span>Nelson DeMille (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock ">
+                              <span class="listprice"></span>
+                              <strong class="price">$12.99</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/The-Passage-A-Novel-ebook/dp/B003F3PM7A/ref=pd_ts_zgc_kinc_digital-text_9_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Passage: A Novel">
+                              <img src="http://ecx.images-amazon.com/images/I/510I8TiEw7L._SL75_.jpg" alt="The Passage" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">9.</span>
+                              <span class="arrowSprite arrowDown_s " title="Ranking has gone down in the past 24 hours" >
+                                <span>Ranking has gone down in the past 24 hours</span>
+                              </span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">21 days in the top 100</span>

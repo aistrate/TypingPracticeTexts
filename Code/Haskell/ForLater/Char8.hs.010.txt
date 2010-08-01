@@ -1,0 +1,49 @@
+{-# INLINE filter #-}
+
+find :: (Char -> Bool) -> ByteString -> Maybe Char
+find f ps = w2c `fmap` B.find (f . w2c) ps
+{-# INLINE find #-}
+
+zip :: ByteString -> ByteString -> [(Char,Char)]
+zip ps qs
+    | B.null ps || B.null qs = []
+    | otherwise = (unsafeHead ps, unsafeHead qs) : zip (B.unsafeTail ps) (B.unsafeTail qs)
+
+zipWith :: (Char -> Char -> a) -> ByteString -> ByteString -> [a]
+zipWith f = B.zipWith ((. w2c) . f . w2c)
+
+unzip :: [(Char,Char)] -> (ByteString,ByteString)
+unzip ls = (pack (P.map fst ls), pack (P.map snd ls))
+{-# INLINE unzip #-}
+
+unsafeHead :: ByteString -> Char
+unsafeHead  = w2c . B.unsafeHead
+{-# INLINE unsafeHead #-}
+
+{-# RULES
+"ByteString specialise break -> breakSpace"
+    break isSpace = breakSpace
+  #-}
+
+breakSpace :: ByteString -> (ByteString,ByteString)
+breakSpace (PS x s l) = inlinePerformIO $ withForeignPtr x $ \p -> do
+    i <- firstspace (p `plusPtr` s) 0 l
+    return $! case () of {_
+        | i == 0    -> (empty, PS x s l)
+        | i == l    -> (PS x s l, empty)
+        | otherwise -> (PS x s i, PS x (s+i) (l-i))
+    }
+{-# INLINE breakSpace #-}
+
+firstspace :: Ptr Word8 -> Int -> Int -> IO Int
+STRICT3(firstspace)
+firstspace ptr n m
+    | n >= m    = return n
+    | otherwise = do w <- peekByteOff ptr n
+                     if (not . isSpaceWord8) w then firstspace ptr (n+1) m else return n
+
+dropSpace :: ByteString -> ByteString
+dropSpace (PS x s l) = inlinePerformIO $ withForeignPtr x $ \p -> do
+    i <- firstnonspace (p `plusPtr` s) 0 l
+    return $! if i == l then empty else PS x (s+i) (l-i)
+{-# INLINE dropSpace #-}

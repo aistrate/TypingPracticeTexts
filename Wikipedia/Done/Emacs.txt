@@ -1,0 +1,13 @@
+Emacs
+
+Emacs is a class of feature-rich text editors, usually characterized by their extensibility. Emacs has, perhaps, more editing commands compared to other editors, numbering over 1,000 commands. It also allows the user to combine these commands into macros to automate work.
+
+Development began in the mid-70s and continues actively as of 2009. Emacs text editors are most popular with technically proficient computer users and computer programmers. The most popular version of Emacs is GNU Emacs, a part of the GNU project, which is commonly referred to simply as "Emacs".
+
+The GNU Emacs manual describes it as "the extensible, customizable, self-documenting, real-time display editor." It is also the most ported of the implementations of Emacs. As of July 2009, the latest stable release of GNU Emacs is version 23.1.
+
+Aside from GNU Emacs, another version of Emacs in common use, XEmacs, forked from GNU Emacs in 1991. XEmacs has remained mostly compatible and continues to use the same extension language, Emacs Lisp, as GNU Emacs. Large parts of GNU Emacs and XEmacs are written in Emacs Lisp, so the extensibility of Emacs' features is deep.
+
+The original EMACS consisted of a set of Editor MACroS for the TECO editor. It was written in 1976 by Richard Stallman, initially together with Guy L. Steele, Jr.. It was inspired by the ideas of TECMAC and TMACS, a pair of TECO-macro editors written by Steele, Dave Moon, Richard Greenblatt, Charles Frankston, and others.
+
+In Unix culture, Emacs became one of the two main contenders in the traditional editor wars, the other being vi. The word "emacs" is often pluralized as emacsen, by analogy with boxen (itself used by analogy with oxen) and VAXen.

@@ -1,0 +1,100 @@
+					{
+						buf.Append(col.GetSqlType(dialect, p));
+					}
+					buf.Append(' ')
+						.Append(dialect.IdentityColumnString);
+				}
+				else
+				{
+					buf.Append(col.GetSqlType(dialect, p));
+
+					if(string.IsNullOrEmpty(col.DefaultValue)==false)
+					{
+						buf.Append(" default ").Append(col.DefaultValue).Append(" ");
+					}
+
+					if (col.IsNullable)
+					{
+						buf.Append(dialect.NullColumnString);
+					}
+					else
+					{
+						buf.Append(" not null");
+					}
+				}
+
+				if (col.IsUnique)
+				{
+					if (dialect.SupportsUnique)
+					{
+						buf.Append(" unique");
+					}
+					else
+					{
+						UniqueKey uk = GetUniqueKey(col.GetQuotedName(dialect) + "_");
+						uk.AddColumn(col);
+					}
+				}
+
+				if(col.HasCheckConstraint && dialect.SupportsColumnCheck)
+				{
+					buf.Append(" check( ")
+						.Append(col.CheckConstraint)
+						.Append(") ");
+				}
+
+				if(string.IsNullOrEmpty(col.Comment)==false)
+				{
+					buf.Append(dialect.GetColumnComment(col.Comment));
+				}
+			}
+			if (HasPrimaryKey)
+			{
+				buf.Append(StringHelper.CommaSpace).Append(PrimaryKey.SqlConstraintString(dialect, defaultSchema));
+			}
+
+			foreach (UniqueKey uk in UniqueKeyIterator)
+			{
+				buf.Append(',').Append(uk.SqlConstraintString(dialect));
+			}
+			
+			if(dialect.SupportsTableCheck)
+			{
+				foreach (string checkConstraint in checkConstraints)
+				{
+					buf.Append(", check (")
+						.Append(checkConstraint)
+						.Append(") ");
+				}
+			}
+
+			buf.Append(StringHelper.ClosedParen);
+
+			if(string.IsNullOrEmpty(comment)==false)
+			{
+				buf.Append(dialect.GetTableComment(comment));
+			}
+
+			return buf.ToString();
+		}
+
+		public string SqlDropString(Dialect.Dialect dialect, string defaultCatalog, string defaultSchema)
+		{
+			return dialect.GetDropTableString(GetQualifiedName(dialect, defaultCatalog, defaultSchema));
+		}
+
+		public virtual PrimaryKey PrimaryKey
+		{
+			get { return primaryKey; }
+			set { primaryKey = value; }
+		}
+
+		public Index GetIndex(string name)
+		{
+			Index result;
+			indexes.TryGetValue(name, out result);
+			return result;
+		}
+
+		public Index AddIndex(Index index)
+		{

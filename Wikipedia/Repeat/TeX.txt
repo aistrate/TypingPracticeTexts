@@ -1,0 +1,7 @@
+TeX
+
+TeX is a typesetting system designed and mostly written by Donald Knuth. Together with the METAFONT language for font description and the Computer Modern family of typefaces, it was designed with two main goals in mind: to allow anybody to produce high-quality books using a reasonable amount of effort, and to provide a system that would give the exact same results on all computers, now and in the future.
+
+TeX is a way to typeset complex mathematical formulae. It has been noted as one of the most sophisticated digital typographical systems in the world. TeX is popular in academia, especially in mathematics, computer science, engineering, and physics. It has largely displaced Unix troff, the other favored formatter, in many Unix installations, which use both for different purposes. It is now also being used for many other typesetting tasks, especially in the form of LaTeX and other template packages.
+
+The widely-used MIME type for TeX is application/x-tex. TeX is free software.

@@ -1,0 +1,30 @@
+                          <span class="listprice gry t11">$59.99</span>
+                          <span class="red t14">$46.79</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec5?ie=UTF8&ASIN=0201914654&reason=1848000693&reason=1430219483&1848000693.order=0&1848000693.source=Purchase&isRecommendedItem=1&1430219483.order=1&1430219483.source=Purchase&isPopup=0&pf_rd_i=283155&pf_rd_s=center-13&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec5?ie=UTF8&ASIN=0201914654&reason=1848000693&reason=1430219483&1848000693.order=0&1848000693.source=Purchase&isRecommendedItem=1&1430219483.order=1&1430219483.source=Purchase&isPopup=1&pf_rd_i=283155&pf_rd_s=center-13&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ItemElement5" style="width: 33%; margin-bottom: 0px; display: none;">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0TitleContainer5" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Title5">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ImageContainer5">
+                            <a href="/gp/product/0684868768/ref=s9_qpick_bw_ir06?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Emergence: The Connected Lives of Ants, Brains, Cities, and Software">
+                              <div class="imageContainer">
+                                <img url="http://ecx.images-amazon.com/images/I/51b1kuLZbRL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="84" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Image5" />
+                              </div>Emergence: The Connected Lives of...
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Steven-Johnson/e/B000APC0M6/ref=s9_qpick_bw_al6?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155">Steven Johnson</a>
+                          </div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$16.00</span>
+                          <span class="red t14">$10.88</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec6?ie=UTF8&0198502435.order=1&ASIN=0684868768&reason=0743241665&reason=0198502435&0198502435.source=Purchase&0743241665.source=Purchase&0743241665.order=0&isRecommendedItem=1&isPopup=0&pf_rd_i=283155&pf_rd_s=center-13&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec6?ie=UTF8&0198502435.order=1&ASIN=0684868768&reason=0743241665&reason=0198502435&0198502435.source=Purchase&0743241665.source=Purchase&0743241665.order=0&isRecommendedItem=1&isPopup=1&pf_rd_i=283155&pf_rd_s=center-13&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>

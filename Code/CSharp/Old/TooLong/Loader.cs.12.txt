@@ -1,0 +1,99 @@
+		public virtual int[] GetNamedParameterLocs(string name)
+		{
+			throw new AssertionFailure("no named parameters");
+		}
+
+		protected IList LoadEntity(
+			ISessionImplementor session,
+			object id,
+			IType identifierType,
+			object optionalObject,
+			string optionalEntityName,
+			object optionalIdentifier,
+			IEntityPersister persister)
+		{
+			if (log.IsDebugEnabled)
+			{
+				log.Debug(
+					"loading entity: " +
+					MessageHelper.InfoString(persister, id, identifierType, Factory)
+					);
+			}
+
+			IList result;
+
+			try
+			{
+				QueryParameters qp =
+					new QueryParameters(new IType[] {identifierType}, new object[] {id}, optionalObject,
+					                    optionalEntityName ?? null, optionalIdentifier);
+				result = DoQueryAndInitializeNonLazyCollections(
+					session,
+					qp,
+					false);
+			}
+			catch (HibernateException)
+			{
+				throw;
+			}
+			catch (Exception sqle)
+			{
+				ILoadable[] persisters = EntityPersisters;
+				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle,
+				                                 "could not load an entity: "
+				                                 +
+				                                 MessageHelper.InfoString(persisters[persisters.Length - 1], id, identifierType,
+				                                                          Factory), SqlString);
+			}
+
+			log.Debug("done entity load");
+
+			return result;
+		}
+
+		protected IList LoadEntity(ISessionImplementor session, object key, object index, IType keyType, IType indexType, IEntityPersister persister)
+		{
+			log.Debug("loading collection element by index");
+
+			IList result;
+			try
+			{
+				result = DoQueryAndInitializeNonLazyCollections(session, new QueryParameters(new IType[] { keyType, indexType }, new object[] { key, index }), false);
+			}
+			catch (Exception sqle)
+			{
+				throw ADOExceptionHelper.Convert(factory.SQLExceptionConverter, sqle, "could not collection element by index", SqlString);
+			}
+
+			log.Debug("done entity load");
+
+			return result;
+		}
+
+		protected internal IList LoadEntityBatch(
+			ISessionImplementor session,
+			object[] ids,
+			IType idType,
+			object optionalObject,
+			string optionalEntityName,
+			object optionalId,
+			IEntityPersister persister)
+		{
+			if (log.IsDebugEnabled)
+			{
+				log.Debug(
+					"batch loading entity: " +
+					MessageHelper.InfoString(persister, ids, Factory)
+					);
+			}
+
+			IType[] types = new IType[ids.Length];
+			for (int i = 0; i < types.Length; i++)
+			{
+				types[i] = idType;
+			}
+
+			IList result;
+
+			try
+			{

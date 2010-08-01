@@ -1,0 +1,49 @@
+constrFixity :: Constr -> Fixity
+constrFixity = confixity
+
+showConstr :: Constr -> String
+showConstr = constring
+
+readConstr :: DataType -> String -> Maybe Constr
+readConstr dt str =
+      case dataTypeRep dt of
+        AlgRep cons -> idx cons
+        IntRep      -> mkReadCon (\i -> (mkPrimCon dt str (IntConstr i)))
+        FloatRep    -> mkReadCon (\f -> (mkPrimCon dt str (FloatConstr f)))
+        StringRep   -> Just (mkStringConstr dt str)
+        NoRep       -> Nothing
+  where
+
+    mkReadCon :: Read t => (t -> Constr) -> Maybe Constr
+    mkReadCon f = case (reads str) of
+                    [(t,"")] -> Just (f t)
+                    _ -> Nothing
+
+    idx :: [Constr] -> Maybe Constr
+    idx cons = let fit = filter ((==) str . showConstr) cons
+                in if fit == []
+                     then Nothing
+                     else Just (head fit)
+
+isAlgType :: DataType -> Bool
+isAlgType dt = case datarep dt of
+                 (AlgRep _) -> True
+                 _ -> False
+
+indexConstr :: DataType -> ConIndex -> Constr
+indexConstr dt idx = case datarep dt of
+                        (AlgRep cs) -> cs !! (idx-1)
+                        _           -> error "indexConstr"
+
+constrIndex :: Constr -> ConIndex
+constrIndex con = case constrRep con of
+                    (AlgConstr idx) -> idx
+                    _ -> error "constrIndex"
+
+maxConstrIndex :: DataType -> ConIndex
+maxConstrIndex dt = case dataTypeRep dt of
+                        AlgRep cs -> length cs
+                        _            -> error "maxConstrIndex"
+
+mkIntType :: String -> DataType
+mkIntType = mkPrimType IntRep

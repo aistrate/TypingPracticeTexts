@@ -1,0 +1,50 @@
+module Data.Foldable (
+        Foldable(..),
+        foldr',
+        foldl',
+        foldrM,
+        foldlM,
+        traverse_,
+        for_,
+        sequenceA_,
+        asum,
+        mapM_,
+        forM_,
+        sequence_,
+        msum,
+        toList,
+        concat,
+        concatMap,
+        and,
+        or,
+        any,
+        all,
+        sum,
+        product,
+        maximum,
+        maximumBy,
+        minimum,
+        minimumBy,
+        elem,
+        notElem,
+        find
+        ) where
+
+import Prelude hiding (foldl, foldr, foldl1, foldr1, mapM_, sequence_,
+                elem, notElem, concat, concatMap, and, or, any, all,
+                sum, product, maximum, minimum)
+import qualified Prelude (foldl, foldr, foldl1, foldr1)
+import Control.Applicative
+import Control.Monad (MonadPlus(..))
+import Data.Maybe (fromMaybe, listToMaybe)
+import Data.Monoid
+
+#ifdef __NHC__
+import Control.Arrow (ArrowZero(..))
+#endif
+
+#ifdef __GLASGOW_HASKELL__
+import GHC.Exts (build)
+#endif
+
+#if defined(__GLASGOW_HASKELL__)

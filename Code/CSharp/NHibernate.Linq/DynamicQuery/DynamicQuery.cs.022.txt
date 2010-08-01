@@ -1,0 +1,50 @@
+			ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
+			NextToken();
+			Expression e = ParseExpression();
+			ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
+			NextToken();
+			return e;
+		}
+
+		Expression ParseIdentifier()
+		{
+			ValidateToken(TokenId.Identifier);
+			object value;
+			if (keywords.TryGetValue(token.text, out value))
+			{
+				if (value is Type) return ParseTypeAccess((Type)value);
+				if (value == (object)keywordIt) return ParseIt();
+				if (value == (object)keywordIif) return ParseIif();
+				if (value == (object)keywordNew) return ParseNew();
+				NextToken();
+				return (Expression)value;
+			}
+			if (symbols.TryGetValue(token.text, out value) ||
+				externals != null && externals.TryGetValue(token.text, out value))
+			{
+				Expression expr = value as Expression;
+				if (expr == null)
+				{
+					expr = Expression.Constant(value);
+				}
+				else
+				{
+					LambdaExpression lambda = expr as LambdaExpression;
+					if (lambda != null) return ParseLambdaInvocation(lambda);
+				}
+				NextToken();
+				return expr;
+			}
+			if (it != null) return ParseMemberAccess(null, it);
+			throw ParseError(Res.UnknownIdentifier, token.text);
+		}
+
+		Expression ParseIt()
+		{
+			if (it == null)
+				throw ParseError(Res.NoItInScope);
+			NextToken();
+			return it;
+		}
+
+		Expression ParseIif()

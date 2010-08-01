@@ -1,0 +1,50 @@
+    do base <- lexBaseChar <++ return 10
+       n    <- lexInteger base
+       guard (n <= toInteger (ord maxBound))
+       return (chr (fromInteger n))
+
+  lexCntrlChar =
+    do char '^'
+       c <- get
+       case c of
+         '@'  -> return '\^@'
+         'A'  -> return '\^A'
+         'B'  -> return '\^B'
+         'C'  -> return '\^C'
+         'D'  -> return '\^D'
+         'E'  -> return '\^E'
+         'F'  -> return '\^F'
+         'G'  -> return '\^G'
+         'H'  -> return '\^H'
+         'I'  -> return '\^I'
+         'J'  -> return '\^J'
+         'K'  -> return '\^K'
+         'L'  -> return '\^L'
+         'M'  -> return '\^M'
+         'N'  -> return '\^N'
+         'O'  -> return '\^O'
+         'P'  -> return '\^P'
+         'Q'  -> return '\^Q'
+         'R'  -> return '\^R'
+         'S'  -> return '\^S'
+         'T'  -> return '\^T'
+         'U'  -> return '\^U'
+         'V'  -> return '\^V'
+         'W'  -> return '\^W'
+         'X'  -> return '\^X'
+         'Y'  -> return '\^Y'
+         'Z'  -> return '\^Z'
+         '['  -> return '\^['
+         '\\' -> return '\^\'
+         ']'  -> return '\^]'
+         '^'  -> return '\^^'
+         '_'  -> return '\^_'
+         _    -> pfail
+
+  lexAscii =
+    do choice
+         [ (string "SOH" >> return '\SOH') <++
+           (string "SO"  >> return '\SO') 
+
+         , string "NUL" >> return '\NUL'
+         , string "STX" >> return '\STX'

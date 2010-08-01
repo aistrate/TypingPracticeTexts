@@ -1,0 +1,29 @@
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Setting-Record-Straight-American-History/dp/1932225277/ref=pd_ts_zgc_b_books_9_i?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Setting the Record Straight: American History in Black & White">
+                              <img src="http://ecx.images-amazon.com/images/I/51VSBDN994L._SL75_.jpg" alt="Setting the Record Straight" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">9.</span>
+                              <span class="arrowSprite arrowDown_s " title="Ranking has gone down in the past 24 hours" >
+                                <span>Ranking has gone down in the past 24 hours</span>
+                              </span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">25 days in the top 100</span>
+                            </div>
+                            <a href="http://www.amazon.com/Setting-Record-Straight-American-History/dp/1932225277/ref=pd_ts_zgc_b_books_9?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Setting the Record Straight: American History in Black & White" class="titleLink">Setting the Record Straight: American History in&#8230</a>
+                            <div class="tiny byline">
+                              <span class="carat">&#8250</span>
+                              <a href="/David-Barton/e/B001JOZJUM/ref=zg_ch_by_1">David Barton</a>
+                            </div>
+                            <div class="platformBinding">Paperback</div>
+                            <div class="priceBlock ">
+                              <span class="listprice">$8.95</span>
+                              <strong class="price">$4.92</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>

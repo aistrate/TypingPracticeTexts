@@ -1,0 +1,69 @@
+            return Math.Max(0, proposedInitial - PresentValue);
+        }
+    }
+
+    protected InvestmentScenario InvestmentScenario
+    {
+        get
+        {
+            if (investmentScenario == null)
+                investmentScenario = new InvestmentScenario(TotalPresentValue, TotalDepositPerYear, YearsLeft, TargetValue, 
+                                                            InterestRatePerYear, StandardDeviation);
+
+            return investmentScenario;
+        }
+    }
+    private InvestmentScenario investmentScenario;
+
+    private decimal readDecimal(TextBox textBox)
+    {
+        return readDecimal(textBox, 2);
+    }
+
+    private decimal readDecimal(TextBox textBox, int decimals)
+    {
+        decimal d = 0m;
+        decimal.TryParse(textBox.Text, out d);
+        d = Math.Round(Math.Abs(d), decimals);
+
+        textBox.Text = d.ToString();
+        return d;
+    }
+
+    private int readInt(TextBox textBox)
+    {
+        int i = (int)readDecimal(textBox, 0);
+        textBox.Text = i.ToString();
+        return i;
+    }
+
+    protected bool Initialize
+    {
+        get { return Utility.GetQueryParameters().GetBoolValue("initialize", false); }
+    }
+
+    protected LoginTypes CurrentLoginType
+    {
+        get
+        {
+            if (currentLoginType == null)
+                currentLoginType = CommonAdapter.GetCurrentLoginType();
+            return (LoginTypes)currentLoginType;
+        }
+    }
+    private LoginTypes? currentLoginType = null;
+
+    private void displayError(Exception ex)
+    {
+        displayError(Utility.GetCompleteExceptionMessage(ex));
+    }
+
+    private void displayError(string errorMessage)
+    {
+        ErrorLabel errorLabel = pnlFutureValue.Visible ? elbFutureValue : elbGivenFields;
+
+        pnlErrorFutureValue.Visible = true;
+        errorLabel.Text += (errorLabel.Text != "" ? "<br />" : "ERROR: ") +
+                            errorMessage;
+    }
+}

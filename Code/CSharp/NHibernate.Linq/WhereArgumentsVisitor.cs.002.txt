@@ -1,0 +1,50 @@
+				bool value = (bool)expr.Value;
+				var falseCriteria = NHibernate.Criterion.Expression.Sql("1=0");
+				var trueCriteria = NHibernate.Criterion.Expression.Sql("1=1");
+				if (value)
+				{
+					this.CurrentCriterions.Add(trueCriteria);
+				}
+				else
+				{
+					this.CurrentCriterions.Add(falseCriteria);
+				}
+
+				return expr;
+			}
+
+			if (expr.Type.IsSubclassOf(typeof(Expression)))
+				return Visit(expr.Value as Expression);
+
+			return base.VisitConstant(expr);
+		}
+
+		protected override Expression VisitMethodCall(MethodCallExpression expr)
+		{
+			switch (expr.Method.Name)
+			{
+				case "Any":
+					CurrentCriterions.Add(GetExistsCriteria(expr));
+					break;
+				case "StartsWith":
+					CurrentCriterions.Add(GetLikeCriteria(expr, MatchMode.Start));
+					break;
+				case "EndsWith":
+					CurrentCriterions.Add(GetLikeCriteria(expr, MatchMode.End));
+					break;
+				case "Contains":
+					if (expr.Object == null)
+					{
+						if (expr.Arguments[0] is ConstantExpression)
+						{
+							CurrentCriterions.Add(GetCollectionContainsCriteria(expr.Arguments[0], expr.Arguments[1]));
+						}
+						else if (expr.Arguments[0] is CollectionAccessExpression)
+						{
+							CurrentCriterions.Add(GetCollectionContainsCriteria((CollectionAccessExpression)expr.Arguments[0], expr.Arguments[1]));
+						}
+						else
+						{
+							CurrentCriterions.Add(GetCollectionContainsCriteria(expr.Arguments[0], expr.Arguments[1]));
+						}
+					}

@@ -1,0 +1,50 @@
+					from p2 in g
+					where p2.UnitPrice == g.Min(p3 => p3.UnitPrice)
+					select p2
+							};
+
+			ObjectDumper.Write(categories, 1);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Max to find the latest hire date of any Employee.")]
+		public void DLinq26()
+		{
+			DateTime? q = db.Employees.Select(e => e.HireDate).Max();
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Max to find the most units in stock of any Product.")]
+		public void DLinq27()
+		{
+			short? q = db.Products.Max(p => p.UnitsInStock);
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Max to find the Products that have the highest unit price " +
+					 "in each category.")]
+		[Ignore("TODO")]
+		public void DLinq28()
+		{
+			var categories =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								g.Key,
+								MostExpensiveProducts =
+					from p2 in g
+					where p2.UnitPrice == g.Max(p3 => p3.UnitPrice)
+					select p2
+							};
+
+			ObjectDumper.Write(categories, 1);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Average to find the average freight of all Orders.")]
+		public void DLinq29()
+		{

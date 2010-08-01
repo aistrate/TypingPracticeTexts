@@ -1,0 +1,30 @@
+                        <a href="/gp/feature.html/ref=bhp_9p2_barg_04?ie=UTF8&docId=550074&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Children's Books</a>
+                      </li>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_barg_05?ie=UTF8&docId=550048&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Fiction</a>
+                      </li>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_barg_06?ie=UTF8&docId=550080&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Mysteries and Suspense</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="asinItem">
+                  <div class="prodImage">
+                    <a href="/Paranormal-Romance-Books/b/ref=bhp_9p2_para_02?ie=UTF8&node=1285981011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                      <img src="http://ecx.images-amazon.com/images/P/0441018645.01._SL110_PE45_OU01_SCLZZZZZZZ_V217428024_.jpg" width="80" alt="Dead in the Family" height="121" border="0" />
+                    </a>
+                  </div>
+                  <div class="asinTextBlock">
+                    <div class="title">
+                      <a href="/Paranormal-Romance-Books/b/ref=bhp_9p2_para_01?ie=UTF8&node=1285981011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Paranormal Romance</a>
+                    </div>
+                    <ul>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_para_03?ie=UTF8&docId=1000368631&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">New Releases</a>
+                      </li>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_para_04?ie=UTF8&docId=1000368641&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">New Releases for Teens</a>
+                      </li>
+                      <li>
+                        <a href="/gp/redirect.html/ref=bhp_9p2_para_05?location=http://www.amazon.com/gp/bestsellers/books/1285981011&token=3A0F170E7CEFE27BDC730D3D7344512BC1296B83&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Bestsellers</a>

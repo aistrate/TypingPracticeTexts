@@ -1,0 +1,50 @@
+#define STRICT3(f) f a b c | a `seq` b `seq` c `seq` False = undefined
+#define STRICT4(f) f a b c d | a `seq` b `seq` c `seq` d `seq` False = undefined
+
+singleton :: Char -> ByteString
+singleton = B.singleton . c2w
+{-# INLINE singleton #-}
+
+#if __GLASGOW_HASKELL__ >= 608
+instance IsString ByteString where
+    fromString = pack
+    {-# INLINE fromString #-}
+#endif
+
+pack :: String -> ByteString
+#if !defined(__GLASGOW_HASKELL__)
+
+pack str = B.unsafeCreate (P.length str) $ \p -> go p str
+    where go _ []     = return ()
+          go p (x:xs) = poke p (c2w x) >> go (p `plusPtr` 1) xs
+
+#else /* hack away */
+
+pack str = B.unsafeCreate (P.length str) $ \(Ptr p) -> stToIO (go p str)
+  where
+    go :: Addr# -> [Char] -> ST a ()
+    go _ []        = return ()
+    go p (C# c:cs) = writeByte p (int2Word# (ord# c)) >> go (p `plusAddr#` 1#) cs
+
+    writeByte p c = ST $ \s# ->
+        case writeWord8OffAddr# p 0# c s# of s2# -> (# s2#, () #)
+    {-# INLINE writeByte #-}
+{-# INLINE [1] pack #-}
+
+{-# RULES
+"ByteString pack/packAddress" forall s .
+   pack (unpackCString# s) = inlinePerformIO (B.unsafePackAddress s)
+ #-}
+
+#endif
+
+unpack :: ByteString -> [Char]
+unpack = P.map w2c . B.unpack
+{-# INLINE unpack #-}
+
+cons :: Char -> ByteString -> ByteString
+cons = B.cons . c2w
+{-# INLINE cons #-}
+
+snoc :: ByteString -> Char -> ByteString
+snoc p = B.snoc p . c2w

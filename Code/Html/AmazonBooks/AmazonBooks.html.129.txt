@@ -1,0 +1,30 @@
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative">
+                          <a href="/gp/product/0451229851/ref=s9_al_bw_i1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Lover Mine: A Novel of the Black Dagger Brotherhood">
+                            <div style="margin-bottom: 4px; ">
+                              <img src="http://ecx.images-amazon.com/images/I/51H8UbRKB8L._SL120_.jpg" alt="" width="80" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image1" class="productImage" />
+                            </div>Lover Mine: A Novel of the Black...
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/J.-R.-Ward/e/B001H6OGQA/ref=s9_al_bw_al2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">J. R. Ward</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$25.95</span>
+                            <span class="red t14">$10.95</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative">
+                          <a href="/gp/product/0399156461/ref=s9_al_bw_i2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Burning Lamp (An Arcane Society Novel)">
+                            <div style="margin-bottom: 4px; ">
+                              <img src="http://ecx.images-amazon.com/images/I/518%2BvcEWTuL._SL120_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image2" class="productImage" />
+                            </div>Burning Lamp (An Arcane Society Novel)
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Amanda-Quick/e/B000AQ12NI/ref=s9_al_bw_al3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">Amanda Quick</a>

@@ -1,0 +1,62 @@
+cache = unsafePerformIO $ do
+                empty_tc_tbl <- HT.new (==) HT.hashString
+                empty_ap_tbl <- HT.new (==) hashKP
+                key_loc      <- newIORef (Key 1) 
+                let ret = Cache {       next_key = key_loc,
+                                        tc_tbl = empty_tc_tbl, 
+                                        ap_tbl = empty_ap_tbl }
+#ifdef __GLASGOW_HASKELL__
+                block $ do
+                        stable_ref <- newStablePtr ret
+                        let ref = castStablePtrToPtr stable_ref
+                        ref2 <- getOrSetTypeableStore ref
+                        if ref==ref2
+                                then deRefStablePtr stable_ref
+                                else do
+                                        freeStablePtr stable_ref
+                                        deRefStablePtr
+                                                (castPtrToStablePtr ref2)
+#else
+                return ret
+#endif
+
+newKey :: IORef Key -> IO Key
+#ifdef __GLASGOW_HASKELL__
+newKey _ = do i <- genSym; return (Key i)
+#else
+newKey kloc = do { k@(Key i) <- readIORef kloc ;
+                   writeIORef kloc (Key (i+1)) ;
+                   return k }
+#endif
+
+#ifdef __GLASGOW_HASKELL__
+foreign import ccall unsafe "genSymZh"
+  genSym :: IO Int
+#endif
+
+mkTyConKey :: String -> Key
+mkTyConKey str 
+  = unsafePerformIO $ do
+        let Cache {next_key = kloc, tc_tbl = tbl} = cache
+        mb_k <- HT.lookup tbl str
+        case mb_k of
+          Just k  -> return k
+          Nothing -> do { k <- newKey kloc ;
+                          HT.insert tbl str k ;
+                          return k }
+
+appKey :: Key -> Key -> Key
+appKey k1 k2
+  = unsafePerformIO $ do
+        let Cache {next_key = kloc, ap_tbl = tbl} = cache
+        mb_k <- HT.lookup tbl kpr
+        case mb_k of
+          Just k  -> return k
+          Nothing -> do { k <- newKey kloc ;
+                          HT.insert tbl kpr k ;
+                          return k }
+  where
+    kpr = KeyPr k1 k2
+
+appKeys :: Key -> [Key] -> Key
+appKeys k ks = foldl appKey k ks

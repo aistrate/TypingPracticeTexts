@@ -1,0 +1,49 @@
+    isIdsChar c = isAlpha c || c == '_'
+    isIdfChar c = isAlphaNum c || c `elem` "_'"
+
+#ifndef __GLASGOW_HASKELL__
+infinity, notANumber :: Rational
+infinity   = 1 :% 0
+notANumber = 0 :% 0
+#endif
+
+lexLitChar :: ReadP Lexeme
+lexLitChar =
+  do char '\''
+     (c,esc) <- lexCharE
+     guard (esc || c /= '\'')
+     char '\''
+     return (Char c)
+
+lexChar :: ReadP Char
+lexChar = do { (c,_) <- lexCharE; return c }
+
+lexCharE :: ReadP (Char, Bool)
+lexCharE =
+  do c1 <- get
+     if c1 == '\\'
+       then do c2 <- lexEsc; return (c2, True)
+       else do return (c1, False)
+ where 
+  lexEsc =
+    lexEscChar
+      +++ lexNumeric
+        +++ lexCntrlChar
+          +++ lexAscii
+  
+  lexEscChar =
+    do c <- get
+       case c of
+         'a'  -> return '\a'
+         'b'  -> return '\b'
+         'f'  -> return '\f'
+         'n'  -> return '\n'
+         'r'  -> return '\r'
+         't'  -> return '\t'
+         'v'  -> return '\v'
+         '\\' -> return '\\'
+         '\"' -> return '\"'
+         '\'' -> return '\''
+         _    -> pfail
+  
+  lexNumeric =

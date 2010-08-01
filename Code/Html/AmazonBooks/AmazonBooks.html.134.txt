@@ -1,0 +1,30 @@
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Richelle-Mead/e/B001IGUOAQ/ref=s9_al_bw_al10?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">Richelle Mead</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Paperback</div>
+                            <span class="listprice gry t11">$15.00</span>
+                            <span class="red t14">$10.20</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0312357192/ref=s9_al_bw_i10?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Born To Be Wild (The Others)">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/51UtS%2Be5YhL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL120_OU01_.jpg" alt="" width="75" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image10" class="productImage" />
+                            </div>Born To Be Wild (The Others)
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Christine-Warren/e/B001IGNLZQ/ref=s9_al_bw_al11?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">Christine Warren</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Mass Market Paperback</div>
+                            <span class="red t14">$7.99</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>

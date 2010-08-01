@@ -1,0 +1,57 @@
+          end _    0 _ _  = Nothing
+          end True _ n ps = Just (negate n, ps)
+          end _    _ n ps = Just (n, ps)
+
+readInteger :: ByteString -> Maybe (Integer, ByteString)
+readInteger as
+    | null as   = Nothing
+    | otherwise =
+        case unsafeHead as of
+            '-' -> first (B.unsafeTail as) >>= \(n, bs) -> return (-n, bs)
+            '+' -> first (B.unsafeTail as)
+            _   -> first as
+
+    where first ps | null ps   = Nothing
+                   | otherwise =
+                       case B.unsafeHead ps of
+                        w | w >= 0x30 && w <= 0x39 -> Just $
+                            loop 1 (fromIntegral w - 0x30) [] (B.unsafeTail ps)
+                          | otherwise              -> Nothing
+
+          loop :: Int -> Int -> [Integer]
+               -> ByteString -> (Integer, ByteString)
+          STRICT4(loop)
+          loop d acc ns ps
+              | null ps   = combine d acc ns empty
+              | otherwise =
+                  case B.unsafeHead ps of
+                   w | w >= 0x30 && w <= 0x39 ->
+                       if d == 9 then loop 1 (fromIntegral w - 0x30)
+                                           (toInteger acc : ns)
+                                           (B.unsafeTail ps)
+                                 else loop (d+1)
+                                           (10*acc + (fromIntegral w - 0x30))
+                                           ns (B.unsafeTail ps)
+                     | otherwise -> combine d acc ns ps
+
+          combine _ acc [] ps = (toInteger acc, ps)
+          combine d acc ns ps =
+              ((10^d * combine1 1000000000 ns + toInteger acc), ps)
+
+          combine1 _ [n] = n
+          combine1 b ns  = combine1 (b*b) $ combine2 b ns
+
+          combine2 b (n:m:ns) = let t = m*b + n in t `seq` (t : combine2 b ns)
+          combine2 _ ns       = ns
+
+readFile :: FilePath -> IO ByteString
+readFile f = bracket (openFile f ReadMode) hClose
+    (\h -> hFileSize h >>= hGet h . fromIntegral)
+
+writeFile :: FilePath -> ByteString -> IO ()
+writeFile f txt = bracket (openFile f WriteMode) hClose
+    (\h -> hPut h txt)
+
+appendFile :: FilePath -> ByteString -> IO ()
+appendFile f txt = bracket (openFile f AppendMode) hClose
+    (\h -> hPut h txt)

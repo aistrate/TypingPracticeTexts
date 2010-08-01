@@ -1,0 +1,50 @@
+instance IsChar Char where
+    toChar c = c
+    fromChar c = c
+
+data UPrintf = UChar Char | UString String | UInteger Integer Integer | UFloat Float | UDouble Double
+
+uprintf :: String -> [UPrintf] -> String
+uprintf ""       []       = ""
+uprintf ""       (_:_)    = fmterr
+uprintf ('%':'%':cs) us   = '%':uprintf cs us
+uprintf ('%':_)  []       = argerr
+uprintf ('%':cs) us@(_:_) = fmt cs us
+uprintf (c:cs)   us       = c:uprintf cs us
+
+fmt :: String -> [UPrintf] -> String
+fmt cs us =
+	let (width, prec, ladj, zero, plus, cs', us') = getSpecs False False False cs us
+	    adjust (pre, str) = 
+		let lstr = length str
+		    lpre = length pre
+		    fill = if lstr+lpre < width then take (width-(lstr+lpre)) (repeat (if zero then '0' else ' ')) else ""
+		in  if ladj then pre ++ str ++ fill else if zero then pre ++ fill ++ str else fill ++ pre ++ str
+            adjust' ("", str) | plus = adjust ("+", str)
+            adjust' ps = adjust ps
+        in
+	case cs' of
+	[]     -> fmterr
+	c:cs'' ->
+	    case us' of
+	    []     -> argerr
+	    u:us'' ->
+		(case c of
+		'c' -> adjust  ("", [toEnum (toint u)])
+		'd' -> adjust' (fmti u)
+		'i' -> adjust' (fmti u)
+		'x' -> adjust  ("", fmtu 16 u)
+		'X' -> adjust  ("", map toUpper $ fmtu 16 u)
+		'o' -> adjust  ("", fmtu 8  u)
+		'u' -> adjust  ("", fmtu 10 u)
+		'e' -> adjust' (dfmt' c prec u)
+		'E' -> adjust' (dfmt' c prec u)
+		'f' -> adjust' (dfmt' c prec u)
+		'g' -> adjust' (dfmt' c prec u)
+		'G' -> adjust' (dfmt' c prec u)
+		's' -> adjust  ("", tostr prec u)
+		_   -> perror ("bad formatting char " ++ [c])
+		 ) ++ uprintf cs'' us''
+
+fmti :: UPrintf -> (String, String)
+fmti (UInteger _ i) = if i < 0 then ("-", show (-i)) else ("", show i)

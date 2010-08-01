@@ -1,0 +1,50 @@
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.RegisteredAt >= new DateTime(2000, 1, 1)
+						 select user).ToList();
+			Assert.AreEqual(2, query.Count);
+		}
+
+		[Test]
+		public void UsersRegisteredAtOrAfterY2K_And_Before2001()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.RegisteredAt >= new DateTime(2000, 1, 1) && user.RegisteredAt <= new DateTime(2001, 1, 1)
+						 select user).ToList();
+			Assert.AreEqual(1, query.Count);
+		}
+
+		[Test]
+		public void UsersByNameAndRegistrationDate()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.Name == "ayende" && user.RegisteredAt == DateTime.Today
+						 select user).FirstOrDefault();
+			Assert.AreEqual("ayende", query.Name);
+			Assert.AreEqual(DateTime.Today, query.RegisteredAt);
+		}
+
+		[Test]
+		public void UsersRegisteredAfterY2K()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.RegisteredAt > new DateTime(2000, 1, 1)
+						 select user).ToList();
+			Assert.AreEqual(1, query.Count);
+		}
+
+		[Test]
+		public void UsersRegisteredAtOrBeforeY2K()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.RegisteredAt <= new DateTime(2000, 1, 1)
+						 select user).ToList();
+			Assert.AreEqual(2, query.Count);
+		}
+
+		[Test]
+		public void UsersRegisteredBeforeY2K()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.RegisteredAt < new DateTime(2000, 1, 1)
+						 select user).ToList();

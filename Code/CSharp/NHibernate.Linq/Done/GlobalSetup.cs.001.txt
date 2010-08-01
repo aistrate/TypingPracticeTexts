@@ -1,0 +1,50 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Data;
+using NHibernate.Cfg;
+using NHibernate.Linq.Tests.Entities;
+using NHibernate.Tool.hbm2ddl;
+using NUnit.Framework;
+
+namespace NHibernate.Linq.Tests
+{
+	public class GlobalSetup
+	{
+		private static ISessionFactory factory;
+
+		[SetUp]
+		public void SetupNHibernate()
+		{
+			Configuration cfg = new Configuration().Configure();
+			new SchemaExport(cfg).Execute(false, true, false);
+
+			factory = cfg.BuildSessionFactory();
+
+			CreateTestData();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+
+		}
+
+		#region Test Data
+
+		private static void CreatePatientData(ISession session)
+		{
+			State newYork = new State
+			{
+				Abbreviation = "NY",
+				FullName = "New York"
+			};
+			State florida = new State
+			{
+				Abbreviation = "FL",
+				FullName = "Florida"
+			};
+
+			Physician drDobbs = new Physician
+			{
+				Name = "Dr Dobbs"

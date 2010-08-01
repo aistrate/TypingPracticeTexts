@@ -1,0 +1,30 @@
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Title5">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ImageContainer5">
+                            <a href="/gp/product/1555580416/ref=s9_simv_bw_p14_i6?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Common LISP. The Language. Second Edition">
+                              <div class="imageContainer">
+                                <img url="http://ecx.images-amazon.com/images/I/41WR9iE-8rL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="93" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Image5" />
+                              </div>Common LISP. The Language. Second...
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span><a class="noLinkDecoration" href="/Guy-L.-Steele-Jr./e/B000AR9L7Q/ref=s9_simv_bw_p14_al6?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155">Guy L. Steele Jr.</a>, <a class="noLinkDecoration" href="/Guy-L.-Steele/e/B000AQ4N52/ref=s9_simv_bw_p14_al6?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155">Guy L. Steele</a>
+                          </div>
+                          <div class="gry t11 nt">Paperback</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ItemElement6" style="width: 49%; margin-bottom: 0px; display: none;">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_TitleContainer6" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Title6">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ImageContainer6">
+                            <a href="/gp/product/1435712757/ref=s9_simv_bw_p14_i7?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Let Over Lambda">
+                              <div class="imageContainer">
+                                <img url="http://ecx.images-amazon.com/images/I/41rpu2m9vkL._SL135_.jpg" alt="" width="90" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Image6" />
+                              </div>Let Over Lambda
+                            </a>
+                          </span>
+                          <div class="t11">Doug Hoyte</div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$39.95</span>

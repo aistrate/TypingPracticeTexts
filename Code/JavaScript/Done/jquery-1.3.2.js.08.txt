@@ -1,0 +1,99 @@
+			if ( !/^\d+(px)?$/i.test( ret ) && /^\d/.test( ret ) ) {
+				var left = style.left, rsLeft = elem.runtimeStyle.left;
+
+				elem.runtimeStyle.left = elem.currentStyle.left;
+				style.left = ret || 0;
+				ret = style.pixelLeft + "px";
+
+				style.left = left;
+				elem.runtimeStyle.left = rsLeft;
+			}
+		}
+
+		return ret;
+	},
+
+	clean: function( elems, context, fragment ) {
+		context = context || document;
+
+		if ( typeof context.createElement === "undefined" )
+			context = context.ownerDocument || context[0] && context[0].ownerDocument || document;
+
+		if ( !fragment && elems.length === 1 && typeof elems[0] === "string" ) {
+			var match = /^<(\w+)\s*\/?>$/.exec(elems[0]);
+			if ( match )
+				return [ context.createElement( match[1] ) ];
+		}
+
+		var ret = [], scripts = [], div = context.createElement("div");
+
+		jQuery.each(elems, function(i, elem){
+			if ( typeof elem === "number" )
+				elem += '';
+
+			if ( !elem )
+				return;
+
+			if ( typeof elem === "string" ) {
+				elem = elem.replace(/(<(\w+)[^>]*?)\/>/g, function(all, front, tag){
+					return tag.match(/^(abbr|br|col|img|input|link|meta|param|hr|area|embed)$/i) ?
+						all :
+						front + "></" + tag + ">";
+				});
+
+				var tags = elem.replace(/^\s+/, "").substring(0, 10).toLowerCase();
+
+				var wrap =
+					!tags.indexOf("<opt") &&
+					[ 1, "<select multiple='multiple'>", "</select>" ] ||
+
+					!tags.indexOf("<leg") &&
+					[ 1, "<fieldset>", "</fieldset>" ] ||
+
+					tags.match(/^<(thead|tbody|tfoot|colg|cap)/) &&
+					[ 1, "<table>", "</table>" ] ||
+
+					!tags.indexOf("<tr") &&
+					[ 2, "<table><tbody>", "</tbody></table>" ] ||
+
+					(!tags.indexOf("<td") || !tags.indexOf("<th")) &&
+					[ 3, "<table><tbody><tr>", "</tr></tbody></table>" ] ||
+
+					!tags.indexOf("<col") &&
+					[ 2, "<table><tbody></tbody><colgroup>", "</colgroup></table>" ] ||
+
+					!jQuery.support.htmlSerialize &&
+					[ 1, "div<div>", "</div>" ] ||
+
+					[ 0, "", "" ];
+
+				div.innerHTML = wrap[1] + elem + wrap[2];
+
+				while ( wrap[0]-- )
+					div = div.lastChild;
+
+				if ( !jQuery.support.tbody ) {
+
+					var hasBody = /<tbody/i.test(elem),
+						tbody = !tags.indexOf("<table") && !hasBody ?
+							div.firstChild && div.firstChild.childNodes :
+
+						wrap[1] == "<table>" && !hasBody ?
+							div.childNodes :
+							[];
+
+					for ( var j = tbody.length - 1; j >= 0 ; --j )
+						if ( jQuery.nodeName( tbody[ j ], "tbody" ) && !tbody[ j ].childNodes.length )
+							tbody[ j ].parentNode.removeChild( tbody[ j ] );
+
+					}
+
+				if ( !jQuery.support.leadingWhitespace && /^\s/.test( elem ) )
+					div.insertBefore( context.createTextNode( elem.match(/^\s[0] ), div.firstChild );
+				
+				elem = jQuery.makeArray( div.childNodes );
+			}
+
+			if ( elem.nodeType )
+				ret.push( elem );
+			else

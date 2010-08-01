@@ -1,0 +1,100 @@
+				ret = jQuery.merge( ret, elem );
+
+		});
+
+		if ( fragment ) {
+			for ( var i = 0; ret[i]; i++ ) {
+				if ( jQuery.nodeName( ret[i], "script" ) && (!ret[i].type || ret[i].type.toLowerCase() === "text/javascript") ) {
+					scripts.push( ret[i].parentNode ? ret[i].parentNode.removeChild( ret[i] ) : ret[i] );
+				} else {
+					if ( ret[i].nodeType === 1 )
+						ret.splice.apply( ret, [i + 1, 0].concat(jQuery.makeArray(ret[i].getElementsByTagName("script"))) );
+					fragment.appendChild( ret[i] );
+				}
+			}
+			
+			return scripts;
+		}
+
+		return ret;
+	},
+
+	attr: function( elem, name, value ) {
+		if (!elem || elem.nodeType == 3 || elem.nodeType == 8)
+			return undefined;
+
+		var notxml = !jQuery.isXMLDoc( elem ),
+			set = value !== undefined;
+
+		name = notxml && jQuery.props[ name ] || name;
+
+		if ( elem.tagName ) {
+
+			var special = /href|src|style/.test( name );
+
+			if ( name == "selected" && elem.parentNode )
+				elem.parentNode.selectedIndex;
+
+			if ( name in elem && notxml && !special ) {
+				if ( set ){
+					if ( name == "type" && jQuery.nodeName( elem, "input" ) && elem.parentNode )
+						throw "type property can't be changed";
+
+					elem[ name ] = value;
+				}
+
+				if( jQuery.nodeName( elem, "form" ) && elem.getAttributeNode(name) )
+					return elem.getAttributeNode( name ).nodeValue;
+
+				if ( name == "tabIndex" ) {
+					var attributeNode = elem.getAttributeNode( "tabIndex" );
+					return attributeNode && attributeNode.specified
+						? attributeNode.value
+						: elem.nodeName.match(/(button|input|object|select|textarea)/i)
+							? 0
+							: elem.nodeName.match(/^(a|area)$/i) && elem.href
+								? 0
+								: undefined;
+				}
+
+				return elem[ name ];
+			}
+
+			if ( !jQuery.support.style && notxml &&  name == "style" )
+				return jQuery.attr( elem.style, "cssText", value );
+
+			if ( set )
+				elem.setAttribute( name, "" + value );
+
+			var attr = !jQuery.support.hrefNormalized && notxml && special
+					? elem.getAttribute( name, 2 )
+					: elem.getAttribute( name );
+
+			return attr === null ? undefined : attr;
+		}
+
+		if ( !jQuery.support.opacity && name == "opacity" ) {
+			if ( set ) {
+				elem.zoom = 1;
+
+				elem.filter = (elem.filter || "").replace( /alpha\([^)]*\)/, "" ) +
+					(parseInt( value ) + '' == "NaN" ? "" : "alpha(opacity=" + value * 100 + ")");
+			}
+
+			return elem.filter && elem.filter.indexOf("opacity=") >= 0 ?
+				(parseFloat( elem.filter.match(/opacity=([^)]*)/)[1] ) / 100) + '':
+				"";
+		}
+
+		name = name.replace(/-([a-z])/ig, function(all, letter){
+			return letter.toUpperCase();
+		});
+
+		if ( set )
+			elem[ name ] = value;
+
+		return elem[ name ];
+	},
+
+	trim: function( text ) {
+		return (text || "").replace( /^\s+|\s+$/g, "" );

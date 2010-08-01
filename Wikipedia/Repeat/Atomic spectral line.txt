@@ -1,0 +1,10 @@
+Atomic spectral line
+
+In physics, atomic spectral lines are of two types:
+
+ * An emission line is formed when an electron makes a transition from a particular discrete energy level of an atom, to a lower energy state, emitting a photon of a particular energy and wavelength. A spectrum of many such photons will show an emission spike at the wavelength associated with these photons.
+ * An absorption line is formed when an electron makes a transition from a lower to a higher discrete energy state, with a photon being absorbed in the process. These absorbed photons generally come from background continuum radiation and a spectrum will show a drop in the continuum radiation at the wavelength associated with the absorbed photons.
+
+The two states must be bound states in which the electron is bound to the atom, so the transition is sometimes referred to as a "bound-bound" transition, as opposed to a transition in which the electron is ejected out of the atom completely ("bound-free" transition) into a continuum state, leaving an ionized atom, and generating continuum radiation.
+
+A photon with an energy equal to the energy difference between the levels is released or absorbed in the process. The frequency nu at which the spectral line occurs is related to the photon energy E by Planck's law E = h*nu where h is Planck's constant.

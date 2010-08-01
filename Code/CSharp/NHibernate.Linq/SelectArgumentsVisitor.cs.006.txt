@@ -1,0 +1,50 @@
+		{
+			var leftVisitor = new SelectArgumentsVisitor(_rootCriteria, _session);
+			var rightVisitor = new SelectArgumentsVisitor(_rootCriteria, _session);
+			leftVisitor.Visit(expr.Left);
+			rightVisitor.Visit(expr.Right);
+
+			var joinedProjections = new List<IProjection>();
+			joinedProjections.AddRange(leftVisitor._projections);
+			joinedProjections.AddRange(rightVisitor._projections);
+
+			IType[] types = joinedProjections[0].GetTypes(_rootCriteria, CriteriaQuery);
+			var useConcat = types[0] is AbstractStringType;
+			SqlFunctionProjection projection;
+			if (useConcat)
+			{
+				projection = new SqlFunctionProjection("concat", types[0], joinedProjections.ToArray());
+			}
+			else
+			{
+				projection = new SqlFunctionProjection(arithmaticAddition, types[0], joinedProjections.ToArray());
+			}
+			_projections.Add(projection);
+		}
+
+		private void VisitMultiplyExpression(BinaryExpression expr)
+		{
+			VisitAritmaticOperation(expr, arithmaticMultiply);
+		}
+
+		private void VisitSubtractExpression(BinaryExpression expr)
+		{
+			VisitAritmaticOperation(expr, arithmaticSubstract);
+		}
+
+		private void VisitDivideExpression(BinaryExpression expr)
+		{
+			VisitAritmaticOperation(expr, arithmaticDivide);
+		}
+
+		private void VisitAritmaticOperation(BinaryExpression expr, ISQLFunction arithmaticOperation)
+		{
+			var leftVisitor = new SelectArgumentsVisitor(_rootCriteria, _session);
+			var rightVisitor = new SelectArgumentsVisitor(_rootCriteria, _session);
+			leftVisitor.Visit(expr.Left);
+			rightVisitor.Visit(expr.Right);
+
+			var joinedProjections = new List<IProjection>();
+			joinedProjections.AddRange(leftVisitor._projections);
+			joinedProjections.AddRange(rightVisitor._projections);
+			var types = joinedProjections[0].GetTypes(_rootCriteria, CriteriaQuery);

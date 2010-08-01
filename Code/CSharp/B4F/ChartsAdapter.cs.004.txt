@@ -1,0 +1,42 @@
+        public static DataTable GetPositionValuations(int accountId, int instrumentId, DateTime[] dates)
+        {
+            using (IDalSession session = NHSessionFactory.CreateSession())
+            {
+                List<IValuation> valuations = dates.Length > 0 ?
+                                              SecurityLayerAdapter.GetOwnedValuations(session, accountId, instrumentId, dates, true, true) :
+                                              new List<IValuation>();
+
+                return (from v in valuations
+                        where v.BaseMarketValue.Quantity != 0m
+                        orderby v.Date
+                        group v by v.Date into grp
+                        select new { Date = grp.Key, BaseMarketValueQuantity = grp.Sum(val => val.BaseMarketValue.Quantity) })
+                        .ToDataTable("Series");
+            }
+        }
+
+        #endregion
+
+        #region Allocation by Instrument Chart
+
+        public static DataSet GetAllocationByInstrument(int accountId)
+        {
+            using (IDalSession session = NHSessionFactory.CreateSession())
+            {
+                return getOwnedFundPositions(session, accountId)
+                            .Select(p => new { InstrumentName = p.InstrumentOfPosition.Name,
+                                               CurrentBaseValueQuantity = p.CurrentBaseValue.Quantity })
+                            .ToDataSet();
+            }
+        }
+
+        #endregion
+
+        private static List<IFundPosition> getOwnedFundPositions(IDalSession session, int accountId)
+        {
+            return SecurityLayerAdapter.GetOwnedFundPositions(session, accountId, PositionsView.NotZero)
+                                       .OrderBy(p => p.InstrumentOfPosition.DisplayName)
+                                       .ToList();
+        }
+    }
+}

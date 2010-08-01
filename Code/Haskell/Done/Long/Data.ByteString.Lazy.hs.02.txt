@@ -1,0 +1,99 @@
+        readFile,
+        writeFile,
+        appendFile,
+
+        hGetContents,
+        hGet,
+        hGetNonBlocking,
+        hPut,
+        hPutStr,
+
+  ) where
+
+import qualified Prelude
+import Prelude hiding
+    (reverse,head,tail,last,init,null,length,map,lines,foldl,foldr,unlines
+    ,concat,any,take,drop,splitAt,takeWhile,dropWhile,span,break,elem,filter,maximum
+    ,minimum,all,concatMap,foldl1,foldr1,scanl, scanl1, scanr, scanr1
+    ,repeat, cycle, interact, iterate,readFile,writeFile,appendFile,replicate
+    ,getContents,getLine,putStr,putStrLn ,zip,zipWith,unzip,notElem)
+
+import qualified Data.List              as L
+import qualified Data.ByteString        as S
+import qualified Data.ByteString.Internal as S
+import qualified Data.ByteString.Unsafe as S
+import Data.ByteString.Lazy.Internal
+
+import Data.Monoid              (Monoid(..))
+
+import Data.Word                (Word8)
+import Data.Int                 (Int64)
+import System.IO                (Handle,stdin,stdout,openBinaryFile,IOMode(..)
+                                ,hClose,hWaitForInput,hIsEOF)
+import System.IO.Unsafe
+#ifndef __NHC__
+import Control.Exception        (bracket)
+#else
+import IO		        (bracket)
+#endif
+
+import Foreign.ForeignPtr       (withForeignPtr)
+import Foreign.Ptr
+import Foreign.Storable
+
+#define STRICT1(f) f a | a `seq` False = undefined
+#define STRICT2(f) f a b | a `seq` b `seq` False = undefined
+#define STRICT3(f) f a b c | a `seq` b `seq` c `seq` False = undefined
+#define STRICT4(f) f a b c d | a `seq` b `seq` c `seq` d `seq` False = undefined
+#define STRICT5(f) f a b c d e | a `seq` b `seq` c `seq` d `seq` e `seq` False = undefined
+
+instance Eq  ByteString
+    where (==)    = eq
+
+instance Ord ByteString
+    where compare = cmp
+
+instance Monoid ByteString where
+    mempty  = empty
+    mappend = append
+    mconcat = concat
+
+eq :: ByteString -> ByteString -> Bool
+eq Empty Empty = True
+eq Empty _     = False
+eq _     Empty = False
+eq (Chunk a as) (Chunk b bs) =
+  case compare (S.length a) (S.length b) of
+    LT -> a == (S.take (S.length a) b) && eq as (Chunk (S.drop (S.length a) b) bs)
+    EQ -> a == b                       && eq as bs
+    GT -> (S.take (S.length b) a) == b && eq (Chunk (S.drop (S.length b) a) as) bs
+
+cmp :: ByteString -> ByteString -> Ordering
+cmp Empty Empty = EQ
+cmp Empty _     = LT
+cmp _     Empty = GT
+cmp (Chunk a as) (Chunk b bs) =
+  case compare (S.length a) (S.length b) of
+    LT -> case compare a (S.take (S.length a) b) of
+            EQ     -> cmp as (Chunk (S.drop (S.length a) b) bs)
+            result -> result
+    EQ -> case compare a b of
+            EQ     -> cmp as bs
+            result -> result
+    GT -> case compare (S.take (S.length b) a) b of
+            EQ     -> cmp (Chunk (S.drop (S.length b) a) as) bs
+            result -> result
+
+empty :: ByteString
+empty = Empty
+{-# INLINE empty #-}
+
+singleton :: Word8 -> ByteString
+singleton w = Chunk (S.singleton w) Empty
+{-# INLINE singleton #-}
+
+pack :: [Word8] -> ByteString
+pack ws = L.foldr (Chunk . S.pack) Empty (chunks defaultChunkSize ws)
+  where
+    chunks :: Int -> [a] -> [[a]]
+    chunks _    [] = []

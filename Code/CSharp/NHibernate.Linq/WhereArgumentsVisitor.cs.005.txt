@@ -1,0 +1,49 @@
+			switch (expr.NodeType)
+			{
+				case ExpressionType.Equal:
+					comparePropToValue = (n, v) => (v != null) ? Restrictions.Eq(n, v) : Restrictions.IsNull(n);
+					comparePropToProp = Restrictions.EqProperty;
+					compareValueToCriteria = Subqueries.Eq;
+					comparePropToCriteria = Subqueries.PropertyEq;
+					break;
+
+				case ExpressionType.GreaterThan:
+					comparePropToValue = Restrictions.Gt;
+					comparePropToProp = Restrictions.GtProperty;
+					compareValueToCriteria = Subqueries.Gt;
+					comparePropToCriteria = Subqueries.PropertyGt;
+					break;
+
+				case ExpressionType.GreaterThanOrEqual:
+					comparePropToValue = Restrictions.Ge;
+					comparePropToProp = Restrictions.GeProperty;
+					compareValueToCriteria = Subqueries.Ge;
+					comparePropToCriteria = Subqueries.PropertyGe;
+					break;
+
+				case ExpressionType.LessThan:
+					comparePropToValue = Restrictions.Lt;
+					comparePropToProp = Restrictions.LtProperty;
+					compareValueToCriteria = Subqueries.Lt;
+					comparePropToCriteria = Subqueries.PropertyLt;
+					break;
+
+				case ExpressionType.LessThanOrEqual:
+					comparePropToValue = Restrictions.Le;
+					comparePropToProp = Restrictions.LeProperty;
+					compareValueToCriteria = Subqueries.Le;
+					comparePropToCriteria = Subqueries.PropertyLe;
+					break;
+
+				case ExpressionType.NotEqual:
+					comparePropToValue = (n, v) => (v != null) ? Restrictions.Not(Restrictions.Eq(n, v)) : Restrictions.IsNotNull(n);
+					comparePropToProp = Restrictions.NotEqProperty;
+					compareValueToCriteria = Subqueries.Ne;
+					comparePropToCriteria = Subqueries.PropertyNe;
+					break;
+			}
+
+			CurrentCriterions.Add(
+				BinaryCriterionVisitor.GetBinaryCriteria(rootCriteria, session,
+					expr, comparePropToValue, comparePropToProp,
+					compareValueToCriteria, comparePropToCriteria));

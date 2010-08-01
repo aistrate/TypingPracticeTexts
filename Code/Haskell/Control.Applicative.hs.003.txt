@@ -1,0 +1,40 @@
+instance Applicative ZipList where
+        pure x = ZipList (repeat x)
+        ZipList fs <*> ZipList xs = ZipList (zipWith id fs xs)
+
+(<$>) :: Functor f => (a -> b) -> f a -> f b
+f <$> a = fmap f a
+
+(<$) :: Functor f => a -> f b -> f a
+(<$) = (<$>) . const
+ 
+(*>) :: Applicative f => f a -> f b -> f b
+(*>) = liftA2 (const id)
+ 
+(<*) :: Applicative f => f a -> f b -> f a
+(<*) = liftA2 const
+ 
+(<**>) :: Applicative f => f a -> f (a -> b) -> f b
+(<**>) = liftA2 (flip ($))
+
+liftA :: Applicative f => (a -> b) -> f a -> f b
+liftA f a = pure f <*> a
+
+liftA2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
+liftA2 f a b = f <$> a <*> b
+
+liftA3 :: Applicative f => (a -> b -> c -> d) -> f a -> f b -> f c -> f d
+liftA3 f a b c = f <$> a <*> b <*> c
+
+optional :: Alternative f => f a -> f (Maybe a)
+optional v = Just <$> v <|> pure Nothing
+
+some :: Alternative f => f a -> f [a]
+some v = some_v
+  where many_v = some_v <|> pure []
+        some_v = (:) <$> v <*> many_v
+
+many :: Alternative f => f a -> f [a]
+many v = many_v
+  where many_v = some_v <|> pure []
+        some_v = (:) <$> v <*> many_v

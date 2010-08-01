@@ -1,0 +1,30 @@
+        <tr class="navShopSearch" align="left" width="100%">
+          <td width="185">
+            <div id="navShopAllButton" class="navSprite navButton navShopAllButtonSubnav">
+              <a class="destination" href="/gp/site-directory/ref=topnav_sad">
+                <span class="text">Shop All Departments</span>
+              </a>
+              <a class="flyoutAnchor">
+                <span class="navSprite downArrow"></span>
+              </a>
+            </div>
+          </td>
+          <td width="100%">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="100%">
+                  <form style="width:100%; margin:0 0 0 0; border:0; padding:0 0 0 0;" method="get" action="/s/ref=nb_sb_noss" name="site-search">
+
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td class="navSearchStart"></td>
+                        <td id="navSearchBar" class="navSearchBar">Search</td>
+
+                        <td class="dropdownNavbar" >
+                          <table id="subDropdownTable" width="100%" border="0" cellpadding="0" cellspacing="0" >
+                            <tr>
+                              <td id="navSearchDropdown" width="185px" >
+                                <div id="hiddenSearchDropdown" width="auto">
+                                  <select name="url" id="searchDropdownBox" class="searchSelect" title="Search in"  style='min-width:185px; _width:185px;' >
+                                    <option value="search-alias=aps">All Departments</option>
+                                    <option value="search-alias=automotive">Automotive</option>

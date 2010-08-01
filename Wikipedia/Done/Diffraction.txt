@@ -1,0 +1,7 @@
+Diffraction
+
+Diffraction refers to various phenomena which occur when a wave encounters an obstacle. It is described as the apparent bending of waves around small obstacles and the spreading out of waves past small openings. Similar effects are observed when light waves travel through a medium with a varying refractive index or a sound wave through one with varying acoustic impedance. Diffraction occurs with all waves, including sound waves, water waves, and electromagnetic waves such as visible light, x-rays and radio waves. As physical objects have wave-like properties (at the atomic level), diffraction also occurs with matter and can be studied according to the principles of quantum mechanics.
+
+While diffraction occurs whenever propagating waves encounter such changes, its effects are generally most pronounced for waves where the wavelength is on the order of the size of the diffracting objects. If the obstructing object provides multiple, closely-spaced openings, a complex pattern of varying intensity can result. This is due to the superposition, or interference, of different parts of a wave that traveled to the observer by different paths.
+
+The formalism of diffraction can also describe the way in which waves of finite extent propagate in free space. For example, the expanding profile of a laser beam, the beam shape of a radar antenna and the field of view of an ultrasonic transducer are all explained by diffraction theory.

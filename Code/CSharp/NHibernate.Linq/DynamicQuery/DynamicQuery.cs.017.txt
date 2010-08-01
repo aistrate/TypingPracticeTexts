@@ -1,0 +1,50 @@
+						else if ((e = PromoteExpression(left, right.Type, true)) != null)
+						{
+							left = e;
+						}
+						else
+						{
+							throw IncompatibleOperandsError(op.text, left, right, op.pos);
+						}
+					}
+				}
+				else
+				{
+					CheckAndPromoteOperands(isEquality ? typeof(IEqualitySignatures) : typeof(IRelationalSignatures),
+						op.text, ref left, ref right, op.pos);
+				}
+				switch (op.id)
+				{
+					case TokenId.Equal:
+					case TokenId.DoubleEqual:
+						left = GenerateEqual(left, right);
+						break;
+					case TokenId.ExclamationEqual:
+					case TokenId.LessGreater:
+						left = GenerateNotEqual(left, right);
+						break;
+					case TokenId.GreaterThan:
+						left = GenerateGreaterThan(left, right);
+						break;
+					case TokenId.GreaterThanEqual:
+						left = GenerateGreaterThanEqual(left, right);
+						break;
+					case TokenId.LessThan:
+						left = GenerateLessThan(left, right);
+						break;
+					case TokenId.LessThanEqual:
+						left = GenerateLessThanEqual(left, right);
+						break;
+				}
+			}
+			return left;
+		}
+
+		Expression ParseAdditive()
+		{
+			Expression left = ParseMultiplicative();
+			while (token.id == TokenId.Plus || token.id == TokenId.Minus ||
+				token.id == TokenId.Amphersand)
+			{
+				Token op = token;
+				NextToken();

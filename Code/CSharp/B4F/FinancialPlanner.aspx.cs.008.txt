@@ -1,0 +1,50 @@
+        series.Color = color;
+        series.MarkerStyle = markerStyle;
+
+        if (dates.Count() == 1 && chartType != SeriesChartType.SplineRange)
+        {
+            series.Type = SeriesChartType.Point;
+            series.MarkerSize = 8;
+        }
+        else
+            series.Type = chartType;
+
+        series.Points.DataBindXY(dates, valueLists);
+
+        return series;
+    }
+
+    protected decimal TrafficLightValue
+    {
+        set { imgTrafficLight.ImageUrl = string.Format("~/Images/TrafficLight/Set2/{0}-light.jpg",
+                                                       CommonAdapter.GetTrafficLightColor(value).Name.ToLower()); }
+    }
+
+    protected int ExtrasSelectedIndex
+    {
+        get { return mvwExtras.ActiveViewIndex; }
+        set
+        {
+            int newIndex = value,
+                oldIndex = 1 - newIndex;
+
+            string[] choiceLabels = new string[] { "Voorstel aanpassing",
+                                                   "Aanpassingen combineren" };
+
+            lblChoiceOfExtras.Text = choiceLabels[newIndex] + ":";
+            lnkChoiceOfExtras.Text = choiceLabels[oldIndex];
+
+            mvwExtras.ActiveViewIndex = newIndex;
+        }
+    }
+
+    protected Control[] FocusCandidates
+    {
+        get { return new Control[] { txtPresentValue, txtInterestRatePerYear, txtTargetValue }; }
+    }
+
+    protected int SelectedAccountId
+    {
+        get
+        {
+            return pnlAccountList.Visible && ddlAccount.SelectedValue != int.MinValue.ToString()

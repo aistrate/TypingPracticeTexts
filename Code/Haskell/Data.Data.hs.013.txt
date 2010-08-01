@@ -1,0 +1,49 @@
+  gmapT  _   []     = []
+  gmapT  f   (x:xs) = (f x:f xs)
+  gmapQ  _   []     = []
+  gmapQ  f   (x:xs) = [f x,f xs]
+  gmapM  _   []     = return []
+  gmapM  f   (x:xs) = f x >>= \x' -> f xs >>= \xs' -> return (x':xs')
+
+nothingConstr :: Constr
+nothingConstr = mkConstr maybeDataType "Nothing" [] Prefix
+justConstr :: Constr
+justConstr    = mkConstr maybeDataType "Just"    [] Prefix
+
+maybeDataType :: DataType
+maybeDataType = mkDataType "Prelude.Maybe" [nothingConstr,justConstr]
+
+instance Data a => Data (Maybe a) where
+  gfoldl _ z Nothing  = z Nothing
+  gfoldl f z (Just x) = z Just `f` x
+  toConstr Nothing  = nothingConstr
+  toConstr (Just _) = justConstr
+  gunfold k z c = case constrIndex c of
+                    1 -> z Nothing
+                    2 -> k (z Just)
+                    _ -> error "gunfold"
+  dataTypeOf _ = maybeDataType
+  dataCast1 f  = gcast1 f
+
+ltConstr :: Constr
+ltConstr         = mkConstr orderingDataType "LT" [] Prefix
+eqConstr :: Constr
+eqConstr         = mkConstr orderingDataType "EQ" [] Prefix
+gtConstr :: Constr
+gtConstr         = mkConstr orderingDataType "GT" [] Prefix
+
+orderingDataType :: DataType
+orderingDataType = mkDataType "Prelude.Ordering" [ltConstr,eqConstr,gtConstr]
+
+instance Data Ordering where
+  gfoldl _ z LT  = z LT
+  gfoldl _ z EQ  = z EQ
+  gfoldl _ z GT  = z GT
+  toConstr LT  = ltConstr
+  toConstr EQ  = eqConstr
+  toConstr GT  = gtConstr
+  gunfold _ z c = case constrIndex c of
+                    1 -> z LT
+                    2 -> z EQ
+                    3 -> z GT
+                    _ -> error "gunfold"

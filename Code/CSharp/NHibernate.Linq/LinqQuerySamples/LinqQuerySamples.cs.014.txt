@@ -1,0 +1,50 @@
+				select new { e.FirstName, e.LastName, et.PK_EmployeeTerritories.Territory.TerritoryDescription };
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "select clause to filter for pairs of employees where " +
+					 "one employee reports to the other and where " +
+					 "both employees are from the same City.")]
+		public void DLinqJoin4()
+		{
+			var q =
+				from e1 in db.Employees
+				from e2 in e1.Employees.Cast<Employee>()
+				where e1.City == e2.City
+				select new
+						{
+							FirstName1 = e1.FirstName,
+							LastName1 = e1.LastName,
+							FirstName2 = e2.FirstName,
+							LastName2 = e2.LastName,
+							e1.City
+						};
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample explictly joins two tables and projects results from both tables.")]
+		[Ignore("TODO")]
+		public void DLinqJoin5()
+		{
+			var q =
+				from c in db.Customers
+				join o in db.Orders on c.CustomerID equals o.Customer.CustomerID into orders
+				select new { c.ContactName, OrderCount = orders.Count() };
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample explictly joins three tables and projects results from each of them.")]
+		[Ignore("TODO")]
+		public void DLinqJoin6()
+		{
+			var q =
+				from c in db.Customers
+				join o in db.Orders on c.CustomerID equals o.Customer.CustomerID into ords
+				join e in db.Employees on c.City equals e.City into emps

@@ -1,0 +1,100 @@
+            else:
+                data[f.name] = [obj.pk for obj in f.value_from_object(instance)]
+        else:
+            data[f.name] = f.value_from_object(instance)
+    return data
+
+def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda f: f.formfield()):
+    
+    field_list = []
+    opts = model._meta
+    for f in opts.fields + opts.many_to_many:
+        if not f.editable:
+            continue
+        if fields and not f.name in fields:
+            continue
+        if exclude and f.name in exclude:
+            continue
+        formfield = formfield_callback(f)
+        if formfield:
+            field_list.append((f.name, formfield))
+    field_dict = SortedDict(field_list)
+    if fields:
+        field_dict = SortedDict([(f, field_dict.get(f)) for f in fields if (not exclude) or (exclude and f not in exclude)])
+    return field_dict
+
+class ModelFormOptions(object):
+    def __init__(self, options=None):
+        self.model = getattr(options, 'model', None)
+        self.fields = getattr(options, 'fields', None)
+        self.exclude = getattr(options, 'exclude', None)
+
+class ModelFormMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+        formfield_callback = attrs.pop('formfield_callback',
+                lambda f: f.formfield())
+        try:
+            parents = [b for b in bases if issubclass(b, ModelForm)]
+        except NameError:
+            parents = None
+        declared_fields = get_declared_fields(bases, attrs, False)
+        new_class = super(ModelFormMetaclass, cls).__new__(cls, name, bases,
+                attrs)
+        if not parents:
+            return new_class
+
+        if 'media' not in attrs:
+            new_class.media = media_property(new_class)
+        opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
+        if opts.model:
+            fields = fields_for_model(opts.model, opts.fields,
+                                      opts.exclude, formfield_callback)
+            fields.update(declared_fields)
+        else:
+            fields = declared_fields
+        new_class.declared_fields = declared_fields
+        new_class.base_fields = fields
+        return new_class
+
+class BaseModelForm(BaseForm):
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 empty_permitted=False, instance=None):
+        opts = self._meta
+        if instance is None:
+            self.instance = opts.model()
+            object_data = {}
+        else:
+            self.instance = instance
+            object_data = model_to_dict(instance, opts.fields, opts.exclude)
+        if initial is not None:
+            object_data.update(initial)
+        super(BaseModelForm, self).__init__(data, files, auto_id, prefix, object_data,
+                                            error_class, label_suffix, empty_permitted)
+
+    def clean(self):
+        self.validate_unique()
+        return self.cleaned_data
+
+    def validate_unique(self):
+        unique_checks, date_checks = self._get_unique_checks()
+        form_errors = []
+        bad_fields = set()
+
+        field_errors, global_errors = self._perform_unique_checks(unique_checks)
+        bad_fields.union(field_errors)
+        form_errors.extend(global_errors)
+
+        field_errors, global_errors = self._perform_date_checks(date_checks)
+        bad_fields.union(field_errors)
+        form_errors.extend(global_errors)
+
+        for field_name in bad_fields:
+            del self.cleaned_data[field_name]
+        if form_errors:
+            raise ValidationError(form_errors)
+
+    def _get_unique_checks(self):
+        from django.db.models.fields import FieldDoesNotExist, Field as ModelField
+
+        unique_checks = []

@@ -1,0 +1,50 @@
+					 "saved if shipping is not included.")]
+		[Ignore("TODO")]
+		public void DLinq17c()
+		{
+			var q =
+				from o in db.Orders
+				select new
+						{
+							o.OrderID,
+							DiscountedProducts =
+					from od in o.OrderDetails.Cast<OrderDetail>()
+					where od.Discount > 0.0f
+					orderby od.Discount descending
+					select od,
+							FreeShippingDiscount = o.Freight
+						};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses Distinct to select a sequence of the unique cities " +
+					 "that have Customers.")]
+		public void DLinq18()
+		{
+			var q = (
+						from c in db.Customers
+						select c.City)
+				.Distinct();
+
+			ObjectDumper.Write(q);
+		}
+
+		#endregion Select/Distinct Tests
+
+		#region Count/Sum/Min/Max/Avg Tests
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Count to find the number of Customers in the database.")]
+		public void DLinq19()
+		{
+			int q = db.Customers.Count();
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Count to find the number of Products in the database " +
+					 "that are not discontinued.")]
+		public void DLinq20()
+		{

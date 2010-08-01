@@ -1,0 +1,100 @@
+hedgeDiff cmplo cmphi (Bin _ kx x l r) Tip 
+  = join kx x (filterGt cmplo l) (filterLt cmphi r)
+hedgeDiff cmplo cmphi t (Bin _ kx _ l r) 
+  = merge (hedgeDiff cmplo cmpkx (trim cmplo cmpkx t) l) 
+          (hedgeDiff cmpkx cmphi (trim cmpkx cmphi t) r)
+  where
+    cmpkx k = compare kx k   
+
+differenceWith :: Ord k => (a -> b -> Maybe a) -> Map k a -> Map k b -> Map k a
+differenceWith f m1 m2
+  = differenceWithKey (\_ x y -> f x y) m1 m2
+
+differenceWithKey :: Ord k => (k -> a -> b -> Maybe a) -> Map k a -> Map k b -> Map k a
+differenceWithKey _ Tip _   = Tip
+differenceWithKey _ t1 Tip  = t1
+differenceWithKey f t1 t2   = hedgeDiffWithKey f (const LT) (const GT) t1 t2
+
+hedgeDiffWithKey :: Ord a
+                 => (a -> b -> c -> Maybe b)
+                 -> (a -> Ordering) -> (a -> Ordering)
+                 -> Map a b -> Map a c
+                 -> Map a b
+hedgeDiffWithKey _ _     _     Tip _
+  = Tip
+hedgeDiffWithKey _ cmplo cmphi (Bin _ kx x l r) Tip
+  = join kx x (filterGt cmplo l) (filterLt cmphi r)
+hedgeDiffWithKey f cmplo cmphi t (Bin _ kx x l r) 
+  = case found of
+      Nothing -> merge tl tr
+      Just (ky,y) -> 
+          case f ky y x of
+            Nothing -> merge tl tr
+            Just z  -> join ky z tl tr
+  where
+    cmpkx k     = compare kx k   
+    lt          = trim cmplo cmpkx t
+    (found,gt)  = trimLookupLo kx cmphi t
+    tl          = hedgeDiffWithKey f cmplo cmpkx lt l
+    tr          = hedgeDiffWithKey f cmpkx cmphi gt r
+
+intersection :: Ord k => Map k a -> Map k b -> Map k a
+intersection m1 m2
+  = intersectionWithKey (\_ x _ -> x) m1 m2
+
+intersectionWith :: Ord k => (a -> b -> c) -> Map k a -> Map k b -> Map k c
+intersectionWith f m1 m2
+  = intersectionWithKey (\_ x y -> f x y) m1 m2
+
+intersectionWithKey :: Ord k => (k -> a -> b -> c) -> Map k a -> Map k b -> Map k c
+intersectionWithKey _ Tip _ = Tip
+intersectionWithKey _ _ Tip = Tip
+intersectionWithKey f t1@(Bin s1 k1 x1 l1 r1) t2@(Bin s2 k2 x2 l2 r2) =
+   if s1 >= s2 then
+      let (lt,found,gt) = splitLookupWithKey k2 t1
+          tl            = intersectionWithKey f lt l2
+          tr            = intersectionWithKey f gt r2
+      in case found of
+      Just (k,x) -> join k (f k x x2) tl tr
+      Nothing -> merge tl tr
+   else let (lt,found,gt) = splitLookup k1 t2
+            tl            = intersectionWithKey f l1 lt
+            tr            = intersectionWithKey f r1 gt
+      in case found of
+      Just x -> join k1 (f k1 x1 x) tl tr
+      Nothing -> merge tl tr
+
+isSubmapOf :: (Ord k,Eq a) => Map k a -> Map k a -> Bool
+isSubmapOf m1 m2
+  = isSubmapOfBy (==) m1 m2
+
+isSubmapOfBy :: Ord k => (a->b->Bool) -> Map k a -> Map k b -> Bool
+isSubmapOfBy f t1 t2
+  = (size t1 <= size t2) && (submap' f t1 t2)
+
+submap' :: Ord a => (b -> c -> Bool) -> Map a b -> Map a c -> Bool
+submap' _ Tip _ = True
+submap' _ _ Tip = False
+submap' f (Bin _ kx x l r) t
+  = case found of
+      Nothing -> False
+      Just y  -> f x y && submap' f l lt && submap' f r gt
+  where
+    (lt,found,gt) = splitLookup kx t
+
+isProperSubmapOf :: (Ord k,Eq a) => Map k a -> Map k a -> Bool
+isProperSubmapOf m1 m2
+  = isProperSubmapOfBy (==) m1 m2
+
+isProperSubmapOfBy :: Ord k => (a -> b -> Bool) -> Map k a -> Map k b -> Bool
+isProperSubmapOfBy f t1 t2
+  = (size t1 < size t2) && (submap' f t1 t2)
+
+filter :: Ord k => (a -> Bool) -> Map k a -> Map k a
+filter p m
+  = filterWithKey (\_ x -> p x) m
+
+filterWithKey :: Ord k => (k -> a -> Bool) -> Map k a -> Map k a
+filterWithKey _ Tip = Tip
+filterWithKey p (Bin _ kx x l r)
+  | p kx x    = join kx x (filterWithKey p l) (filterWithKey p r)

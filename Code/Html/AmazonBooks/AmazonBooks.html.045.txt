@@ -1,0 +1,30 @@
+                <li>
+                  <a href="/Store-Books/b/ref=bhp_bb0309A_pbstor6?ie=UTF8&node=165662011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Paperback Store</a>
+                </li>
+                <li>
+                  <a href="/Popular-Pre-orders-Books/b/ref=bhp_bb0309A_preord6?ie=UTF8&node=15372101&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Popular Pre-orders</a>
+                </li>
+                <li>
+                  <a href="/b/ref=bhp_bb0309A_rare6?ie=UTF8&node=2056775011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Rare &amp; Collectible Books</a>
+                </li>
+                <li>
+                  <a href="/Summer-Reading-Books/b/ref=bhp_bb0309A_sumread6?ie=UTF8&node=341154011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Summer Reading</a>
+                </li>
+                <li>
+                  <a href="/Summer-Reading-Kids-Books/b/ref=bhp_bb0309A_sumread7?ie=UTF8&node=565572&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Summer Reading for Kids &amp; Teens</a>
+                </li>
+                <li>
+                  <a href="/Authors-Books/b/ref=bhp_bb0309A_writersbl6?ie=UTF8&node=390923011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Writer's Block: Author Interviews and Essays</a>
+                </li>
+              </ul>
+              <h3>Special Formats</h3>
+              <ul>
+                <li>
+                  <a href="/Audiobooks-Books/b/ref=bhp_bb0309A_audiobk7?ie=UTF8&node=368395011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Audiobooks</a>
+                </li>
+                <li>
+                  <a href="/e-Docs-Books/b/ref=bhp_bb0309A_edocs7?ie=UTF8&node=551440&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">e-Documents</a>
+                </li>
+                <li>
+                  <a href="/Visually-Impaired-Books/b/ref=bhp_bb0309A_visualimp7?ie=UTF8&node=14264821&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">For the Visually Impaired</a>
+                </li>

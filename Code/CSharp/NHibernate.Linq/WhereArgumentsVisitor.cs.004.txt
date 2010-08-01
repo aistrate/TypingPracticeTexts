@@ -1,0 +1,50 @@
+				case ExpressionType.AndAlso:
+					VisitAndAlsoExpression(expr);
+					break;
+
+				case ExpressionType.OrElse:
+					VisitOrElseExpression(expr);
+					break;
+
+				default:
+					VisitBinaryCriterionExpression(expr);
+					break;
+			}
+
+			return expr;
+		}
+
+		private void VisitAndAlsoExpression(BinaryExpression expr)
+		{
+			criterionStack.Push(new List<ICriterion>());
+			Visit(expr.Left);
+			Visit(expr.Right);
+			var ands = criterionStack.Pop();
+
+			var conjunction = new Conjunction();
+			foreach (var crit in ands)
+				conjunction.Add(crit);
+			CurrentCriterions.Add(conjunction);
+		}
+
+		private void VisitOrElseExpression(BinaryExpression expr)
+		{
+			criterionStack.Push(new List<ICriterion>());
+			Visit(expr.Left);
+			Visit(expr.Right);
+			IList<ICriterion> ors = criterionStack.Pop();
+
+			var disjunction = new Disjunction();
+			foreach (ICriterion crit in ors)
+			{
+				disjunction.Add(crit);
+			}
+			CurrentCriterions.Add(disjunction);
+		}
+
+		private void VisitBinaryCriterionExpression(BinaryExpression expr)
+		{
+			ComparePropToValue comparePropToValue = null;
+			ComparePropToProp comparePropToProp = null;
+			CompareValueToCriteria compareValueToCriteria = null;
+			ComparePropToCriteria comparePropToCriteria = null;

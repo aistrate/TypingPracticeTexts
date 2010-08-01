@@ -1,0 +1,30 @@
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$25.95</span>
+                            <span class="red t14">$17.13</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative">
+                          <a href="/gp/product/0312606168/ref=s9_al_bw_i3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Burned (House of Night Novels)">
+                            <div style="margin-bottom: 4px; ">
+                              <img src="http://ecx.images-amazon.com/images/I/51GIctemBiL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL120_OU01_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image3" class="productImage" />
+                            </div>Burned (House of Night Novels)
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span><a class="noLinkDecoration" href="/Kristin-Cast/e/B0032XIXXS/ref=s9_al_bw_al4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">Kristin Cast</a>, <a class="noLinkDecoration" href="/P.-C.-Cast/e/B001H6U4KC/ref=s9_al_bw_al4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">P. C. Cast</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$17.99</span>
+                            <span class="red t14">$9.41</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative">
+                          <a href="/gp/product/031612558X/ref=s9_al_bw_i4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="The Short Second Life of Bree Tanner: An Eclipse Novella (Twilight Saga)">
+                            <div style="margin-bottom: 4px; ">
+                              <img src="http://ecx.images-amazon.com/images/I/41Ka5DpsH5L._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL120_OU01_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image4" class="productImage" />

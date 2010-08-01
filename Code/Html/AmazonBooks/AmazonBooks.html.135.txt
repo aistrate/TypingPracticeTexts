@@ -1,0 +1,30 @@
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0312942591/ref=s9_al_bw_i11?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Death Blows: The Bloodhound Files">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/51mlVhMOuBL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL120_OU01_.jpg" alt="" width="75" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image11" class="productImage" />
+                            </div>Death Blows: The Bloodhound Files
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/D.-D.-Barant/e/B00385B6I4/ref=s9_al_bw_al12?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">D. D. Barant</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Mass Market Paperback</div>
+                            <span class="red t14">$7.99</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0451463412/ref=s9_al_bw_i12?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="A Taint in the Blood: A Novel of the Shadowspawn">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/518f4J1SSdL._SL120_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image12" class="productImage" />
+                            </div>A Taint in the Blood: A Novel of the...
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/S.-M.-Stirling/e/B000AP5GTA/ref=s9_al_bw_al13?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">S. M. Stirling</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$25.95</span>

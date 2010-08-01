@@ -1,0 +1,50 @@
+			decimal? q = db.Orders.Select(o => o.Freight).Average();
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Average to find the average unit price of all Products.")]
+		public void DLinq30()
+		{
+			decimal? q = db.Products.Average(p => p.UnitPrice);
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Average to find the Products that have unit price higher than " +
+					 "the average unit price of the category for each category.")]
+		[Ignore("TODO")]
+		public void DLinq31()
+		{
+			var categories =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								g.Key,
+								ExpensiveProducts =
+					from p2 in g
+					where p2.UnitPrice > g.Average(p3 => p3.UnitPrice)
+					select p2
+							};
+
+			ObjectDumper.Write(categories, 1);
+		}
+
+		#endregion Count/Sum/Min/Max/Avg Test
+
+		#region Join Tests
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "from clause to select all orders for customers in London.")]
+		public void DLinqJoin1()
+		{
+			var q =
+				from c in db.Customers
+				from o in c.Orders.Cast<Order>()
+				where c.City == "London"
+				select o;
+
+			ObjectDumper.Write(q);

@@ -1,0 +1,30 @@
+                      </div>
+                    </div>
+                    <div class="clear"></div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ItemElement1" style="width: 49%; margin-bottom: 0px; ">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_TitleContainer1" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Title1">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ImageContainer1">
+                            <a href="/gp/product/0521545668/ref=s9_simv_bw_p14_i2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Lisp in Small Pieces">
+                              <div class="imageContainer">
+                                <img src="http://ecx.images-amazon.com/images/I/3192E9EXK0L._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="104" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Image1" />
+                              </div>Lisp in Small Pieces
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Christian-Queinnec/e/B001HOZVX4/ref=s9_simv_bw_p14_al2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155">Christian Queinnec</a>
+                          </div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$95.00</span>
+                          <span class="red t14">$85.50</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ItemElement2" style="width: 49%; margin-bottom: 0px; ">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_TitleContainer2" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Title2">

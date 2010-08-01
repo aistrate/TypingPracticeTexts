@@ -1,0 +1,77 @@
+            @prefix, @suffix = options[:prefix] || '', options[:suffix] || ''
+            @regex = /^(#{Regexp.escape(@prefix)})(.+?)(#{Regexp.escape(@suffix)})$/
+          end
+
+          def match(method_name)
+            if matchdata = @regex.match(method_name)
+              AttributeMethodMatch.new(method_missing_target, matchdata[2])
+            else
+              nil
+            end
+          end
+
+          def method_name(attr_name)
+            "#{prefix}#{attr_name}#{suffix}"
+          end
+
+          def method_missing_target
+            :"#{prefix}attribute#{suffix}"
+          end
+        end
+
+        def attribute_method_matchers #:nodoc:
+          read_inheritable_attribute(:attribute_method_matchers) || write_inheritable_attribute(:attribute_method_matchers, [])
+        end
+    end
+
+    def method_missing(method_id, *args, &block)
+      if method_id == :to_ary || method_id == :to_str
+        raise NoMethodError, "undefined method `#{method_id}' for #{inspect}:#{self.class}"
+      end
+
+      method_name = method_id.to_s
+      if match = match_attribute_method?(method_name)
+        guard_private_attribute_method!(method_name, args)
+        return __send__(match.target, match.attr_name, *args, &block)
+      end
+      super
+    end
+
+    alias :respond_to_without_attributes? :respond_to?
+    def respond_to?(method, include_private_methods = false)
+      if super
+        return true
+      elsif !include_private_methods && super(method, true)
+        return false
+      elsif match_attribute_method?(method.to_s)
+        return true
+      end
+      super
+    end
+
+    protected
+      def attribute_method?(attr_name)
+        attributes.include?(attr_name)
+      end
+
+    private
+      def match_attribute_method?(method_name)
+        self.class.send(:attribute_method_matchers).each do |method|
+          if (match = method.match(method_name)) && attribute_method?(match.attr_name)
+            return match
+          end
+        end
+        nil
+      end
+
+      def guard_private_attribute_method!(method_name, args)
+        if self.class.private_method_defined?(method_name)
+          raise NoMethodError.new("Attempt to call private method", method_name, args)
+        end
+      end
+
+      def missing_attribute(attr_name, stack)
+        raise ActiveModel::MissingAttributeError, "missing attribute: #{attr_name}", stack
+      end
+  end
+end

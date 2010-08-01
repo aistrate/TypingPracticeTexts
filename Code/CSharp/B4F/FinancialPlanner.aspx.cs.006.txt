@@ -1,0 +1,50 @@
+                                                    InterestRatePerYear,
+                                                    PresentValue + ExtraInitial,
+                                                    DepositPerYear + ExtraPeriodical,
+                                                    YearsLeft);
+        lblTargetValueExtras.Text = FinancialPlannerAdapter.FormatCurrency(TargetValue);
+    }
+
+    private void chPortfolioFutureValueDataBind()
+    {
+        if (!isChartDataBound)
+        {
+            isChartDataBound = true;
+
+            decimal[] cashFlow = Enumerable.Repeat(100m, 1)
+                         .Concat(Enumerable.Repeat(0m, 5))
+                         .Concat(Enumerable.Repeat(40m, 20))
+                         .Concat(Enumerable.Repeat(0m, 4))
+                         .Concat(Enumerable.Repeat(-1000m, 1))
+                         .Concat(Enumerable.Repeat(-300m, 13))
+                         .ToArray();
+
+            DateTime[] futureDates = FinancialPlannerAdapter.GetRangeOfDates(YearsLeft);
+
+            var uncertaintyValues = new decimal[]
+                                    {
+                                        InterestRatePerYear * 0.85m,
+                                        InterestRatePerYear * 1.15m
+                                    }
+                                    .Select(interestRate => FinancialPlannerAdapter.GetFutureValueSeries(
+                                                                YearsLeft, interestRate, PresentValue, DepositPerYear))
+                                    .ToArray();
+            
+            addSeries(futureDates, uncertaintyValues, "Market uncertainty", SeriesChartType.SplineRange, Color.FromArgb(0xEC, 0xEC, 0xEC),
+                      MarkerStyle.None);
+
+            if (TargetValue > 0)
+            {
+                DateTime[] futureDates2 = FinancialPlannerAdapter.GetRangeOfDates(YearsLeft + 1);
+
+                var targetValues = FinancialPlannerAdapter.GetFutureValueSeries(YearsLeft + 1, InvestmentScenario.InternalRateOfReturn, PresentValue,
+                                                                                DepositPerYear);
+                addSeries(futureDates2, targetValues, "Doelvermogen", SeriesChartType.Spline, Color.FromArgb(0xE0, 0x40, 0x0A), 
+                          MarkerStyle.Circle);
+
+            }
+
+            var futureValuesBeforeAdjust = FinancialPlannerAdapter.GetFutureValueSeries(YearsLeft, InterestRatePerYear, PresentValue, 
+                                                                                        DepositPerYear);
+            addSeries(futureDates, futureValuesBeforeAdjust, "Zonder aanpassing", SeriesChartType.Spline, Color.FromArgb(0x41, 0x8C, 0xF0),
+                      MarkerStyle.Circle);

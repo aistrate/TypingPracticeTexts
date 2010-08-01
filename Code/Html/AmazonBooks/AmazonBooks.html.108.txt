@@ -1,0 +1,30 @@
+                          <span class="red t14">$35.95</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="clear: left; width: 100%; height: 1px; margin: 0; padding: 0; overflow: hidden"></div>
+              <div class="action">
+                <span class="carat">&rsaquo;</span>
+                <a href="/gp/history/ref=s9_simv_bw_p14_clnk?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155">View or edit your browsing history</a>
+              </div>
+              <div class="h_rule"></div>
+            </div>
+            <script type="text/javascript">
+              if (typeof S9MultiPackLayout != "undefined") {
+              var ns_1RVCMGP6WPZF34Z5GVPD_12234__S9MultiPackLayout = new S9MultiPackLayout(
+              "ns_1RVCMGP6WPZF34Z5GVPD_12234_", 3, 7, 155);
+              }
+            </script>
+            <div class="unified_widget asinCoop">
+
+              <div class="h_rule"></div>
+            </div>
+            <div class="unified_widget blurb">
+              <h2>Featured Categories</h2>
+              <div class="row">
+                <div class="asinItem">
+                  <div class="prodImage">
+                    <a href="/Passage-Justin-Cronin/dp/0345504968/ref=bhp_9p2_botm_01?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">

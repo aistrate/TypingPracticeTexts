@@ -1,0 +1,50 @@
+                      ? int.Parse(ddlAccount.SelectedValue)
+                      : 0;
+        }
+    }
+
+    protected int SelectedModelId
+    {
+        get
+        {
+            return ddlModelPortfolio.Visible && ddlModelPortfolio.SelectedValue != int.MinValue.ToString()
+                      ? int.Parse(ddlModelPortfolio.SelectedValue)
+                      : 0;
+        }
+    }
+
+    protected FinancialDataView FinancialDataView
+    {
+        get
+        {
+            if (financialDataView == null)
+            {
+                if (SelectedAccountId != 0)
+                    financialDataView = FinancialPlannerAdapter.GetFinancialDataFromAccount(SelectedAccountId, ModelMissingExpectedReturn_IsAllowed);
+                else if (SelectedModelId != 0)
+                    financialDataView = FinancialPlannerAdapter.GetFinancialDataFromModel(SelectedModelId, ModelMissingExpectedReturn_IsAllowed);
+            }
+
+            return financialDataView;
+        }
+    }
+    private FinancialDataView financialDataView;
+
+    protected decimal InterestRatePerYear
+    {
+        get { return mvwInterestRatePerYear.ActiveViewIndex == 0 ? readDecimal(txtInterestRatePerYear, 3) / 100m : FinancialDataView.ExpectedReturn; }
+    }
+
+    protected decimal StandardDeviation
+    {
+        get { return pnlStandardDeviation.Visible ? readDecimal(txtStandardDeviation, 3) / 100m : FinancialDataView.StandardDeviation; }
+    }
+
+    protected decimal PresentValue
+    {
+        get { return mvwPresentValue.ActiveViewIndex == 0 ? readDecimal(txtPresentValue) : FinancialDataView.TotalPositionQuantity; }
+    }
+
+    protected decimal TargetValue { get { return readDecimal(txtTargetValue); } }
+    protected int YearsLeft { get { return readInt(txtYearsLeft); } }
+    protected decimal DepositPerYear { get { return readDecimal(txtDepositPerYear); } }

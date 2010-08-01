@@ -1,0 +1,7 @@
+Infinity
+
+Infinity is a concept in mathematics and philosophy that refers to a quantity without bound or end. People have developed various ideas throughout history about the nature of infinity. In mathematics, infinity is defined in the context of set theory. The word comes from the Latin infinitas or "unboundedness."
+
+While some people conceptualize infinity as a number that is larger than all other numbers, infinity is not treated as a number in mathematics. The German mathematician Georg Cantor formalized many ideas related to infinity and infinite sets during the late 19th and early 20th centuries. He also discovered that there are different "kinds" or "measures" of infinity, a concept called cardinality. For example, the set of integers is countably infinite. However, the set of real numbers is uncountably infinite.
+
+A set of elements can be defined as infinite if the set has a seemingly paradoxical quality: a subset of elements in an infinite set can be matched up, one-to-one, to all of the elements in a set. The paradoxical nature of infinity is illustrated by the idea of a grand hotel, with infinitely many rooms-all of which are occupied by guests-but can nevertheless manage to accommodate a new guest by moving each existing guest over, one by one, to other rooms.

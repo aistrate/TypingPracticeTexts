@@ -1,0 +1,49 @@
+     else do 
+        let avail = w - r
+        if (count == avail)
+           then do 
+                memcpy_ptr_baoff ptr raw (fromIntegral r) (fromIntegral count)
+                writeIORef ref buf{ bufWPtr=0, bufRPtr=0 }
+                return (so_far + count)
+           else do
+        if (count < avail)
+           then do 
+                memcpy_ptr_baoff ptr raw (fromIntegral r) (fromIntegral count)
+                writeIORef ref buf{ bufRPtr = r + count }
+                return (so_far + count)
+           else do
+  
+        memcpy_ptr_baoff ptr raw (fromIntegral r) (fromIntegral avail)
+        writeIORef ref buf{ bufWPtr=0, bufRPtr=0 }
+        let remaining = count - avail
+            so_far' = so_far + avail
+            ptr' = ptr `plusPtr` avail
+
+        if remaining < sz
+           then bufRead fd ref is_stream ptr' so_far' remaining
+           else do 
+
+        rest <- readChunk fd is_stream ptr' remaining
+        return (so_far' + rest)
+
+readChunk :: FD -> Bool -> Ptr a -> Int -> IO Int
+readChunk fd is_stream ptr bytes0 = loop 0 bytes0
+ where
+  loop :: Int -> Int -> IO Int
+  loop off bytes | bytes <= 0 = return off
+  loop off bytes = do
+    r <- fromIntegral `liftM`
+           readRawBufferPtr "readChunk" fd is_stream 
+                            (castPtr ptr) off (fromIntegral bytes)
+    if r == 0
+        then return off
+        else loop (off + r) (bytes - r)
+
+hGetBufNonBlocking :: Handle -> Ptr a -> Int -> IO Int
+hGetBufNonBlocking h ptr count
+  | count == 0 = return 0
+  | count <  0 = illegalBufferSize h "hGetBufNonBlocking" count
+  | otherwise = 
+      wantReadableHandle "hGetBufNonBlocking" h $ 
+        \ Handle__{ haFD=fd, haBuffer=ref, haIsStream=is_stream } -> do
+            bufReadNonBlocking fd ref is_stream ptr 0 count

@@ -1,0 +1,13 @@
+Numeral system
+
+A numeral system (or system of numeration) is a writing system for expressing numbers, that is a mathematical notation for representing numbers of a given set, using graphemes or symbols in a consistent manner. It can be seen as the context that allows the numerals "11" to be interpreted as the binary symbol for three, the decimal symbol for eleven, or as other numbers in different bases.
+
+Ideally, a numeral system will:
+
+ * Represent a useful set of numbers (e.g. all whole numbers, integers, or rational numbers)
+ * Give every number represented a unique representation (or at least a standard representation)
+ * Reflect the algebraic and arithmetic structure of the numbers.
+
+For example, the usual decimal representation of whole numbers gives every whole number a unique representation as a finite sequence of digits. However, when decimal representation is used for the rational or real numbers, the representation may not be unique: many rational numbers have two numerals, a standard one that terminates, such as 2.31, and another that recurs, such as 2.309999999... . Numerals which terminate have no non-zero digits after a given position. For example, numerals like 2.31 and 2.310 are taken to be the same, except for some scientific contexts where greater precision is implied by the trailing zero.
+
+Numeral systems are sometimes called number systems, but that name is misleading, as it could refer to different systems of numbers, such as the system of real numbers, the system of complex numbers, the system of p-adic numbers, etc. Such systems are not the topic of this article.

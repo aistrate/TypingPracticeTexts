@@ -1,0 +1,30 @@
+                              <img src="http://ecx.images-amazon.com/images/I/51QWwGRXouL._SL75_.jpg" alt="The Girl" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">1.</span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">607 days in the top 100</span>
+                            </div>
+                            <a href="http://www.amazon.com/Girl-Dragon-Tattoo-ebook/dp/B0015DROBO/ref=pd_ts_zgc_kinc_digital-text_1?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Girl with the Dragon Tattoo" class="titleLink">The Girl with the Dragon Tattoo</a>
+                            <div class="tiny byline">
+                              <span class="carat"></span>Stieg Larsson (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock ">
+                              <span class="listprice"></span>
+                              <strong class="price">$7.15</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Girl-Kicked-Hornets-Nest-ebook/dp/B0031YJFCQ/ref=pd_ts_zgc_kinc_digital-text_2_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Girl Who Kicked the Hornet's Nest">
+                              <img src="http://ecx.images-amazon.com/images/I/511ZEohSj6L._SL75_.jpg" alt="The Girl" />
+                            </a>

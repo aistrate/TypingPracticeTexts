@@ -1,0 +1,7 @@
+Spin (physics)
+
+In particle physics and quantum mechanics, spin is a fundamental characteristic property of elementary particles, composite particles (hadrons), and atomic nuclei.
+
+All elementary particles of a given kind have the same spin quantum number, which is an important part of a particle's quantum state. The spin of electrons, when combined with the spin-statistics theorem, results in the Pauli exclusion principle, which in turn grounds the periodic table of chemical elements. The spin direction (also called spin for short) of a particle is an important intrinsic degree of freedom.
+
+Wolfgang Pauli was the first to propose the concept of spin, but he did not name it. In 1925, Ralph Kronig, George Uhlenbeck, and Samuel Goudsmit suggested a physical interpretation of particles spinning around their own axis. The mathematical theory was worked out in depth by Pauli in 1927. When Paul Dirac derived his relativistic quantum mechanics in 1928, electron spin was an essential part thereof.

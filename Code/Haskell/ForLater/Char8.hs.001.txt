@@ -1,0 +1,50 @@
+{-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -XMagicHash -XUnboxedTuples -fno-warn-orphans #-}
+
+module Data.ByteString.Char8 (
+
+        ByteString,
+
+        empty,
+        singleton,
+        pack,
+        unpack,
+
+        cons,
+        snoc,
+        append,
+        head,
+        uncons,
+        last,
+        tail,
+        init,
+        null,
+        length,
+
+        map,
+        reverse,
+        intersperse,
+        intercalate,
+        transpose,
+
+        foldl,
+        foldl',
+        foldl1,
+        foldl1',
+
+        foldr,
+        foldr',
+        foldr1,
+        foldr1',
+
+        concat,
+        concatMap,
+        any,
+        all,
+        maximum,
+        minimum,
+
+        scanl,
+        scanl1,
+        scanr,
+        scanr1,

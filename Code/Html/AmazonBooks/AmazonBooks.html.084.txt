@@ -1,0 +1,30 @@
+                </div>
+                <div class="zgChartFooter">
+                  <span class="carat">&#8250;</span>
+                  <a href="/gp/bestsellers/digital-text/ref=pd_ts_zgc_kinc_digital-text_more?pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" class="breadcrumb">See all bestsellers in Top 100</a>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+              var ZeitgeistFVP = {
+              popover: null,
+              popoverText: "Amazon Bestsellers lists are updated hourly. Between list updates, the price of an item may change from being free to having a price and vice versa. Although the item's price changes immediately, the list and its rankings stay the same until the next hourly update.",
+              displayPaidList: function(widgetID) {
+              jQuery("#zgTopPaidTab_" + widgetID).addClass("zg_explore_currentTab");
+              jQuery("#zgTopFreeTab_" + widgetID).removeClass("zg_explore_currentTab");
+              jQuery("#zgTopPaidList_" + widgetID).show();
+              jQuery("#zgTopFreeList_" + widgetID).hide();
+              },
+              displayFreeList: function(widgetID) {
+              jQuery("#zgTopFreeTab_" + widgetID).addClass("zg_explore_currentTab");
+              jQuery("#zgTopPaidTab_" + widgetID).removeClass("zg_explore_currentTab");
+              jQuery("#zgTopPaidList_" + widgetID).hide();
+              jQuery("#zgTopFreeList_" + widgetID).show();
+              },
+              displayPricePopover: function(anchor, title) {
+              if (ZeitgeistFVP.popover) {
+              ZeitgeistFVP.popover.close();
+              }
+              ZeitgeistFVP.popover = jQuery.AmazonPopover.displayPopover({
+              literalContent: ZeitgeistFVP.popoverText,
+              location: "bottom",

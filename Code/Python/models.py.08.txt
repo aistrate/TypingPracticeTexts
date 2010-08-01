@@ -1,0 +1,137 @@
+                kwargs["initial"] = self.parent_instance.pk
+        kwargs["required"] = False
+        kwargs["widget"] = InlineForeignKeyHiddenInput
+        super(InlineForeignKeyField, self).__init__(*args, **kwargs)
+
+    def clean(self, value):
+        if value in EMPTY_VALUES:
+            if self.pk_field:
+                return None
+            return self.parent_instance
+        if self.to_field:
+            orig = getattr(self.parent_instance, self.to_field)
+        else:
+            orig = self.parent_instance.pk
+        if force_unicode(value) != force_unicode(orig):
+            raise ValidationError(self.error_messages['invalid_choice'])
+        return self.parent_instance
+
+class ModelChoiceIterator(object):
+    def __init__(self, field):
+        self.field = field
+        self.queryset = field.queryset
+
+    def __iter__(self):
+        if self.field.empty_label is not None:
+            yield (u"", self.field.empty_label)
+        if self.field.cache_choices:
+            if self.field.choice_cache is None:
+                self.field.choice_cache = [
+                    self.choice(obj) for obj in self.queryset.all()
+                ]
+            for choice in self.field.choice_cache:
+                yield choice
+        else:
+            for obj in self.queryset.all():
+                yield self.choice(obj)
+
+    def __len__(self):
+        return len(self.queryset)
+
+    def choice(self, obj):
+        if self.field.to_field_name:
+            key = obj.serializable_value(self.field.to_field_name)
+        else:
+            key = obj.pk
+        return (key, self.field.label_from_instance(obj))
+
+class ModelChoiceField(ChoiceField):
+    
+    default_error_messages = {
+        'invalid_choice': _(u'Select a valid choice. That choice is not one of'
+                            u' the available choices.'),
+    }
+
+    def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
+                 required=True, widget=None, label=None, initial=None,
+                 help_text=None, to_field_name=None, *args, **kwargs):
+        if required and (initial is not None):
+            self.empty_label = None
+        else:
+            self.empty_label = empty_label
+        self.cache_choices = cache_choices
+
+        Field.__init__(self, required, widget, label, initial, help_text,
+                       *args, **kwargs)
+        self.queryset = queryset
+        self.choice_cache = None
+        self.to_field_name = to_field_name
+
+    def _get_queryset(self):
+        return self._queryset
+
+    def _set_queryset(self, queryset):
+        self._queryset = queryset
+        self.widget.choices = self.choices
+
+    queryset = property(_get_queryset, _set_queryset)
+
+    def label_from_instance(self, obj):
+        
+        return smart_unicode(obj)
+
+    def _get_choices(self):
+        if hasattr(self, '_choices'):
+            return self._choices
+
+        return ModelChoiceIterator(self)
+
+    choices = property(_get_choices, ChoiceField._set_choices)
+
+    def clean(self, value):
+        Field.clean(self, value)
+        if value in EMPTY_VALUES:
+            return None
+        try:
+            key = self.to_field_name or 'pk'
+            value = self.queryset.get(**{key: value})
+        except self.queryset.model.DoesNotExist:
+            raise ValidationError(self.error_messages['invalid_choice'])
+        return value
+
+class ModelMultipleChoiceField(ModelChoiceField):
+    
+    widget = SelectMultiple
+    hidden_widget = MultipleHiddenInput
+    default_error_messages = {
+        'list': _(u'Enter a list of values.'),
+        'invalid_choice': _(u'Select a valid choice. %s is not one of the'
+                            u' available choices.'),
+        'invalid_pk_value': _(u'"%s" is not a valid value for a primary key.')
+    }
+
+    def __init__(self, queryset, cache_choices=False, required=True,
+                 widget=None, label=None, initial=None,
+                 help_text=None, *args, **kwargs):
+        super(ModelMultipleChoiceField, self).__init__(queryset, None,
+            cache_choices, required, widget, label, initial, help_text,
+            *args, **kwargs)
+
+    def clean(self, value):
+        if self.required and not value:
+            raise ValidationError(self.error_messages['required'])
+        elif not self.required and not value:
+            return []
+        if not isinstance(value, (list, tuple)):
+            raise ValidationError(self.error_messages['list'])
+        for pk in value:
+            try:
+                self.queryset.filter(pk=pk)
+            except ValueError:
+                raise ValidationError(self.error_messages['invalid_pk_value'] % pk)
+        qs = self.queryset.filter(pk__in=value)
+        pks = set([force_unicode(o.pk) for o in qs])
+        for val in value:
+            if force_unicode(val) not in pks:
+                raise ValidationError(self.error_messages['invalid_choice'] % val)
+        return qs

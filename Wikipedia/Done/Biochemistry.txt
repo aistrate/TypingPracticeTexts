@@ -1,0 +1,11 @@
+Biochemistry
+
+Biochemistry is the study of the chemical processes in living organisms. It deals with the structure and function of cellular components such as proteins, carbohydrates, lipids, nucleic acids and other biomolecules.
+
+Among the vast number of different biomolecules, many are complex and large molecules (called polymers), which are composed of similar repeating subunits (called monomers). Each class of polymeric biomolecule has a different set of subunit types. For example, a protein is a polymer whose subunits are selected from a set of 20 or more amino acids. Biochemistry studies the chemical properties of important biological molecules, like proteins, and in particular the chemistry of enzyme-catalyzed reactions.
+
+The biochemistry of cell metabolism and the endocrine system has been extensively described. Other areas of biochemistry include the genetic code (DNA, RNA), protein synthesis, cell membrane transport, and signal transduction.
+
+Since all known life forms that are still alive today are descended from the same common ancestor, they have generally similar biochemistries.
+
+It remains unknown whether alternative types of biochemistries are possible, or practical, given the chemical elements composing the matter of the Universe. An emerging thesis, called "carbon chauvinism," holds that only carbon-based compounds are available to be part of a real biochemistry.

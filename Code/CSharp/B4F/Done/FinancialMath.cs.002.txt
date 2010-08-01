@@ -1,0 +1,50 @@
+                {
+                    irrGuess -= 0.02;
+                    if (irrGuess < -1.0)
+                        throw new ApplicationException("Internal Rate of Return (IRR) could not be calculated.");
+                }
+            }
+        }
+
+        public static double CumulativeNormalDistribution(double x, double mean, double standardDeviation)
+        {
+            return 0.5 * (1.0 + ErrorFunction((x - mean) / (standardDeviation * Math.Sqrt(2.0))));
+        }
+
+        public static double ErrorFunction(double x)
+        {
+            const double a1 = 0.254829592,
+                         a2 = -0.284496736,
+                         a3 = 1.421413741,
+                         a4 = -1.453152027,
+                         a5 = 1.061405429,
+                         p = 0.3275911;
+
+            double signX = (x >= 0.0) ? 1d : -1d;
+            x = Math.Abs(x);
+
+            double t = 1.0 / (1.0 + p * x);
+            double y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.Exp(-x * x);
+
+            return signX * y;
+        }
+
+        public static double GoalSeek(Func<double, double> func, double goalY, double guessX)
+        {
+            double aX = guessX,
+                   aY = func(aX);
+            double bX, bY;
+
+            if (IsZero(aY - goalY))
+                return aX;
+
+            double deltaX = Math.Abs(guessX / 4);
+            if (IsZero(deltaX))
+                deltaX = 0.25;
+
+            int cycles = 0;
+            while (true)
+            {
+                cycles = incCycles(cycles);
+
+                bX = aX + deltaX;

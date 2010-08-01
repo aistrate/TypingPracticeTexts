@@ -1,0 +1,48 @@
+    (I# x#) `xor` (I# y#)  = I# (word2Int# (int2Word# x# `xor#` int2Word# y#))
+
+    complement (I# x#)     = I# (word2Int# (int2Word# x# `xor#` int2Word# (-1#)))
+
+    (I# x#) `shift` (I# i#)
+        | i# >=# 0#        = I# (x# `iShiftL#` i#)
+        | otherwise        = I# (x# `iShiftRA#` negateInt# i#)
+
+    {-# INLINE rotate #-}
+    (I# x#) `rotate` (I# i#) =
+        I# (word2Int# ((x'# `uncheckedShiftL#` i'#) `or#`
+                       (x'# `uncheckedShiftRL#` (wsib -# i'#))))
+      where
+        x'# = int2Word# x#
+        i'# = word2Int# (int2Word# i# `and#` int2Word# (wsib -# 1#))
+        wsib = WORD_SIZE_IN_BITS#   
+    bitSize  _             = WORD_SIZE_IN_BITS
+
+    {-# INLINE shiftR #-}
+    x `shiftR`  i = x `shift`  (-i)
+#else /* !__GLASGOW_HASKELL__ */
+
+#ifdef __HUGS__
+    (.&.)                  = primAndInt
+    (.|.)                  = primOrInt
+    xor                    = primXorInt
+    complement             = primComplementInt
+    shift                  = primShiftInt
+    bit                    = primBitInt
+    testBit                = primTestInt
+    bitSize _              = SIZEOF_HSINT*8
+#elif defined(__NHC__)
+    (.&.)                  = nhc_primIntAnd
+    (.|.)                  = nhc_primIntOr
+    xor                    = nhc_primIntXor
+    complement             = nhc_primIntCompl
+    shiftL                 = nhc_primIntLsh
+    shiftR                 = nhc_primIntRsh
+    bitSize _              = 32
+#endif /* __NHC__ */
+
+    x `rotate`  i
+        | i<0 && x<0       = let left = i+bitSize x in
+                             ((x `shift` i) .&. complement ((-1) `shift` left))
+                             .|. (x `shift` left)
+        | i<0              = (x `shift` i) .|. (x `shift` (i+bitSize x))
+        | i==0             = x
+        | i>0              = (x `shift` i) .|. (x `shift` (i-bitSize x))

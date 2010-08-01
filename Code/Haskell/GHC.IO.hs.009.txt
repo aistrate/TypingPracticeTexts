@@ -1,0 +1,50 @@
+          <- readIORef ref
+
+      buf_ret <-
+         if (not flush && (size - w > count))
+
+            then do memcpy_baoff_ba old_raw (fromIntegral w) raw (fromIntegral count)
+                    writeIORef ref old_buf{ bufWPtr = w + count }
+                    return (newEmptyBuffer raw WriteBuffer sz)
+
+            else do flushed_buf <- flushWriteBuffer fd (haIsStream handle_) old_buf
+
+                    let this_buf = 
+                            Buffer{ bufBuf=raw, bufState=WriteBuffer, 
+                                    bufRPtr=0, bufWPtr=count, bufSize=sz }
+
+                    if (not flush && sz == size && count /= sz)
+                        then do 
+                          writeIORef ref this_buf
+                          return flushed_buf                         
+
+                        else do
+                          flushWriteBuffer fd (haIsStream handle_) this_buf
+                          writeIORef ref flushed_buf
+                          if sz == size
+                             then return (newEmptyBuffer raw WriteBuffer sz)
+                             else allocateBuffer size WriteBuffer
+
+      case buf_ret of
+        Buffer{ bufSize=buf_ret_sz, bufBuf=buf_ret_raw } -> do
+          if release && buf_ret_sz == size
+            then do
+              spare_bufs <- readIORef spare_buf_ref
+              writeIORef spare_buf_ref 
+                (BufferListCons buf_ret_raw spare_bufs)
+              return buf_ret
+            else
+              return buf_ret
+
+hPutBuf :: Handle
+        -> Ptr a
+        -> Int
+        -> IO ()
+hPutBuf h ptr count = do hPutBuf' h ptr count True; return ()
+
+hPutBufNonBlocking
+        :: Handle
+        -> Ptr a
+        -> Int
+        -> IO Int
+hPutBufNonBlocking h ptr count = hPutBuf' h ptr count False

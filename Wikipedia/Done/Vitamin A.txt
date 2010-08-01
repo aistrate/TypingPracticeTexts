@@ -1,0 +1,13 @@
+Vitamin A
+
+Vitamin A is a vitamin which is needed by the retina of the eye in the form of a specific metabolite, the light-absorbing molecule retinal. This molecule is absolutely necessary for both scotopic and color vision. Vitamin A also functions in a very different role, as an irreversibly oxidized form retinoic acid, which is an important hormone-like growth factor for epithelial and other cells.
+
+In foods of animal origin, the major form of vitamin A is an ester, primarily retinyl palmitate, which is converted to an alcohol (retinol) in the small intestine. The retinol form functions as a storage form of the vitamin, and can be converted to and from its visually active aldehyde form, retinal. The associated acid (retinoic acid), a metabolite which can be irreversibly synthesized from vitamin A, has only partial vitamin A activity, and does not function in the retina or some essential parts of the reproductive system.
+
+All forms of vitamin A have a beta-ionone ring to which an isoprenoid chain is attached, called a retinyl group. This structure is essential for vitamin activity. The orange pigment of carrots - beta-carotene - can be represented as two connected retinyl groups, which are used in the body to contribute to vitamin A levels. Alpha-carotene and gamma-carotene also have a single retinyl group which give them some vitamin activity. None of the other carotenes have vitamin activity. The carotenoid beta-cryptoxanthin possesses an ionone group and has vitamin activity in humans.
+
+Vitamin A can be found in two principal forms in foods:
+
+ * Retinol, the form of vitamin A absorbed when eating animal food sources, is a yellow, fat-soluble substance. Since the pure alcohol form is unstable, the vitamin is found in tissues in a form of retinyl ester. It is also commercially produced and administered as esters such as retinyl acetate or palmitate.
+
+ * The carotenes alpha-carotene, beta-carotene, gamma-carotene; and the xanthophyll beta-cryptoxanthin (all of which contain beta-ionone rings), but no other carotenoids, function as vitamin A in herbivores and omnivore animals, which possess the enzyme required to convert these compounds to retinal. Carnivores in general are poor converters of ionine-containg carotenoids, and pure carnivores such as cats and ferets lack beta-carotene 15,15'-monooxygenase and cannot convert any carotenoids to retinal (resulting in none of the carotenoids being forms of vitamin A for these species).

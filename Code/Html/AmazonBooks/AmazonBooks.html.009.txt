@@ -1,0 +1,30 @@
+    this.getBtfFlyoutContents = function() {
+      return this._btfFlyoutContents;
+    }
+    this.loading = function() {
+      if (!this._startedLoading && this._isReportingEvents()) {
+        uet('ns');
+      }
+      this._startedLoading = true;
+    }
+    this.componentLoaded = function() {
+      this._loadedCount++;
+      if (this._startedLoading && this._isReportingEvents() && (this._loadedCount == this._finishLoadQuota)) {
+        uet('ne');
+      }
+    }
+    this._isReportingEvents = function() {
+      return this._hasUedata;
+    }
+  }
+  _navbar = new Navbar({ finishLoadQuota: 1});
+  _navbar.loading();
+  amznJQ.available('jQuery', function() {
+    _navbar._navPopoverBorderSpriteImage_h = new Image();
+    _navbar._navPopoverBorderSpriteImage_h.src = 'http://g-ecx.images-amazon.com/images/G/01/gno/popover/sprites-h._V192570380_.gif';
+    _navbar._navPopoverBorderSpriteImage_v = new Image();
+    _navbar._navPopoverBorderSpriteImage_v.src = 'http://g-ecx.images-amazon.com/images/G/01/gno/popover/sprites-v._V192570383_.gif';
+  });
+  window.navSAFlyoutDelay = 0;
+-->
+    </script>

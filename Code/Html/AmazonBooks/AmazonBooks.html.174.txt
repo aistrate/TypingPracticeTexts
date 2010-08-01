@@ -1,0 +1,30 @@
+          left;
+          }
+          .rhf_loading_inner {
+          margin-left: auto;
+          margin-right: auto;
+          }
+          .rhfWrapper .shoveler .shoveler-heading {
+          padding-right:13.25em;
+          }
+          .rhfWrapper .shoveler .shoveler-pagination {
+          padding: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+          width:13.25em;
+          text-align:right;
+          }
+          .rhfWrapper .shoveler .start-over {
+          font-size: 80%;
+          }
+          .rhfWrapper .shoveler .start-over a {
+          text-decoration:none;
+          }
+          .rhfWrapper .shoveler .start-over a:visited {
+          color: #004B91;
+          }
+          .rhfWrapper .shoveler {
+          position: relative;
+          width: 100%;
+          }

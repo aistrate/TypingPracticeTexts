@@ -1,0 +1,97 @@
+		/// <summary>
+		/// Gets the schema for this table in quoted form if it is necessary.
+		/// </summary>
+		/// <param name="dialect">
+		/// The <see cref="Dialect.Dialect" /> that knows how to quote the table name.
+		/// </param>
+		/// <returns>
+		/// The schema name for this table in a form that is safe to use inside
+		/// of a SQL statement. Quoted if it needs to be, not quoted if it does not need to be.
+		/// </returns>
+		public string GetQuotedSchemaName(Dialect.Dialect dialect)
+		{
+			if (schema == null)
+			{
+				return null;
+			}
+
+			if (schema.StartsWith("`"))
+			{
+				return dialect.QuoteForSchemaName(schema.Substring(1, schema.Length - 2));
+			}
+
+			return schema;
+		}
+
+		/// <summary>
+		/// Gets the <see cref="Column"/> at the specified index.
+		/// </summary>
+		/// <param name="n">The index of the Column to get.</param>
+		/// <returns> 
+		/// The <see cref="Column"/> at the specified index.
+		/// </returns>
+		public Column GetColumn(int n)
+		{
+			IEnumerator<Column> iter = columns.Values.GetEnumerator();
+			for (int i = 0; i < n; i++)
+			{
+				iter.MoveNext();
+			}
+			return iter.Current;
+		}
+
+		/// <summary>
+		/// Adds the <see cref="Column"/> to the <see cref="ICollection"/> of 
+		/// Columns that are part of the Table.
+		/// </summary>
+		/// <param name="column">The <see cref="Column"/> to include in the Table.</param>
+		public void AddColumn(Column column)
+		{
+			Column old = GetColumn(column);
+			if (old == null)
+			{
+				columns[column.CanonicalName] = column;
+				column.uniqueInteger = columns.Count;
+			}
+			else
+			{
+				column.uniqueInteger = old.uniqueInteger;
+			}
+		}
+
+		/// <summary>
+		/// Gets the number of columns that this Table contains.
+		/// </summary>
+		/// <value>
+		/// The number of columns that this Table contains.
+		/// </value>
+		public int ColumnSpan
+		{
+			get { return columns.Count; }
+		}
+
+		/// <summary>
+		/// Gets an <see cref="IEnumerable"/> of <see cref="Column"/> objects that 
+		/// are part of the Table.
+		/// </summary>
+		/// <value>
+		/// An <see cref="IEnumerable"/> of <see cref="Column"/> objects that are 
+		/// part of the Table.
+		/// </value>
+		public virtual IEnumerable<Column> ColumnIterator
+		{
+			get { return columns.Values; }
+		}
+
+		/// <summary>
+		/// Gets an <see cref="ICollection"/> of <see cref="Index"/> objects that 
+		/// are part of the Table.
+		/// </summary>
+		/// <value>
+		/// An <see cref="ICollection"/> of <see cref="Index"/> objects that are 
+		/// part of the Table.
+		/// </value>
+		public virtual IEnumerable<Index> IndexIterator
+		{
+			get { return indexes.Values; }
+		}

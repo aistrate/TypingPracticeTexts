@@ -1,0 +1,40 @@
+			ObjectDumper.Write(q);
+		}
+
+		[Category("Paging")]
+		[Test(Description = "This sample uses the Skip and Take operators to do paging by " +
+					 "skipping the first 50 records and then returning the next 10, thereby " +
+					 "providing the data for page 6 of the Products table.")]
+		public void DLinq62()
+		{
+			var q = (
+						from c in db.Customers
+						orderby c.ContactName
+						select c)
+				.Skip(50)
+				.Take(10);
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("Paging")]
+		[Test(Description = "This sample uses a where clause and the Take operator to do paging by, " +
+					 "first filtering to get only the ProductIDs above 50 (the last ProductID " +
+					 "from page 5), then ordering by ProductID, and finally taking the first 10 results, " +
+					 "thereby providing the data for page 6 of the Products table.  " +
+					 "Note that this method only works when ordering by a unique key.")]
+		public void DLinq63()
+		{
+			var q = (
+						from p in db.Products
+						where p.ProductID > 50
+						orderby p.ProductID
+						select p)
+				.Take(10);
+
+			ObjectDumper.Write(q);
+		}
+
+		#endregion Top/Bottom/Paging Methods
+	}
+}

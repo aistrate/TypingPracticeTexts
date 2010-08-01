@@ -1,0 +1,50 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude #-}
+
+module Text.ParserCombinators.ReadP
+  ( 
+#ifndef __NHC__
+  ReadP,
+#else
+  ReadPN,
+#endif
+  
+  get,
+  look,
+  (+++),
+  (<++),
+  gather,
+  
+  pfail,
+  satisfy,
+  char,
+  string,
+  munch,
+  munch1,
+  skipSpaces,
+  choice,
+  count,
+  between,
+  option,
+  optional,
+  many,
+  many1,
+  skipMany,
+  skipMany1,
+  sepBy,
+  sepBy1,
+  endBy,
+  endBy1,
+  chainr,
+  chainl,
+  chainl1,
+  chainr1,
+  manyTill,
+  
+  ReadS,
+  readP_to_S,
+  readS_to_P,
+  
+  )
+ where
+
+import Control.Monad( MonadPlus(..), sequence, liftM2 )

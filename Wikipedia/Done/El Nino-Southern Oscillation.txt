@@ -1,0 +1,7 @@
+El Nino-Southern Oscillation
+
+El Nino-Southern Oscillation (ENSO) is a quasi periodic climate pattern that occurs across the tropical Pacific with a roughly 5 year cycle. It is comprised of an oceanic component, called El Nino (or La Nina), which is characterized by warming or cooling of surface waters in the tropical eastern Pacific Ocean, and an atmospheric component, the Southern Oscillation, which is characterized by changes in surface pressure in the tropical western Pacific. The two components are coupled: when the warm oceanic phase (known as El Nino) is in effect, surface pressures in the western Pacific are high, and when the cold phase is in effect (La Nina), surface pressures in the western Pacific are low. The oscillation does not have a specific period but occurs every four to twelve years, with the most common periods being around 5 years. Mechanisms that cause the oscillation remain under study.
+
+ENSO is associated with floods, droughts and other weather disturbances in many regions of the world, which vary with each event. Developing countries dependent upon agriculture and fishing, particularly those bordering the Pacific Ocean, are the most affected. In the Atlantic Ocean, effects lag behind those in the Pacific by 12 to 18 months.
+
+In popular usage, El Nino-Southern Oscillation is often called just "El Nino". El Nino is Spanish for "the boy" and refers to the Christ child, because periodic warming in the Pacific near South America is usually noticed around Christmas. "La Nina" is Spanish for "the girl."

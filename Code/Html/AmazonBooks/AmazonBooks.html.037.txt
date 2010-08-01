@@ -1,0 +1,30 @@
+            <li class="listsPopoverLi listsPopoverLiPostHr">
+              <span class="arrow">&rsaquo;</span>
+              <a href="/gp/remembers/ref=gno_listpop_ar">Amazon Remembers</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <script type="text/javascript">
+        amznJQ.available("navbarJSInteraction", function(){
+        var qlAjaxLink = '/gp/registry/quicklist/ref=gno_listpop_ql';
+        jQuery('#qlYourListsLink a').attr('href', qlAjaxLink);
+        });
+      </script>
+    </div>
+    <!--Pilu -->
+    <script type="text/javascript">
+      var issHost = "completion.amazon.com/search/complete";
+      var issMktid = "1";
+      var issSearchAliases = ["aps", "stripbooks", "popular", "apparel", "dvd", "electronics", "sporting", "garden", "videogames", "toys-and-games", "jewelry", "digital-text", "digital-music", "wireless-aps", "watches", "grocery", "hpc", "baby-products", "office-products", "software", "magazines", "vhs", "tools", "automotive", "misc", "industrial", "mi", "amazontv", "digital-music-track", "digital-music-album", "music-artist", "music-album", "music-song", "stripbooks-spanish", "electronics-accessories", "photo", "audio-video", "computers", "furniture", "kitchen", "wireless-accessories", "wireless-phones", "audiobooks", "beauty", "shoes"];
+      var iss;
+      amznJQ.available('search-js-autocomplete', function(){
+      iss = new AutoComplete();
+      iss.initDynamicSuggestions('#twotabsearchtextbox', 'form[name=site-search]',
+      'select.searchSelect', issHost, issMktid, issSearchAliases, 'updateISSCompletion',
+      'in {department}', 'Search suggestions', 1,
+      1);
+      });
+      window.updateISSCompletion = function(){ iss.updateAutoCompletion(); };
+      amznJQ.declareAvailable('navbarInline');
+      amznJQ.available('jQuery', function() {

@@ -1,0 +1,50 @@
+{-# INLINE foldr1 #-}
+
+foldr1' :: (Char -> Char -> Char) -> ByteString -> Char
+foldr1' f ps = w2c (B.foldr1' (\x y -> c2w (f (w2c x) (w2c y))) ps)
+{-# INLINE foldr1' #-}
+
+concatMap :: (Char -> ByteString) -> ByteString -> ByteString
+concatMap f = B.concatMap (f . w2c)
+{-# INLINE concatMap #-}
+
+any :: (Char -> Bool) -> ByteString -> Bool
+any f = B.any (f . w2c)
+{-# INLINE any #-}
+
+all :: (Char -> Bool) -> ByteString -> Bool
+all f = B.all (f . w2c)
+{-# INLINE all #-}
+
+maximum :: ByteString -> Char
+maximum = w2c . B.maximum
+{-# INLINE maximum #-}
+
+minimum :: ByteString -> Char
+minimum = w2c . B.minimum
+{-# INLINE minimum #-}
+
+mapAccumL :: (acc -> Char -> (acc, Char)) -> acc -> ByteString -> (acc, ByteString)
+mapAccumL f = B.mapAccumL (\acc w -> case f acc (w2c w) of (acc', c) -> (acc', c2w c))
+
+mapAccumR :: (acc -> Char -> (acc, Char)) -> acc -> ByteString -> (acc, ByteString)
+mapAccumR f = B.mapAccumR (\acc w -> case f acc (w2c w) of (acc', c) -> (acc', c2w c))
+
+scanl :: (Char -> Char -> Char) -> Char -> ByteString -> ByteString
+scanl f z = B.scanl (\a b -> c2w (f (w2c a) (w2c b))) (c2w z)
+
+scanl1 :: (Char -> Char -> Char) -> ByteString -> ByteString
+scanl1 f = B.scanl1 (\a b -> c2w (f (w2c a) (w2c b)))
+
+scanr :: (Char -> Char -> Char) -> Char -> ByteString -> ByteString
+scanr f z = B.scanr (\a b -> c2w (f (w2c a) (w2c b))) (c2w z)
+
+scanr1 :: (Char -> Char -> Char) -> ByteString -> ByteString
+scanr1 f = B.scanr1 (\a b -> c2w (f (w2c a) (w2c b)))
+
+replicate :: Int -> Char -> ByteString
+replicate w = B.replicate w . c2w
+{-# INLINE replicate #-}
+
+unfoldr :: (a -> Maybe (Char, a)) -> a -> ByteString
+unfoldr f x0 = B.unfoldr (fmap k . f) x0

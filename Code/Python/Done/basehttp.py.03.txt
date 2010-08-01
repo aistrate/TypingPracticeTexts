@@ -1,0 +1,100 @@
+                self.handle_error()
+            except:
+                self.close()
+                raise
+
+    def setup_environ(self):
+        
+        env = self.environ = self.os_environ.copy()
+        self.add_cgi_vars()
+
+        env['wsgi.input']        = self.get_stdin()
+        env['wsgi.errors']       = self.get_stderr()
+        env['wsgi.version']      = self.wsgi_version
+        env['wsgi.run_once']     = self.wsgi_run_once
+        env['wsgi.url_scheme']   = self.get_scheme()
+        env['wsgi.multithread']  = self.wsgi_multithread
+        env['wsgi.multiprocess'] = self.wsgi_multiprocess
+
+        if self.wsgi_file_wrapper is not None:
+            env['wsgi.file_wrapper'] = self.wsgi_file_wrapper
+
+        if self.origin_server and self.server_software:
+            env.setdefault('SERVER_SOFTWARE',self.server_software)
+
+    def finish_response(self):
+        
+        if not self.result_is_file() or not self.sendfile():
+            for data in self.result:
+                self.write(data)
+            self.finish_content()
+        self.close()
+
+    def get_scheme(self):
+        
+        return guess_scheme(self.environ)
+
+    def set_content_length(self):
+        
+        try:
+            blocks = len(self.result)
+        except (TypeError, AttributeError, NotImplementedError):
+            pass
+        else:
+            if blocks==1:
+                self.headers['Content-Length'] = str(self.bytes_sent)
+                return
+
+    def cleanup_headers(self):
+        
+        if 'Content-Length' not in self.headers:
+            self.set_content_length()
+
+    def start_response(self, status, headers,exc_info=None):
+        
+        if exc_info:
+            try:
+                if self.headers_sent:
+                    raise exc_info[0], exc_info[1], exc_info[2]
+            finally:
+                exc_info = None
+        elif self.headers is not None:
+            raise AssertionError("Headers already set!")
+
+        assert isinstance(status, str),"Status must be a string"
+        assert len(status)>=4,"Status must be at least 4 characters"
+        assert int(status[:3]),"Status message must begin w/3-digit code"
+        assert status[3]==" ", "Status message must have a space after code"
+        if __debug__:
+            for name,val in headers:
+                assert isinstance(name, str),"Header names must be strings"
+                assert isinstance(val, str),"Header values must be strings"
+                assert not is_hop_by_hop(name),"Hop-by-hop headers not allowed"
+        self.status = status
+        self.headers = self.headers_class(headers)
+        return self.write
+
+    def send_preamble(self):
+        
+        if self.origin_server:
+            if self.client_is_modern():
+                self._write('HTTP/%s %s\r\n' % (self.http_version,self.status))
+                if 'Date' not in self.headers:
+                    self._write(
+                        'Date: %s\r\n' % http_date()
+                    )
+                if self.server_software and 'Server' not in self.headers:
+                    self._write('Server: %s\r\n' % self.server_software)
+        else:
+            self._write('Status: %s\r\n' % self.status)
+
+    def write(self, data):
+        
+        assert isinstance(data, str), "write() argument must be string"
+
+        if not self.status:
+            raise AssertionError("write() before start_response()")
+
+        elif not self.headers_sent:
+            self.bytes_sent = len(data)
+            self.send_headers()

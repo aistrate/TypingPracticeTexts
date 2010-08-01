@@ -1,0 +1,50 @@
+        showConstr,
+        readConstr,
+
+        tyconUQname,
+        tyconModule,
+
+        fromConstr,
+        fromConstrB,
+        fromConstrM
+
+  ) where
+
+import Prelude
+
+import Data.Typeable
+import Data.Maybe
+import Control.Monad
+
+import Data.Typeable
+import Data.Int
+import Data.Word
+#ifdef __GLASGOW_HASKELL__
+import GHC.Real( Ratio(..) )
+import GHC.Ptr
+import GHC.ForeignPtr
+import GHC.Arr
+#else
+# ifdef __HUGS__
+import Hugs.Prelude( Ratio(..) )
+# endif
+import System.IO
+import Foreign.Ptr
+import Foreign.ForeignPtr
+import Foreign.StablePtr
+import Control.Monad.ST
+import Control.Concurrent
+import Data.Array
+import Data.IORef
+#endif
+
+#include "Typeable.h"
+
+class Typeable a => Data a where
+
+  gfoldl  :: (forall d b. Data d => c (d -> b) -> d -> c b)
+          -> (forall g. g -> c g)
+          -> a
+          -> c a
+
+  gfoldl _ z = z

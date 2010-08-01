@@ -1,0 +1,5 @@
+Gravitation
+
+Gravitation, or gravity, is a natural phenomenon by which objects with mass attract one another. In everyday life, gravitation is most familiar as the agent that lends weight to objects with mass and causes them to fall to the ground when dropped. Gravitation causes dispersed matter to coalesce, thus accounting for the existence of the Earth, the Sun, and most of the macroscopic objects in the universe. It is responsible for keeping the Earth and the other planets in their orbits around the Sun; for keeping the Moon in its orbit around the Earth; for the formation of tides; for convection, by which fluid flow occurs under the influence of a density gradient and gravity; for heating the interiors of forming stars and planets to very high temperatures; and for various other phenomena observed on Earth.
+
+Modern physics describes gravitation using the general theory of relativity, in which gravitation is a consequence of the curvature of spacetime which governs the motion of inertial objects. The simpler Newton's law of universal gravitation provides an accurate approximation for most calculations.

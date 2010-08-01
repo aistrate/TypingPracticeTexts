@@ -1,0 +1,30 @@
+                        <div class="iconLeft navSprite"></div>
+                        <div class="iconMiddle navSprite">
+                          <div id="navCartCount" class="iconText"></div>
+                        </div>
+                        <div class="iconRight navSprite"></div>
+                        <div class="text">Cart</div>
+                      </a>
+                    </div>
+                  </div>
+                </td>
+                <td align="right" style="padding-right:0px;">
+                  <div id="navYourListsButton" class="navButton navBlueButton">
+                    <div class="navSprite left"></div>
+                    <div class="navSprite right"></div>
+                    <a class="destination" href="/wishlist/ref=topnav_lists">
+                      <span class="text">Wish List</span>
+                    </a>
+                    <a class="flyoutAnchor">
+                      <span class="navSprite downArrow"></span>
+                    </a>
+                  </div>
+                </td>
+                <td class="navSprite navSearchEnd"/>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr width="100%" height="26">
+          <td colspan="2" width="100%">
+            <table id="navCatSubnav" cellspacing="0">

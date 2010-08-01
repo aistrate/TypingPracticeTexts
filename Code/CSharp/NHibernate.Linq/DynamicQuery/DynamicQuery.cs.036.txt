@@ -1,0 +1,50 @@
+						case TypeCode.UInt16:
+						case TypeCode.Int32:
+						case TypeCode.UInt32:
+						case TypeCode.Int64:
+						case TypeCode.UInt64:
+						case TypeCode.Single:
+						case TypeCode.Double:
+						case TypeCode.Decimal:
+							return true;
+					}
+					break;
+				case TypeCode.Int16:
+					switch (tc)
+					{
+						case TypeCode.Int16:
+						case TypeCode.Int32:
+						case TypeCode.Int64:
+						case TypeCode.Single:
+						case TypeCode.Double:
+						case TypeCode.Decimal:
+							return true;
+					}
+					break;
+				case TypeCode.UInt16:
+					switch (tc)
+					{
+						case TypeCode.UInt16:
+						case TypeCode.Int32:
+						case TypeCode.UInt32:
+						case TypeCode.Int64:
+						case TypeCode.UInt64:
+						case TypeCode.Single:
+						case TypeCode.Double:
+						case TypeCode.Decimal:
+							return true;
+					}
+					break;
+				case TypeCode.Int32:
+					switch (tc)
+					{
+						case TypeCode.Int32:
+						case TypeCode.Int64:
+						case TypeCode.Single:
+						case TypeCode.Double:
+						case TypeCode.Decimal:
+							return true;
+					}
+					break;
+				case TypeCode.UInt32:
+					switch (tc)

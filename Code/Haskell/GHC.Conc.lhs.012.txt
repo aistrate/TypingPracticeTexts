@@ -1,0 +1,50 @@
+ | Break
+ | Close
+ | Logoff
+ | Shutdown
+ deriving (Eq, Ord, Enum, Show, Read, Typeable)
+
+start_console_handler :: Word32 -> IO ()
+start_console_handler r =
+  case toWin32ConsoleEvent r of
+     Just x  -> withMVar win32ConsoleHandler $ \handler -> do
+                    forkIO (handler x)
+                    return ()
+     Nothing -> return ()
+
+toWin32ConsoleEvent :: Num a => a -> Maybe ConsoleEvent
+toWin32ConsoleEvent ev = 
+   case ev of
+       0         -> Just ControlC
+       1     -> Just Break
+       2     -> Just Close
+       5    -> Just Logoff
+       6  -> Just Shutdown
+       _ -> Nothing
+
+win32ConsoleHandler :: MVar (ConsoleEvent -> IO ())
+win32ConsoleHandler = unsafePerformIO (newMVar (error "win32ConsoleHandler"))
+
+stick :: IORef HANDLE
+{-# NOINLINE stick #-}
+stick = unsafePerformIO (newIORef nullPtr)
+
+wakeupIOManager :: IO ()
+wakeupIOManager = do 
+  _hdl <- readIORef stick
+  c_sendIOManagerEvent io_MANAGER_WAKEUP
+
+getDelay :: USecs -> [DelayReq] -> IO ([DelayReq], DWORD)
+getDelay _   [] = return ([], iNFINITE)
+getDelay now all@(d : rest) 
+  = case d of
+     Delay time m | now >= time -> do
+        putMVar m ()
+        getDelay now rest
+     DelaySTM time t | now >= time -> do
+        atomically $ writeTVar t True
+        getDelay now rest
+     _otherwise ->
+        let micro_seconds = delayTime d - now
+            milli_seconds = (micro_seconds + 999) `div` 1000
+        in return (all, fromIntegral milli_seconds)

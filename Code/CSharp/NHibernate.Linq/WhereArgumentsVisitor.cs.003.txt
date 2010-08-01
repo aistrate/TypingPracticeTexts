@@ -1,0 +1,50 @@
+					else if (expr.Object is ConstantExpression)
+					{
+						CurrentCriterions.Add(GetCollectionContainsCriteria(expr.Object, expr.Arguments[0]));
+					}
+					else if (expr.Object is CollectionAccessExpression)
+					{
+						CurrentCriterions.Add(GetCollectionContainsCriteria((CollectionAccessExpression)expr.Object, expr.Arguments[0]));
+					}
+					else
+					{
+						CurrentCriterions.Add(GetLikeCriteria(expr, MatchMode.Anywhere));
+					}
+					break;
+				case "Equals":
+					VisitBinaryCriterionExpression(Expression.Equal(expr.Object, expr.Arguments[0]));
+					break;
+			}
+
+			return expr;
+		}
+
+		protected override Expression VisitTypeIs(TypeBinaryExpression expr)
+		{
+			var visitor = new MemberNameVisitor(rootCriteria);
+			visitor.Visit(expr);
+			string memberName = visitor.MemberName + ".class";
+
+			var metaData = session.SessionFactory.GetClassMetadata(expr.TypeOperand);
+			if (metaData.HasSubclasses)
+			{
+				var disjunction = new Disjunction();
+				foreach (string entityName in ((IEntityPersister)metaData).EntityMetamodel.SubclassEntityNames)
+				{
+					var metadata = session.SessionFactory.GetClassMetadata(entityName);
+					disjunction.Add(Property.ForName(memberName).Eq(metadata.GetMappedClass(EntityMode.Poco)));
+				}
+				visitor.CurrentCriteria.Add(disjunction);
+			}
+			else
+			{
+				visitor.CurrentCriteria.Add(Property.ForName(memberName).Eq(expr.TypeOperand));
+			}
+
+			return expr;
+		}
+
+		protected override Expression VisitBinary(BinaryExpression expr)
+		{
+			switch (expr.NodeType)
+			{

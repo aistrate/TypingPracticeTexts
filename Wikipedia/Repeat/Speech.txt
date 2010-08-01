@@ -1,0 +1,11 @@
+Speech
+
+Speech is the vocalized form of human communication. It is based upon the syntactic combination of lexicals and names that are drawn from very large (usually >10,000 different words) vocabularies. Each spoken word is created out of the phonetic combination of a limited set of vowel and consonant speech sound units. These vocabularies, the syntax which structures them, and their set of speech sound units, differ creating the existence of many thousands of different types of mutually unintelligible human languages. Human speakers are often polyglot able to communicate in two or more of them. The vocal abilities that enable humans to produce speech also provide humans with the ability to sing.
+
+A gestural form of human communication exists for the deaf in the form of sign language. Speech in some cultures has become the basis of a written language, often one that differs in its vocabulary, syntax and phonetics from its associated spoken one, a situation called diglossia. Speech in addition to its use in communication, it is suggested by some psychologists such as Vygotsky is internally used by mental processes to enhance and organize cognition in the form of an interior monologue.
+
+Speech is researched in terms of the speech production and speech perception of the sounds used in spoken language. Several academic disciplines study these including acoustics, psychology, speech pathology, linguistics, cognitive science, communication studies, otolaryngology and computer science. Another area of research is how the human brain in its different areas such as the Broca's area and Wernicke's area underlies speech.
+
+It is controversial how far human speech is unique in that other animals also communicate with vocalizations. While none in the wild uses syntax nor compatibly large vocabularies, research upon the nonverbal abilities of language trained apes such as Washoe and Kanzi raises the possibility that they might have these capabilities.
+
+The origins of speech are unknown and subject to much debate and speculation.

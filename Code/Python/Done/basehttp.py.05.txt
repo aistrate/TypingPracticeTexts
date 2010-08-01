@@ -1,0 +1,148 @@
+    def server_bind(self):
+        
+        try:
+            HTTPServer.server_bind(self)
+        except Exception, e:
+            raise WSGIServerException, e
+        self.setup_environ()
+
+    def setup_environ(self):
+        env = self.base_environ = {}
+        env['SERVER_NAME'] = self.server_name
+        env['GATEWAY_INTERFACE'] = 'CGI/1.1'
+        env['SERVER_PORT'] = str(self.server_port)
+        env['REMOTE_HOST']=''
+        env['CONTENT_LENGTH']=''
+        env['SCRIPT_NAME'] = ''
+
+    def get_app(self):
+        return self.application
+
+    def set_app(self,application):
+        self.application = application
+
+class WSGIRequestHandler(BaseHTTPRequestHandler):
+    server_version = "WSGIServer/" + __version__
+
+    def __init__(self, *args, **kwargs):
+        from django.conf import settings
+        self.admin_media_prefix = settings.ADMIN_MEDIA_PREFIX
+        self.path = ''
+        BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
+
+    def get_environ(self):
+        env = self.server.base_environ.copy()
+        env['SERVER_PROTOCOL'] = self.request_version
+        env['REQUEST_METHOD'] = self.command
+        if '?' in self.path:
+            path,query = self.path.split('?',1)
+        else:
+            path,query = self.path,''
+
+        env['PATH_INFO'] = urllib.unquote(path)
+        env['QUERY_STRING'] = query
+        env['REMOTE_ADDR'] = self.client_address[0]
+
+        if self.headers.typeheader is None:
+            env['CONTENT_TYPE'] = self.headers.type
+        else:
+            env['CONTENT_TYPE'] = self.headers.typeheader
+
+        length = self.headers.getheader('content-length')
+        if length:
+            env['CONTENT_LENGTH'] = length
+
+        for h in self.headers.headers:
+            k,v = h.split(':',1)
+            k=k.replace('-','_').upper(); v=v.strip()
+            if k in env:
+                continue
+            if 'HTTP_'+k in env:
+                env['HTTP_'+k] += ','+v
+            else:
+                env['HTTP_'+k] = v
+        return env
+
+    def get_stderr(self):
+        return sys.stderr
+
+    def handle(self):
+        
+        self.raw_requestline = self.rfile.readline()
+        if not self.parse_request():
+            return
+        handler = ServerHandler(self.rfile, self.wfile, self.get_stderr(), self.get_environ())
+        handler.request_handler = self
+        handler.run(self.server.get_app())
+
+    def log_message(self, format, *args):
+        if self.path.startswith(self.admin_media_prefix) or self.path == '/favicon.ico':
+            return
+        sys.stderr.write("[%s] %s\n" % (self.log_date_time_string(), format % args))
+
+class AdminMediaHandler(object):
+    
+    def __init__(self, application, media_dir=None):
+        from django.conf import settings
+        self.application = application
+        if not media_dir:
+            import django
+            self.media_dir = \
+                os.path.join(django.__path__[0], 'contrib', 'admin', 'media')
+        else:
+            self.media_dir = media_dir
+        self.media_url = settings.ADMIN_MEDIA_PREFIX
+
+    def file_path(self, url):
+        
+        relative_url = url[len(self.media_url):]
+        relative_path = urllib.url2pathname(relative_url)
+        return safe_join(self.media_dir, relative_path)
+
+    def __call__(self, environ, start_response):
+        import os.path
+
+        if self.media_url.startswith('http://') or self.media_url.startswith('https://') \
+            or not environ['PATH_INFO'].startswith(self.media_url):
+            return self.application(environ, start_response)
+
+        try:
+            file_path = self.file_path(environ['PATH_INFO'])
+        except ValueError:
+            status = '404 NOT FOUND'
+            headers = {'Content-type': 'text/plain'}
+            output = ['Page not found: %s' % environ['PATH_INFO']]
+            start_response(status, headers.items())
+            return output
+        if not os.path.exists(file_path):
+            status = '404 NOT FOUND'
+            headers = {'Content-type': 'text/plain'}
+            output = ['Page not found: %s' % environ['PATH_INFO']]
+        else:
+            try:
+                fp = open(file_path, 'rb')
+            except IOError:
+                status = '401 UNAUTHORIZED'
+                headers = {'Content-type': 'text/plain'}
+                output = ['Permission denied: %s' % environ['PATH_INFO']]
+            else:
+                mtime = http_date(os.stat(file_path)[stat.ST_MTIME])
+                headers = {'Last-Modified': mtime}
+                if environ.get('HTTP_IF_MODIFIED_SINCE', None) == mtime:
+                    status = '304 NOT MODIFIED'
+                    output = []
+                else:
+                    status = '200 OK'
+                    mime_type = mimetypes.guess_type(file_path)[0]
+                    if mime_type:
+                        headers['Content-Type'] = mime_type
+                    output = [fp.read()]
+                    fp.close()
+        start_response(status, headers.items())
+        return output
+
+def run(addr, port, wsgi_handler):
+    server_address = (addr, port)
+    httpd = WSGIServer(server_address, WSGIRequestHandler)
+    httpd.set_app(wsgi_handler)
+    httpd.serve_forever()

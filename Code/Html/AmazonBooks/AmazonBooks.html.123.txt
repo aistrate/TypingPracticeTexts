@@ -1,0 +1,30 @@
+                          </div>
+                          <div class="gry t11 nt">Paperback</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="clear: left; width: 100%; height: 1px; margin: 0; padding: 0; overflow: hidden"></div>
+              <div class="action">
+                <span class="carat">&rsaquo;</span>
+                <a href="/gp/history/ref=s9_simv_bw_p14_clnk?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-7&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=490891951&pf_rd_i=283155">View or edit your browsing history</a>
+              </div>
+              <div class="h_rule"></div>
+            </div>
+            <script type="text/javascript">
+              if (typeof S9MultiPackLayout != "undefined") {
+              var ns_1RVCMGP6WPZF34Z5GVPD_12229__S9MultiPackLayout = new S9MultiPackLayout(
+              "ns_1RVCMGP6WPZF34Z5GVPD_12229_", 3, 7, 155);
+              }
+            </script>
+            <div class="unified_widget blurb">
+              <h2>Featured in Mystery &amp; Thrillers</h2>
+              <div class="row">
+                <div class="asinItem">
+                  <div class="prodImage">
+                    <a href="/Sizzling-Sixteen-Stephanie-Janet-Evanovich/dp/0312383304/ref=amb_link_353320382_2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                      <img src="http://ecx.images-amazon.com/images/P/0312383304.01._SL110_PE47_OU01_SCLZZZZZZZ_V214013274_.jpg" width="80" alt="Sizzling Sixteen" height="121" border="0" />
+                    </a>
+                  </div>

@@ -1,0 +1,98 @@
+        def find_one(options)
+          case from = options[:from]
+          when Symbol
+            instantiate_record(get(from, options[:params]))
+          when String
+            path = "#{from}#{query_string(options[:params])}"
+            instantiate_record(connection.get(path, headers))
+          end
+        end
+
+        def find_single(scope, options)
+          prefix_options, query_options = split_options(options[:params])
+          path = element_path(scope, prefix_options, query_options)
+          instantiate_record(connection.get(path, headers), prefix_options)
+        end
+
+        def instantiate_collection(collection, prefix_options = {})
+          collection.collect! { |record| instantiate_record(record, prefix_options) }
+        end
+
+        def instantiate_record(record, prefix_options = {})
+          new(record).tap do |resource|
+            resource.prefix_options = prefix_options
+          end
+        end
+
+        def create_site_uri_from(site)
+          site.is_a?(URI) ? site.dup : uri_parser.parse(site)
+        end
+
+        def create_proxy_uri_from(proxy)
+          proxy.is_a?(URI) ? proxy.dup : uri_parser.parse(proxy)
+        end
+
+        def prefix_parameters
+          @prefix_parameters ||= prefix_source.scan(/:\w+/).map { |key| key[1..-1].to_sym }.to_set
+        end
+
+        def query_string(options)
+          "?#{options.to_query}" unless options.nil? || options.empty?
+        end
+
+        def split_options(options = {})
+          prefix_options, query_options = {}, {}
+
+          (options || {}).each do |key, value|
+            next if key.blank?
+            (prefix_parameters.include?(key.to_sym) ? prefix_options : query_options)[key.to_sym] = value
+          end
+
+          [ prefix_options, query_options ]
+        end
+
+        def uri_parser
+          @uri_parser ||= URI.const_defined?(:Parser) ? URI::Parser.new : URI
+        end
+    end
+
+    attr_accessor :attributes
+    attr_accessor :prefix_options
+
+    def schema
+      self.class.schema || self.attributes
+    end
+
+    def known_attributes
+      self.class.known_attributes + self.attributes.keys.map(&:to_s)
+    end
+
+    def initialize(attributes = {})
+      @attributes     = {}.with_indifferent_access
+      @prefix_options = {}
+      load(attributes)
+    end
+
+    def clone
+      cloned = attributes.reject {|k,v| k == self.class.primary_key || v.is_a?(ActiveResource::Base)}.inject({}) do |attrs, (k, v)|
+        attrs[k] = v.clone
+        attrs
+      end
+      resource = self.class.new({})
+      resource.prefix_options = self.prefix_options
+      resource.send :instance_variable_set, '@attributes', cloned
+      resource
+    end
+
+    def new?
+      id.nil?
+    end
+    alias :new_record? :new?
+
+    def id
+      attributes[self.class.primary_key]
+    end
+
+    def id=(id)
+      attributes[self.class.primary_key] = id
+    end

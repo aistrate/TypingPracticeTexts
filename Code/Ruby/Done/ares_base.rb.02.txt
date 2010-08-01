@@ -1,0 +1,100 @@
+        end
+      end
+
+      def user=(user)
+        @connection = nil
+        @user = user
+      end
+
+      def password
+        if defined?(@password)
+          @password
+        elsif superclass != Object && superclass.password
+          superclass.password.dup.freeze
+        end
+      end
+
+      def password=(password)
+        @connection = nil
+        @password = password
+      end
+
+      def auth_type
+        if defined?(@auth_type)
+          @auth_type
+        end
+      end
+
+      def auth_type=(auth_type)
+        @connection = nil
+        @auth_type = auth_type
+      end
+
+      def format=(mime_type_reference_or_format)
+        format = mime_type_reference_or_format.is_a?(Symbol) ?
+          ActiveResource::Formats[mime_type_reference_or_format] : mime_type_reference_or_format
+
+        write_inheritable_attribute(:format, format)
+        connection.format = format if site
+      end
+
+      def format
+        read_inheritable_attribute(:format) || ActiveResource::Formats::XmlFormat
+      end
+
+      def timeout=(timeout)
+        @connection = nil
+        @timeout = timeout
+      end
+
+      def timeout
+        if defined?(@timeout)
+          @timeout
+        elsif superclass != Object && superclass.timeout
+          superclass.timeout
+        end
+      end
+
+      def ssl_options=(opts={})
+        @connection   = nil
+        @ssl_options  = opts
+      end
+
+      def ssl_options
+        if defined?(@ssl_options)
+          @ssl_options
+        elsif superclass != Object && superclass.ssl_options
+          superclass.ssl_options
+        end
+      end
+
+      def connection(refresh = false)
+        if defined?(@connection) || superclass == Object
+          @connection = Connection.new(site, format) if refresh || @connection.nil?
+          @connection.proxy = proxy if proxy
+          @connection.user = user if user
+          @connection.password = password if password
+          @connection.auth_type = auth_type if auth_type
+          @connection.timeout = timeout if timeout
+          @connection.ssl_options = ssl_options if ssl_options
+          @connection
+        else
+          superclass.connection
+        end
+      end
+
+      def headers
+        @headers ||= {}
+      end
+
+      attr_accessor_with_default(:element_name)    { ActiveSupport::Inflector.underscore(to_s.split("::").last) }
+
+      attr_accessor_with_default(:collection_name) { ActiveSupport::Inflector.pluralize(element_name) }
+      attr_accessor_with_default(:primary_key, 'id')
+
+      def prefix(options={})
+        default = site.path
+        default << '/' unless default[-1..-1] == '/'
+        self.prefix = default
+        prefix(options)
+      end

@@ -1,0 +1,50 @@
+				argList.Add(ParseExpression());
+				if (token.id != TokenId.Comma) break;
+				NextToken();
+			}
+			return argList.ToArray();
+		}
+
+		Expression ParseElementAccess(Expression expr)
+		{
+			int errorPos = token.pos;
+			ValidateToken(TokenId.OpenBracket, Res.OpenParenExpected);
+			NextToken();
+			Expression[] args = ParseArguments();
+			ValidateToken(TokenId.CloseBracket, Res.CloseBracketOrCommaExpected);
+			NextToken();
+			if (expr.Type.IsArray)
+			{
+				if (expr.Type.GetArrayRank() != 1 || args.Length != 1)
+					throw ParseError(errorPos, Res.CannotIndexMultiDimArray);
+				Expression index = PromoteExpression(args[0], typeof(int), true);
+				if (index == null)
+					throw ParseError(errorPos, Res.InvalidIndex);
+				return Expression.ArrayIndex(expr, index);
+			}
+			else
+			{
+				MethodBase mb;
+				switch (FindIndexer(expr.Type, args, out mb))
+				{
+					case 0:
+						throw ParseError(errorPos, Res.NoApplicableIndexer,
+							GetTypeName(expr.Type));
+					case 1:
+						return Expression.Call(expr, (MethodInfo)mb, args);
+					default:
+						throw ParseError(errorPos, Res.AmbiguousIndexerInvocation,
+							GetTypeName(expr.Type));
+				}
+			}
+		}
+
+		static bool IsPredefinedType(Type type)
+		{
+			foreach (Type t in predefinedTypes) if (t == type) return true;
+			return false;
+		}
+
+		static bool IsNullableType(Type type)
+		{
+			return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);

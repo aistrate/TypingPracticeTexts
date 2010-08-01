@@ -1,0 +1,30 @@
+                    <span id="rhfMainHeading">Your Recent History</span>
+                  </h2>&nbsp;<span class="tiny" id="rhfLearnMore">
+                    (<a href="/gp/yourstore/cc/ref=pd_rhf_lm">What's this?</a>)
+                  </span>
+                </div>
+              </td>
+              <td class="rhf-box-corner-sprite rhf-box-tr" width="10"></td>
+            </tr>
+            <tr>
+              <td class="rhf-box-sides-sprite rhf-box-l" width="10">&nbsp;</td>
+              <td>
+                <div id="rhf_container" style="display:none;">
+                  <div class="rhf_loading_outer">
+                    <div class="rhf_loading_middle">
+                      <div class="rhf_loading_inner"></div>
+                    </div>
+                  </div>
+                  <script type="text/JavaScript">
+                    amznJQ.onReady('JQuery', function() { (function($) {
+                    window.RECS_rhfShvlLoading = false;
+                    window.RECS_rhfShvlLoaded = false;
+                    $("#rhf_container").show();
+                    var rhfShvlEventHandler = function () {
+                    if (   ! window.RECS_rhfShvlLoaded
+                    && ! window.RECS_rhfShvlLoading
+                    && $('#rhf_container').size() > 0 ) {
+                    var yPosition = $(window).scrollTop() + $(window).height();
+                    var rhfElementFound = $('#rhfMainHeading').size();
+                    var rhfPosition = $('#rhfMainHeading').offset().top;
+                    if (/webkit.*mobile/i.test(navigator.userAgent)) {

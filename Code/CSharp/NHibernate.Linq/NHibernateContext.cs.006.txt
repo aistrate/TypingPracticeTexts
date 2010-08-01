@@ -1,0 +1,51 @@
+		void IUpdatable.SetValue(object targetResource, string propertyName, object propertyValue)
+		{
+			IClassMetadata metadata = session.SessionFactory.GetClassMetadata(targetResource.GetType().FullName);
+			if (metadata == null)
+			{
+				throw new DataServiceException("Type not recognized as a valid type for this Context");
+			}
+
+			if (metadata.IdentifierPropertyName == propertyName)
+			{
+				metadata.SetIdentifier(targetResource, propertyValue, EntityMode.Poco);
+			}
+			else
+			{
+				metadata.SetPropertyValue(targetResource, propertyName, propertyValue, EntityMode.Poco);
+			}
+		}
+
+		#endregion
+
+		#region IExpandProvider Members
+
+		IEnumerable IExpandProvider.ApplyExpansions(IQueryable queryable, ICollection<ExpandSegmentCollection> expandPaths)
+		{
+			if (queryable == null) throw new DataServiceException("Query cannot be null");
+
+			INHibernateQueryable nHibQuery = queryable as INHibernateQueryable;
+			if (nHibQuery == null) throw new DataServiceException("Expansion only supported on INHibernateQueryable queries");
+
+			if (expandPaths.Count == 0) throw new DataServiceException("Expansion Paths cannot be null");
+			foreach (ExpandSegmentCollection coll in expandPaths)
+			{
+				foreach (ExpandSegment seg in coll)
+				{
+					if (seg.HasFilter)
+					{
+						throw new DataServiceException("NHibernate does not support Expansions with Filters");
+					}
+					else
+					{
+						nHibQuery.QueryOptions.AddExpansion(seg.Name);
+					}
+				}
+			}
+
+			return nHibQuery as IEnumerable;
+		}
+
+		#endregion
+	}
+}

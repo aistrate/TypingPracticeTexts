@@ -1,0 +1,50 @@
+   , zipWith
+   , zipWith3
+   , zipWith4, zipWith5, zipWith6, zipWith7
+
+   , unzip
+   , unzip3
+   , unzip4, unzip5, unzip6, unzip7
+
+   , lines
+   , words
+   , unlines
+   , unwords
+
+   , nub
+
+   , delete
+   , (\\)
+
+   , union
+   , intersect
+
+   , sort
+   , insert
+
+   , nubBy
+   , deleteBy
+   , deleteFirstsBy
+   , unionBy
+   , intersectBy
+   , groupBy
+
+   , sortBy
+   , insertBy
+   , maximumBy
+   , minimumBy
+
+   , genericLength
+   , genericTake
+   , genericDrop
+   , genericSplitAt
+   , genericIndex
+   , genericReplicate
+
+   ) where
+
+#ifdef __NHC__
+import Prelude
+#endif
+
+import Data.Maybe

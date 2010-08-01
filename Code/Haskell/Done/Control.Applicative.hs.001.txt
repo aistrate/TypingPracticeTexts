@@ -1,0 +1,50 @@
+module Control.Applicative (
+        Applicative(..),
+        Alternative(..),
+        Const(..), WrappedMonad(..), WrappedArrow(..), ZipList(..),
+        (<$>), (<$), (*>), (<*), (<**>),
+        liftA, liftA2, liftA3,
+        optional, some, many
+        ) where
+
+import Prelude hiding (id,(.))
+import qualified Prelude
+
+import Control.Category
+import Control.Arrow
+        (Arrow(arr, (&&&)), ArrowZero(zeroArrow), ArrowPlus((<+>)))
+import Control.Monad (liftM, ap, MonadPlus(..))
+import Control.Monad.Instances ()
+import Data.Monoid (Monoid(..))
+
+infixl 3 <|>
+infixl 4 <$>, <$
+infixl 4 <*>, <*, *>, <**>
+
+class Functor f => Applicative f where
+        pure :: a -> f a
+
+        (<*>) :: f (a -> b) -> f a -> f b
+
+class Applicative f => Alternative f where
+        empty :: f a
+        (<|>) :: f a -> f a -> f a
+
+instance Applicative Maybe where
+        pure = return
+        (<*>) = ap
+
+instance Alternative Maybe where
+        empty = Nothing
+        Nothing <|> p = p
+        Just x <|> _ = Just x
+
+instance Applicative [] where
+        pure = return
+        (<*>) = ap
+
+instance Alternative [] where
+        empty = []
+        (<|>) = (++)
+
+instance Applicative IO where

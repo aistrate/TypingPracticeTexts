@@ -1,0 +1,30 @@
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://askville.amazon.com">
+                          Askville<br/> <span class="navFooterDescText">
+                            Community<br/> Answers
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.audible.com">
+                          Audible<br/> <span class="navFooterDescText">
+                            Download<br/> Audio Books
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.dpreview.com">
+                          DPReview<br/> <span class="navFooterDescText">
+                            Digital<br/> Photography
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.endless.com">
+                          Endless<br/> <span class="navFooterDescText">
+                            Shoes &<br/> Handbags

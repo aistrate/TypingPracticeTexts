@@ -1,0 +1,49 @@
+string :: String -> ReadP String
+string this = do s <- look; scan this s
+ where
+  scan []     _               = do return this
+  scan (x:xs) (y:ys) | x == y = do get; scan xs ys
+  scan _      _               = do pfail
+
+munch :: (Char -> Bool) -> ReadP String
+munch p =
+  do s <- look
+     scan s
+ where
+  scan (c:cs) | p c = do get; s <- scan cs; return (c:s)
+  scan _            = do return ""
+
+munch1 :: (Char -> Bool) -> ReadP String
+munch1 p =
+  do c <- get
+     if p c then do s <- munch p; return (c:s) else pfail
+
+choice :: [ReadP a] -> ReadP a
+choice []     = pfail
+choice [p]    = p
+choice (p:ps) = p +++ choice ps
+
+skipSpaces :: ReadP ()
+skipSpaces =
+  do s <- look
+     skip s
+ where
+  skip (c:s) | isSpace c = do get; skip s
+  skip _                 = do return ()
+
+count :: Int -> ReadP a -> ReadP [a]
+count n p = sequence (replicate n p)
+
+between :: ReadP open -> ReadP close -> ReadP a -> ReadP a
+between open close p = do open
+                          x <- p
+                          close
+                          return x
+
+option :: a -> ReadP a -> ReadP a
+option x p = p +++ return x
+
+optional :: ReadP a -> ReadP ()
+optional p = (p >> return ()) +++ return ()
+
+many :: ReadP a -> ReadP [a]

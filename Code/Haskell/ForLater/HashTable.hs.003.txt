@@ -1,0 +1,49 @@
+{-# NOINLINE hashData #-}
+hashData :: IORef HashData
+hashData =  unsafePerformIO (newIORef (HD { tables=0, insertions=0, lookups=0,
+                                            totBuckets=0, maxEntries=0,
+                                            maxChain=0, maxBuckets=tABLE_MIN } ))
+
+instrument :: (HashData -> HashData) -> IO ()
+instrument i | iNSTRUMENTED = modifyIORef hashData i
+             | otherwise    = return ()
+
+recordNew :: IO ()
+recordNew = instrument rec
+  where rec hd@HD{ tables=t, totBuckets=b } =
+               hd{ tables=t+1, totBuckets=b+fromIntegral tABLE_MIN }
+
+recordIns :: Int32 -> Int32 -> [a] -> IO ()
+recordIns i sz bkt = instrument rec
+  where rec hd@HD{ insertions=ins, maxEntries=mx, maxChain=mc } =
+               hd{ insertions=ins+fromIntegral i, maxEntries=mx `max` sz,
+                   maxChain=mc `max` length bkt }
+
+recordResize :: Int32 -> Int32 -> IO ()
+recordResize older newer = instrument rec
+  where rec hd@HD{ totBuckets=b, maxBuckets=mx } =
+               hd{ totBuckets=b+fromIntegral (newer-older),
+                   maxBuckets=mx `max` newer }
+
+recordLookup :: IO ()
+recordLookup = instrument lkup
+  where lkup hd@HD{ lookups=l } = hd{ lookups=l+1 }
+
+golden :: Int32
+golden = 1013904242
+
+hashInt32 :: Int32 -> Int32
+hashInt32 x = mulHi x golden + x
+
+hashInt :: Int -> Int32
+hashInt x = hashInt32 (fromIntegral x)
+
+mulHi :: Int32 -> Int32 -> Int32
+mulHi a b = fromIntegral (r `shiftR` 32)
+   where r :: Int64
+         r = fromIntegral a * fromIntegral b
+
+hashString :: String -> Int32
+hashString = foldl' f golden
+   where f m c = fromIntegral (ord c) * magic + hashInt32 m
+         magic = 0xdeadbeef

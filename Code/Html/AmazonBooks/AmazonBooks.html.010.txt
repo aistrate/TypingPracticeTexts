@@ -1,0 +1,30 @@
+    <style type="text/css">
+      <!--
+.navSprite,
+.navSaJs li.navSaMenuItem {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/01/gno/images/orangeBlue/navPackedSprites-US-16._V212310439_.png);
+}
+.navSpritePopoverH {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/01/gno/popover/sprites-h._V192570380_.gif);
+}
+.navSpritePopoverV {
+  background-image: url(http://g-ecx.images-amazon.com/images/G/01/gno/popover/sprites-v._V192570383_.gif);
+}
+#navbar .tiny,
+.navbar .tiny {
+  font-family: Arial, sans-serif;
+  font-size: x-small;
+}
+.nav_popover .header .l {
+  background: url(http://g-ecx.images-amazon.com/images/G/01/gno/popover/sprites-v._V192570383_.gif) -14px 0px no-repeat;
+}
+.nav_popover .header .r {
+  background: url(http://g-ecx.images-amazon.com/images/G/01/gno/popover/sprites-h._V192570380_.gif) 0px -14px no-repeat;
+}
+.nav_popover .header .c {
+  background: url(http://g-ecx.images-amazon.com/images/G/01/gno/popover/sprites-h._V192570380_.gif) 0px 0px repeat-x;
+}
+.nav_popover .footer .l {
+  background: url(http://g-ecx.images-amazon.com/images/G/01/gno/popover/sprites-h._V192570380_.gif) 0px -21px no-repeat;
+}
+.nav_popover .footer .r {

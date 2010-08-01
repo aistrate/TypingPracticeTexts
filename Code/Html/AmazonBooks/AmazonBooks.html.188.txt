@@ -1,0 +1,30 @@
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.fabric.com">
+                          Fabric<br/> <span class="navFooterDescText">
+                            Sewing, Quilting<br/> & Knitting
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.imdb.com">
+                          IMDb<br/> <span class="navFooterDescText">
+                            Movies, Films<br/> & Actors
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.shopbop.com/welcome">
+                          Shopbop<br/> <span class="navFooterDescText">
+                            Designer<br/> Fashion Brands
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.smallparts.com">

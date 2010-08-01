@@ -1,0 +1,49 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude #-}
+
+module Data.List
+   (
+#ifdef __NHC__
+     [] (..)
+   ,
+#endif
+
+     (++)
+   , head
+   , last
+   , tail
+   , init
+   , null
+   , length
+
+   , map
+   , reverse
+
+   , intersperse
+   , intercalate
+   , transpose
+   
+   , subsequences
+   , permutations
+
+   , foldl
+   , foldl'
+   , foldl1
+   , foldl1'
+   , foldr
+   , foldr1
+
+   , concat
+   , concatMap
+   , and
+   , or
+   , any
+   , all
+   , sum
+   , product
+   , maximum
+   , minimum
+
+   , scanl
+   , scanl1
+   , scanr
+   , scanr1

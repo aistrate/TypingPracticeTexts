@@ -1,0 +1,50 @@
+					GenerateStaticMethodCall("Compare", left, right),
+					Expression.Constant(0)
+				);
+			}
+			return Expression.GreaterThanOrEqual(left, right);
+		}
+
+		Expression GenerateLessThan(Expression left, Expression right)
+		{
+			if (left.Type == typeof(string))
+			{
+				return Expression.LessThan(
+					GenerateStaticMethodCall("Compare", left, right),
+					Expression.Constant(0)
+				);
+			}
+			return Expression.LessThan(left, right);
+		}
+
+		Expression GenerateLessThanEqual(Expression left, Expression right)
+		{
+			if (left.Type == typeof(string))
+			{
+				return Expression.LessThanOrEqual(
+					GenerateStaticMethodCall("Compare", left, right),
+					Expression.Constant(0)
+				);
+			}
+			return Expression.LessThanOrEqual(left, right);
+		}
+
+		Expression GenerateAdd(Expression left, Expression right)
+		{
+			if (left.Type == typeof(string) && right.Type == typeof(string))
+			{
+				return GenerateStaticMethodCall("Concat", left, right);
+			}
+			return Expression.Add(left, right);
+		}
+
+		Expression GenerateSubtract(Expression left, Expression right)
+		{
+			return Expression.Subtract(left, right);
+		}
+
+		Expression GenerateStringConcat(Expression left, Expression right)
+		{
+			return Expression.Call(
+				null,
+				typeof(string).GetMethod("Concat", new[] { typeof(object), typeof(object) }),

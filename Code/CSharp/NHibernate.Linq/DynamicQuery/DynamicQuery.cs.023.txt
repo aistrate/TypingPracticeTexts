@@ -1,0 +1,50 @@
+		{
+			int errorPos = token.pos;
+			NextToken();
+			Expression[] args = ParseArgumentList();
+			if (args.Length != 3)
+				throw ParseError(errorPos, Res.IifRequiresThreeArgs);
+			return GenerateConditional(args[0], args[1], args[2], errorPos);
+		}
+
+		Expression GenerateConditional(Expression test, Expression expr1, Expression expr2, int errorPos)
+		{
+			if (test.Type != typeof(bool))
+				throw ParseError(errorPos, Res.FirstExprMustBeBool);
+			if (expr1.Type != expr2.Type)
+			{
+				Expression expr1as2 = expr2 != nullLiteral ? PromoteExpression(expr1, expr2.Type, true) : null;
+				Expression expr2as1 = expr1 != nullLiteral ? PromoteExpression(expr2, expr1.Type, true) : null;
+				if (expr1as2 != null && expr2as1 == null)
+				{
+					expr1 = expr1as2;
+				}
+				else if (expr2as1 != null && expr1as2 == null)
+				{
+					expr2 = expr2as1;
+				}
+				else
+				{
+					string type1 = expr1 != nullLiteral ? expr1.Type.Name : "null";
+					string type2 = expr2 != nullLiteral ? expr2.Type.Name : "null";
+					if (expr1as2 != null && expr2as1 != null)
+						throw ParseError(errorPos, Res.BothTypesConvertToOther, type1, type2);
+					throw ParseError(errorPos, Res.NeitherTypeConvertsToOther, type1, type2);
+				}
+			}
+			return Expression.Condition(test, expr1, expr2);
+		}
+
+		Expression ParseNew()
+		{
+			NextToken();
+			ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
+			NextToken();
+			List<DynamicProperty> properties = new List<DynamicProperty>();
+			List<Expression> expressions = new List<Expression>();
+			while (true)
+			{
+				int exprPos = token.pos;
+				Expression expr = ParseExpression();
+				string propName;
+				if (TokenIdentifierIs("as"))

@@ -1,0 +1,99 @@
+		if ( s.global )
+			jQuery.event.trigger( "ajaxError", [xhr, s, e] );
+	},
+
+	active: 0,
+
+	httpSuccess: function( xhr ) {
+		try {
+			return !xhr.status && location.protocol == "file:" ||
+				( xhr.status >= 200 && xhr.status < 300 ) || xhr.status == 304 || xhr.status == 1223;
+		} catch(e){}
+		return false;
+	},
+
+	httpNotModified: function( xhr, url ) {
+		try {
+			var xhrRes = xhr.getResponseHeader("Last-Modified");
+
+			return xhr.status == 304 || xhrRes == jQuery.lastModified[url];
+		} catch(e){}
+		return false;
+	},
+
+	httpData: function( xhr, type, s ) {
+		var ct = xhr.getResponseHeader("content-type"),
+			xml = type == "xml" || !type && ct && ct.indexOf("xml") >= 0,
+			data = xml ? xhr.responseXML : xhr.responseText;
+
+		if ( xml && data.documentElement.tagName == "parsererror" )
+			throw "parsererror";
+			
+		if( s && s.dataFilter )
+			data = s.dataFilter( data, type );
+
+		if( typeof data === "string" ){
+
+			if ( type == "script" )
+				jQuery.globalEval( data );
+
+			if ( type == "json" )
+				data = window["eval"]("(" + data + ")");
+		}
+		
+		return data;
+	},
+
+	param: function( a ) {
+		var s = [ ];
+
+		function add( key, value ){
+			s[ s.length ] = encodeURIComponent(key) + '=' + encodeURIComponent(value);
+		};
+
+		if ( jQuery.isArray(a) || a.jquery )
+			jQuery.each( a, function(){
+				add( this.name, this.value );
+			});
+
+		else
+			for ( var j in a )
+				if ( jQuery.isArray(a[j]) )
+					jQuery.each( a[j], function(){
+						add( j, this );
+					});
+				else
+					add( j, jQuery.isFunction(a[j]) ? a[j]() : a[j] );
+
+		return s.join("&").replace(/%20/g, "+");
+	}
+
+});
+var elemdisplay = {},
+	timerId,
+	fxAttrs = [
+		[ "height", "marginTop", "marginBottom", "paddingTop", "paddingBottom" ],
+		[ "width", "marginLeft", "marginRight", "paddingLeft", "paddingRight" ],
+		[ "opacity" ]
+	];
+
+function genFx( type, num ){
+	var obj = {};
+	jQuery.each( fxAttrs.concat.apply([], fxAttrs.slice(0,num)), function(){
+		obj[ this ] = type;
+	});
+	return obj;
+}
+
+jQuery.fn.extend({
+	show: function(speed,callback){
+		if ( speed ) {
+			return this.animate( genFx("show", 3), speed, callback);
+		} else {
+			for ( var i = 0, l = this.length; i < l; i++ ){
+				var old = jQuery.data(this[i], "olddisplay");
+				
+				this[i].style.display = old || "";
+				
+				if ( jQuery.css(this[i], "display") === "none" ) {
+					var tagName = this[i].tagName, display;

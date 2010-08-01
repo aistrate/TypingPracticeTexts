@@ -1,0 +1,64 @@
+           -> IO CInt
+
+foreign import ccall unsafe "hsFD_SETSIZE"
+  c_fD_SETSIZE :: CInt
+
+fD_SETSIZE :: Fd
+fD_SETSIZE = fromIntegral c_fD_SETSIZE
+
+foreign import ccall unsafe "hsFD_ISSET"
+  c_fdIsSet :: CInt -> Ptr CFdSet -> IO CInt
+
+fdIsSet :: Fd -> Ptr CFdSet -> IO CInt
+fdIsSet (Fd fd) fdset = c_fdIsSet fd fdset
+
+foreign import ccall unsafe "hsFD_SET"
+  c_fdSet :: CInt -> Ptr CFdSet -> IO ()
+
+fdSet :: Fd -> Ptr CFdSet -> IO ()
+fdSet (Fd fd) fdset = c_fdSet fd fdset
+
+foreign import ccall unsafe "hsFD_ZERO"
+  fdZero :: Ptr CFdSet -> IO ()
+
+foreign import ccall unsafe "sizeof_fd_set"
+  sizeofFdSet :: Int
+
+#endif
+
+reportStackOverflow :: IO a
+reportStackOverflow = do callStackOverflowHook; return undefined
+
+reportError :: SomeException -> IO a
+reportError ex = do
+   handler <- getUncaughtExceptionHandler
+   handler ex
+   return undefined
+
+foreign import ccall unsafe "stackOverflow"
+        callStackOverflowHook :: IO ()
+
+{-# NOINLINE uncaughtExceptionHandler #-}
+uncaughtExceptionHandler :: IORef (SomeException -> IO ())
+uncaughtExceptionHandler = unsafePerformIO (newIORef defaultHandler)
+   where
+      defaultHandler :: SomeException -> IO ()
+      defaultHandler se@(SomeException ex) = do
+         (hFlush stdout) `catchAny` (\ _ -> return ())
+         let msg = case cast ex of
+               Just Deadlock -> "no threads to run:  infinite loop or deadlock?"
+               _ -> case cast ex of
+                    Just (ErrorCall s) -> s
+                    _                  -> showsPrec 0 se ""
+         withCString "%s" $ \cfmt ->
+          withCString msg $ \cmsg ->
+            errorBelch cfmt cmsg
+
+foreign import ccall unsafe "HsBase.h errorBelch2"
+   errorBelch :: CString -> CString -> IO ()
+
+setUncaughtExceptionHandler :: (SomeException -> IO ()) -> IO ()
+setUncaughtExceptionHandler = writeIORef uncaughtExceptionHandler
+
+getUncaughtExceptionHandler :: IO (SomeException -> IO ())
+getUncaughtExceptionHandler = readIORef uncaughtExceptionHandler

@@ -1,0 +1,49 @@
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses Group By to return two sequences of products. " +
+					 "The first sequence contains products with unit price " +
+					 "greater than 10. The second sequence contains products " +
+					 "with unit price less than or equal to 10.")]
+		public void DLinq51()
+		{
+			var categories =
+				from p in db.Products
+				group p by new { Criterion = p.UnitPrice > 10 }
+					into g
+					select g;
+
+			ObjectDumper.Write(categories, 1);
+		}
+
+		#endregion Group By Methods
+
+		#region Exists/In/Any/All Methods
+
+		[Category("EXISTS/IN/ANY/ALL")]
+		[Test(Description = "This sample uses Any to return only Customers that have no Orders.")]
+		public void DLinq52()
+		{
+			var q =
+				from c in db.Customers
+				where !c.Orders.Cast<Order>().Any()
+				select c;
+
+			ObjectDumper.Write(q);
+
+			foreach (Customer c in q)
+				Assert.IsTrue(!c.Orders.Cast<Order>().Any());
+		}
+
+		[Category("EXISTS/IN/ANY/ALL")]
+		[Test(Description = "This sample uses Any to return only Customers that have Orders.")]
+		public void DLinq52b()
+		{
+			var q =
+				from c in db.Customers
+				where c.Orders.Cast<Order>().Any()
+				select c;
+
+			ObjectDumper.Write(q);
+
+			foreach (Customer c in q)
+				Assert.IsTrue(c.Orders.Cast<Order>().Any());
+		}

@@ -1,0 +1,100 @@
+                       Nothing -> glue l r
+
+updateLookupWithKey :: Ord k => (k -> a -> Maybe a) -> k -> Map k a -> (Maybe a,Map k a)
+updateLookupWithKey f k t
+  = case t of
+      Tip -> (Nothing,Tip)
+      Bin sx kx x l r 
+          -> case compare k kx of
+               LT -> let (found,l') = updateLookupWithKey f k l in (found,balance kx x l' r)
+               GT -> let (found,r') = updateLookupWithKey f k r in (found,balance kx x l r') 
+               EQ -> case f kx x of
+                       Just x' -> (Just x',Bin sx kx x' l r)
+                       Nothing -> (Just x,glue l r)
+
+alter :: Ord k => (Maybe a -> Maybe a) -> k -> Map k a -> Map k a
+alter f k t
+  = case t of
+      Tip -> case f Nothing of
+               Nothing -> Tip
+               Just x -> singleton k x
+      Bin sx kx x l r 
+          -> case compare k kx of
+               LT -> balance kx x (alter f k l) r
+               GT -> balance kx x l (alter f k r)
+               EQ -> case f (Just x) of
+                       Just x' -> Bin sx kx x' l r
+                       Nothing -> glue l r
+
+findIndex :: Ord k => k -> Map k a -> Int
+findIndex k t
+  = case lookupIndex k t of
+      Nothing  -> error "Map.findIndex: element is not in the map"
+      Just idx -> idx
+
+lookupIndex :: Ord k => k -> Map k a -> Maybe Int
+lookupIndex k t = f 0 t
+  where
+    f _   Tip  = Nothing
+    f idx (Bin _ kx _ l r)
+      = case compare k kx of
+          LT -> f idx l
+          GT -> f (idx + size l + 1) r 
+          EQ -> Just (idx + size l)
+
+elemAt :: Int -> Map k a -> (k,a)
+elemAt _ Tip = error "Map.elemAt: index out of range"
+elemAt i (Bin _ kx x l r)
+  = case compare i sizeL of
+      LT -> elemAt i l
+      GT -> elemAt (i-sizeL-1) r
+      EQ -> (kx,x)
+  where
+    sizeL = size l
+
+updateAt :: (k -> a -> Maybe a) -> Int -> Map k a -> Map k a
+updateAt _ _ Tip  = error "Map.updateAt: index out of range"
+updateAt f i (Bin sx kx x l r)
+  = case compare i sizeL of
+      LT -> balance kx x (updateAt f i l) r
+      GT -> balance kx x l (updateAt f (i-sizeL-1) r)
+      EQ -> case f kx x of
+              Just x' -> Bin sx kx x' l r
+              Nothing -> glue l r
+  where
+    sizeL = size l
+
+deleteAt :: Int -> Map k a -> Map k a
+deleteAt i m
+  = updateAt (\_ _ -> Nothing) i m
+
+findMin :: Map k a -> (k,a)
+findMin (Bin _ kx x Tip _)  = (kx,x)
+findMin (Bin _ _  _ l _)    = findMin l
+findMin Tip                 = error "Map.findMin: empty map has no minimal element"
+
+findMax :: Map k a -> (k,a)
+findMax (Bin _ kx x _ Tip)  = (kx,x)
+findMax (Bin _ _  _ _ r)    = findMax r
+findMax Tip                 = error "Map.findMax: empty map has no maximal element"
+
+deleteMin :: Map k a -> Map k a
+deleteMin (Bin _ _  _ Tip r)  = r
+deleteMin (Bin _ kx x l r)    = balance kx x (deleteMin l) r
+deleteMin Tip                 = Tip
+
+deleteMax :: Map k a -> Map k a
+deleteMax (Bin _ _  _ l Tip)  = l
+deleteMax (Bin _ kx x l r)    = balance kx x l (deleteMax r)
+deleteMax Tip                 = Tip
+
+updateMin :: (a -> Maybe a) -> Map k a -> Map k a
+updateMin f m
+  = updateMinWithKey (\_ x -> f x) m
+
+updateMax :: (a -> Maybe a) -> Map k a -> Map k a
+updateMax f m
+  = updateMaxWithKey (\_ x -> f x) m
+
+updateMinWithKey :: (k -> a -> Maybe a) -> Map k a -> Map k a
+updateMinWithKey f t

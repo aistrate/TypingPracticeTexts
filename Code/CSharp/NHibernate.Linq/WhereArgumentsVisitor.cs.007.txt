@@ -1,0 +1,58 @@
+			{
+				var arg = (LambdaExpression)LinqUtil.StripQuotes(expr.Arguments[1]);
+				string alias = arg.Parameters[0].Name;
+
+				DetachedCriteria subquery = query.CreateCriteria(propertyName, alias);
+
+				var temp = new WhereArgumentsVisitor(subquery.Adapt(session), session);
+				temp.Visit(arg.Body);
+
+				foreach (ICriterion c in temp.CurrentCriterions)
+				{
+					subquery.Add(c);
+				}
+			}
+
+			string identifierName = rootEntity.GetAliasedIdentifierPropertyName();
+			return Subqueries.PropertyIn(identifierName, query);
+		}
+
+		private ICriterion GetLikeCriteria(MethodCallExpression expr, MatchMode matchMode)
+		{
+			return Restrictions.Like(MemberNameVisitor.GetMemberName(rootCriteria, expr.Object),
+									 String.Format("{0}", QueryUtil.GetExpressionValue(expr.Arguments[0])),
+									 matchMode);
+		}
+
+		private ICriterion GetCollectionContainsCriteria(CollectionAccessExpression arg, Expression containsExpression)
+		{
+			EntityExpression rootEntity = EntityExpressionVisitor.FirstEntity(arg);
+
+			DetachedCriteria query = DetachedCriteria.For(rootEntity.Type)
+				.SetProjection(Projections.Id());
+
+			var visitor = new MemberNameVisitor(query.Adapt(session), true);
+			visitor.Visit(arg);
+
+			var containedEntity = QueryUtil.GetExpressionValue(containsExpression);
+			var collectionIdPropertyName = visitor.MemberName + "." + arg.ElementExpression.MetaData.IdentifierPropertyName;
+			var idValue = arg.ElementExpression.MetaData.GetIdentifier(containedEntity, EntityMode.Poco);
+
+			query.Add(Restrictions.Eq(collectionIdPropertyName, idValue));
+
+			string identifierName = rootEntity.MetaData.IdentifierPropertyName;
+			return Subqueries.PropertyIn(identifierName, query);
+		}
+
+		private ICriterion GetCollectionContainsCriteria(Expression list, Expression containedExpr)
+		{
+			var values = QueryUtil.GetExpressionValue(list) as ICollection;
+
+			if (values == null)
+				throw new InvalidOperationException("Expression argument must be of type ICollection.");
+
+			return Restrictions.In(MemberNameVisitor.GetMemberName(rootCriteria, containedExpr),
+									   values);
+		}
+	}
+}

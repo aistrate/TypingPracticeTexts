@@ -1,0 +1,50 @@
+		[Test]
+		public void UsersWithDynamicInvokedExpression()
+		{
+			Expression<Func<User, bool>> expr1 = u => u.Name == "ayende";
+			Expression<Func<User, bool>> expr2 = u => u.Name == "rahien";
+
+			var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
+			var dynamicWhereClause = Expression.Lambda<Func<User, bool>>
+				  (Expression.OrElse(expr1.Body, invokedExpr), expr1.Parameters);
+
+			var query = session.Linq<User>().Where(dynamicWhereClause).ToList();
+
+			CollectionAssert.AreCountEqual(2, query);
+		}
+
+		[Test]
+		public void UsersWithComponentProperties()
+		{
+			var query = from user in session.Linq<User>()
+						where user.Component.Property1 == "test1"
+						select user;
+
+			var list = query.ToList();
+			CollectionAssert.AreCountEqual(1, list);
+		}
+
+		[Test]
+		public void UsersWithNestedComponentProperties()
+		{
+			var query = from user in session.Linq<User>()
+						where user.Component.OtherComponent.OtherProperty1 == "othertest1"
+						select user;
+
+			var list = query.ToList();
+			CollectionAssert.AreCountEqual(1, list);
+		}
+
+		[Test]
+		public void UsersWithAssociatedEntityProperties()
+		{
+			var query = from user in session.Linq<User>()
+						where user.Role.Name == "Admin" && user.Role.IsActive
+						select new { user.Name, RoleName = user.Role.Name };
+
+			var list = query.ToList();
+			CollectionAssert.AreCountEqual(1, list);
+		}
+
+		[Test]
+		public void UsersWithEntityPropertiesThreeLevelsDeep()

@@ -1,0 +1,49 @@
+		{
+			var query = from user in session.Linq<User>()
+						where user.Role.Entity.Output != null
+						select new
+						{
+							user.Name,
+							RoleName = user.Role.Name,
+							Output = user.Role.Entity.Output
+						};
+
+			var list = query.ToList();
+			CollectionAssert.AreCountEqual(1, list);
+		}
+
+		[Test]
+		public void UsersWithoutRole()
+		{
+			var query = from user in session.Linq<User>()
+						where user.Role == null
+						select new { user.Name, RoleName = user.Role.Name };
+
+			var list = query.ToList();
+			CollectionAssert.AreCountEqual(1, list);
+		}
+
+		[Test]
+		public void UsersWithRole()
+		{
+			var query = from user in session.Linq<User>()
+						where user.Role != null
+						select new { user.Name, RoleName = user.Role.Name };
+
+			var list = query.ToList();
+			CollectionAssert.AreCountEqual(2, list);
+		}
+
+		[Test]
+		public void UsersWithStringContains()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.Name.Contains("yend")
+						 select user).ToList();
+			Assert.AreEqual(1, query.Count);
+		}
+
+		[Test]
+		public void UsersWithArrayContains()
+		{
+			var names = new string[] { "ayende", "rahien" };

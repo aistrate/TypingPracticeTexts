@@ -1,0 +1,49 @@
+					list = new List<Expression>(n);
+					for (int j = 0; j < i; j++)
+					{
+						list.Add(original[j]);
+					}
+					list.Add(p);
+				}
+			}
+
+			if (list != null)
+				return list.AsReadOnly();
+
+			return original;
+		}
+
+		protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment assignment)
+		{
+			Expression e = Visit(assignment.Expression);
+
+			if (e != assignment.Expression)
+			{
+				return Expression.Bind(assignment.Member, e);
+			}
+
+			return assignment;
+		}
+
+		protected virtual MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding binding)
+		{
+			IEnumerable<MemberBinding> bindings = VisitBindingList(binding.Bindings);
+
+			if (bindings != binding.Bindings)
+			{
+				return Expression.MemberBind(binding.Member, bindings);
+			}
+
+			return binding;
+		}
+
+		protected virtual MemberListBinding VisitMemberListBinding(MemberListBinding binding)
+		{
+			IEnumerable<ElementInit> initializers = VisitElementInitializerList(binding.Initializers);
+
+			if (initializers != binding.Initializers)
+			{
+				return Expression.ListBind(binding.Member, initializers);
+			}
+			return binding;
+		}

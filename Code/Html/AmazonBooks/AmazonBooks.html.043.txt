@@ -1,0 +1,30 @@
+              <ul>
+                <li>
+                  <a href="/s/ref=bhp_bb0309A_childbaby3?ie=UTF8&rh=n%3A4%2Cp_n_age_range%3A673421011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Babies &amp; Toddlers</a>
+                </li>
+                <li>
+                  <a href="/s/ref=amb_link_86403691_40?ie=UTF8&rh=n%3A4%2Cp_n_age_range%3A673422011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Ages 4-8</a>
+                </li>
+                <li>
+                  <a href="/s/ref=bhp_bb0309A_childnine3?ie=UTF8&rh=n%3A4%2Cp_n_age_range%3A673423011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Ages 9-12</a>
+                </li>
+                <li>
+                  <a href="/b/ref=bhp_bb0309A_childawards3?ie=UTF8&node=2241972011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Children's Book Awards</a>
+                </li>
+                <li>
+                  <a href="/Childrens-Books/b/ref=bhp_bb0309A_childall3?ie=UTF8&node=4&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">All Children's Books</a>
+                </li>
+              </ul>
+              <h3>Bargain Books</h3>
+              <ul>
+                <li>
+                  <a href="/Childrens-Book-Sale/b/ref=bhp_bb0309A_bargainfour4?ie=UTF8&node=220084011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">4-for-3 Books</a>
+                </li>
+                <li>
+                  <a href="/exec/obidos/tg/feature/-/568126/ref=bhp_bb0309A_bargainformer4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Former Bestsellers</a>
+                </li>
+                <li>
+                  <a href="/exec/obidos/tg/feature/-/550066/ref=bhp_bb0309A_bargainunderfive4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Under $5</a>
+                </li>
+                <li>
+                  <a href="/exec/obidos/tg/feature/-/550051/ref=bhp_bb0309A_bargainunderten4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=browse&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264183682&pf_rd_i=283155">Under $10</a>

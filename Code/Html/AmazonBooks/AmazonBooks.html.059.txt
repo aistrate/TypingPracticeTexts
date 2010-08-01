@@ -1,0 +1,30 @@
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Sizzling-Sixteen-Stephanie-Janet-Evanovich/dp/0312383304/ref=pd_ts_zgc_b_books_8_i?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Sizzling Sixteen (Stephanie Plum)">
+                              <img src="http://ecx.images-amazon.com/images/I/51qdT2FLyRL._SL75_.jpg" alt="Sizzling Sixteen" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">8.</span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">90 days in the top 100</span>
+                            </div>
+                            <a href="http://www.amazon.com/Sizzling-Sixteen-Stephanie-Janet-Evanovich/dp/0312383304/ref=pd_ts_zgc_b_books_8?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Sizzling Sixteen (Stephanie Plum)" class="titleLink">Sizzling Sixteen (Stephanie Plum)</a>
+                            <div class="tiny byline">
+                              <span class="carat">&#8250</span>
+                              <a href="/Janet-Evanovich/e/B000APXTY4/ref=zg_ch_by_1">Janet Evanovich</a>
+                            </div>
+                            <div class="platformBinding">Hardcover</div>
+                            <div class="priceBlock ">
+                              <span class="listprice">$27.99</span>
+                              <strong class="price">$14.83</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">

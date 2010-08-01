@@ -1,0 +1,99 @@
+				if (keys[i] == null)
+				{
+					
+				}
+				else
+				{
+					obj = session.PersistenceContext.GetEntity(key);
+					if (obj != null)
+					{
+						InstanceAlreadyLoaded(rs, i, persisters[i], key, obj, lockModes[i], session);
+					}
+					else
+					{
+						obj =
+							InstanceNotYetLoaded(rs, i, persisters[i], key, lockModes[i], optionalObjectKey, optionalObject, hydratedObjects,
+							                     session);
+					}
+				}
+
+				rowResults[i] = obj;
+			}
+			return rowResults;
+		}
+
+		private void InstanceAlreadyLoaded(
+			IDataReader rs,
+			int i,
+			ILoadable persister,
+			EntityKey key,
+			object obj,
+			LockMode lockMode,
+			ISessionImplementor session)
+		{
+			if (!persister.IsInstance(obj, session.EntityMode))
+			{
+				string errorMsg = string.Format("loading object was of wrong class [{0}]", obj.GetType().FullName);
+				throw new WrongClassException(errorMsg, key.Identifier, persister.EntityName);
+			}
+
+			if (LockMode.None != lockMode && UpgradeLocks())
+			{
+				if (persister.IsVersioned && session.PersistenceContext.GetEntry(obj).LockMode.LessThan(lockMode))
+				{
+					CheckVersion(i, persister, key.Identifier, session.PersistenceContext.GetEntry(obj).Version, rs, session);
+					session.PersistenceContext.GetEntry(obj).LockMode= lockMode;
+				}
+			}
+		}
+
+		private object InstanceNotYetLoaded(IDataReader dr, int i, ILoadable persister, EntityKey key, LockMode lockMode,
+		                                    EntityKey optionalObjectKey, object optionalObject, IList hydratedObjects,
+		                                    ISessionImplementor session)
+		{
+			object obj;
+
+			string instanceClass = GetInstanceClass(dr, i, persister, key.Identifier, session);
+
+			if (optionalObjectKey != null && key.Equals(optionalObjectKey))
+			{
+				obj = optionalObject;
+			}
+			else
+			{
+				obj = session.Instantiate(instanceClass, key.Identifier);
+			}
+
+			LockMode acquiredLockMode = lockMode == LockMode.None ? LockMode.Read : lockMode;
+			LoadFromResultSet(dr, i, obj, instanceClass, key, acquiredLockMode, persister, session);
+
+			hydratedObjects.Add(obj);
+
+			return obj;
+		}
+
+		private void LoadFromResultSet(IDataReader rs, int i, object obj, string instanceClass,
+			EntityKey key, LockMode lockMode, ILoadable rootPersister, ISessionImplementor session)
+		{
+			object id = key.Identifier;
+
+			ILoadable persister = (ILoadable) Factory.GetEntityPersister(instanceClass);
+
+			if (log.IsDebugEnabled)
+			{
+				log.Debug("Initializing object from DataReader: " + MessageHelper.InfoString(persister, id));
+			}
+
+			TwoPhaseLoad.AddUninitializedEntity(key, obj, persister, lockMode, false, session);
+
+			string[][] cols = persister == rootPersister
+			                  	? EntityAliases[i].SuffixedPropertyAliases
+			                  	: EntityAliases[i].GetSuffixedPropertyAliases(persister);
+
+			object[] values = persister.Hydrate(rs, id, obj, rootPersister, cols, true, session);
+
+			TwoPhaseLoad.PostHydrate(persister, id, values, obj, lockMode, false, session);
+		}
+
+		private string GetInstanceClass(IDataReader rs, int i, ILoadable persister, object id, ISessionImplementor session)
+		{

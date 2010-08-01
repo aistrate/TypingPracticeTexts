@@ -1,0 +1,30 @@
+      closeTanDown: 'http://g-ecx.images-amazon.com/images/G/01/nav2/images/close-tan-sm-dn._V192185961_.gif',
+      loadingBar: 'http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/loading-bar-small._V192188123_.gif',
+      pixel: 'http://g-ecx.images-amazon.com/images/G/01/icons/blank-pixel._V192192429_.gif'
+      };
+      var container = document.createElement("DIV");
+      container.id = "ap_container";
+      if (document.body.childNodes.length) {
+      document.body.insertBefore(container, document.body.childNodes[0]);
+      } else {
+      document.body.appendChild(container);
+      }
+    </script>
+    <script type="text/javascript" src="http://z-ecx.images-amazon.com/images/G/01/browser-scripts/site-wide/us-site-wide-3364699973.js._V191146763_.js"></script>
+    <script type='text/javascript'>
+      amznJQ.addLogical('navbarCSSUSSA185', []);
+      amznJQ.addLogical('navbarJS-jQuery', []);
+      amznJQ.addLogical('search-js-autocomplete', []);
+      amznJQ.addLogical('popover', []);
+      amznJQ.addLogical('amazonShoveler', ["http://z-ecx.images-amazon.com/images/G/01/nav2/gamma/amazonShoveler/amazonShoveler-amazonShoveler-19493.js._V191715860_.js"]);
+      amznJQ.addLogical('amzn-ratings-bar', ["http://z-ecx.images-amazon.com/images/G/01/x-locale/personalization/yourstore/js/ratings-bar-ns-366177._V204593667_.js"]);
+      amznJQ.addLogical('websiteGridCSS', []);
+      amznJQ.addLogical('clientLog', []);
+      amznJQ.addLogical('s9widget', []);
+      amznJQ.addLogical('s9shoveler', ["http://z-ecx.images-amazon.com/images/G/01/s9-campaigns/amazonShovelerTreatmentRedesign-min._V210724868_.js"]);
+    </script>
+    <script type="text/javascript">
+      amznJQ.addLogical('ClientLogImpl', ["http://z-ecx.images-amazon.com/images/G/01/wma/clog/clog-platform._V213973670_.js"]);
+      var CLOG_Scaffold = {
+      _spArgs : [], _sArgs : [], debugCallbacks : [],
+      version : '1.0.1',

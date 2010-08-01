@@ -1,0 +1,49 @@
+module Data.Traversable (
+        Traversable(..),
+        for,
+        forM,
+        mapAccumL,
+        mapAccumR,
+        fmapDefault,
+        foldMapDefault,
+        ) where
+
+import Prelude hiding (mapM, sequence, foldr)
+import qualified Prelude (mapM, foldr)
+import Control.Applicative
+import Data.Foldable (Foldable())
+import Data.Monoid (Monoid)
+
+#if defined(__GLASGOW_HASKELL__)
+import GHC.Arr
+#elif defined(__HUGS__)
+import Hugs.Array
+#elif defined(__NHC__)
+import Array
+#endif
+
+class (Functor t, Foldable t) => Traversable t where
+        traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
+        traverse f = sequenceA . fmap f
+
+        sequenceA :: Applicative f => t (f a) -> f (t a)
+        sequenceA = traverse id
+
+        mapM :: Monad m => (a -> m b) -> t a -> m (t b)
+        mapM f = unwrapMonad . traverse (WrapMonad . f)
+
+        sequence :: Monad m => t (m a) -> m (t a)
+        sequence = mapM id
+
+instance Traversable Maybe where
+        traverse _ Nothing = pure Nothing
+        traverse f (Just x) = Just <$> f x
+
+instance Traversable [] where
+        traverse f = Prelude.foldr cons_f (pure [])
+          where cons_f x ys = (:) <$> f x <*> ys
+
+        mapM = Prelude.mapM
+
+instance Ix i => Traversable (Array i) where
+        traverse f arr = listArray (bounds arr) `fmap` traverse f (elems arr)

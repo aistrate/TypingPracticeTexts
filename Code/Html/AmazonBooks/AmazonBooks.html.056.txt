@@ -1,0 +1,30 @@
+                            <a href="http://www.amazon.com/Overton-Window-Glenn-Beck/dp/1439184305/ref=pd_ts_zgc_b_books_5_i?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Overton Window">
+                              <img src="http://ecx.images-amazon.com/images/I/51RgGGWILPL._SL75_PIsitb-sticker-arrow-st,TopRight,8,-14_OU01_.jpg" alt="The Overton" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">5.</span>
+                              <span class="arrowSprite arrowDown_s " title="Ranking has gone down in the past 24 hours" >
+                                <span>Ranking has gone down in the past 24 hours</span>
+                              </span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">42 days in the top 100</span>
+                            </div>
+                            <a href="http://www.amazon.com/Overton-Window-Glenn-Beck/dp/1439184305/ref=pd_ts_zgc_b_books_5?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Overton Window" class="titleLink">The Overton Window</a>
+                            <div class="tiny byline">
+                              <span class="carat">&#8250</span>
+                              <a href="/Glenn-Beck/e/B001IQUMVM/ref=zg_ch_by_1">Glenn Beck</a>
+                            </div>
+                            <div class="platformBinding">Hardcover</div>
+                            <div class="priceBlock ">
+                              <span class="listprice">$26.00</span>
+                              <strong class="price">$14.03</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">

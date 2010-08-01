@@ -1,0 +1,50 @@
+        , writeTVar
+        , unsafeIOToSTM
+
+#ifdef mingw32_HOST_OS
+        , asyncRead
+        , asyncWrite
+        , asyncDoProc
+
+        , asyncReadBA
+        , asyncWriteBA
+#endif
+
+#ifndef mingw32_HOST_OS
+        , signalHandlerLock
+#endif
+
+        , ensureIOManagerIsRunning
+
+#ifdef mingw32_HOST_OS
+        , ConsoleEvent(..)
+        , win32ConsoleHandler
+        , toWin32ConsoleEvent
+#endif
+        , setUncaughtExceptionHandler
+        , getUncaughtExceptionHandler
+
+        , reportError, reportStackOverflow
+        ) where
+
+import System.Posix.Types
+#ifndef mingw32_HOST_OS
+import System.Posix.Internals
+#endif
+import Foreign
+import Foreign.C
+
+import Data.Maybe
+
+import GHC.Base
+import {-# SOURCE #-} GHC.Handle
+import GHC.IOBase
+import GHC.Num          ( Num(..) )
+import GHC.Real         ( fromIntegral )
+#ifdef mingw32_HOST_OS
+import GHC.Real         ( div )
+import GHC.Ptr          ( plusPtr, FunPtr(..) )
+#endif
+#ifdef mingw32_HOST_OS
+import GHC.Read         ( Read )
+import GHC.Enum         ( Enum )

@@ -1,0 +1,49 @@
+					 "to find the number of Products in each CategoryID " +
+					 "that are not discontinued.")]
+		public void DLinq48b()
+		{
+			var q =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								g.Key,
+								NumProducts = g.Count(p => !p.Discontinued)
+							};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses a where clause after a group by clause " +
+					 "to find all categories that have at least 10 products.")]
+		public void DLinq49()
+		{
+			var q =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					where g.Count() >= 10
+					select new
+							{
+								g.Key,
+								ProductCount = g.Count()
+							};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses Group By to group products by CategoryID and SupplierID.")]
+		[Ignore("TODO")]
+		public void DLinq50()
+		{
+			var categories =
+				from p in db.Products
+				group p by new { p.Category.CategoryID, p.Supplier.SupplierID }
+					into g
+					select new { g.Key, g };
+
+			ObjectDumper.Write(categories, 1);
+		}

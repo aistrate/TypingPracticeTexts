@@ -1,0 +1,50 @@
+      k c x = do c' <- c
+                 x' <- f x
+                 return (c' x')
+
+  gmapMp :: MonadPlus m => (forall d. Data d => d -> m d) -> a -> m a
+
+  gmapMp f x = unMp (gfoldl k z x) >>= \(x',b) ->
+                if b then return x' else mzero
+    where
+      z g = Mp (return (g,False))
+      k (Mp c) y
+        = Mp ( c >>= \(h, b) ->
+                 (f y >>= \y' -> return (h y', True))
+                 `mplus` return (h y, b)
+             )
+
+  gmapMo :: MonadPlus m => (forall d. Data d => d -> m d) -> a -> m a
+
+  gmapMo f x = unMp (gfoldl k z x) >>= \(x',b) ->
+                if b then return x' else mzero
+    where
+      z g = Mp (return (g,False))
+      k (Mp c) y
+        = Mp ( c >>= \(h,b) -> if b
+                        then return (h y, b)
+                        else (f y >>= \y' -> return (h y',True))
+                             `mplus` return (h y, b)
+             )
+
+newtype ID x = ID { unID :: x }
+
+newtype CONST c a = CONST { unCONST :: c }
+
+data Qi q a = Qi Int (Maybe q)
+
+newtype Qr r a = Qr { unQr  :: r -> r }
+
+newtype Mp m x = Mp { unMp :: m (x, Bool) }
+
+fromConstr :: Data a => Constr -> a
+fromConstr = fromConstrB undefined
+
+fromConstrB :: Data a
+            => (forall d. Data d => d)
+            -> Constr
+            -> a
+fromConstrB f = unID . gunfold k z
+ where
+  k c = ID (unID c f)
+  z = ID

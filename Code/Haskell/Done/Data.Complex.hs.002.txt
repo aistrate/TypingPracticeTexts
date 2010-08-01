@@ -1,0 +1,50 @@
+{-# SPECIALISE cis :: Double -> Complex Double #-}
+cis              :: (RealFloat a) => a -> Complex a
+cis theta        =  cos theta :+ sin theta
+
+{-# SPECIALISE polar :: Complex Double -> (Double,Double) #-}
+polar            :: (RealFloat a) => Complex a -> (a,a)
+polar z          =  (magnitude z, phase z)
+
+{-# SPECIALISE magnitude :: Complex Double -> Double #-}
+magnitude :: (RealFloat a) => Complex a -> a
+magnitude (x:+y) =  scaleFloat k
+                     (sqrt (sqr (scaleFloat mk x) + sqr (scaleFloat mk y)))
+                    where k  = max (exponent x) (exponent y)
+                          mk = - k
+                          sqr z = z * z
+
+{-# SPECIALISE phase :: Complex Double -> Double #-}
+phase :: (RealFloat a) => Complex a -> a
+phase (0 :+ 0)   = 0
+phase (x:+y)     = atan2 y x
+
+#include "Typeable.h"
+INSTANCE_TYPEABLE1(Complex,complexTc,"Complex")
+
+instance  (RealFloat a) => Num (Complex a)  where
+    {-# SPECIALISE instance Num (Complex Float) #-}
+    {-# SPECIALISE instance Num (Complex Double) #-}
+    (x:+y) + (x':+y')   =  (x+x') :+ (y+y')
+    (x:+y) - (x':+y')   =  (x-x') :+ (y-y')
+    (x:+y) * (x':+y')   =  (x*x'-y*y') :+ (x*y'+y*x')
+    negate (x:+y)       =  negate x :+ negate y
+    abs z               =  magnitude z :+ 0
+    signum (0:+0)       =  0
+    signum z@(x:+y)     =  x/r :+ y/r  where r = magnitude z
+    fromInteger n       =  fromInteger n :+ 0
+#ifdef __HUGS__
+    fromInt n           =  fromInt n :+ 0
+#endif
+
+instance  (RealFloat a) => Fractional (Complex a)  where
+    {-# SPECIALISE instance Fractional (Complex Float) #-}
+    {-# SPECIALISE instance Fractional (Complex Double) #-}
+    (x:+y) / (x':+y')   =  (x*x''+y*y'') / d :+ (y*x''-x*y'') / d
+                           where x'' = scaleFloat k x'
+                                 y'' = scaleFloat k y'
+                                 k   = - max (exponent x') (exponent y')
+                                 d   = x'*x'' + y'*y''
+
+    fromRational a      =  fromRational a :+ 0
+#ifdef __HUGS__

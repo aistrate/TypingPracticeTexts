@@ -1,0 +1,50 @@
+            Utility.ScrollToBottom(hdnScrollToBottom);
+        }
+        catch (Exception ex) { displayError(ex); }
+    }
+
+    private void displayFutureValueBeforeAdjust()
+    {
+        lblFutureValueBeforeAdjust.Text = FinancialPlannerAdapter.GetFutureValueDisplayString(
+                                                                InterestRatePerYear, PresentValue, DepositPerYear, YearsLeft);
+        lblEndOfPeriod.Text = DateTime.Today.AddYears(YearsLeft).ToString("MMMM yyyy");
+    }
+
+    private void displayChanceOfMeetingTarget()
+    {
+        lblChanceOfMeetingTarget.Text = string.Format("{0:0.0#} %", InvestmentScenario.ChanceOfMeetingTarget * 100m);
+        
+        pnlTrafficLight.Visible = true;
+        TrafficLightValue = InvestmentScenario.ChanceOfMeetingTarget;
+    }
+
+    private void displayExtras()
+    {
+        switch (ExtrasSelectedIndex)
+        {
+            case 0:
+                lblProposedPeriodical.Text = FinancialPlannerAdapter.FormatCurrency(ProposedPeriodical);
+                lblProposedInitial.Text = FinancialPlannerAdapter.FormatCurrency(ProposedInitial);
+                break;
+
+            case 1:
+                decimal proposedPeriodical = Math.Ceiling(ProposedPeriodical);
+                decimal proposedInitial = Math.Ceiling(ProposedInitial);
+
+                lblExtraPeriodicalMax.Text = proposedPeriodical.ToString("#,##0");
+                lblExtraInitialMax.Text = proposedInitial.ToString("#,##0");
+                sldExtraPeriodical.Maximum = (double)proposedPeriodical;
+                sldExtraInitial.Maximum = (double)proposedInitial;
+
+                if (IsSliderReset)
+                {
+                    IsSliderReset = false;
+                }
+                displayFutureValueAfterAdjust();
+                break;
+        }
+    }
+
+    private void displayFutureValueAfterAdjust()
+    {
+        lblFutureValueAfterAdjust.Text = FinancialPlannerAdapter.GetFutureValueDisplayString(

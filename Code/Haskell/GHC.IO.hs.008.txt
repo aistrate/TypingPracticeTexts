@@ -1,0 +1,50 @@
+   shoveString n (c:cs) = do
+        n' <- writeCharIntoBuffer raw n c
+        if (c == '\n') 
+         then do 
+              new_buf <- commitBuffer hdl raw len n' True False
+              writeLines hdl new_buf cs
+         else 
+              shoveString n' cs
+  in
+  shoveString 0 s
+
+writeBlocks :: Handle -> Buffer -> String -> IO ()
+writeBlocks hdl Buffer{ bufBuf=raw, bufSize=len } s =
+  let
+   shoveString :: Int -> [Char] -> IO ()
+   shoveString n cs | n == len = do
+        new_buf <- commitBuffer hdl raw len n True False
+        writeBlocks hdl new_buf cs
+   shoveString n [] = do
+        commitBuffer hdl raw len n False True
+        return ()
+   shoveString n (c:cs) = do
+        n' <- writeCharIntoBuffer raw n c
+        shoveString n' cs
+  in
+  shoveString 0 s
+
+commitBuffer
+        :: Handle
+        -> RawBuffer -> Int
+        -> Int
+        -> Bool
+        -> Bool
+        -> IO Buffer
+
+commitBuffer hdl raw sz@(I# _) count@(I# _) flush release = do
+  wantWritableHandle "commitAndReleaseBuffer" hdl $
+     commitBuffer' raw sz count flush release
+
+commitBuffer' :: RawBuffer -> Int -> Int -> Bool -> Bool -> Handle__
+              -> IO Buffer
+commitBuffer' raw sz@(I# _) count@(I# _) flush release
+  handle_@Handle__{ haFD=fd, haBuffer=ref, haBuffers=spare_buf_ref } = do
+
+#ifdef DEBUG_DUMP
+      puts ("commitBuffer: sz=" ++ show sz ++ ", count=" ++ show count
+            ++ ", flush=" ++ show flush ++ ", release=" ++ show release ++"\n")
+#endif
+
+      old_buf@Buffer{ bufBuf=old_raw, bufWPtr=w, bufSize=size }

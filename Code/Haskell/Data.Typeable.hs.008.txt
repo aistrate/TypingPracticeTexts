@@ -1,0 +1,49 @@
+INSTANCE_TYPEABLE0(Bool,boolTc,"Bool")
+INSTANCE_TYPEABLE0(Char,charTc,"Char")
+INSTANCE_TYPEABLE0(Float,floatTc,"Float")
+INSTANCE_TYPEABLE0(Double,doubleTc,"Double")
+INSTANCE_TYPEABLE0(Int,intTc,"Int")
+#ifndef __NHC__
+INSTANCE_TYPEABLE0(Word,wordTc,"Word" )
+#endif
+INSTANCE_TYPEABLE0(Integer,integerTc,"Integer")
+INSTANCE_TYPEABLE0(Ordering,orderingTc,"Ordering")
+INSTANCE_TYPEABLE0(Handle,handleTc,"Handle")
+
+INSTANCE_TYPEABLE0(Int8,int8Tc,"Int8")
+INSTANCE_TYPEABLE0(Int16,int16Tc,"Int16")
+INSTANCE_TYPEABLE0(Int32,int32Tc,"Int32")
+INSTANCE_TYPEABLE0(Int64,int64Tc,"Int64")
+
+INSTANCE_TYPEABLE0(Word8,word8Tc,"Word8" )
+INSTANCE_TYPEABLE0(Word16,word16Tc,"Word16")
+INSTANCE_TYPEABLE0(Word32,word32Tc,"Word32")
+INSTANCE_TYPEABLE0(Word64,word64Tc,"Word64")
+
+INSTANCE_TYPEABLE0(TyCon,tyconTc,"TyCon")
+INSTANCE_TYPEABLE0(TypeRep,typeRepTc,"TypeRep")
+
+#ifdef __GLASGOW_HASKELL__
+INSTANCE_TYPEABLE0(RealWorld,realWorldTc,"RealWorld")
+#endif
+
+#ifndef __HUGS__
+newtype Key = Key Int deriving( Eq )
+#endif
+
+data KeyPr = KeyPr !Key !Key deriving( Eq )
+
+hashKP :: KeyPr -> Int32
+hashKP (KeyPr (Key k1) (Key k2)) = (HT.hashInt k1 + HT.hashInt k2) `rem` HT.prime
+
+data Cache = Cache { next_key :: !(IORef Key),
+                     tc_tbl   :: !(HT.HashTable String Key),
+                     ap_tbl   :: !(HT.HashTable KeyPr Key) }
+
+{-# NOINLINE cache #-}
+#ifdef __GLASGOW_HASKELL__
+foreign import ccall unsafe "RtsTypeable.h getOrSetTypeableStore"
+    getOrSetTypeableStore :: Ptr a -> IO (Ptr a)
+#endif
+
+cache :: Cache

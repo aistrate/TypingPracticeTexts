@@ -1,0 +1,30 @@
+              if (!ODAPixelGenerator.imgArray) ODAPixelGenerator.imgArray = [];
+              if (!ODAPixelGenerator.iframeArray) ODAPixelGenerator.iframeArray = [];
+              ODAPixelGenerator.addImage = function (imgSrc) {
+              ODAPixelGenerator.imgArray.push(imgSrc);
+              }
+              ODAPixelGenerator.addFrame = function (iframeSrc) {
+              ODAPixelGenerator.iframeArray.push(iframeSrc);
+              }
+              ODAPixelGenerator.createOutput = function () {
+              if (jQuery("#ODAPixelHolder").length) {
+              var i;
+              for (i = 0; i < ODAPixelGenerator.imgArray.length; i++)
+            jQuery("#ODAPixelHolder").append('<img src="'+ODAPixelGenerator.imgArray[i] + '" width="1" height="1" />');
+              for (i = 0; i < ODAPixelGenerator.iframeArray.length; i++)
+            jQuery("#ODAPixelHolder").append('<iframe src="'+ODAPixelGenerator.iframeArray[i] + '" height="1" width="1" frameborder="0"></iframe>');
+              }
+              }
+              if (!ODAPixelGenerator.callbackCreated)
+              amznJQ.onReady('JQuery', ODAPixelGenerator.createOutput);
+              ODAPixelGenerator.callbackCreated = 1;
+            </script>
+            <script>
+              ODAPixelGenerator.addFrame("http://fls.doubleclick.net/activityi;src=1943517;type=pagev322;cat=books713;ord=69889676433;u=JFJgXf51pZcgBC4sGD2laO9IY8NjOXVYB/+aMDQu77ReEXR87PnKVXlSrSKdeSCNBQ8k7loRl7rDmPQo0qBYiSvRI0DD8PtmB4GQ0IoNV5D0oML2PiY1Ig==;?");
+            </script>
+            <div style='height:1px;' id='ODAPixelHolder'></div>
+            <noscript>
+              <iframe src="http://fls.doubleclick.net/activityi;src=1943517;type=pagev322;cat=books713;ord=69889676433;u=JFJgXf51pZcgBC4sGD2laO9IY8NjOXVYB/+aMDQu77ReEXR87PnKVXlSrSKdeSCNBQ8k7loRl7rDmPQo0qBYiSvRI0DD8PtmB4GQ0IoNV5D0oML2PiY1Ig==;?" height="1" width="1" frameborder="0"></iframe>
+            </noscript>
+            <!-- END: Offsite Advertising Interest Tracking -->
+          </div>

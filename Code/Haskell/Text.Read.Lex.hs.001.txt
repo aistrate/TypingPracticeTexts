@@ -1,0 +1,50 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude #-}
+
+module Text.Read.Lex
+  ( Lexeme(..)
+
+  , lex
+  , hsLex
+  , lexChar
+
+  , readIntP
+  , readOctP
+  , readDecP
+  , readHexP
+  )
+ where
+
+import Text.ParserCombinators.ReadP
+
+#ifdef __GLASGOW_HASKELL__
+import GHC.Base
+import GHC.Num( Num(..), Integer )
+import GHC.Show( Show(..) )
+#ifndef __HADDOCK__
+import {-# SOURCE #-} GHC.Unicode ( isSpace, isAlpha, isAlphaNum )
+#endif
+import GHC.Real( Ratio(..), Integral, Rational, (%), fromIntegral, 
+                 toInteger, (^), (^^), infinity, notANumber )
+import GHC.List
+import GHC.Enum( maxBound )
+#else
+import Prelude hiding ( lex )
+import Data.Char( chr, ord, isSpace, isAlpha, isAlphaNum )
+import Data.Ratio( Ratio, (%) )
+#endif
+#ifdef __HUGS__
+import Hugs.Prelude( Ratio(..) )
+#endif
+import Data.Maybe
+import Control.Monad
+
+data Lexeme
+  = Char   Char
+  | String String
+  | Punc   String
+  | Ident  String
+  | Symbol String
+  | Int Integer
+  | Rat Rational
+  | EOF
+ deriving (Eq, Show)

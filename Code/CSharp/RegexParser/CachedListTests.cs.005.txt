@@ -1,0 +1,37 @@
+            Assert.AreEqual(n1 - 1, seq1.LastOrDefault(), "First/n1");
+            Assert.AreEqual(n1, counter.Value, "First/counter/1");
+            Assert.AreEqual(n2 - 1, seq2.LastOrDefault(), "First/n2");
+            Assert.AreEqual(n2, counter.Value, "First/counter/2");
+
+            Assert.AreEqual(n1 - 1, seq1.LastOrDefault(), "Second/n1");
+            Assert.AreEqual(n2, counter.Value, "Second/counter/1");
+            Assert.AreEqual(n2 - 1, seq2.LastOrDefault(), "Second/n2");
+            Assert.AreEqual(n2, counter.Value, "Second/counter/2");
+
+            IEnumerable<int> seq3 = numbersCachedList.Take(n3),
+                             seq4 = numbersCachedList.Take(n4),
+                             seq5 = numbersCachedList.Take(n5);
+
+            Assert.AreEqual(n3 - 1, seq3.LastOrDefault(), "First/n3");
+            Assert.AreEqual(n3, counter.Value, "First/counter/3");
+            Assert.AreEqual(n4 - 1, seq4.LastOrDefault(), "First/n4");
+            Assert.AreEqual(n4, counter.Value, "First/counter/4");
+            Assert.AreEqual(n5 - 1, seq5.LastOrDefault(), "First/n5");
+            Assert.AreEqual(n5, counter.Value, "First/counter/5");
+        }
+
+        private const int n1 = 5000, n2 = 12000,
+                          n3 = 15000, n4 = 25000, n5 = 34000;
+
+        private IEnumerable<int> getNaturalNumbers(Counter counter)
+        {
+            for (int i = 0; ; i++)
+            {
+                counter.Inc();
+                yield return i;
+            }
+        }
+
+        #endregion
+    }
+}

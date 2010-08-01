@@ -1,0 +1,50 @@
+  let reqs = new_reqs ++ old_reqs
+
+  new_delays <- atomicModifyIORef pendingDelays (\a -> ([],a))
+  let  delays0 = foldr insertDelay old_delays new_delays
+
+  fdZero readfds
+  fdZero writefds
+  fdSet wakeup readfds
+  maxfd <- buildFdSets 0 readfds writefds reqs
+
+  let do_select delays = do
+          now <- getUSecOfDay
+          (delays', timeout) <- getDelay now ptimeval delays
+
+          res <- c_select (fromIntegral ((max wakeup maxfd)+1)) readfds writefds 
+                        nullPtr timeout
+          if (res == -1)
+             then do
+                err <- getErrno
+                case err of
+                  _ | err == eINTR ->  do_select delays'
+                  _ | err == eBADF ->  return (True, delays)
+                  _ | otherwise    ->  throwErrno "select"
+             else
+                return (False,delays')
+
+  (wakeup_all,delays') <- do_select delays0
+
+  exit <-
+    if wakeup_all then return False
+      else do
+        b <- fdIsSet wakeup readfds
+        if b == 0 
+          then return False
+          else alloca $ \p -> do 
+                 c_read (fromIntegral wakeup) p 1; return ()
+                 s <- peek p            
+                 case s of
+                  _ | s == io_MANAGER_WAKEUP -> return False
+                  _ | s == io_MANAGER_DIE    -> return True
+                  _ -> withMVar signalHandlerLock $ \_ -> do
+                          handler_tbl <- peek handlers
+                          sp <- peekElemOff handler_tbl (fromIntegral s)
+                          io <- deRefStablePtr sp
+                          forkIO io
+                          return False
+
+  if exit then return () else do
+
+  atomicModifyIORef prodding (\_ -> (False,False))

@@ -1,0 +1,49 @@
+fromConstrM :: (Monad m, Data a)
+            => (forall d. Data d => m d)
+            -> Constr
+            -> m a
+fromConstrM f = gunfold k z
+ where
+  k c = do { c' <- c; b <- f; return (c' b) }
+  z = return
+
+data DataType = DataType
+                        { tycon   :: String
+                        , datarep :: DataRep
+                        }
+
+              deriving Show
+
+data Constr = Constr
+                        { conrep    :: ConstrRep
+                        , constring :: String
+                        , confields :: [String]
+                        , confixity :: Fixity
+                        , datatype  :: DataType
+                        }
+
+instance Show Constr where
+ show = constring
+
+instance Eq Constr where
+  c == c' = constrRep c == constrRep c'
+
+data DataRep = AlgRep [Constr]
+             | IntRep
+             | FloatRep
+             | StringRep
+             | NoRep
+
+            deriving (Eq,Show)
+
+data ConstrRep = AlgConstr    ConIndex
+               | IntConstr    Integer
+               | FloatConstr  Double
+               | StringConstr String
+
+               deriving (Eq,Show)
+
+type ConIndex = Int
+
+data Fixity = Prefix
+            | Infix

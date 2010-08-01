@@ -1,0 +1,50 @@
+  Look f     `mplus` Final r    = Look (\s -> Final (run (f s) s ++ r))
+  p          `mplus` Final r    = Look (\s -> Final (run p s ++ r))
+
+  Look f     `mplus` Look g     = Look (\s -> f s `mplus` g s)
+  Look f     `mplus` p          = Look (\s -> f s `mplus` p)
+  p          `mplus` Look f     = Look (\s -> p `mplus` f s)
+
+#ifndef __NHC__
+newtype ReadP a = R (forall b . (a -> P b) -> P b)
+#else
+#define ReadP  (ReadPN b)
+newtype ReadPN b a = R ((a -> P b) -> P b)
+#endif
+
+instance Functor ReadP where
+  fmap h (R f) = R (\k -> f (k . h))
+
+instance Monad ReadP where
+  return x  = R (\k -> k x)
+  fail _    = R (\_ -> Fail)
+  R m >>= f = R (\k -> m (\a -> let R m' = f a in m' k))
+
+instance MonadPlus ReadP where
+  mzero = pfail
+  mplus = (+++)
+
+final :: [(a,String)] -> P a
+final [] = Fail
+final r  = Final r
+
+run :: P a -> ReadS a
+run (Get f)      (c:s) = run (f c) s
+run (Look f)     s     = run (f s) s
+run (Result x p) s     = (x,s) : run p s
+run (Final r)    _     = r
+run _            _     = []
+
+get :: ReadP Char
+get = R Get
+
+look :: ReadP String
+look = R Look
+
+pfail :: ReadP a
+pfail = R (\_ -> Fail)
+
+(+++) :: ReadP a -> ReadP a -> ReadP a
+R f1 +++ R f2 = R (\k -> f1 k `mplus` f2 k)
+
+#ifndef __NHC__

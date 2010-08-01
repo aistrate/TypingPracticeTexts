@@ -1,0 +1,11 @@
+Continuation
+
+In computing and programming, a continuation is an abstract representation of the control state. In other terms, a continuation reifies an instance of a computational process at a given point in the process's execution. It contains information such as the process's current stack (including all data whose lifetime is within the process e.g. "local variables"), as well the process's point in the computation. Such an instance can then be later resumed upon invocation. The "current continuation" or "continuation of the computation step" is the continuation that, from the perspective of running code, would be derived from the current point in a program's execution.
+
+The term continuations can also be used to refer to first-class continuations, which are constructs that give a programming language the ability to save the execution state at any point and return to that point at a later point in the program.
+
+Programs must allocate space in memory for the variables its functions use. Most programming languages use a call stack for storing the variables needed because it allows for fast and simple allocating and automatic deallocation of memory. There are also programming languages that use a heap for this, which allows for flexibility but with a higher cost for allocating and deallocating memory. These two different implementations both have benefits and drawbacks in the context of continuations.
+
+Almost all languages have a means for manipulating the order of execution steps (i.e. manipulating the continuation of a computation step). The goto is the most basic form of this. Control structures like if statements, loops, return statements, break statements, and exit are more structured (and limited) ways to manipulate the order of executing instructions and are essentially limited goto statements.
+
+More complex constructs exist as well. For example in C, setjmp can be used to jump from the middle of one function to another function, provided the second function is lower on the stack (if it is waiting for the first function to return, possibly among others). Other more complex examples include coroutines in Simula 67, tasklets in Stackless Python, generators in Icon and Python, continuations in Scala (starting in 2.8), fibers in Ruby (starting in 1.9.1), the backtracking mechanism in Prolog, and threads.

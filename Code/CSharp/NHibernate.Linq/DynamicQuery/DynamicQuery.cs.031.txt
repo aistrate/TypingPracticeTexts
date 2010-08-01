@@ -1,0 +1,50 @@
+		int FindMethod(Type type, string methodName, bool staticAccess, Expression[] args, out MethodBase method)
+		{
+			BindingFlags flags = BindingFlags.Public | BindingFlags.DeclaredOnly |
+				(staticAccess ? BindingFlags.Static : BindingFlags.Instance);
+			foreach (Type t in SelfAndBaseTypes(type))
+			{
+				MemberInfo[] members = t.FindMembers(MemberTypes.Method,
+					flags, Type.FilterNameIgnoreCase, methodName);
+				int count = FindBestMethod(members.Cast<MethodBase>(), args, out method);
+				if (count != 0) return count;
+			}
+			method = null;
+			return 0;
+		}
+
+		int FindIndexer(Type type, Expression[] args, out MethodBase method)
+		{
+			foreach (Type t in SelfAndBaseTypes(type))
+			{
+				MemberInfo[] members = t.GetDefaultMembers();
+				if (members.Length != 0)
+				{
+					IEnumerable<MethodBase> methods = members.
+						OfType<PropertyInfo>().
+						Select(p => (MethodBase)p.GetGetMethod()).
+						Where(m => m != null);
+					int count = FindBestMethod(methods, args, out method);
+					if (count != 0) return count;
+				}
+			}
+			method = null;
+			return 0;
+		}
+
+		static IEnumerable<Type> SelfAndBaseTypes(Type type)
+		{
+			if (type.IsInterface)
+			{
+				List<Type> types = new List<Type>();
+				AddInterface(types, type);
+				return types;
+			}
+			return SelfAndBaseClasses(type);
+		}
+
+		static IEnumerable<Type> SelfAndBaseClasses(Type type)
+		{
+			while (type != null)
+			{
+				yield return type;

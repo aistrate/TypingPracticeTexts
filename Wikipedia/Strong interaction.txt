@@ -1,0 +1,9 @@
+Strong interaction
+
+In particle physics, the strong interaction (also called the strong force, strong nuclear force, or colour force) is one of the four fundamental interactions of nature, along with electromagnetic force, weak interaction and gravitation. The word strong is used since, for interactions involving sufficiently low energies, the strong interaction is the "strongest" of the four fundamental forces; its strength is 100 times that of the electromagnetic force, and several orders of magnitude greater than that of the weak force and gravitation. (These ratios are in fact figures of convenience; the fundamental figures vary dramatically according to the distances over which the forces are exerted. For example, the "weak" force really is roughly as strong as the electromagnetic force at the distances relevant to its effects, which are a small fraction of the radius of the nucleus of an atom.)
+
+The strong interaction is observable in two areas: On the larger scale, it is the force that binds protons and neutrons together to form the nucleus of an atom. On the smaller scale, it is also the force that holds quarks and gluons together to form the proton, the neutron and other particles.
+
+In the context of binding protons and neutrons (nucleons) together to form atoms, the strong interaction is called the nuclear force (or residual strong force). In this case, it is the residuum of the strong interaction between the quarks that make up the protons and neutrons. As such, the residual strong interaction obeys a quite different distance-dependent behavior between nucleons, than when it is acting to bind quarks within nucleons.
+
+The strong force is thought to be mediated by gluons, acting upon quarks, antiquarks, and the gluons themselves. This is detailed in the theory of quantum chromodynamics (QCD).

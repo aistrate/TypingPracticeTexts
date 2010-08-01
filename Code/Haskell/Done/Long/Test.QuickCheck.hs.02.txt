@@ -1,0 +1,99 @@
+vector :: Arbitrary a => Int -> Gen [a]
+vector n = sequence [ arbitrary | i <- [1..n] ]
+
+oneof :: [Gen a] -> Gen a
+oneof gens = elements gens >>= id
+
+frequency :: [(Int, Gen a)] -> Gen a
+frequency xs = choose (1, tot) >>= (`pick` xs)
+ where
+  tot = sum (map fst xs)
+
+  pick n ((k,x):xs)
+    | n <= k    = x
+    | otherwise = pick (n-k) xs
+
+two :: Monad m => m a -> m (a, a)
+two m = liftM2 (,) m m
+
+three :: Monad m => m a -> m (a, a, a)
+three m = liftM3 (,,) m m m
+
+four :: Monad m => m a -> m (a, a, a, a)
+four m = liftM4 (,,,) m m m m
+
+class Arbitrary a where
+  arbitrary   :: Gen a
+  coarbitrary :: a -> Gen b -> Gen b
+
+instance Arbitrary () where
+  arbitrary     = return ()
+  coarbitrary _ = variant 0
+
+instance Arbitrary Bool where
+  arbitrary     = elements [True, False]
+  coarbitrary b = if b then variant 0 else variant 1
+
+instance Arbitrary Int where
+  arbitrary     = sized $ \n -> choose (-n,n)
+  coarbitrary n = variant (if n >= 0 then 2*n else 2*(-n) + 1)
+
+instance Arbitrary Integer where
+  arbitrary     = sized $ \n -> choose (-fromIntegral n,fromIntegral n)
+  coarbitrary n = variant (fromInteger (if n >= 0 then 2*n else 2*(-n) + 1))
+
+instance Arbitrary Float where
+  arbitrary     = liftM3 fraction arbitrary arbitrary arbitrary 
+  coarbitrary x = coarbitrary (decodeFloat x)
+
+instance Arbitrary Double where
+  arbitrary     = liftM3 fraction arbitrary arbitrary arbitrary 
+  coarbitrary x = coarbitrary (decodeFloat x)
+
+fraction a b c = fromInteger a + (fromInteger b / (abs (fromInteger c) + 1))
+
+instance (Arbitrary a, Arbitrary b) => Arbitrary (a, b) where
+  arbitrary          = liftM2 (,) arbitrary arbitrary
+  coarbitrary (a, b) = coarbitrary a . coarbitrary b
+
+instance (Arbitrary a, Arbitrary b, Arbitrary c) => Arbitrary (a, b, c) where
+  arbitrary             = liftM3 (,,) arbitrary arbitrary arbitrary
+  coarbitrary (a, b, c) = coarbitrary a . coarbitrary b . coarbitrary c
+
+instance (Arbitrary a, Arbitrary b, Arbitrary c, Arbitrary d)
+      => Arbitrary (a, b, c, d)
+ where
+  arbitrary = liftM4 (,,,) arbitrary arbitrary arbitrary arbitrary
+  coarbitrary (a, b, c, d) =
+    coarbitrary a . coarbitrary b . coarbitrary c . coarbitrary d
+
+instance (Arbitrary a) => Arbitrary (Maybe a) where
+  arbitrary            = sized arbMaybe
+   where
+    arbMaybe 0 = return Nothing
+    arbMaybe n = fmap Just (resize (n-1) arbitrary)
+  coarbitrary Nothing  = variant 0
+  coarbitrary (Just x) = variant 1 . coarbitrary x
+
+instance (Arbitrary a, Arbitrary b) => Arbitrary (Either a b) where
+  arbitrary             = oneof [fmap Left arbitrary, fmap Right arbitrary]
+  coarbitrary (Left x)  = variant 0 . coarbitrary x
+  coarbitrary (Right x) = variant 1 . coarbitrary x
+
+instance Arbitrary a => Arbitrary [a] where
+  arbitrary          = sized (\n -> choose (0,n) >>= vector)
+  coarbitrary []     = variant 0
+  coarbitrary (a:as) = coarbitrary a . variant 1 . coarbitrary as
+
+instance (Arbitrary a, Arbitrary b) => Arbitrary (a -> b) where
+  arbitrary         = promote (`coarbitrary` arbitrary)
+  coarbitrary f gen = arbitrary >>= ((`coarbitrary` gen) . f)
+
+data Result
+  = Result { ok :: Maybe Bool, stamp :: [String], arguments :: [String] }
+
+nothing :: Result
+nothing = Result{ ok = Nothing, stamp = [], arguments = [] }
+
+newtype Property
+  = Prop (Gen Result)

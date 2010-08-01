@@ -1,0 +1,124 @@
+			return result;
+		}
+
+		public virtual string QueryIdentifier
+		{
+			get { return null; }
+		}
+
+		protected IList DoList(ISessionImplementor session, QueryParameters queryParameters)
+		{
+			bool stats = Factory.Statistics.IsStatisticsEnabled;
+			long startTime = 0;
+			if (stats)
+				startTime = DateTime.Now.Ticks;
+
+			IList result;
+			try
+			{
+				result = DoQueryAndInitializeNonLazyCollections(session, queryParameters, true);
+			}
+			catch (HibernateException)
+			{
+				throw;
+			}
+			catch (Exception sqle)
+			{
+				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle, "could not execute query", SqlString,
+				                                 queryParameters.PositionalParameterValues, queryParameters.NamedParameters);
+			}
+			if (stats)
+			{
+				Factory.StatisticsImplementor.QueryExecuted(QueryIdentifier, result.Count, (DateTime.Now.Ticks - startTime));
+			}
+			return result;
+		}
+
+		protected virtual void PostInstantiate()
+		{
+		}
+
+		protected abstract IEntityAliases[] EntityAliases { get; }
+
+		protected abstract ICollectionAliases[] CollectionAliases { get; }
+
+		public ISessionFactoryImplementor Factory
+		{
+			get { return factory; }
+		}
+
+		public override string ToString()
+		{
+			return GetType().FullName + '(' + SqlString + ')';
+		}
+
+		protected SqlType[] ConvertITypesToSqlTypes(ArrayList nhTypes, int totalSpan)
+		{
+			SqlType[] result = new SqlType[totalSpan];
+
+			int index = 0;
+			foreach (IType type in nhTypes)
+			{
+				int span = type.SqlTypes(Factory).Length;
+				Array.Copy(type.SqlTypes(Factory), 0, result, index, span);
+				index += span;
+			}
+
+			return result;
+		}
+
+		protected SqlType[] GetParameterTypes(QueryParameters parameters, bool addLimit, bool addOffset)
+		{
+			ArrayList paramTypeList = new ArrayList();
+			int span = 0;
+
+			foreach (IType type in parameters.FilteredPositionalParameterTypes)
+			{
+				paramTypeList.Add(type);
+				span += type.GetColumnSpan(Factory);
+			}
+
+			if (parameters.NamedParameters != null && parameters.NamedParameters.Count > 0)
+			{
+				int offset = paramTypeList.Count;
+
+				foreach (DictionaryEntry e in parameters.NamedParameters)
+				{
+					string name = (string) e.Key;
+					TypedValue typedval = (TypedValue) e.Value;
+					int[] locs = GetNamedParameterLocs(name);
+					span += typedval.Type.GetColumnSpan(Factory) * locs.Length;
+
+					for (int i = 0; i < locs.Length; i++)
+					{
+						ArrayHelper.SafeSetValue(paramTypeList, locs[i] + offset, typedval.Type);
+					}
+				}
+			}
+
+			if (addLimit && Factory.Dialect.SupportsVariableLimit)
+			{
+				if (Factory.Dialect.BindLimitParametersFirst)
+				{
+					paramTypeList.Insert(0, NHibernateUtil.Int32);
+					if (addOffset)
+					{
+						paramTypeList.Insert(0, NHibernateUtil.Int32);
+					}
+				}
+				else
+				{
+					paramTypeList.Add(NHibernateUtil.Int32);
+					if (addOffset)
+					{
+						paramTypeList.Add(NHibernateUtil.Int32);
+					}
+				}
+
+				span += addOffset ? 2 : 1;
+			}
+
+			return ConvertITypesToSqlTypes(paramTypeList, span);
+		}
+	}
+}

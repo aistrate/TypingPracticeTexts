@@ -1,0 +1,50 @@
+    where k (i, j) = (c2w i, j)
+
+unfoldrN :: Int -> (a -> Maybe (Char, a)) -> a -> (ByteString, Maybe a)
+unfoldrN n f w = B.unfoldrN n ((k `fmap`) . f) w
+    where k (i,j) = (c2w i, j)
+{-# INLINE unfoldrN #-}
+
+takeWhile :: (Char -> Bool) -> ByteString -> ByteString
+takeWhile f = B.takeWhile (f . w2c)
+{-# INLINE takeWhile #-}
+
+dropWhile :: (Char -> Bool) -> ByteString -> ByteString
+dropWhile f = B.dropWhile (f . w2c)
+#if defined(__GLASGOW_HASKELL__)
+{-# INLINE [1] dropWhile #-}
+#endif
+
+{-# RULES
+"ByteString specialise dropWhile isSpace -> dropSpace"
+    dropWhile isSpace = dropSpace
+  #-}
+
+break :: (Char -> Bool) -> ByteString -> (ByteString, ByteString)
+break f = B.break (f . w2c)
+#if defined(__GLASGOW_HASKELL__)
+{-# INLINE [1] break #-}
+#endif
+
+{-# RULES
+"ByteString specialise break (x==)" forall x.
+    break ((==) x) = breakChar x
+"ByteString specialise break (==x)" forall x.
+    break (==x) = breakChar x
+  #-}
+
+breakChar :: Char -> ByteString -> (ByteString, ByteString)
+breakChar c p = case elemIndex c p of
+    Nothing -> (p,empty)
+    Just n  -> (B.unsafeTake n p, B.unsafeDrop n p)
+{-# INLINE breakChar #-}
+
+span :: (Char -> Bool) -> ByteString -> (ByteString, ByteString)
+span f = B.span (f . w2c)
+{-# INLINE span #-}
+
+spanEnd :: (Char -> Bool) -> ByteString -> (ByteString, ByteString)
+spanEnd f = B.spanEnd (f . w2c)
+{-# INLINE spanEnd #-}
+
+breakEnd :: (Char -> Bool) -> ByteString -> (ByteString, ByteString)

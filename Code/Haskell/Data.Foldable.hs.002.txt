@@ -1,0 +1,50 @@
+import GHC.Arr
+#elif defined(__HUGS__)
+import Hugs.Array
+#elif defined(__NHC__)
+import Array
+#endif
+
+class Foldable t where
+        fold :: Monoid m => t m -> m
+        fold = foldMap id
+
+        foldMap :: Monoid m => (a -> m) -> t a -> m
+        foldMap f = foldr (mappend . f) mempty
+
+        foldr :: (a -> b -> b) -> b -> t a -> b
+        foldr f z t = appEndo (foldMap (Endo . f) t) z
+
+        foldl :: (a -> b -> a) -> a -> t b -> a
+        foldl f z t = appEndo (getDual (foldMap (Dual . Endo . flip f) t)) z
+
+        foldr1 :: (a -> a -> a) -> t a -> a
+        foldr1 f xs = fromMaybe (error "foldr1: empty structure")
+                        (foldr mf Nothing xs)
+          where mf x Nothing = Just x
+                mf x (Just y) = Just (f x y)
+
+        foldl1 :: (a -> a -> a) -> t a -> a
+        foldl1 f xs = fromMaybe (error "foldl1: empty structure")
+                        (foldl mf Nothing xs)
+          where mf Nothing y = Just y
+                mf (Just x) y = Just (f x y)
+
+instance Foldable Maybe where
+        foldr _ z Nothing = z
+        foldr f z (Just x) = f x z
+
+        foldl _ z Nothing = z
+        foldl f z (Just x) = f z x
+
+instance Foldable [] where
+        foldr = Prelude.foldr
+        foldl = Prelude.foldl
+        foldr1 = Prelude.foldr1
+        foldl1 = Prelude.foldl1
+
+instance Ix i => Foldable (Array i) where
+        foldr f z = Prelude.foldr f z . elems
+
+foldr' :: Foldable t => (a -> b -> b) -> b -> t a -> b
+foldr' f z0 xs = foldl f' id xs z0

@@ -1,0 +1,100 @@
+find :: Ord k => k -> Map k a -> a
+find k m
+  = case lookup k m of
+      Nothing -> error "Map.find: element not in the map"
+      Just x  -> x
+
+findWithDefault :: Ord k => a -> k -> Map k a -> a
+findWithDefault def k m
+  = case lookup k m of
+      Nothing -> def
+      Just x  -> x
+
+empty :: Map k a
+empty 
+  = Tip
+
+singleton :: k -> a -> Map k a
+singleton k x  
+  = Bin 1 k x Tip Tip
+
+insert :: Ord k => k -> a -> Map k a -> Map k a
+insert kx x t
+  = case t of
+      Tip -> singleton kx x
+      Bin sz ky y l r
+          -> case compare kx ky of
+               LT -> balance ky y (insert kx x l) r
+               GT -> balance ky y l (insert kx x r)
+               EQ -> Bin sz kx x l r
+
+insertWith :: Ord k => (a -> a -> a) -> k -> a -> Map k a -> Map k a
+insertWith f k x m          
+  = insertWithKey (\_ x' y' -> f x' y') k x m
+
+insertWith' :: Ord k => (a -> a -> a) -> k -> a -> Map k a -> Map k a
+insertWith' f k x m          
+  = insertWithKey' (\_ x' y' -> f x' y') k x m
+
+insertWithKey :: Ord k => (k -> a -> a -> a) -> k -> a -> Map k a -> Map k a
+insertWithKey f kx x t
+  = case t of
+      Tip -> singleton kx x
+      Bin sy ky y l r
+          -> case compare kx ky of
+               LT -> balance ky y (insertWithKey f kx x l) r
+               GT -> balance ky y l (insertWithKey f kx x r)
+               EQ -> Bin sy kx (f kx x y) l r
+
+insertWithKey' :: Ord k => (k -> a -> a -> a) -> k -> a -> Map k a -> Map k a
+insertWithKey' f kx x t
+  = case t of
+      Tip -> singleton kx x
+      Bin sy ky y l r
+          -> case compare kx ky of
+               LT -> balance ky y (insertWithKey' f kx x l) r
+               GT -> balance ky y l (insertWithKey' f kx x r)
+               EQ -> let x' = f kx x y in seq x' (Bin sy kx x' l r)
+
+insertLookupWithKey :: Ord k => (k -> a -> a -> a) -> k -> a -> Map k a -> (Maybe a,Map k a)
+insertLookupWithKey f kx x t
+  = case t of
+      Tip -> (Nothing, singleton kx x)
+      Bin sy ky y l r
+          -> case compare kx ky of
+               LT -> let (found,l') = insertLookupWithKey f kx x l in (found,balance ky y l' r)
+               GT -> let (found,r') = insertLookupWithKey f kx x r in (found,balance ky y l r')
+               EQ -> (Just y, Bin sy kx (f kx x y) l r)
+
+delete :: Ord k => k -> Map k a -> Map k a
+delete k t
+  = case t of
+      Tip -> Tip
+      Bin _ kx x l r
+          -> case compare k kx of
+               LT -> balance kx x (delete k l) r
+               GT -> balance kx x l (delete k r)
+               EQ -> glue l r
+
+adjust :: Ord k => (a -> a) -> k -> Map k a -> Map k a
+adjust f k m
+  = adjustWithKey (\_ x -> f x) k m
+
+adjustWithKey :: Ord k => (k -> a -> a) -> k -> Map k a -> Map k a
+adjustWithKey f k m
+  = updateWithKey (\k' x' -> Just (f k' x')) k m
+
+update :: Ord k => (a -> Maybe a) -> k -> Map k a -> Map k a
+update f k m
+  = updateWithKey (\_ x -> f x) k m
+
+updateWithKey :: Ord k => (k -> a -> Maybe a) -> k -> Map k a -> Map k a
+updateWithKey f k t
+  = case t of
+      Tip -> Tip
+      Bin sx kx x l r 
+          -> case compare k kx of
+               LT -> balance kx x (updateWithKey f k l) r
+               GT -> balance kx x l (updateWithKey f k r)
+               EQ -> case f kx x of
+                       Just x' -> Bin sx kx x' l r

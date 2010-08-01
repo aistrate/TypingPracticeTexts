@@ -1,0 +1,50 @@
+        case waitRead# fd# s of { s' -> (# s', () #)
+        }}
+
+threadWaitWrite :: Fd -> IO ()
+threadWaitWrite fd
+#ifndef mingw32_HOST_OS
+  | threaded  = waitForWriteEvent fd
+#endif
+  | otherwise = IO $ \s -> 
+        case fromIntegral fd of { I# fd# ->
+        case waitWrite# fd# s of { s' -> (# s', () #)
+        }}
+
+threadDelay :: Int -> IO ()
+threadDelay time
+  | threaded  = waitForDelayEvent time
+  | otherwise = IO $ \s -> 
+        case fromIntegral time of { I# time# ->
+        case delay# time# s of { s' -> (# s', () #)
+        }}
+
+registerDelay :: Int -> IO (TVar Bool)
+registerDelay usecs 
+  | threaded = waitForDelayEventSTM usecs
+  | otherwise = error "registerDelay: requires -threaded"
+
+foreign import ccall unsafe "rtsSupportsBoundThreads" threaded :: Bool
+
+waitForDelayEvent :: Int -> IO ()
+waitForDelayEvent usecs = do
+  m <- newEmptyMVar
+  target <- calculateTarget usecs
+  atomicModifyIORef pendingDelays (\xs -> (Delay target m : xs, ()))
+  prodServiceThread
+  takeMVar m
+
+waitForDelayEventSTM :: Int -> IO (TVar Bool)
+waitForDelayEventSTM usecs = do
+   t <- atomically $ newTVar False
+   target <- calculateTarget usecs
+   atomicModifyIORef pendingDelays (\xs -> (DelaySTM target t : xs, ()))
+   prodServiceThread
+   return t  
+    
+calculateTarget :: Int -> IO USecs
+calculateTarget usecs = do
+    now <- getUSecOfDay
+    return $ now + (fromIntegral usecs)
+
+#ifndef mingw32_HOST_OS

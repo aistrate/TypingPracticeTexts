@@ -1,0 +1,49 @@
+mkFloatType :: String -> DataType
+mkFloatType = mkPrimType FloatRep
+
+mkStringType :: String -> DataType
+mkStringType = mkPrimType StringRep
+
+mkPrimType :: DataRep -> String -> DataType
+mkPrimType dr str = DataType
+                        { tycon   = str
+                        , datarep = dr
+                        }
+
+mkPrimCon :: DataType -> String -> ConstrRep -> Constr
+mkPrimCon dt str cr = Constr
+                        { datatype  = dt
+                        , conrep    = cr
+                        , constring = str
+                        , confields = error "constrFields"
+                        , confixity = error "constrFixity"
+                        }
+
+mkIntConstr :: DataType -> Integer -> Constr
+mkIntConstr dt i = case datarep dt of
+                  IntRep -> mkPrimCon dt (show i) (IntConstr i)
+                  _ -> error "mkIntConstr"
+
+mkFloatConstr :: DataType -> Double -> Constr
+mkFloatConstr dt f = case datarep dt of
+                    FloatRep -> mkPrimCon dt (show f) (FloatConstr f)
+                    _ -> error "mkFloatConstr"
+
+mkStringConstr :: DataType -> String -> Constr
+mkStringConstr dt str = case datarep dt of
+                       StringRep -> mkPrimCon dt str (StringConstr str)
+                       _ -> error "mkStringConstr"
+
+mkNorepType :: String -> DataType
+mkNorepType str = DataType
+                        { tycon   = str
+                        , datarep = NoRep
+                        }
+
+isNorepType :: DataType -> Bool
+isNorepType dt = case datarep dt of
+                   NoRep -> True
+                   _ -> False
+
+tyconUQname :: String -> String
+tyconUQname x = let x' = dropWhile (not . (==) '.') x

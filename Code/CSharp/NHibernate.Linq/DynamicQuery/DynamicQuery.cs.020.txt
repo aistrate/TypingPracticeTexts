@@ -1,0 +1,50 @@
+		Expression ParsePrimaryStart()
+		{
+			switch (token.id)
+			{
+				case TokenId.Identifier:
+					return ParseIdentifier();
+				case TokenId.StringLiteral:
+					return ParseStringLiteral();
+				case TokenId.IntegerLiteral:
+					return ParseIntegerLiteral();
+				case TokenId.RealLiteral:
+					return ParseRealLiteral();
+				case TokenId.OpenParen:
+					return ParseParenExpression();
+				default:
+					throw ParseError(Res.ExpressionExpected);
+			}
+		}
+
+		Expression ParseStringLiteral()
+		{
+			ValidateToken(TokenId.StringLiteral);
+			char quote = token.text[0];
+			string s = token.text.Substring(1, token.text.Length - 2);
+			int start = 0;
+			while (true)
+			{
+				int i = s.IndexOf(quote, start);
+				if (i < 0) break;
+				s = s.Remove(i, 1);
+				start = i + 1;
+			}
+			if (quote == '\'')
+			{
+				if (s.Length != 1)
+					throw ParseError(Res.InvalidCharacterLiteral);
+				NextToken();
+				return CreateLiteral(s[0], s);
+			}
+			NextToken();
+			return CreateLiteral(s, s);
+		}
+
+		Expression ParseIntegerLiteral()
+		{
+			ValidateToken(TokenId.IntegerLiteral);
+			string text = token.text;
+			if (text[0] != '-')
+			{
+				ulong value;

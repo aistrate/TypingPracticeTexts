@@ -1,0 +1,50 @@
+			End,
+			Identifier,
+			StringLiteral,
+			IntegerLiteral,
+			RealLiteral,
+			Exclamation,
+			Percent,
+			Amphersand,
+			OpenParen,
+			CloseParen,
+			Asterisk,
+			Plus,
+			Comma,
+			Minus,
+			Dot,
+			Slash,
+			Colon,
+			LessThan,
+			Equal,
+			GreaterThan,
+			Question,
+			OpenBracket,
+			CloseBracket,
+			Bar,
+			ExclamationEqual,
+			DoubleAmphersand,
+			LessThanEqual,
+			LessGreater,
+			DoubleEqual,
+			GreaterThanEqual,
+			DoubleBar
+		}
+
+		interface ILogicalSignatures
+		{
+			void F(bool x, bool y);
+			void F(bool? x, bool? y);
+		}
+
+		interface IArithmeticSignatures
+		{
+			void F(int x, int y);
+			void F(uint x, uint y);
+			void F(long x, long y);
+			void F(ulong x, ulong y);
+			void F(float x, float y);
+			void F(double x, double y);
+			void F(decimal x, decimal y);
+			void F(int? x, int? y);
+			void F(uint? x, uint? y);

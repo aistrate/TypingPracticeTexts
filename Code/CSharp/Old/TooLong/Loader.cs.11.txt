@@ -1,0 +1,99 @@
+		protected IDataReader GetResultSet(IDbCommand st, bool autoDiscoverTypes, bool callable, RowSelection selection, ISessionImplementor session)
+		{
+			IDataReader rs = null;
+			try
+			{
+				log.Info(st.CommandText);
+
+				rs = session.Batcher.ExecuteReader(st);
+				rs = WrapResultSetIfEnabled(rs, session);
+
+				Dialect.Dialect dialect = session.Factory.Dialect;
+				if (!dialect.SupportsLimitOffset || !UseLimit(selection, dialect))
+				{
+					Advance(rs, selection);
+				}
+
+				if (autoDiscoverTypes)
+				{
+					AutoDiscoverTypes(rs);
+				}
+				return rs;
+			}
+			catch (Exception sqle)
+			{
+				ADOExceptionReporter.LogExceptions(sqle);
+				session.Batcher.CloseCommand(st, rs);
+				throw;
+			}
+		}
+
+		protected virtual void AutoDiscoverTypes(IDataReader rs)
+		{
+			throw new AssertionFailure("Auto discover types not supported in this loader");
+		}
+
+		[MethodImpl(MethodImplOptions.Synchronized)]
+		private IDataReader WrapResultSetIfEnabled(IDataReader rs, ISessionImplementor session)
+		{
+			if (session.Factory.Settings.IsWrapResultSetsEnabled)
+			{
+				try
+				{
+					log.Debug("Wrapping result set [" + rs + "]");
+					return new ResultSetWrapper(rs, RetreiveColumnNameToIndexCache(rs));
+				}
+				catch (Exception e)
+				{
+					log.Info("Error wrapping result set", e);
+					return rs;
+				}
+			}
+			else
+			{
+				return rs;
+			}
+		}
+
+		private ColumnNameCache RetreiveColumnNameToIndexCache(IDataReader rs)
+		{
+			if (columnNameCache == null)
+			{
+				log.Debug("Building columnName->columnIndex cache");
+				columnNameCache = new ColumnNameCache(rs.GetSchemaTable().Rows.Count);
+			}
+
+			return columnNameCache;
+		}
+
+		protected internal virtual int BindNamedParameters(IDbCommand st, IDictionary namedParams, int start,
+		                                                   ISessionImplementor session)
+		{
+			if (namedParams != null)
+			{
+				int result = 0;
+				foreach (DictionaryEntry e in namedParams)
+				{
+					string name = (string) e.Key;
+					TypedValue typedval = (TypedValue) e.Value;
+					int[] locs = GetNamedParameterLocs(name);
+					for (int i = 0; i < locs.Length; i++)
+					{
+						if (log.IsDebugEnabled)
+						{
+							log.Debug(
+								"BindNamedParameters() " +
+								typedval.Value + " -> " + name +
+								" [" + (locs[i] + start) + "]");
+						}
+						typedval.Type.NullSafeSet(st, typedval.Value, locs[i] + start, session);
+					}
+					result += locs.Length;
+				}
+				return result;
+			}
+			else
+			{
+				return 0;
+			}
+		}

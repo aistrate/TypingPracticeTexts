@@ -1,0 +1,30 @@
+                          <i>Stone's Fall</i> by Iain Pears
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="asinItem">
+                  <div class="asinTextBlock">
+                    <p class="seeMore">
+                      <span class="carat">&#8250;</span>
+                      <a href="/gp/feature.html/ref=amb_link_353320382_19?ie=UTF8&docId=1000346431&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">See more titles in Mystery &amp; Thrillers</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="h_rule"></div>
+            </div>
+            <div class="unified_widget rcm widget">
+              <script type="text/javascript">
+                if( typeof jQuery != 'undefined' ) {   amznJQ.onReady('s9shoveler', function() {
+                (function($) {
+                $("#ns_1RVCMGP6WPZF34Z5GVPD_12240_-shoveler-div").s9shoveler( 18 );
+                })(jQuery);
+                });
+                }
+              </script>
+              <div id="ns_1RVCMGP6WPZF34Z5GVPD_12240_-shoveler-div" class="s9-shoveler">
+                <div class="shoveler-header">

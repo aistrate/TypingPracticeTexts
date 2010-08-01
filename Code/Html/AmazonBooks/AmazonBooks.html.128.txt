@@ -1,0 +1,30 @@
+                  <div class="shoveler-title">
+                    <h2 style="padding-right: 6.5em;">Love You Forever: Paranormal Romance Store</h2>
+                  </div>
+                  <div class="shoveler-pagination" style="display: none;">
+                    <span>
+                      Page <span class="page-number">???</span> of <span class="num-pages">???</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="shoveler-main">
+                  <div class="shoveler-content">
+                    <a title="Back" href="#" class="prev-button button"></a>
+                    <div style="clear: both; width: 410px; height: 1px; margin: 0; padding: 0; overflow: hidden;"></div>
+                    <ul class="optional-disabled shoveler-images">
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative">
+                          <a href="/gp/product/0441018645/ref=s9_al_bw_i0?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Dead in the Family (Sookie Stackhouse, Book 10)">
+                            <div style="margin-bottom: 4px; ">
+                              <img src="http://ecx.images-amazon.com/images/I/51B7%2BbDZmTL._SL120_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image0" class="productImage" />
+                            </div>Dead in the Family
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Charlaine-Harris/e/B000AQ04CS/ref=s9_al_bw_al1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">Charlaine Harris</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$25.95</span>
+                            <span class="red t14">$14.27</span>
+                          </span>

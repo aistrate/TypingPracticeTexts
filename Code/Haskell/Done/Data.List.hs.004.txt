@@ -1,0 +1,50 @@
+import Data.Char        ( isSpace )
+
+#ifdef __GLASGOW_HASKELL__
+import GHC.Num
+import GHC.Real
+import GHC.List
+import GHC.Base
+#endif
+
+infix 5 \\
+
+stripPrefix :: Eq a => [a] -> [a] -> Maybe [a]
+stripPrefix [] ys = Just ys
+stripPrefix (x:xs) (y:ys)
+ | x == y = stripPrefix xs ys
+stripPrefix _ _ = Nothing
+
+elemIndex       :: Eq a => a -> [a] -> Maybe Int
+elemIndex x     = findIndex (x==)
+
+elemIndices     :: Eq a => a -> [a] -> [Int]
+elemIndices x   = findIndices (x==)
+
+find            :: (a -> Bool) -> [a] -> Maybe a
+find p          = listToMaybe . filter p
+
+findIndex       :: (a -> Bool) -> [a] -> Maybe Int
+findIndex p     = listToMaybe . findIndices p
+
+findIndices      :: (a -> Bool) -> [a] -> [Int]
+
+#if defined(USE_REPORT_PRELUDE) || !defined(__GLASGOW_HASKELL__)
+findIndices p xs = [ i | (x,i) <- zip xs [0..], p x]
+#else
+findIndices p ls = loop 0# ls
+                 where
+                   loop _ [] = []
+                   loop n (x:xs) | p x       = I# n : loop (n +# 1#) xs
+                                 | otherwise = loop (n +# 1#) xs
+#endif  /* USE_REPORT_PRELUDE */
+
+isPrefixOf              :: (Eq a) => [a] -> [a] -> Bool
+isPrefixOf [] _         =  True
+isPrefixOf _  []        =  False
+isPrefixOf (x:xs) (y:ys)=  x == y && isPrefixOf xs ys
+
+isSuffixOf              :: (Eq a) => [a] -> [a] -> Bool
+isSuffixOf x y          =  reverse x `isPrefixOf` reverse y
+
+isInfixOf               :: (Eq a) => [a] -> [a] -> Bool

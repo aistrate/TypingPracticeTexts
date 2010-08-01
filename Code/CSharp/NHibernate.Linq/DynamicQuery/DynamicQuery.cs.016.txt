@@ -1,0 +1,50 @@
+			{
+				Token op = token;
+				NextToken();
+				Expression right = ParseComparison();
+				CheckAndPromoteOperands(typeof(ILogicalSignatures), op.text, ref left, ref right, op.pos);
+				left = Expression.AndAlso(left, right);
+			}
+			return left;
+		}
+
+		Expression ParseComparison()
+		{
+			Expression left = ParseAdditive();
+			while (token.id == TokenId.Equal || token.id == TokenId.DoubleEqual ||
+				token.id == TokenId.ExclamationEqual || token.id == TokenId.LessGreater ||
+				token.id == TokenId.GreaterThan || token.id == TokenId.GreaterThanEqual ||
+				token.id == TokenId.LessThan || token.id == TokenId.LessThanEqual)
+			{
+				Token op = token;
+				NextToken();
+				Expression right = ParseAdditive();
+				bool isEquality = op.id == TokenId.Equal || op.id == TokenId.DoubleEqual ||
+					op.id == TokenId.ExclamationEqual || op.id == TokenId.LessGreater;
+				if (isEquality && !left.Type.IsValueType && !right.Type.IsValueType)
+				{
+					if (left.Type != right.Type)
+					{
+						if (left.Type.IsAssignableFrom(right.Type))
+						{
+							right = Expression.Convert(right, left.Type);
+						}
+						else if (right.Type.IsAssignableFrom(left.Type))
+						{
+							left = Expression.Convert(left, right.Type);
+						}
+						else
+						{
+							throw IncompatibleOperandsError(op.text, left, right, op.pos);
+						}
+					}
+				}
+				else if (IsEnumType(left.Type) || IsEnumType(right.Type))
+				{
+					if (left.Type != right.Type)
+					{
+						Expression e;
+						if ((e = PromoteExpression(right, left.Type, true)) != null)
+						{
+							right = e;
+						}

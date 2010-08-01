@@ -1,0 +1,9 @@
+X Window System
+
+The X Window System (commonly X or X11) is a computer software system and network protocol that provides a graphical user interface (GUI) for networked computers, and was initially developed as part of Project Athena. It implements the X display protocol and provides windowing on raster graphics (bitmap) computer displays and manages keyboard and pointing device control functions. In its standard distribution, it is a complete, albeit simple, display and human interface solution, but also delivers a standard toolkit and protocol stack for building graphical user interfaces on most Unix-like operating systems and OpenVMS, and has been ported to many other contemporary general purpose operating systems. Desktop environments of Unix-like operating systems offer the X Window System.
+
+X provides the basic framework, or primitives, for building such GUI environments: drawing and moving windows on the screen and interacting with a mouse and/or keyboard. X does not mandate the user interface - individual client programs handle this. As such, the visual styling of X-based environments varies greatly; different programs may present radically different interfaces. X is built as an additional application layer on top of the operating system kernel.
+
+Unlike previous display protocols, X was specifically designed to be used over network connections rather than on an integral or attached display device. X features network transparency: the machine where an application program (the client application) runs can differ from the user's local machine (the display server).
+
+X originated at MIT in 1984. The current protocol version, X11, appeared in September 1987. The X.Org Foundation leads the X project, with the current reference implementation, X.Org Server, available as free and open source software under the MIT License and similar permissive licenses.

@@ -1,0 +1,49 @@
+  reqs' <- if wakeup_all then do wakeupAll reqs; return []
+                         else completeRequests reqs readfds writefds []
+
+  service_loop wakeup readfds writefds ptimeval reqs' delays'
+
+io_MANAGER_WAKEUP, io_MANAGER_DIE :: CChar
+io_MANAGER_WAKEUP = 0xff
+io_MANAGER_DIE    = 0xfe
+
+stick :: IORef Fd
+{-# NOINLINE stick #-}
+stick = unsafePerformIO (newIORef 0)
+
+wakeupIOManager :: IO ()
+wakeupIOManager = do
+  fd <- readIORef stick
+  with io_MANAGER_WAKEUP $ \pbuf -> do 
+    c_write (fromIntegral fd) pbuf 1; return ()
+
+signalHandlerLock :: MVar ()
+signalHandlerLock = unsafePerformIO (newMVar ())
+
+foreign import ccall "&signal_handlers" handlers :: Ptr (Ptr (StablePtr (IO ())))
+
+foreign import ccall "setIOManagerPipe"
+  c_setIOManagerPipe :: CInt -> IO ()
+
+buildFdSets :: Fd -> Ptr CFdSet -> Ptr CFdSet -> [IOReq] -> IO Fd
+buildFdSets maxfd _       _        [] = return maxfd
+buildFdSets maxfd readfds writefds (Read fd _ : reqs)
+  | fd >= fD_SETSIZE =  error "buildFdSets: file descriptor out of range"
+  | otherwise        =  do
+        fdSet fd readfds
+        buildFdSets (max maxfd fd) readfds writefds reqs
+buildFdSets maxfd readfds writefds (Write fd _ : reqs)
+  | fd >= fD_SETSIZE =  error "buildFdSets: file descriptor out of range"
+  | otherwise        =  do
+        fdSet fd writefds
+        buildFdSets (max maxfd fd) readfds writefds reqs
+
+completeRequests :: [IOReq] -> Ptr CFdSet -> Ptr CFdSet -> [IOReq]
+                 -> IO [IOReq]
+completeRequests [] _ _ reqs' = return reqs'
+completeRequests (Read fd m : reqs) readfds writefds reqs' = do
+  b <- fdIsSet fd readfds
+  if b /= 0
+    then do putMVar m (); completeRequests reqs readfds writefds reqs'
+    else completeRequests reqs readfds writefds (Read fd m : reqs')
+completeRequests (Write fd m : reqs) readfds writefds reqs' = do

@@ -1,0 +1,50 @@
+			void F(long? x, long? y);
+			void F(ulong? x, ulong? y);
+			void F(float? x, float? y);
+			void F(double? x, double? y);
+			void F(decimal? x, decimal? y);
+		}
+
+		interface IRelationalSignatures : IArithmeticSignatures
+		{
+			void F(string x, string y);
+			void F(char x, char y);
+			void F(DateTime x, DateTime y);
+			void F(TimeSpan x, TimeSpan y);
+			void F(char? x, char? y);
+			void F(DateTime? x, DateTime? y);
+			void F(TimeSpan? x, TimeSpan? y);
+		}
+
+		interface IEqualitySignatures : IRelationalSignatures
+		{
+			void F(bool x, bool y);
+			void F(bool? x, bool? y);
+		}
+
+		interface IAddSignatures : IArithmeticSignatures
+		{
+			void F(DateTime x, TimeSpan y);
+			void F(TimeSpan x, TimeSpan y);
+			void F(DateTime? x, TimeSpan? y);
+			void F(TimeSpan? x, TimeSpan? y);
+		}
+
+		interface ISubtractSignatures : IAddSignatures
+		{
+			void F(DateTime x, DateTime y);
+			void F(DateTime? x, DateTime? y);
+		}
+
+		interface INegationSignatures
+		{
+			void F(int x);
+			void F(long x);
+			void F(float x);
+			void F(double x);
+			void F(decimal x);
+			void F(int? x);
+			void F(long? x);
+			void F(float? x);
+			void F(double? x);
+			void F(decimal? x);

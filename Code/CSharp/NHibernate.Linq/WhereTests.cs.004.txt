@@ -1,0 +1,49 @@
+			Assert.AreEqual(1, query.Count);
+		}
+
+		[Test]
+		public void UsersRegisteredAtOrBeforeY2KAndNamedNHibernate()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.RegisteredAt <= new DateTime(2000, 1, 1) && user.Name == "nhibernate"
+						 select user).ToList();
+			Assert.AreEqual(1, query.Count);
+		}
+
+		[Test]
+		public void UsersRegisteredAtOrBeforeY2KOrNamedNHibernate()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.RegisteredAt <= new DateTime(2000, 1, 1) || user.Name == "nhibernate"
+						 select user).ToList();
+			Assert.AreEqual(2, query.Count);
+		}
+
+		[Test]
+		public void TestDataContext()
+		{
+			var query = from u in nhib.Users
+						where u.Name == "ayende"
+						select u;
+			Assert.AreEqual(1, query.Count());
+		}
+
+		[Test]
+		public void UsersWithNullLoginDate()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.LastLoginDate == null
+						 select user).ToList();
+
+			CollectionAssert.AreCountEqual(2, query);
+		}
+
+		[Test]
+		public void UsersWithNonNullLoginDate()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.LastLoginDate != null
+						 select user).ToList();
+
+			CollectionAssert.AreCountEqual(1, query);
+		}

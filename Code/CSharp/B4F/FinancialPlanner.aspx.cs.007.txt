@@ -1,0 +1,49 @@
+            if (ExtrasSelectedIndex == 1 && (ExtraPeriodical > 0m || ExtraInitial > 0m))
+            {
+                var futureValuesAfterAdjust = FinancialPlannerAdapter.GetFutureValueSeries(
+                                                    YearsLeft, InterestRatePerYear, PresentValue + ExtraInitial, 
+                                                    DepositPerYear + ExtraPeriodical);
+                addSeries(futureDates, futureValuesAfterAdjust, "Met aanpassing", SeriesChartType.Spline, Color.FromArgb(0x1A, 0x3B, 0x69),
+                          MarkerStyle.Circle);
+            }
+
+            if (SelectedAccountId != 0)
+            {
+                DateTime[] valuationDates = FinancialPlannerAdapter.GetValuationDates(SelectedAccountId, YearsLeft);
+
+                if (valuationDates.Length > 0)
+                {
+                    List<Tuple<DateTime, decimal>> valuations = FinancialPlannerAdapter.GetValuationsTotalPortfolio(SelectedAccountId,
+                                                                                                                    valuationDates);
+                    valuations.Add(Tuple.Create(DateTime.Today, PresentValue));
+
+                    addSeries(valuations.Select(v => v.Item1).ToArray(),
+                              valuations.Select(v => v.Item2).ToArray(),
+                              "History", SeriesChartType.Spline, Color.FromArgb(0xFC, 0xB4, 0x41), MarkerStyle.None);
+                }
+            }
+
+            chPortfolioFutureValue.ChartAreas[0].AxisX.LabelStyle.Format = "MMM\nyyyy";
+            chPortfolioFutureValue.ChartAreas[0].AxisX.IntervalAutoMode = IntervalAutoMode.VariableCount;
+            chPortfolioFutureValue.ChartAreas[0].AxisX.LabelStyle.Interval = 1300;
+            
+        }
+    }
+    private bool isChartDataBound = false;
+
+    private Series addSeries(IEnumerable<DateTime> dates, IEnumerable<decimal> valueList,
+                             string seriesName, SeriesChartType chartType, Color color, MarkerStyle markerStyle)
+    {
+        return addSeries(dates, new IEnumerable<decimal>[] { valueList }, seriesName, chartType, color, markerStyle);
+    }
+
+    private Series addSeries(IEnumerable<DateTime> dates, IEnumerable<decimal>[] valueLists,
+                             string seriesName, SeriesChartType chartType, Color color, MarkerStyle markerStyle)
+    {
+        Series series = new Series(seriesName);
+        chPortfolioFutureValue.Series.Add(series);
+       
+        series.LegendText = seriesName;
+        series.XValueType = ChartValueTypes.DateTime;
+        series.EmptyPointStyle.Color = Color.Transparent;
+        series.BorderWidth = 2;

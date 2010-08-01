@@ -1,0 +1,49 @@
+lex :: ReadP Lexeme
+lex = skipSpaces >> lexToken
+
+hsLex :: ReadP String
+hsLex = do skipSpaces 
+           (s,_) <- gather lexToken
+           return s
+
+lexToken :: ReadP Lexeme
+lexToken = lexEOF     +++
+           lexLitChar +++ 
+           lexString  +++ 
+           lexPunc    +++ 
+           lexSymbol  +++ 
+           lexId      +++ 
+           lexNumber
+
+lexEOF :: ReadP Lexeme
+lexEOF = do s <- look
+            guard (null s)
+            return EOF
+
+lexPunc :: ReadP Lexeme
+lexPunc =
+  do c <- satisfy isPuncChar
+     return (Punc [c])
+ where
+  isPuncChar c = c `elem` ",;()[]{}`"
+
+lexSymbol :: ReadP Lexeme
+lexSymbol =
+  do s <- munch1 isSymbolChar
+     if s `elem` reserved_ops then 
+        return (Punc s)
+      else
+        return (Symbol s)
+ where
+  isSymbolChar c = c `elem` "!@#$%&*+./<=>?\\^|:-~"
+  reserved_ops   = ["..", "::", "=", "\\", "|", "<-", "->", "@", "~", "=>"]
+
+lexId :: ReadP Lexeme
+lexId = lex_nan <++ lex_id
+  where
+    lex_nan = (string "NaN"      >> return (Rat notANumber)) +++
+              (string "Infinity" >> return (Rat infinity))
+  
+    lex_id = do c <- satisfy isIdsChar
+                s <- munch isIdfChar
+                return (Ident (c:s))

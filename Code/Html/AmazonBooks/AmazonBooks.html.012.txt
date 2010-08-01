@@ -1,0 +1,30 @@
+#sugdivhdr
+{
+  font-size: 10px;
+  color: #888;
+  line-height: 12px;
+  padding-right: 4px;
+}
+-->
+    </style>
+    <img src="http://g-ecx.images-amazon.com/images/G/01/gno/images/orangeBlue/navPackedSprites-US-16._V212310439_.png" style="display:none" alt=""/>
+    <img src="http://g-ecx.images-amazon.com/images/G/01/x-locale/common/transparent-pixel._V192234675_.gif" style="display:none" alt=""/>
+    <!-- Tilu -->
+    <div id="navbar" style="padding:0px;" class="navbar">
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td rowspan="2" align='left' width="185" valign="bottom">
+            <a id="navLogo" class="nonGateway" href="/ref=gno_logo">
+              <span id="navLogoPrimary" class="navSprite">
+                <span>amazon.com</span>
+              </span>
+              <span id="navLogoSecondary" class="navSprite nonPrime"></span>
+            </a>
+          </td>
+          <td width="100%" align='left' height="26">
+            <table width="100%" id="welcomeRowTable" cellspacing="0" cellpadding="0" border="0">
+              <tr>
+                <td align="left" valign="bottom" class="navGreetingBkg">
+                  <div id="navidWelcomeMsg" style="white-space: nowrap;">
+                    <span class="navGreeting">Hello, Adrian Istrate.</span>
+                    <span class="navMessage" style="white-space: nowrap;">

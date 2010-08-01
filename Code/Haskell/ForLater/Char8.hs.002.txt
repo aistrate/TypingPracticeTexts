@@ -1,0 +1,49 @@
+        mapAccumL,
+        mapAccumR,
+
+        replicate,
+        unfoldr,
+        unfoldrN,
+
+        take,
+        drop,
+        splitAt,
+        takeWhile,
+        dropWhile,
+        span,
+        spanEnd,
+        break,
+        breakEnd,
+        group,
+        groupBy,
+        inits,
+        tails,
+
+        split,
+        splitWith,
+
+        lines,
+        words,
+        unlines,
+        unwords,
+
+        isPrefixOf,
+        isSuffixOf,
+        isInfixOf,
+
+        breakSubstring,
+        findSubstring,
+        findSubstrings,
+
+        elem,
+        notElem,
+
+        find,
+        filter,
+
+        index,
+        elemIndex,
+        elemIndices,
+        elemIndexEnd,
+        findIndex,
+        findIndices,

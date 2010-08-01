@@ -1,0 +1,100 @@
+            }
+
+    def save(self, commit=True):
+        
+        if self.instance.pk is None:
+            fail_message = 'created'
+        else:
+            fail_message = 'changed'
+        return save_instance(self, self.instance, self._meta.fields,
+                             fail_message, commit, exclude=self._meta.exclude)
+
+    save.alters_data = True
+
+class ModelForm(BaseModelForm):
+    __metaclass__ = ModelFormMetaclass
+
+def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
+                       formfield_callback=lambda f: f.formfield()):
+
+    attrs = {'model': model}
+    if fields is not None:
+        attrs['fields'] = fields
+    if exclude is not None:
+        attrs['exclude'] = exclude
+
+    parent = (object,)
+    if hasattr(form, 'Meta'):
+        parent = (form.Meta, object)
+    Meta = type('Meta', parent, attrs)
+
+    class_name = model.__name__ + 'Form'
+
+    form_class_attrs = {
+        'Meta': Meta,
+        'formfield_callback': formfield_callback
+    }
+
+    return ModelFormMetaclass(class_name, (form,), form_class_attrs)
+
+class BaseModelFormSet(BaseFormSet):
+    
+    model = None
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 queryset=None, **kwargs):
+        self.queryset = queryset
+        defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
+        defaults.update(kwargs)
+        super(BaseModelFormSet, self).__init__(**defaults)
+
+    def initial_form_count(self):
+        
+        if not (self.data or self.files):
+            return len(self.get_queryset())
+        return super(BaseModelFormSet, self).initial_form_count()
+
+    def _existing_object(self, pk):
+        if not hasattr(self, '_object_dict'):
+            self._object_dict = dict([(o.pk, o) for o in self.get_queryset()])
+        return self._object_dict.get(pk)
+
+    def _construct_form(self, i, **kwargs):
+        if self.is_bound and i < self.initial_form_count():
+            pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+            pk = self.data[pk_key]
+            pk_field = self.model._meta.pk
+            pk = pk_field.get_db_prep_lookup('exact', pk,
+                connection=connections[self.get_queryset().db])
+            if isinstance(pk, list):
+                pk = pk[0]
+            kwargs['instance'] = self._existing_object(pk)
+        if i < self.initial_form_count() and not kwargs.get('instance'):
+            kwargs['instance'] = self.get_queryset()[i]
+        return super(BaseModelFormSet, self)._construct_form(i, **kwargs)
+
+    def get_queryset(self):
+        if not hasattr(self, '_queryset'):
+            if self.queryset is not None:
+                qs = self.queryset
+            else:
+                qs = self.model._default_manager.get_query_set()
+
+            if not qs.ordered:
+                qs = qs.order_by(self.model._meta.pk.name)
+
+            if self.max_num > 0:
+                self._queryset = qs[:self.max_num]
+            else:
+                self._queryset = qs
+        return self._queryset
+
+    def save_new(self, form, commit=True):
+        
+        return form.save(commit=commit)
+
+    def save_existing(self, form, instance, commit=True):
+        
+        return form.save(commit=commit)
+
+    def save(self, commit=True):

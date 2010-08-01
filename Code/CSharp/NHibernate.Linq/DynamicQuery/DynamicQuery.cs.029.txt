@@ -1,0 +1,50 @@
+		}
+
+		static Type GetNonNullableType(Type type)
+		{
+			return IsNullableType(type) ? type.GetGenericArguments()[0] : type;
+		}
+
+		static string GetTypeName(Type type)
+		{
+			Type baseType = GetNonNullableType(type);
+			string s = baseType.Name;
+			if (type != baseType) s += '?';
+			return s;
+		}
+
+		static bool IsNumericType(Type type)
+		{
+			return GetNumericTypeKind(type) != 0;
+		}
+
+		static bool IsSignedIntegralType(Type type)
+		{
+			return GetNumericTypeKind(type) == 2;
+		}
+
+		static bool IsUnsignedIntegralType(Type type)
+		{
+			return GetNumericTypeKind(type) == 3;
+		}
+
+		static int GetNumericTypeKind(Type type)
+		{
+			type = GetNonNullableType(type);
+			if (type.IsEnum) return 0;
+			switch (Type.GetTypeCode(type))
+			{
+				case TypeCode.Char:
+				case TypeCode.Single:
+				case TypeCode.Double:
+				case TypeCode.Decimal:
+					return 1;
+				case TypeCode.SByte:
+				case TypeCode.Int16:
+				case TypeCode.Int32:
+				case TypeCode.Int64:
+					return 2;
+				case TypeCode.Byte:
+				case TypeCode.UInt16:
+				case TypeCode.UInt32:
+				case TypeCode.UInt64:

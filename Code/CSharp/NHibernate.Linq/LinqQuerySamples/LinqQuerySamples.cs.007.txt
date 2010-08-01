@@ -1,0 +1,50 @@
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses nested queries to return a sequence of " +
+					 "all orders containing their OrderID, a subsequence of the " +
+					 "items in the order where there is a discount, and the money " +
+					 "saved if shipping is not included.")]
+		[Ignore("TODO")]
+		public void DLinq17()
+		{
+			var q =
+				from o in db.Orders
+				select new
+						{
+							o.OrderID,
+							DiscountedProducts =
+					from od in o.OrderDetails.Cast<OrderDetail>()
+					where od.Discount > 0.0f
+					select od,
+							FreeShippingDiscount = o.Freight
+						};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses nested queries to return a sequence of " +
+					 "all orders containing their OrderID, a subsequence of the " +
+					 "items in the order where there is a discount, and the money " +
+					 "saved if shipping is not included.")]
+		[Ignore("TODO")]
+		public void DLinq17b()
+		{
+			var q =
+				from o in db.Orders
+				select new
+						{
+							o.OrderID,
+							DiscountedProducts =
+					from od in o.OrderDetails.Cast<OrderDetail>()
+					where od.Discount > 0.0f
+					select new { od.Quantity, od.UnitPrice },
+							FreeShippingDiscount = o.Freight
+						};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses nested queries to return a sequence of " +
+					 "all orders containing their OrderID, a subsequence of the " +
+					 "items in the order where there is a discount, and the money " +

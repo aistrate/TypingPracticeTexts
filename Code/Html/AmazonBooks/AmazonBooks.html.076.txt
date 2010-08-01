@@ -1,0 +1,30 @@
+                            <a href="http://www.amazon.com/Critical-Care-Mercy-Hospital-ebook/dp/B0024NJVZQ/ref=pd_ts_zgc_kinc_digital-text-f_2?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Critical Care (Mercy Hospital, Book 1)" class="titleLink">Critical Care (Mercy Hospital, Book 1)</a>
+                            <div class="tiny byline">
+                              <span class="carat"></span>Candace Calvert (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock ">
+                              <span class="listprice"></span>
+                              <strong class="price">Free</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Love-Comes-Softly-Book-ebook/dp/B001NCFCSO/ref=pd_ts_zgc_kinc_digital-text-f_3_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Love Comes Softly (Love Comes Softly Series, Book 1)">
+                              <img src="http://ecx.images-amazon.com/images/I/51Kk5QNuNNL._SL75_.jpg" alt="Love Comes" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "noDil">
+                              <span class="rank">3.</span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText"></span>
+                            </div>
+                            <a href="http://www.amazon.com/Love-Comes-Softly-Book-ebook/dp/B001NCFCSO/ref=pd_ts_zgc_kinc_digital-text-f_3?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Love Comes Softly (Love Comes Softly Series, Book 1)" class="titleLink">Love Comes Softly (Love Comes Softly Series, Book&#8230</a>
+                            <div class="tiny byline">

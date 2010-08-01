@@ -1,0 +1,100 @@
+			return fk;
+		}
+
+		public virtual UniqueKey CreateUniqueKey(IList<Column> keyColumns)
+		{
+			string keyName = "UK" + UniqueColumnString(keyColumns);
+			UniqueKey uk = GetOrCreateUniqueKey(keyName);
+			uk.AddColumns(keyColumns);
+			return uk;
+		}
+
+		public string UniqueColumnString(IEnumerable columns)
+		{
+			return UniqueColumnString(columns, null);
+		}
+
+		public string UniqueColumnString(IEnumerable iterator, string referencedEntityName)
+		{
+			int result = 37;
+			if (referencedEntityName != null)
+				result ^= referencedEntityName.GetHashCode();
+
+			foreach (object o in iterator)
+			{
+				result ^= o.GetHashCode();
+			}
+			return (name.GetHashCode().ToString("X") + result.GetHashCode().ToString("X"));
+		}
+
+		public string Schema
+		{
+			get{return schema;}
+			set
+			{
+				if (value != null && value[0] == '`')
+				{
+					isSchemaQuoted = true;
+					schema = value.Substring(1, value.Length - 2);
+				}
+				else
+				{
+					schema = value;
+				}
+			}
+		}
+
+		public int UniqueInteger
+		{
+			get { return uniqueInteger; }
+		}
+
+		public void SetIdentifierValue(SimpleValue idValue)
+		{
+			this.idValue = idValue;
+		}
+
+		public bool IsQuoted
+		{
+			get { return quoted; }
+			set { quoted = value; }
+		}
+
+		public void AddCheckConstraint(string constraint)
+		{
+			checkConstraints.Add(constraint);
+		}
+
+		public IEnumerable<string> CheckConstraintsIterator
+		{
+			get { return checkConstraints; }
+		}
+
+		public bool IsAbstractUnionTable
+		{
+			get { return HasDenormalizedTables && isAbstract; }
+		}
+
+		public bool HasDenormalizedTables
+		{
+			get { return hasDenormalizedTables; }
+		}
+
+		internal void SetHasDenormalizedTables()
+		{
+			hasDenormalizedTables = true;
+		}
+
+		public bool IsAbstract
+		{
+			get { return isAbstract; }
+			set { isAbstract = value; }
+		}
+
+		public virtual bool ContainsColumn(Column column)
+		{
+			return columns.ContainsValue(column);
+		}
+
+		public virtual Column GetColumn(Column column)
+		{

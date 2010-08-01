@@ -1,0 +1,30 @@
+          background-position: 0px -41px;
+          background-repeat:repeat-x;
+          }
+          .rhf-box-tr {
+          background-position: 0px -81px;
+          background-repeat:no-repeat;
+          }
+          .rhf-box-l {
+          background-position: -7px 0px;
+          background-repeat:repeat-y;
+          }
+          .rhf-box-r {
+          background-position: 9px 0px;
+          background-repeat:repeat-y;
+          }
+          .rhf-box-br {
+          background-position: 0px -123px;
+          background-repeat:no-repeat;
+          }
+          .rhf-box-bc {
+          background-position: 0px -139px;
+          background-repeat:repeat-x;
+          }
+          .rhf-box-bl {
+          background-position: 0px -158px;
+          background-repeat:no-repeat;
+          }
+          .rhfHistoryWrapper {
+          padding: 0 10px;
+          }

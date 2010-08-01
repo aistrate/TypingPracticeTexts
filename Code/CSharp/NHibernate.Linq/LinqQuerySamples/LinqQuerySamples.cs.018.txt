@@ -1,0 +1,50 @@
+								MostExpensiveProducts =
+					from p2 in g
+					where p2.UnitPrice == g.Max(p3 => p3.UnitPrice)
+					select p2
+							};
+
+			ObjectDumper.Write(categories, 1);
+		}
+
+		#endregion Order By Tests
+
+		#region Group By Methods
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses group by to partition Products by " +
+					 "CategoryID.")]
+		[Ignore("TODO")]
+		public void DLinq42()
+		{
+			var q =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select g;
+
+			ObjectDumper.Write(q, 1);
+
+			foreach (var o in q)
+			{
+				Console.WriteLine("\n{0}\n", o);
+
+				foreach (var p in o)
+				{
+					ObjectDumper.Write(p);
+				}
+			}
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses group by and Max " +
+					 "to find the maximum unit price for each CategoryID.")]
+		[Ignore("TODO")]
+		public void DLinq43()
+		{
+			var q =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{

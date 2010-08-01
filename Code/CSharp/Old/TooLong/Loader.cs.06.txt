@@ -1,0 +1,100 @@
+					if (!collectionPersisters[i].IsArray)
+					{
+						EndCollectionLoad(resultSetId, session, collectionPersisters[i]);
+					}
+				}
+			}
+		}
+
+		private void EndCollectionLoad(object resultSetId, ISessionImplementor session, ICollectionPersister collectionPersister)
+		{
+			session.PersistenceContext.LoadContexts.GetCollectionLoadContext((IDataReader) resultSetId)
+				.EndLoadingCollections(collectionPersister);
+		}
+
+		protected virtual IList GetResultList(IList results, IResultTransformer resultTransformer)
+		{
+			return results;
+		}
+
+		protected virtual object GetResultColumnOrRow(object[] row, IResultTransformer resultTransformer, IDataReader rs,
+		                                              ISessionImplementor session)
+		{
+			return row;
+		}
+
+		private void RegisterNonExists(EntityKey[] keys,ISessionImplementor session)
+		{
+			int[] owners = Owners;
+			if (owners != null)
+			{
+				EntityType[] ownerAssociationTypes = OwnerAssociationTypes;
+				for (int i = 0; i < keys.Length; i++)
+				{
+					int owner = owners[i];
+					if (owner > -1)
+					{
+						EntityKey ownerKey = keys[owner];
+						if (keys[i] == null && ownerKey != null)
+						{
+							bool isOneToOneAssociation = ownerAssociationTypes != null && ownerAssociationTypes[i] != null
+							                             && ownerAssociationTypes[i].IsOneToOne;
+							if (isOneToOneAssociation)
+							{
+								session.PersistenceContext.AddNullProperty(ownerKey, ownerAssociationTypes[i].PropertyName);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private void ReadCollectionElement(
+			object optionalOwner,
+			object optionalKey,
+			ICollectionPersister persister,
+			ICollectionAliases descriptor,
+			IDataReader rs,
+			ISessionImplementor session
+			)
+		{
+			IPersistenceContext persistenceContext = session.PersistenceContext;
+
+			object collectionRowKey = persister.ReadKey(
+				rs,
+				descriptor.SuffixedKeyAliases,
+				session);
+
+			if (collectionRowKey != null)
+			{
+
+				if (log.IsDebugEnabled)
+				{
+					log.Debug(
+						"found row of collection: " +
+						MessageHelper.InfoString(persister, collectionRowKey));
+				}
+
+				object owner = optionalOwner;
+				if (owner == null)
+				{
+					owner = persistenceContext.GetCollectionOwner(collectionRowKey, persister);
+					if (owner == null)
+					{
+					}
+				}
+				IPersistentCollection rowCollection = persistenceContext.LoadContexts.GetCollectionLoadContext(rs).GetLoadingCollection(persister, collectionRowKey);
+
+				if (rowCollection != null)
+				{
+					rowCollection.ReadFrom(rs, persister, descriptor, owner);
+				}
+			}
+			else if (optionalKey != null)
+			{
+
+				if (log.IsDebugEnabled)
+				{
+					log.Debug(
+						"result set contains (possibly empty) collection: " +
+						MessageHelper.InfoString(persister, optionalKey));

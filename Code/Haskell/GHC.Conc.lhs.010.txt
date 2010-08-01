@@ -1,0 +1,50 @@
+data IOReq
+  = Read   {-# UNPACK #-} !Fd {-# UNPACK #-} !(MVar ())
+  | Write  {-# UNPACK #-} !Fd {-# UNPACK #-} !(MVar ())
+#endif
+
+data DelayReq
+  = Delay    {-# UNPACK #-} !USecs {-# UNPACK #-} !(MVar ())
+  | DelaySTM {-# UNPACK #-} !USecs {-# UNPACK #-} !(TVar Bool)
+
+#ifndef mingw32_HOST_OS
+pendingEvents :: IORef [IOReq]
+#endif
+pendingDelays :: IORef [DelayReq]
+{-# NOINLINE pendingEvents #-}
+{-# NOINLINE pendingDelays #-}
+(pendingEvents,pendingDelays) = unsafePerformIO $ do
+  startIOManagerThread
+  reqs <- newIORef []
+  dels <- newIORef []
+  return (reqs, dels)
+
+ensureIOManagerIsRunning :: IO ()
+ensureIOManagerIsRunning 
+  | threaded  = seq pendingEvents $ return ()
+  | otherwise = return ()
+
+insertDelay :: DelayReq -> [DelayReq] -> [DelayReq]
+insertDelay d [] = [d]
+insertDelay d1 ds@(d2 : rest)
+  | delayTime d1 <= delayTime d2 = d1 : ds
+  | otherwise                    = d2 : insertDelay d1 rest
+
+delayTime :: DelayReq -> USecs
+delayTime (Delay t _) = t
+delayTime (DelaySTM t _) = t
+
+type USecs = Word64
+
+atomicModifyIORef :: IORef a -> (a -> (a,b)) -> IO b
+atomicModifyIORef (IORef (STRef r#)) f = IO $ \s -> atomicModifyMutVar# r# f s
+
+foreign import ccall unsafe "getUSecOfDay" 
+  getUSecOfDay :: IO USecs
+
+prodding :: IORef Bool
+{-# NOINLINE prodding #-}
+prodding = unsafePerformIO (newIORef False)
+
+prodServiceThread :: IO ()
+prodServiceThread = do

@@ -1,0 +1,49 @@
+			if (token.id == TokenId.Minus || token.id == TokenId.Exclamation ||
+				TokenIdentifierIs("not"))
+			{
+				Token op = token;
+				NextToken();
+				if (op.id == TokenId.Minus && (token.id == TokenId.IntegerLiteral ||
+					token.id == TokenId.RealLiteral))
+				{
+					token.text = "-" + token.text;
+					token.pos = op.pos;
+					return ParsePrimary();
+				}
+				Expression expr = ParseUnary();
+				if (op.id == TokenId.Minus)
+				{
+					CheckAndPromoteOperand(typeof(INegationSignatures), op.text, ref expr, op.pos);
+					expr = Expression.Negate(expr);
+				}
+				else
+				{
+					CheckAndPromoteOperand(typeof(INotSignatures), op.text, ref expr, op.pos);
+					expr = Expression.Not(expr);
+				}
+				return expr;
+			}
+			return ParsePrimary();
+		}
+
+		Expression ParsePrimary()
+		{
+			Expression expr = ParsePrimaryStart();
+			while (true)
+			{
+				if (token.id == TokenId.Dot)
+				{
+					NextToken();
+					expr = ParseMemberAccess(null, expr);
+				}
+				else if (token.id == TokenId.OpenBracket)
+				{
+					expr = ParseElementAccess(expr);
+				}
+				else
+				{
+					break;
+				}
+			}
+			return expr;
+		}

@@ -1,0 +1,49 @@
+					throw new DataServiceException("Incorrect Type Returned");
+				}
+			}
+
+			return returnValue;
+		}
+
+		object IUpdatable.GetValue(object targetResource, string propertyName)
+		{
+			IClassMetadata metadata = session.SessionFactory.GetClassMetadata(targetResource.GetType().FullName);
+			if (metadata == null)
+			{
+				throw new DataServiceException("Type not recognized as a valid type for this Context");
+			}
+
+			if (metadata.IdentifierPropertyName == propertyName)
+			{
+				return metadata.GetIdentifier(targetResource, EntityMode.Poco);
+			}
+			else
+			{
+				return metadata.GetPropertyValue(targetResource, propertyName, EntityMode.Poco);
+			}
+		}
+
+		void IUpdatable.RemoveReferenceFromCollection(object targetResource, string propertyName, object resourceToBeRemoved)
+		{
+			IClassMetadata metadata = session.SessionFactory.GetClassMetadata(targetResource.GetType().FullName);
+			if (metadata == null)
+			{
+				throw new DataServiceException("Type not recognized as a valid type for this Context");
+			}
+
+			object collection = metadata.GetPropertyValue(targetResource, propertyName, EntityMode.Poco);
+
+			if (collection is IList)
+			{
+				((IList)collection).Remove(resourceToBeRemoved);
+			}
+			else
+			{
+				MethodInfo removeMethod = collection.GetType().GetMethod("Remove", BindingFlags.Public | BindingFlags.Instance);
+				if (removeMethod == null)
+				{
+					throw new DataServiceException(string.Concat("Could not determine the collection type of the ", propertyName, " property."));
+				}
+				removeMethod.Invoke(collection, new object[] { resourceToBeRemoved });
+			}
+		}

@@ -1,0 +1,30 @@
+                          <div class="gry t11 nt">Hardcover</div>
+                          <span class="listprice gry t11">$26.95</span>
+                          <span class="red t14">$16.17</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec6?ie=UTF8&ASIN=0393066320&014303622X.source=Purchase&reason=014303622X&reason=0743241665&0743241665.source=Purchase&0743241665.order=1&isRecommendedItem=1&isPopup=0&014303622X.order=0&pf_rd_i=283155&pf_rd_s=center-10&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec6?ie=UTF8&ASIN=0393066320&014303622X.source=Purchase&reason=014303622X&reason=0743241665&0743241665.source=Purchase&0743241665.order=1&isRecommendedItem=1&isPopup=1&014303622X.order=0&pf_rd_i=283155&pf_rd_s=center-10&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ItemElement6" style="width: 33%; margin-bottom: 0px; display: none;">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0TitleContainer6" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0Title6">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ImageContainer6">
+                            <a href="/gp/product/0817439390/ref=s9_newr_bw_ir07?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Understanding Exposure, 3rd Edition: How to Shoot Great Photographs with Any Camera">
+                              <div class="imageContainer">
+                                <img url="http://ecx.images-amazon.com/images/I/51C%2BvFOQO2L._SL135_.jpg" alt="" width="104" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0Image6" />
+                              </div>Understanding Exposure, 3rd Edition...
+                            </a>
+                          </span>
+                          <div class="t11">Bryan Peterson</div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$25.99</span>
+                          <span class="red t14">$17.15</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec7?ie=UTF8&ASIN=0817439390&reason=B000YBH4YU&isRecommendedItem=1&B000YBH4YU.order=0&B000YBH4YU.source=Purchase&isPopup=0&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec7?ie=UTF8&ASIN=0817439390&reason=B000YBH4YU&isRecommendedItem=1&B000YBH4YU.order=0&B000YBH4YU.source=Purchase&isPopup=1&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>
+                        </div>
+                      </div>

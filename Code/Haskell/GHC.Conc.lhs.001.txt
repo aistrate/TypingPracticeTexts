@@ -1,0 +1,50 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude #-}
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+{-# OPTIONS_HADDOCK not-home #-}
+
+#include "Typeable.h"
+
+module GHC.Conc
+        ( ThreadId(..)
+
+        , forkIO
+        , forkOnIO
+        , numCapabilities
+        , childHandler
+        , myThreadId
+        , killThread
+        , throwTo
+        , par
+        , pseq
+        , yield
+        , labelThread
+
+        , ThreadStatus(..), BlockReason(..)
+        , threadStatus
+
+        , threadDelay
+        , registerDelay
+        , threadWaitRead
+        , threadWaitWrite
+
+        , MVar(..)
+        , newMVar
+        , newEmptyMVar
+        , takeMVar
+        , putMVar
+        , tryTakeMVar
+        , tryPutMVar
+        , isEmptyMVar
+        , addMVarFinalizer
+
+        , STM(..)
+        , atomically
+        , retry
+        , orElse
+        , catchSTM
+        , alwaysSucceeds
+        , always
+        , TVar(..)
+        , newTVar
+        , newTVarIO
+        , readTVar

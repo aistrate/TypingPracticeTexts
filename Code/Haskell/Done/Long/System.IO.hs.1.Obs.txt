@@ -1,0 +1,107 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  System.IO
+-- Copyright   :  (c) The University of Glasgow 2001
+-- License     :  BSD-style (see the file libraries/base/LICENSE)
+-- 
+-- Maintainer  :  libraries@haskell.org
+-- Stability   :  stable
+-- Portability :  portable
+--
+-- The standard IO library.
+--
+-----------------------------------------------------------------------------
+
+module System.IO (
+    -- * The IO monad
+
+    IO,                        -- instance MonadFix
+    fixIO,                     -- :: (a -> IO a) -> IO a
+
+    -- * Files and handles
+
+    FilePath,                  -- :: String
+
+    Handle,             -- abstract, instance of: Eq, Show.
+
+    -- ** Standard handles
+
+    -- | Three handles are allocated during program initialisation,
+    -- and are initially open.
+
+    stdin, stdout, stderr,   -- :: Handle
+
+    -- * Opening and closing files
+
+    -- ** Opening files
+
+    withFile,
+    openFile,                  -- :: FilePath -> IOMode -> IO Handle
+    IOMode(ReadMode,WriteMode,AppendMode,ReadWriteMode),
+
+    -- ** Closing files
+
+    hClose,                    -- :: Handle -> IO ()
+
+    -- ** Special cases
+
+    -- | These functions are also exported by the "Prelude".
+
+    readFile,                  -- :: FilePath -> IO String
+    writeFile,                 -- :: FilePath -> String -> IO ()
+    appendFile,                -- :: FilePath -> String -> IO ()
+
+    -- ** File locking
+
+    -- $locking
+
+    -- * Operations on handles
+
+    -- ** Determining and changing the size of a file
+
+    hFileSize,                 -- :: Handle -> IO Integer
+#ifdef __GLASGOW_HASKELL__
+    hSetFileSize,              -- :: Handle -> Integer -> IO ()
+#endif
+
+    -- ** Detecting the end of input
+
+    hIsEOF,                    -- :: Handle -> IO Bool
+    isEOF,                     -- :: IO Bool
+
+    -- ** Buffering operations
+
+    BufferMode(NoBuffering,LineBuffering,BlockBuffering),
+    hSetBuffering,             -- :: Handle -> BufferMode -> IO ()
+    hGetBuffering,             -- :: Handle -> IO BufferMode
+    hFlush,                    -- :: Handle -> IO ()
+
+    -- ** Repositioning handles
+
+    hGetPosn,                  -- :: Handle -> IO HandlePosn
+    hSetPosn,                  -- :: HandlePosn -> IO ()
+    HandlePosn,                -- abstract, instance of: Eq, Show.
+
+    hSeek,                     -- :: Handle -> SeekMode -> Integer -> IO ()
+    SeekMode(AbsoluteSeek,RelativeSeek,SeekFromEnd),
+#if !defined(__NHC__)
+    hTell,                     -- :: Handle -> IO Integer
+#endif
+
+    -- ** Handle properties
+
+    hIsOpen, hIsClosed,        -- :: Handle -> IO Bool
+    hIsReadable, hIsWritable,  -- :: Handle -> IO Bool
+    hIsSeekable,               -- :: Handle -> IO Bool
+
+    -- ** Terminal operations (not portable: GHC\/Hugs only)
+
+#if !defined(__NHC__)
+    hIsTerminalDevice,          -- :: Handle -> IO Bool
+
+    hSetEcho,                   -- :: Handle -> Bool -> IO ()
+    hGetEcho,                   -- :: Handle -> IO Bool
+#endif
+
+    -- ** Showing handle state (not portable: GHC only)

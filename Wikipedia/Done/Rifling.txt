@@ -1,0 +1,9 @@
+Rifling
+
+Rifling is the process of making spiral grooves in the barrel of a gun or firearm, which imparts a spin to a projectile around its long axis. This spin serves to gyroscopically stabilize the projectile, improving its aerodynamic stability and accuracy.
+
+Rifling is described by its twist rate, which indicates the distance the bullet must travel to complete one full revolution, such as "1 turn in 10 inches" (1:10 inches), or "1 turn in 30 cm" (1:30 cm). A shorter distance indicates a "faster" twist, meaning that for a given velocity the projectile will be rotating at a higher spin rate.
+
+A combination of the weight, length and shape of a projectile determines the twist rate needed to stabilize it - barrels intended for short, large-diameter projectiles like spherical lead balls require a very low twist rate, such as 1 turn in 48 inches (122 cm). Barrels intended for long, small-diameter bullets, such as the ultra-low-drag, 80-grain 0.223 inch bullets (5.2 g, 5.56 mm), use twist rates of 1 turn in 8 inches (20 cm) or faster.
+
+In some cases, rifling will have twist rates that increases down the length of the barrel, called a gain twist or progressive twist; a twist rate that decreases from breech to muzzle is undesirable, as it cannot reliably stabilize the bullet as it travels down the bore. Extremely long projectiles such as flechettes may require impractically high twist rates; these projectiles must be inherently stable, and are often fired from a smoothbore barrel.

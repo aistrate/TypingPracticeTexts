@@ -1,0 +1,30 @@
+      sequenceID : 1,
+      getSessionID : function() {
+      return "182-0202755-3246608";
+      },
+      getRequestID : function() {
+      return "1RVCMGP6WPZF34Z5GVPD";
+      },
+      getMarketplaceID : function() {
+      return "ATVPDKIKX0DER";
+      },
+
+      getBaseURL : function() {
+      return "http://client-log.amazon.com/clog";
+      },
+      epoch : 0,
+
+      debug: function(msg) {
+      for( var i = 0; i < this.debugCallbacks.length; i++ ) {
+            this.debugCallbacks[i](msg);
+        }
+    },
+    addDebugCallback: function(func) {
+        this.debugCallbacks.push(func);
+    },
+    sendPreparedCLOGEntry: function(clientId, namespace, params) {
+        var args = new Array(clientId, namespace, params, (new Date()).getTime() );
+        this._spArgs.push(args);
+    },
+    sendCLOGEntry: function(clientId, namespace, params) {
+        var args = new Array(clientId, namespace, params,(new Date()).getTime() );

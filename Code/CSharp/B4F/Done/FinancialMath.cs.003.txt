@@ -1,0 +1,65 @@
+                bY = func(bX);
+
+                if (IsZero(bY - goalY))
+                    return bX;
+
+                if (IsZero(bY - aY))
+                {
+                    deltaX *= 2;
+                    continue;
+                }
+
+                if ((aY - goalY) * (bY - goalY) < 0)
+                    break;
+
+                if (Math.Abs(aY - goalY) < Math.Abs(bY - goalY))
+                    deltaX *= -1;
+                else
+                    deltaX *= 2;
+            }
+
+            while (true)
+            {
+                cycles = incCycles(cycles);
+
+                double cX = (aX + bX) / 2,
+                       cY = func(cX);
+
+                if (IsZero(cY - goalY))
+                    return cX;
+
+                if ((aY - goalY) * (cY - goalY) < 0)
+                {
+                    bX = cX;
+                    bY = cY;
+                }
+                else
+                {
+                    aX = cX;
+                    aY = cY;
+                }
+            }
+        }
+
+        private static int incCycles(int cycles)
+        {
+            if (cycles >= maxCycles)
+                throw new ApplicationException(string.Format("GoalSeek could not find a solution in {0} cycles.", maxCycles));
+
+            return cycles + 1;
+        }
+        private const int maxCycles = 2000;
+
+        public static bool IsZero(double x)
+        {
+            return IsZero(x, 1e-3);
+        }
+
+        public static bool IsZero(double x, double epsilon)
+        {
+            return Math.Abs(x) < epsilon;
+        }
+
+        #endregion
+    }
+}

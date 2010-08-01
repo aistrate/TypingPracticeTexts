@@ -1,0 +1,49 @@
+   , mapAccumL
+   , mapAccumR
+
+   , iterate
+   , repeat
+   , replicate
+   , cycle
+
+   , unfoldr
+
+   , take
+   , drop
+   , splitAt
+
+   , takeWhile
+   , dropWhile
+   , span
+   , break
+
+   , stripPrefix
+
+   , group
+
+   , inits
+   , tails
+
+   , isPrefixOf
+   , isSuffixOf
+   , isInfixOf
+
+   , elem
+   , notElem
+   , lookup
+
+   , find
+   , filter
+   , partition
+
+   , (!!)
+
+   , elemIndex
+   , elemIndices
+
+   , findIndex
+   , findIndices
+
+   , zip
+   , zip3
+   , zip4, zip5, zip6, zip7

@@ -1,0 +1,37 @@
+	    ((p, cs''), us') = case cs' of
+	    	 	       '.':'*':r -> let (us'', p') = getStar us in ((p', r), us'')
+		               '.':r -> (stoi 0 r, us)
+			       _     -> ((-1, cs'), us)
+	in  (n, p, l, z, s, cs'', us')
+getSpecs l z s cs       us = (0, -1, l, z, s, cs, us)
+
+getStar :: [UPrintf] -> ([UPrintf], Int)
+getStar us =
+    case us of
+    [] -> argerr
+    nu : us' -> (us', toint nu)
+
+dfmt' :: Char -> Int -> UPrintf -> (String, String)
+dfmt' c p (UDouble d) = dfmt c p d
+dfmt' c p (UFloat f)  = dfmt c p f
+dfmt' _ _ _           = baderr
+
+dfmt :: (RealFloat a) => Char -> Int -> a -> (String, String)
+dfmt c p d =
+	case (if isUpper c then map toUpper else id) $
+             (case toLower c of
+                  'e' -> showEFloat
+                  'f' -> showFFloat
+                  'g' -> showGFloat
+                  _   -> error "Printf.dfmt: impossible"
+             )
+               (if p < 0 then Nothing else Just p) d "" of
+	'-':cs -> ("-", cs)
+	cs     -> ("" , cs)
+
+perror :: String -> a
+perror s = error ("Printf.printf: "++s)
+fmterr, argerr, baderr :: a
+fmterr = perror "formatting string ended prematurely"
+argerr = perror "argument list ended prematurely"
+baderr = perror "bad argument"

@@ -1,0 +1,7 @@
+Podcast
+
+A podcast is a series of digital media files (either audio or video) that are released episodically and downloaded through web syndication.
+
+The mode of delivery differentiates podcasts from other ways of accessing media files over the Internet, such as simple download or streamed webcasts: a centrally-maintained web feed on the distributor's server lists all files associated with a given series, and special client software applications known as podcatchers (e.g., iTunes, Zune, Juice, and Winamp) are used that can automatically identify and download new files in the series when they are released, by checking the feed for updates. New files are thus downloaded automatically and stored locally on the user's computer or other device ready for offline use, giving simpler access to episodic content. The most common audio file format used is MP3.
+
+Researchers at the Center for Journalism and Communication Research at the University of Texas at Austin in the USA are proposing a four-part definition of a podcast: A podcast is a digital audio or video file that is episodic; downloadable; programme-driven, mainly with a host and/or theme; and convenient, usually via an automated feed with computer software.

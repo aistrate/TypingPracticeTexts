@@ -1,0 +1,30 @@
+              locationAlign: "center",
+              locationElement: anchor,
+              modal: false,
+              showCloseButton: true,
+              title: title,
+              closeText: "close",
+              width: 316
+              });
+              }
+              }
+            </script>
+            <div style="display:none;"></div>
+            <table border="0" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="center">
+                  <map name="fall09FreeSSS">
+                    <area shape="rect" coords="0,0,300,120" alt="Summer Reading for Kids and Teens" href="/Summer-Reading-Kids-Books/b/ref=amb_link_353151962_2?ie=UTF8&node=565572&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=right-5&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265042402&pf_rd_i=283155"/>
+                  </map>
+                  <img src="http://g-ecx.images-amazon.com/images/G/01/img10/books/300-column/summer_reading_kt_300x120._V211794756_.jpg" width="300" align="center" usemap="#fall09FreeSSS" alt="Summer Reading for Kids and Teens" height="120" border="0" />
+                </td>
+              </tr>
+            </table>
+            <br>
+              <div class="unified_widget rcmBody">
+                <h2>Crack Odyssey</h2><a href="/Portrait-Addict-Young-Man-Memoir/dp/0316054674/ref=amb_link_353249962_1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=right-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264330442&pf_rd_i=283155">
+                  <img src="http://ecx.images-amazon.com/images/P/0316054674.01._SL110_PIsitb-sticker-arrow-sm,TopRight,10,-13_PE40_OU01_SCLZZZZZZZ_V191546926_.jpg" width="88" align="left" alt="Portrait of an Addict as a Young Man" height="133" border="0" />
+                </a><a href="/Portrait-Addict-Young-Man-Memoir/dp/0316054674/ref=amb_link_353249962_2?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=right-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1264330442&pf_rd_i=283155">
+                  <i>Portrait of an Addict as a Young Man</i>
+                </a> is Bill Clegg's visceral memoir of a life as a successful literary agent nearly destroyed by his hunger for the next exhilarating hit from the pipe.
+                <br clear="left">

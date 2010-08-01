@@ -1,0 +1,100 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
+using NHibernate.Engine;
+using NHibernate.Tool.hbm2ddl;
+using NHibernate.Util;
+
+namespace NHibernate.Mapping
+{
+	/// <summary>
+	/// Represents a Table in a database that an object gets mapped against.
+	/// </summary>
+	[Serializable]
+	public class Table : IRelationalModel
+	{
+		internal class ForeignKeyKey: IEqualityComparer<ForeignKeyKey>
+		{
+			internal string referencedClassName;
+			internal List<Column> columns;
+			internal List<Column> referencedColumns;
+
+			internal ForeignKeyKey(IEnumerable<Column> columns, string referencedClassName, IEnumerable<Column> referencedColumns)
+			{
+				this.referencedClassName = referencedClassName;
+				this.columns = new List<Column>(columns);
+				if (referencedColumns != null)
+					this.referencedColumns = new List<Column>(referencedColumns);
+				else
+					this.referencedColumns = new List<Column>();
+			}
+
+			public override int GetHashCode()
+			{
+				return GetHashCode(this);
+			}
+
+			public override bool Equals(object other)
+			{
+				ForeignKeyKey that = other as ForeignKeyKey;
+				if (that != null)
+					return Equals(this, that);
+				else
+					return false;
+			}
+
+			#region IEqualityComparer<ForeignKeyKey> Members
+
+			public bool Equals(ForeignKeyKey x, ForeignKeyKey y)
+			{
+				// NH : Different implementation to prevent NH930 (look test)
+				return //y.referencedClassName.Equals(x.referencedClassName) &&
+					CollectionHelper.CollectionEquals<Column>(y.columns, x.columns) &&
+					CollectionHelper.CollectionEquals<Column>(y.referencedColumns, x.referencedColumns);
+			}
+
+			public int GetHashCode(ForeignKeyKey obj)
+			{
+				int result = CollectionHelper.GetHashCode(obj.columns) ^ CollectionHelper.GetHashCode(obj.referencedColumns);
+				return result;
+			}
+
+			#endregion
+		}
+
+		private string name;
+		private string schema;
+		private string catalog;
+
+		private readonly LinkedHashMap<string, Column> columns = new LinkedHashMap<string, Column>();
+		private IKeyValue idValue;
+		private PrimaryKey primaryKey;
+		private readonly Dictionary<string, Index> indexes = new Dictionary<string, Index>();
+		private readonly Dictionary<ForeignKeyKey, ForeignKey> foreignKeys = new Dictionary<ForeignKeyKey, ForeignKey>();
+		private readonly Dictionary<string, UniqueKey> uniqueKeys = new Dictionary<string, UniqueKey>();
+		private readonly int uniqueInteger;
+		private bool quoted;
+		private static int tableCounter = 0;
+		private readonly List<string> checkConstraints = new List<string>();
+		private bool isAbstract;
+		private bool hasDenormalizedTables = false;
+		private string comment;
+		private string subselect;
+		private string rowId;
+		private bool isSchemaQuoted;
+
+		/// <summary>
+		/// Initializes a new instance of <see cref="Table"/>.
+		/// </summary>
+		public Table()
+		{
+			uniqueInteger = tableCounter++;
+		}
+
+		public Table(string name)
+			: this()
+		{
+			Name = name;
+		}

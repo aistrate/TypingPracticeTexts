@@ -1,0 +1,49 @@
+        [Test]
+        public void Indexer()
+        {
+            CachedList<string> cachedList = new CachedList<string>(threeLetterStrings);
+
+            for (int i = 0; i < threeLetterStrings.Length; i++)
+                Assert.AreEqual(threeLetterStrings[i], cachedList[i], "First/at index: " + i.ToString());
+
+            IEnumerator<string> cachedListEnum = cachedList.GetEnumerator();
+            for (int i = 0; i < threeLetterStrings.Length + 1; i++)
+                cachedListEnum.MoveNext();
+
+            for (int i = 0; i < threeLetterStrings.Length; i++)
+                Assert.AreEqual(threeLetterStrings[i], cachedList[i], "Second/at index: " + i.ToString());
+        }
+
+        [Test]
+        public void IndexerOutOfRange()
+        {
+            CachedList<string> cachedList = new CachedList<string>(new string[] { });
+            string s;
+
+            Assert.Catch<ArgumentOutOfRangeException>(() => { s = cachedList[-1]; });
+            Assert.Catch<ArgumentOutOfRangeException>(() => { s = cachedList[-7]; });
+            Assert.Catch<ArgumentOutOfRangeException>(() => { s = cachedList[0]; });
+            Assert.Catch<ArgumentOutOfRangeException>(() => { s = cachedList[1]; });
+            Assert.Catch<ArgumentOutOfRangeException>(() => { s = cachedList[10]; });
+
+            cachedList = new CachedList<string>(new string[] { "abc" });
+
+            s = cachedList[0];
+            Assert.Catch<ArgumentOutOfRangeException>(() => { s = cachedList[1]; });
+            Assert.Catch<ArgumentOutOfRangeException>(() => { s = cachedList[-1]; });
+        }
+
+        private string[] threeLetterStrings = Enumerable.Range(0, 26)
+                                                        .Select(i => (char)(i + (byte)'a'))
+                                                        .Select(c => new string(Enumerable.Repeat(c, 3).ToArray()))
+                                                        .ToArray();
+
+        #endregion
+
+        #region Performance Tests
+
+        [Test]
+        public void PerformanceTest_IEnumerable()
+        {
+            Counter counter = new Counter();
+            IEnumerable<int> numbersEnum = getNaturalNumbers(counter);

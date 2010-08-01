@@ -1,0 +1,50 @@
+			var query = (from user in session.Linq<User>()
+						 where names.Contains(user.Name)
+						 select user).ToList();
+
+			Assert.AreEqual(2, query.Count);
+		}
+
+		[Test]
+		public void UsersWithListContains()
+		{
+			var names = new List<string>() { "ayende", "rahien" };
+
+			var query = (from user in session.Linq<User>()
+						 where names.Contains(user.Name)
+						 select user).ToList();
+
+			Assert.AreEqual(2, query.Count);
+		}
+
+		[Test]
+		public void TimesheetsWithCollectionContains()
+		{
+			TimesheetEntry entry = session.Get<TimesheetEntry>(1);
+
+			var timesheet = (from sheet in session.Linq<Timesheet>()
+							 where sheet.Entries.Contains(entry)
+							 select sheet).Single();
+
+			Assert.AreEqual(2, timesheet.Id);
+		}
+
+		[Test]
+		public void UsersWithStringNotContains()
+		{
+			var query = (from user in session.Linq<User>()
+						 where !user.Name.Contains("yend")
+						 select user).ToList();
+			Assert.AreEqual(2, query.Count);
+		}
+
+		[Test]
+		public void UsersWithArrayNotContains()
+		{
+			var names = new string[] { "ayende", "rahien" };
+
+			var query = (from user in session.Linq<User>()
+						 where !names.Contains(user.Name)
+						 select user).ToList();
+
+			Assert.AreEqual(1, query.Count);

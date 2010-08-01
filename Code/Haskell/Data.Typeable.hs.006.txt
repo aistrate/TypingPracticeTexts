@@ -1,0 +1,50 @@
+instance (Typeable1 s, Typeable a)
+       => Typeable (s a) where
+  typeOf = typeOfDefault
+
+instance (Typeable2 s, Typeable a)
+       => Typeable1 (s a) where
+  typeOf1 = typeOf1Default
+
+instance (Typeable3 s, Typeable a)
+       => Typeable2 (s a) where
+  typeOf2 = typeOf2Default
+
+instance (Typeable4 s, Typeable a)
+       => Typeable3 (s a) where
+  typeOf3 = typeOf3Default
+
+instance (Typeable5 s, Typeable a)
+       => Typeable4 (s a) where
+  typeOf4 = typeOf4Default
+
+instance (Typeable6 s, Typeable a)
+       => Typeable5 (s a) where
+  typeOf5 = typeOf5Default
+
+instance (Typeable7 s, Typeable a)
+       => Typeable6 (s a) where
+  typeOf6 = typeOf6Default
+
+#endif /* __GLASGOW_HASKELL__ */
+
+cast :: (Typeable a, Typeable b) => a -> Maybe b
+cast x = r
+       where
+         r = if typeOf x == typeOf (fromJust r)
+               then Just $ unsafeCoerce x
+               else Nothing
+
+gcast :: (Typeable a, Typeable b) => c a -> Maybe (c b)
+gcast x = r
+ where
+  r = if typeOf (getArg x) == typeOf (getArg (fromJust r))
+        then Just $ unsafeCoerce x
+        else Nothing
+  getArg :: c x -> x 
+  getArg = undefined
+
+gcast1 :: (Typeable1 t, Typeable1 t') => c (t a) -> Maybe (c (t' a)) 
+gcast1 x = r
+ where
+  r = if typeOf1 (getArg x) == typeOf1 (getArg (fromJust r))

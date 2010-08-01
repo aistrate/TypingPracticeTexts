@@ -1,0 +1,9 @@
+Turing machine
+
+A Turing machine is a theoretical device that manipulates symbols contained on a strip of tape. Despite its simplicity, a Turing machine can be adapted to simulate the logic of any computer algorithm, and is particularly useful in explaining the functions of a CPU inside of a computer. The "Turing" machine (its author called his machine an "a(utomatic)-machine") was described by Alan Turing in 1937. Turing machines are not intended as a practical computing technology, but rather as a thought experiment representing a computing machine. They help computer scientists understand the limits of mechanical computation.
+
+A succinct definition of the thought experiment was given by Turing in his 1948 essay, "Intelligent Machinery". Referring back to his 1936 publication, Turing writes that the Turing machine, here called a Logical Computing Machine, consisted of:
+
+A Turing machine that is able to simulate any other Turing machine is called a Universal Turing machine (UTM, or simply a universal machine). A more mathematically-oriented definition with a similar "universal" nature was introduced by Alonzo Church, whose work on lambda calculus intertwined with Turing's in a formal theory of computation known as the Church-Turing thesis. The thesis states that Turing machines indeed capture the informal notion of effective method in logic and mathematics, and provide a precise definition of an algorithm or 'mechanical procedure'.
+
+Studying their abstract properties yields many insights into computer science and complexity theory.

@@ -1,0 +1,50 @@
+			int q = db.Products.Count(p => !p.Discontinued);
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Sum to find the total freight over all Orders.")]
+		public void DLinq21()
+		{
+			decimal? q = db.Orders.Select(o => o.Freight).Sum();
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Sum to find the total number of units on order over all Products.")]
+		public void DLinq22()
+		{
+			int? q = db.Products.Sum(p => p.UnitsOnOrder);
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Min to find the lowest unit price of any Product.")]
+		public void DLinq23()
+		{
+			decimal? q = db.Products.Select(p => p.UnitPrice).Min();
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Min to find the lowest freight of any Order.")]
+		public void DLinq24()
+		{
+			decimal? q = db.Orders.Min(o => o.Freight);
+			Console.WriteLine(q);
+		}
+
+		[Category("COUNT/SUM/MIN/MAX/AVG")]
+		[Test(Description = "This sample uses Min to find the Products that have the lowest unit price " +
+					 "in each category.")]
+		[Ignore("TODO")]
+		public void DLinq25()
+		{
+			var categories =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								CategoryID = g.Key,
+								CheapestProducts =

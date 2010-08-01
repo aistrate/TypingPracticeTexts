@@ -1,0 +1,100 @@
+(function(){
+
+var 
+	window = this,
+	undefined,
+	_jQuery = window.jQuery,
+	_$ = window.$,
+
+	jQuery = window.jQuery = window.$ = function( selector, context ) {
+		return new jQuery.fn.init( selector, context );
+	},
+
+	quickExpr = /^[^<]*(<(.|\s)+>)[^>]*$|^#([\w-]+)$/,
+	isSimple = /^.[^:#\[\.,]*$/;
+
+jQuery.fn = jQuery.prototype = {
+	init: function( selector, context ) {
+		selector = selector || document;
+
+		if ( selector.nodeType ) {
+			this[0] = selector;
+			this.length = 1;
+			this.context = selector;
+			return this;
+		}
+		if ( typeof selector === "string" ) {
+			var match = quickExpr.exec( selector );
+
+			if ( match && (match[1] || !context) ) {
+
+				if ( match[1] )
+					selector = jQuery.clean( [ match[1] ], context );
+
+				else {
+					var elem = document.getElementById( match[3] );
+
+					if ( elem && elem.id != match[3] )
+						return jQuery().find( selector );
+
+					var ret = jQuery( elem || [] );
+					ret.context = document;
+					ret.selector = selector;
+					return ret;
+				}
+
+			} else
+				return jQuery( context ).find( selector );
+
+		} else if ( jQuery.isFunction( selector ) )
+			return jQuery( document ).ready( selector );
+
+		if ( selector.selector && selector.context ) {
+			this.selector = selector.selector;
+			this.context = selector.context;
+		}
+
+		return this.setArray(jQuery.isArray( selector ) ?
+			selector :
+			jQuery.makeArray(selector));
+	},
+
+	selector: "",
+
+	jquery: "1.3.2",
+
+	size: function() {
+		return this.length;
+	},
+
+	get: function( num ) {
+		return num === undefined ?
+
+			Array.prototype.slice.call( this ) :
+
+			this[ num ];
+	},
+
+	pushStack: function( elems, name, selector ) {
+		var ret = jQuery( elems );
+
+		ret.prevObject = this;
+
+		ret.context = this.context;
+
+		if ( name === "find" )
+			ret.selector = this.selector + (this.selector ? " " : "") + selector;
+		else if ( name )
+			ret.selector = this.selector + "." + name + "(" + selector + ")";
+
+		return ret;
+	},
+
+	setArray: function( elems ) {
+		this.length = 0;
+		Array.prototype.push.apply( this, elems );
+
+		return this;
+	},
+
+	each: function( callback, args ) {

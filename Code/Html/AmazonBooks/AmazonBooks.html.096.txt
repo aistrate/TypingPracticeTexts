@@ -1,0 +1,30 @@
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Catherine-Coulter/e/B000AQ4ZSW/ref=s9_al_bw_al13?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Catherine Coulter</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$26.95</span>
+                            <span class="red t14">$14.55</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0312622872/ref=s9_al_bw_i13?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="The Nearest Exit">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/51pqQl7H5XL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL120_OU01_.jpg" alt="" width="80" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12239_Image13" class="productImage" />
+                            </div>The Nearest Exit
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Olen-Steinhauer/e/B001ITYIM8/ref=s9_al_bw_al14?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Olen Steinhauer</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$25.99</span>
+                            <span class="red t14">$17.15</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>

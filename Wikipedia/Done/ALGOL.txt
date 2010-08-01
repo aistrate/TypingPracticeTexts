@@ -1,0 +1,13 @@
+ALGOL
+
+ALGOL (short for ALGOrithmic Language) is a family of imperative computer programming languages originally developed in the mid 1950s which greatly influenced many other languages and became the de facto way algorithms were described in textbooks and academic works for almost the next 30 years. It was designed to avoid some of the perceived problems with FORTRAN and eventually gave rise to many other programming languages (including BCPL, B, Pascal, Simula and C). ALGOL introduced code blocks and was the first language to use begin and end pairs for delimiting them. Fragments of ALGOL-like syntax are sometimes still used as a notation for algorithms, so-called Pidgin code.
+
+There were three major specifications:
+
+ * ALGOL 58 - originally proposed to be called IAL (for International Algorithmic Language).
+ * ALGOL 60, described in detail in this article - revised 1963
+ * ALGOL 68 - revised 1973 - introduced things like flexible arrays, slices, parallelism, the extensibility features (especially operator identification), and so forth.
+
+Niklaus Wirth based his own ALGOL W on ALGOL 60 before moving to develop Pascal. Algol-W was intended to be the next generation ALGOL but the ALGOL 68 committee decided on a design that was more complex and advanced rather than a cleaned simplified ALGOL 60. The official ALGOL versions are named after the year they were first published.
+
+Algol 68 is substantially different from Algol 60 but was not well received so that in general "Algol" means dialects of Algol 60.

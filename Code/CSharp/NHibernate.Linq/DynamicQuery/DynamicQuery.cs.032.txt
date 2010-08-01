@@ -1,0 +1,50 @@
+				type = type.BaseType;
+			}
+		}
+
+		static void AddInterface(List<Type> types, Type type)
+		{
+			if (!types.Contains(type))
+			{
+				types.Add(type);
+				foreach (Type t in type.GetInterfaces()) AddInterface(types, t);
+			}
+		}
+
+		class MethodData
+		{
+			public MethodBase MethodBase;
+			public ParameterInfo[] Parameters;
+			public Expression[] Args;
+		}
+
+		int FindBestMethod(IEnumerable<MethodBase> methods, Expression[] args, out MethodBase method)
+		{
+			MethodData[] applicable = methods.
+				Select(m => new MethodData { MethodBase = m, Parameters = m.GetParameters() }).
+				Where(m => IsApplicable(m, args)).
+				ToArray();
+			if (applicable.Length > 1)
+			{
+				applicable = applicable.
+					Where(m => applicable.All(n => m == n || IsBetterThan(args, m, n))).
+					ToArray();
+			}
+			if (applicable.Length == 1)
+			{
+				MethodData md = applicable[0];
+				for (int i = 0; i < args.Length; i++) args[i] = md.Args[i];
+				method = md.MethodBase;
+			}
+			else
+			{
+				method = null;
+			}
+			return applicable.Length;
+		}
+
+		bool IsApplicable(MethodData method, Expression[] args)
+		{
+			if (method.Parameters.Length != args.Length) return false;
+			Expression[] promotedArgs = new Expression[args.Length];
+			for (int i = 0; i < args.Length; i++)

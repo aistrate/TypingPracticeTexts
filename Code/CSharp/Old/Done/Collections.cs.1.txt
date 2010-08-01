@@ -1,0 +1,92 @@
+using log4net;
+using NHibernate.Collection;
+using NHibernate.Impl;
+using NHibernate.Persister.Collection;
+using NHibernate.Type;
+
+namespace NHibernate.Engine
+{
+	public static class Collections
+	{
+		private static readonly ILog log = LogManager.GetLogger(typeof(Collections));
+
+		/// <summary> 
+		/// Record the fact that this collection was dereferenced 
+		/// </summary>
+		/// <param name="coll">The collection to be updated by unreachability. </param>
+		/// <param name="session">The session.</param>
+		public static void ProcessUnreachableCollection(IPersistentCollection coll, ISessionImplementor session)
+		{
+			if (coll.Owner == null)
+			{
+				ProcessNeverReferencedCollection(coll, session);
+			}
+			else
+			{
+				ProcessDereferencedCollection(coll, session);
+			}
+		}
+
+		private static void ProcessNeverReferencedCollection(IPersistentCollection coll, ISessionImplementor session)
+		{
+			CollectionEntry entry = session.PersistenceContext.GetCollectionEntry(coll);
+
+			log.Debug("Found collection with unloaded owner: " + MessageHelper.InfoString(entry.LoadedPersister, entry.LoadedKey, session.Factory));
+
+			entry.CurrentPersister = entry.LoadedPersister;
+			entry.CurrentKey = entry.LoadedKey;
+
+			PrepareCollectionForUpdate(coll, entry);
+		}
+
+		private static void ProcessDereferencedCollection(IPersistentCollection coll, ISessionImplementor session)
+		{
+			IPersistenceContext persistenceContext = session.PersistenceContext;
+			CollectionEntry entry = persistenceContext.GetCollectionEntry(coll);
+			ICollectionPersister loadedPersister = entry.LoadedPersister;
+
+			if (log.IsDebugEnabled && loadedPersister != null)
+				log.Debug("Collection dereferenced: " + MessageHelper.InfoString(loadedPersister, entry.LoadedKey, session.Factory));
+
+			// do a check
+			bool hasOrphanDelete = loadedPersister != null && loadedPersister.HasOrphanDelete;
+			if (hasOrphanDelete)
+			{
+				object ownerId = loadedPersister.OwnerEntityPersister.GetIdentifier(coll.Owner, session.EntityMode);
+				//if (ownerId == null)
+				//{
+				//  // the owning entity may have been deleted and its identifier unset due to
+				//  // identifier-rollback; in which case, try to look up its identifier from
+				//  // the persistence context
+				//  if (session.Factory.Settings.IsIdentifierRollbackEnabled)
+				//  {
+				//    EntityEntry ownerEntry = persistenceContext.GetEntry(coll.Owner);
+				//    if (ownerEntry != null)
+				//    {
+				//      ownerId = ownerEntry.Id;
+				//    }
+				//  }
+				//  if (ownerId == null)
+				//  {
+				//    throw new AssertionFailure("Unable to determine collection owner identifier for orphan-delete processing");
+				//  }
+				//}
+				EntityKey key = new EntityKey(ownerId, loadedPersister.OwnerEntityPersister, session.EntityMode);
+				object owner = persistenceContext.GetEntity(key);
+				if (owner == null)
+				{
+					throw new AssertionFailure("collection owner not associated with session: " + loadedPersister.Role);
+				}
+				EntityEntry e = persistenceContext.GetEntry(owner);
+				//only collections belonging to deleted entities are allowed to be dereferenced in the case of orphan delete
+				if (e != null && e.Status != Status.Deleted && e.Status != Status.Gone)
+				{
+					throw new HibernateException("A collection with cascade=\"all-delete-orphan\" was no longer referenced by the owning entity instance: " + loadedPersister.Role);
+				}
+			}
+
+			// do the work
+			entry.CurrentPersister = null;
+			entry.CurrentKey = null;
+			PrepareCollectionForUpdate(coll, entry);
+		}

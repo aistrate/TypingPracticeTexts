@@ -1,0 +1,9 @@
+Complex number
+
+A complex number, in mathematics, is a number comprising a real number and an imaginary number. It can be written in the form a + bi, where a and b are real numbers, and i is the standard imaginary unit with the property i^2 = -1. The complex numbers contain the ordinary real numbers, but extend them by adding in extra numbers and correspondingly expanding the understanding of addition and multiplication. This is in order to form a closed field, where any polynomial equation has a root, including examples such as x^2 = -1.
+
+Complex numbers were first conceived and defined by the Italian mathematician Gerolamo Cardano, who called them "fictitious", during his attempts to find solutions to cubic equations. The solution of a general cubic equation in radicals (without trigonometric functions) may require intermediate calculations containing the square roots of negative numbers, even when the final solutions are real numbers, a situation known as casus irreducibilis. This ultimately led to the fundamental theorem of algebra, which shows that with complex numbers, a solution exists to every polynomial equation of degree one or higher.
+
+The rules for addition, subtraction, multiplication, and division of complex numbers were developed by the Italian mathematician Rafael Bombelli. A more abstract formalism for the complex numbers was further developed by the Irish mathematician William Rowan Hamilton, who extended this abstraction to the theory of quaternions.
+
+Complex numbers are used in a number of fields, including: engineering, electromagnetism, quantum physics, applied mathematics, and chaos theory. When the underlying field of numbers for a mathematical construct is the field of complex numbers, the name usually reflects that fact. Examples are complex analysis, complex matrix, complex polynomial, and complex Lie algebra.

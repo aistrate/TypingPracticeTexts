@@ -1,0 +1,49 @@
+				select e.Country
+				);
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("UNION ALL/UNION/INTERSECT")]
+		[Test(Description = "This sample uses Except to return a sequence of all countries that " +
+					 "Customers live in but no Employees live in.")]
+		[Ignore("TODO")]
+		public void DLinq59()
+		{
+			var q = (
+						from c in db.Customers
+						select c.Country
+					).Except(
+				from e in db.Employees
+				select e.Country
+				);
+
+			ObjectDumper.Write(q);
+		}
+
+		#endregion Union Methods
+
+		#region Top/Bottom/Paging Methods
+
+		[Category("TOP/BOTTOM")]
+		[Test(Description = "This sample uses Take to select the first 5 Employees hired.")]
+		public void DLinq60()
+		{
+			var q = (
+						from e in db.Employees
+						orderby e.HireDate
+						select e)
+				.Take(5);
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("TOP/BOTTOM")]
+		[Test(Description = "This sample uses Skip to select all but the 10 most expensive Products.")]
+		public void DLinq61()
+		{
+			var q = (
+						from p in db.Products
+						orderby p.UnitPrice descending
+						select p)
+				.Skip(10);

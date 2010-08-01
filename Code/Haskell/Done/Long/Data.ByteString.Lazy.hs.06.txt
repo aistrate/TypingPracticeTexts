@@ -1,0 +1,99 @@
+split :: Word8 -> ByteString -> [ByteString]
+split _ Empty     = []
+split w (Chunk c0 cs0) = comb [] (S.split w c0) cs0
+
+  where comb :: [S.ByteString] -> [S.ByteString] -> ByteString -> [ByteString]
+        comb acc (s:[]) Empty        = revChunks (s:acc) : []
+        comb acc (s:[]) (Chunk c cs) = comb (s:acc) (S.split w c) cs
+        comb acc (s:ss) cs           = revChunks (s:acc) : comb [] ss cs
+{-# INLINE split #-}
+
+group :: ByteString -> [ByteString]
+group Empty          = []
+group (Chunk c0 cs0) = group' [] (S.group c0) cs0
+  where 
+    group' :: [S.ByteString] -> [S.ByteString] -> ByteString -> [ByteString]
+    group' acc@(s':_) ss@(s:_) cs
+      | S.unsafeHead s'
+     /= S.unsafeHead s             = revNonEmptyChunks    acc  : group' [] ss cs
+    group' acc (s:[]) Empty        = revNonEmptyChunks (s:acc) : []
+    group' acc (s:[]) (Chunk c cs) = group' (s:acc) (S.group c) cs
+    group' acc (s:ss) cs           = revNonEmptyChunks (s:acc) : group' [] ss cs
+
+groupBy :: (Word8 -> Word8 -> Bool) -> ByteString -> [ByteString]
+groupBy _ Empty          = []
+groupBy k (Chunk c0 cs0) = groupBy' [] 0 (S.groupBy k c0) cs0
+  where
+    groupBy' :: [S.ByteString] -> Word8 -> [S.ByteString] -> ByteString -> [ByteString]
+    groupBy' acc@(_:_) c ss@(s:_) cs
+      | not (c `k` S.unsafeHead s)     = revNonEmptyChunks acc : groupBy' [] 0 ss cs
+    groupBy' acc _ (s:[]) Empty        = revNonEmptyChunks (s : acc) : []
+    groupBy' acc w (s:[]) (Chunk c cs) = groupBy' (s:acc) w' (S.groupBy k c) cs
+                                           where w' | L.null acc = S.unsafeHead s
+                                                    | otherwise  = w
+    groupBy' acc _ (s:ss) cs           = revNonEmptyChunks (s : acc) : groupBy' [] 0 ss cs
+
+intercalate :: ByteString -> [ByteString] -> ByteString
+intercalate s = concat . (L.intersperse s)
+
+index :: ByteString -> Int64 -> Word8
+index _  i | i < 0  = moduleError "index" ("negative index: " ++ show i)
+index cs0 i         = index' cs0 i
+  where index' Empty     n = moduleError "index" ("index too large: " ++ show n)
+        index' (Chunk c cs) n
+          | n >= fromIntegral (S.length c) = 
+              index' cs (n - fromIntegral (S.length c))
+          | otherwise       = S.unsafeIndex c (fromIntegral n)
+
+elemIndex :: Word8 -> ByteString -> Maybe Int64
+elemIndex w cs0 = elemIndex' 0 cs0
+  where elemIndex' _ Empty        = Nothing
+        elemIndex' n (Chunk c cs) =
+          case S.elemIndex w c of
+            Nothing -> elemIndex' (n + fromIntegral (S.length c)) cs
+            Just i  -> Just (n + fromIntegral i)
+
+elemIndices :: Word8 -> ByteString -> [Int64]
+elemIndices w cs0 = elemIndices' 0 cs0
+  where elemIndices' _ Empty        = []
+        elemIndices' n (Chunk c cs) = L.map ((+n).fromIntegral) (S.elemIndices w c)
+                             ++ elemIndices' (n + fromIntegral (S.length c)) cs
+
+count :: Word8 -> ByteString -> Int64
+count w cs = foldlChunks (\n c -> n + fromIntegral (S.count w c)) 0 cs
+
+findIndex :: (Word8 -> Bool) -> ByteString -> Maybe Int64
+findIndex k cs0 = findIndex' 0 cs0
+  where findIndex' _ Empty        = Nothing
+        findIndex' n (Chunk c cs) =
+          case S.findIndex k c of
+            Nothing -> findIndex' (n + fromIntegral (S.length c)) cs
+            Just i  -> Just (n + fromIntegral i)
+{-# INLINE findIndex #-}
+
+find :: (Word8 -> Bool) -> ByteString -> Maybe Word8
+find f cs0 = find' cs0
+  where find' Empty        = Nothing
+        find' (Chunk c cs) = case S.find f c of
+            Nothing -> find' cs
+            Just w  -> Just w
+{-# INLINE find #-}
+
+findIndices :: (Word8 -> Bool) -> ByteString -> [Int64]
+findIndices k cs0 = findIndices' 0 cs0
+  where findIndices' _ Empty        = []
+        findIndices' n (Chunk c cs) = L.map ((+n).fromIntegral) (S.findIndices k c)
+                             ++ findIndices' (n + fromIntegral (S.length c)) cs
+
+elem :: Word8 -> ByteString -> Bool
+elem w cs = case elemIndex w cs of Nothing -> False ; _ -> True
+
+notElem :: Word8 -> ByteString -> Bool
+notElem w cs = not (elem w cs)
+
+filter :: (Word8 -> Bool) -> ByteString -> ByteString
+filter p s = go s
+    where
+        go Empty        = Empty
+        go (Chunk x xs) = chunk (S.filter p x) (go xs)
+{-# INLINE filter #-}

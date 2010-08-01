@@ -1,0 +1,7 @@
+Neutrino
+
+Neutrinos (Italian for "small neutral one") are elementary particles that often travel close to the speed of light, are electrically neutral, are able to pass through ordinary matter almost undisturbed and are thus extremely difficult to detect. Neutrinos have a minuscule, but nonzero mass. They are denoted by the Greek letter (nu).
+
+Neutrinos are created as a result of certain types of radioactive decay or nuclear reactions such as those that take place in the Sun, in nuclear reactors, or when cosmic rays hit atoms. There are three types, or "flavors", of neutrinos: electron neutrinos, muon neutrinos and tauon neutrinos (or tau neutrino); each type also has a corresponding antiparticle, called antineutrinos. Electron neutrinos (or antineutrinos) are generated whenever neutrons change into protons (or protons into neutrons), the two forms of beta decay. Interactions involving neutrinos are mediated by the weak interaction.
+
+Most neutrinos passing through the Earth emanate from the Sun, and more than 50 trillion solar electron neutrinos pass through the human body every second.

@@ -1,0 +1,50 @@
+        rat :: Rational
+        rat = fromInteger a + frac 10 0 1 fs
+
+  valExp :: Rational -> Integer -> Rational
+  valExp rat exp = rat * (10 ^^ exp)
+
+lexFrac :: ReadP (Maybe Digits)
+lexFrac = do char '.'
+             fraction <- lexDigits 10
+             return (Just fraction)
+
+lexExp :: ReadP (Maybe Integer)
+lexExp = do char 'e' +++ char 'E'
+            exp <- signedExp +++ lexInteger 10
+            return (Just exp)
+ where
+   signedExp 
+     = do c <- char '-' +++ char '+'
+          n <- lexInteger 10
+          return (if c == '-' then -n else n)
+
+lexDigits :: Int -> ReadP Digits
+lexDigits base =
+  do s  <- look
+     xs <- scan s id
+     guard (not (null xs))
+     return xs
+ where
+  scan (c:cs) f = case valDig base c of
+                    Just n  -> do get; scan cs (f.(n:))
+                    Nothing -> do return (f [])
+  scan []     f = do return (f [])
+
+lexInteger :: Base -> ReadP Integer
+lexInteger base =
+  do xs <- lexDigits base
+     return (val (fromIntegral base) 0 xs)
+
+val :: Num a => a -> a -> Digits -> a
+val _    y []     = y
+val base y (x:xs) = y' `seq` val base y' xs
+ where
+  y' = y * base + fromIntegral x
+
+frac :: Integral a => a -> a -> a -> Digits -> Ratio a
+frac _    a b []     = a % b
+frac base a b (x:xs) = a' `seq` b' `seq` frac base a' b' xs
+ where
+  a' = a * base + fromIntegral x
+  b' = b * base

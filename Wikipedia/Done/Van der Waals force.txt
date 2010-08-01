@@ -1,0 +1,8 @@
+Van der Waals force
+
+In physical chemistry, the van der Waals force (or van der Waals interaction), named after Dutch scientist Johannes Diderik van der Waals, is the attractive or repulsive force between molecules (or between parts of the same molecule) other than those due to covalent bonds or to the electrostatic interaction of ions with one another or with neutral molecules. The term includes:
+
+ * force between permanent dipole and a corresponding induced dipole
+ * instantaneous induced dipole-induced dipole (London dispersion force).
+
+It is also sometimes used loosely as a synonym for the totality of intermolecular forces. Van der Waals forces are relatively weak compared to normal chemical bonds, but play a fundamental role in fields as diverse as supramolecular chemistry, structural biology, polymer science, nanotechnology, surface science, and condensed matter physics. Van der Waals forces define the chemical character of many organic compounds. They also define the solubility of organic substances in polar and non-polar media. In low molecular weight alcohols, the properties of the polar hydroxyl group dominate the weak intermolecular forces of van der Waals. In higher molecular weight alcohols, the properties of the nonpolar hydrocarbon chain(s) dominate and define the solubility. Van der Waals forces grow with the length of the nonpolar part of the substance.

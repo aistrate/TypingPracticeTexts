@@ -1,0 +1,49 @@
+    protected decimal ExtraPeriodical
+    {
+        get { return ExtrasSelectedIndex == 1 ? readInt(txtExtraPeriodical_BoundControl) : 0m; }
+        set
+        {
+            string formattedValue = value.ToString("###0");
+            txtExtraPeriodical.Text = formattedValue;
+            txtExtraPeriodical_BoundControl.Text = formattedValue;
+        }
+    }
+    
+    protected decimal ExtraInitial
+    {
+        get { return ExtrasSelectedIndex == 1 ? readInt(txtExtraInitial_BoundControl) : 0m; }
+        set
+        {
+            string formattedValue = value.ToString("###0");
+            txtExtraInitial.Text = formattedValue;
+            txtExtraInitial_BoundControl.Text = formattedValue;
+        }
+    }
+
+    protected decimal TotalPresentValue
+    {
+        get { return ExtrasSelectedIndex == 0 ? PresentValue : (PresentValue + ExtraInitial); }
+    }
+
+    protected decimal TotalDepositPerYear
+    {
+        get { return ExtrasSelectedIndex == 0 ? DepositPerYear : (DepositPerYear + ExtraPeriodical); }
+    }
+
+    protected decimal ProposedPeriodical
+    {
+        get
+        {
+            decimal proposedPeriodical = FinancialPlannerAdapter.GetProposedPeriodical(
+                                            InterestRatePerYear, PresentValue, DepositPerYear, YearsLeft, TargetValue);
+
+            return Math.Max(0, proposedPeriodical - DepositPerYear);
+        }
+    }
+
+    protected decimal ProposedInitial
+    {
+        get
+        {
+            decimal proposedInitial = FinancialPlannerAdapter.GetProposedInitial(
+                                            InterestRatePerYear, PresentValue, DepositPerYear, YearsLeft, TargetValue);

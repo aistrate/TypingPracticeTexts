@@ -1,0 +1,100 @@
+  = case t of
+      Bin sx kx x Tip r  -> case f kx x of
+                              Nothing -> r
+                              Just x' -> Bin sx kx x' Tip r
+      Bin _ kx x l r     -> balance kx x (updateMinWithKey f l) r
+      Tip                -> Tip
+
+updateMaxWithKey :: (k -> a -> Maybe a) -> Map k a -> Map k a
+updateMaxWithKey f t
+  = case t of
+      Bin sx kx x l Tip  -> case f kx x of
+                              Nothing -> l
+                              Just x' -> Bin sx kx x' l Tip
+      Bin _ kx x l r     -> balance kx x l (updateMaxWithKey f r)
+      Tip                -> Tip
+
+minViewWithKey :: Map k a -> Maybe ((k,a), Map k a)
+minViewWithKey Tip = Nothing
+minViewWithKey x = Just (deleteFindMin x)
+
+maxViewWithKey :: Map k a -> Maybe ((k,a), Map k a)
+maxViewWithKey Tip = Nothing
+maxViewWithKey x = Just (deleteFindMax x)
+
+minView :: Map k a -> Maybe (a, Map k a)
+minView Tip = Nothing
+minView x = Just (first snd $ deleteFindMin x)
+
+maxView :: Map k a -> Maybe (a, Map k a)
+maxView Tip = Nothing
+maxView x = Just (first snd $ deleteFindMax x)
+
+first :: (a -> b) -> (a,c) -> (b,c)
+first f (x,y) = (f x, y)
+
+unions :: Ord k => [Map k a] -> Map k a
+unions ts
+  = foldlStrict union empty ts
+
+unionsWith :: Ord k => (a->a->a) -> [Map k a] -> Map k a
+unionsWith f ts
+  = foldlStrict (unionWith f) empty ts
+
+union :: Ord k => Map k a -> Map k a -> Map k a
+union Tip t2  = t2
+union t1 Tip  = t1
+union t1 t2 = hedgeUnionL (const LT) (const GT) t1 t2
+
+hedgeUnionL :: Ord a
+            => (a -> Ordering) -> (a -> Ordering) -> Map a b -> Map a b
+            -> Map a b
+hedgeUnionL _     _     t1 Tip
+  = t1
+hedgeUnionL cmplo cmphi Tip (Bin _ kx x l r)
+  = join kx x (filterGt cmplo l) (filterLt cmphi r)
+hedgeUnionL cmplo cmphi (Bin _ kx x l r) t2
+  = join kx x (hedgeUnionL cmplo cmpkx l (trim cmplo cmpkx t2)) 
+              (hedgeUnionL cmpkx cmphi r (trim cmpkx cmphi t2))
+  where
+    cmpkx k  = compare kx k
+
+unionWith :: Ord k => (a -> a -> a) -> Map k a -> Map k a -> Map k a
+unionWith f m1 m2
+  = unionWithKey (\_ x y -> f x y) m1 m2
+
+unionWithKey :: Ord k => (k -> a -> a -> a) -> Map k a -> Map k a -> Map k a
+unionWithKey _ Tip t2  = t2
+unionWithKey _ t1 Tip  = t1
+unionWithKey f t1 t2 = hedgeUnionWithKey f (const LT) (const GT) t1 t2
+
+hedgeUnionWithKey :: Ord a
+                  => (a -> b -> b -> b)
+                  -> (a -> Ordering) -> (a -> Ordering)
+                  -> Map a b -> Map a b
+                  -> Map a b
+hedgeUnionWithKey _ _     _     t1 Tip
+  = t1
+hedgeUnionWithKey _ cmplo cmphi Tip (Bin _ kx x l r)
+  = join kx x (filterGt cmplo l) (filterLt cmphi r)
+hedgeUnionWithKey f cmplo cmphi (Bin _ kx x l r) t2
+  = join kx newx (hedgeUnionWithKey f cmplo cmpkx l lt) 
+                 (hedgeUnionWithKey f cmpkx cmphi r gt)
+  where
+    cmpkx k     = compare kx k
+    lt          = trim cmplo cmpkx t2
+    (found,gt)  = trimLookupLo kx cmphi t2
+    newx        = case found of
+                    Nothing -> x
+                    Just (_,y) -> f kx x y
+
+difference :: Ord k => Map k a -> Map k b -> Map k a
+difference Tip _   = Tip
+difference t1 Tip  = t1
+difference t1 t2   = hedgeDiff (const LT) (const GT) t1 t2
+
+hedgeDiff :: Ord a
+          => (a -> Ordering) -> (a -> Ordering) -> Map a b -> Map a c
+          -> Map a b
+hedgeDiff _     _     Tip _
+  = Tip

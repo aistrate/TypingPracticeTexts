@@ -1,0 +1,62 @@
+many p = return [] +++ many1 p
+
+many1 :: ReadP a -> ReadP [a]
+many1 p = liftM2 (:) p (many p)
+
+skipMany :: ReadP a -> ReadP ()
+skipMany p = many p >> return ()
+
+skipMany1 :: ReadP a -> ReadP ()
+skipMany1 p = p >> skipMany p
+
+sepBy :: ReadP a -> ReadP sep -> ReadP [a]
+sepBy p sep = sepBy1 p sep +++ return []
+
+sepBy1 :: ReadP a -> ReadP sep -> ReadP [a]
+sepBy1 p sep = liftM2 (:) p (many (sep >> p))
+
+endBy :: ReadP a -> ReadP sep -> ReadP [a]
+endBy p sep = many (do x <- p ; sep ; return x)
+
+endBy1 :: ReadP a -> ReadP sep -> ReadP [a]
+endBy1 p sep = many1 (do x <- p ; sep ; return x)
+
+chainr :: ReadP a -> ReadP (a -> a -> a) -> a -> ReadP a
+chainr p op x = chainr1 p op +++ return x
+
+chainl :: ReadP a -> ReadP (a -> a -> a) -> a -> ReadP a
+chainl p op x = chainl1 p op +++ return x
+
+chainr1 :: ReadP a -> ReadP (a -> a -> a) -> ReadP a
+chainr1 p op = scan
+  where scan   = p >>= rest
+        rest x = do f <- op
+                    y <- scan
+                    return (f x y)
+                 +++ return x
+
+chainl1 :: ReadP a -> ReadP (a -> a -> a) -> ReadP a
+chainl1 p op = p >>= rest
+  where rest x = do f <- op
+                    y <- p
+                    rest (f x y)
+                 +++ return x
+
+#ifndef __NHC__
+manyTill :: ReadP a -> ReadP end -> ReadP [a]
+#else
+manyTill :: ReadPN [a] a -> ReadPN [a] end -> ReadPN [a] [a]
+#endif
+manyTill p end = scan
+  where scan = (end >> return []) <++ (liftM2 (:) p scan)
+
+#ifndef __NHC__
+readP_to_S :: ReadP a -> ReadS a
+#else
+readP_to_S :: ReadPN a a -> ReadS a
+#endif
+readP_to_S (R f) = run (f return)
+
+readS_to_P :: ReadS a -> ReadP a
+readS_to_P r =
+  R (\k -> Look (\s -> final [bs'' | (a,s') <- r s, bs'' <- run (k a) s']))

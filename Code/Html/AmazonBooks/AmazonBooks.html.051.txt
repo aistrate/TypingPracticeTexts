@@ -1,0 +1,30 @@
+                  &quot;A provocative topic engaged in fine style by an author in full command of the relevant facts...
+                  <a href="/gp/product/0300141734/ref=s9_qpf_bw_more?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=right-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=476004911&pf_rd_i=283155">Read&nbsp;more</a>
+                  <br clear="none"/><span class="listprice gry t11">$28.00</span> <span class="red t14">$18.48</span>
+                </p>
+              </div>
+              <div class="h_rule"></div>
+            </div>
+            <img src="http://g-ecx.images-amazon.com/images/G/01/x-locale/common/transparent-pixel._V192234675_.gif" width="1" alt="" onload="if (typeof uet == 'function') { uet('af'); }" height="1" border="0" />
+
+            <link rel="stylesheet" type="text/css" href="http://z-ecx.images-amazon.com/images/G/01/zeitgeist/css/zeitgeist-chart/zeitgeist-chart.1._V192897553_.css" />
+            <div class="unified_widget" id="zgChart_ns_1RVCMGP6WPZF34Z5GVPD_442_">
+
+              <div class="zgChart">
+                <h2>Bestsellers</h2>
+                <div class="storeTitle">
+                  <a href="/gp/bestsellers/books/ref=pd_ts_zgc_b_books_mot2?pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD">Books: Top 100</a>
+                </div>
+                <div class="subheadText">Save up to 45% - Updated hourly</div>
+                <div class="zg_chart_tab_container"></div>
+                <div class="zgChartBody">
+                  <div id="zgTopPaidList_zgChart_ns_1RVCMGP6WPZF34Z5GVPD_442_">
+                    <table>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Girl-Who-Kicked-Hornets-Nest/dp/030726999X/ref=pd_ts_zgc_b_books_1_i?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Girl Who Kicked the Hornet's Nest">
+                              <img src="http://ecx.images-amazon.com/images/I/51uqvRYHMkL._SL75_PIsitb-sticker-arrow-st,TopRight,8,-14_OU01_.jpg" alt="The Girl" />
+                            </a>
+                          </div>

@@ -1,0 +1,9 @@
+Weather satellite
+
+A weather satellite is a type of satellite that is primarily used to monitor the weather and climate of the Earth. Satellites can be either polar orbiting, seeing the same swath of the Earth every 12 hours, or geostationary, hovering over the same spot on Earth by orbiting over the equator while moving at the speed of the Earth's rotation. These meteorological satellites, however, see more than clouds and cloud systems. City lights, fires, effects of pollution, auroras, sand and dust storms, snow cover, ice mapping, boundaries of ocean currents, energy flows, etc., are other types of environmental information collected using weather satellites.
+
+Weather satellite images helped in monitoring the volcanic ash cloud from Mount St. Helens and activity from other volcanoes such as Mount Etna. Smoke from fires in the western United States such as Colorado and Utah have also been monitored.
+
+Other environmental satellites can detect changes in the Earth's vegetation, sea state, ocean color, and ice fields. For example, the 2002 oil spill off the northwest coast of Spain was watched carefully by the European ENVISAT, which, though not a weather satellite, flies an instrument (ASAR) which can see changes in the sea surface.
+
+El Nino and its effects on weather are monitored daily from satellite images. The Antarctic ozone hole is mapped from weather satellite data. Collectively, weather satellites flown by the U.S., Europe, India, China, Russia, and Japan provide nearly continuous observations for a global weather watch.

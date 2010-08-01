@@ -1,0 +1,99 @@
+			Index current = GetIndex(index.Name);
+			if (current != null)
+			{
+				throw new MappingException("Index " + index.Name + " already exists!");
+			}
+			indexes[index.Name] = index;
+			return index;
+		}
+
+		public Index GetOrCreateIndex(string indexName)
+		{
+			Index index = GetIndex(indexName);
+			if (index == null)
+			{
+				index = new Index();
+				index.Name = indexName;
+				index.Table = this;
+				indexes[indexName] = index;
+			}
+			return index;
+		}
+
+		public UniqueKey GetUniqueKey(string name)
+		{
+			UniqueKey result;
+			uniqueKeys.TryGetValue(name, out result);
+			return result;
+		}
+
+		public UniqueKey AddUniqueKey(UniqueKey uniqueKey)
+		{
+			UniqueKey current = GetUniqueKey(uniqueKey.Name);
+			if (current != null)
+			{
+				throw new MappingException("UniqueKey " + uniqueKey.Name + " already exists!");
+			}
+			uniqueKeys[uniqueKey.Name] = uniqueKey;
+			return uniqueKey;
+		}
+
+		public UniqueKey GetOrCreateUniqueKey(string keyName)
+		{
+			UniqueKey uk = GetUniqueKey(keyName);
+
+			if (uk == null)
+			{
+				uk = new UniqueKey();
+				uk.Name = keyName;
+				uk.Table = this;
+				uniqueKeys[keyName] = uk;
+			}
+			return uk;
+		}
+
+		public virtual void CreateForeignKeys()
+		{
+		}
+
+		public virtual ForeignKey CreateForeignKey(string keyName, IEnumerable<Column> keyColumns, string referencedEntityName)
+		{
+			return CreateForeignKey(keyName, keyColumns, referencedEntityName, null);
+		}
+
+		public virtual ForeignKey CreateForeignKey(string keyName, IEnumerable<Column> keyColumns,
+			string referencedEntityName, IEnumerable<Column> referencedColumns)
+		{
+			IEnumerable<Column> kCols = keyColumns;
+			IEnumerable<Column> refCols = referencedColumns;
+
+			ForeignKeyKey key = new ForeignKeyKey(kCols, referencedEntityName, refCols);
+
+			ForeignKey fk;
+			foreignKeys.TryGetValue(key, out fk);
+
+			if (fk == null)
+			{
+				fk = new ForeignKey();
+				if (!string.IsNullOrEmpty(keyName))
+				{
+					fk.Name = keyName;
+				}
+				else
+				{
+					fk.Name = "FK" + UniqueColumnString(kCols, referencedEntityName);
+				}
+				fk.Table = this;
+				foreignKeys.Add(key, fk);
+				fk.ReferencedEntityName = referencedEntityName;
+				fk.AddColumns(kCols);
+				if (referencedColumns != null)
+				{
+					fk.AddReferencedColumns(refCols);
+				}
+			}
+
+			if (!string.IsNullOrEmpty(keyName))
+			{
+				fk.Name = keyName;
+			}

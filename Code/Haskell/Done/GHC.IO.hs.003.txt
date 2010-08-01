@@ -1,0 +1,49 @@
+hGetLine :: Handle -> IO String
+hGetLine h = do
+  m <- wantReadableHandle "hGetLine" h $ \ handle_ -> do
+        case haBufferMode handle_ of
+           NoBuffering      -> return Nothing
+           LineBuffering    -> do
+              l <- hGetLineBuffered handle_
+              return (Just l)
+           BlockBuffering _ -> do 
+              l <- hGetLineBuffered handle_
+              return (Just l)
+  case m of
+        Nothing -> hGetLineUnBuffered h
+        Just l  -> return l
+
+hGetLineBuffered :: Handle__ -> IO String
+hGetLineBuffered handle_ = do
+  let ref = haBuffer handle_
+  buf <- readIORef ref
+  hGetLineBufferedLoop handle_ ref buf []
+
+hGetLineBufferedLoop :: Handle__ -> IORef Buffer -> Buffer -> [String]
+                     -> IO String
+hGetLineBufferedLoop handle_ ref
+        buf@Buffer{ bufRPtr=r0, bufWPtr=w, bufBuf=raw0 } xss =
+  let
+        loop raw r
+           | r == w = return (False, w)
+           | otherwise =  do
+                (c,r') <- readCharFromBuffer raw r
+                if c == '\n'
+                   then return (True, r)
+                   else loop raw r'
+  in do
+  (eol, off) <- loop raw0 r0
+
+#ifdef DEBUG_DUMP
+  puts ("hGetLineBufferedLoop: r=" ++ show r0 ++ ", w=" ++ show w ++ ", off=" ++ show off ++ "\n")
+#endif
+
+  xs <- unpack raw0 r0 off
+
+  if eol
+        then do if (w == off + 1)
+                        then writeIORef ref buf{ bufRPtr=0, bufWPtr=0 }
+                        else writeIORef ref buf{ bufRPtr = off + 1 }
+                return (concat (reverse (xs:xss)))
+        else do
+             maybe_buf <- maybeFillReadBuffer (haFD handle_) True (haIsStream handle_)

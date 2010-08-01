@@ -1,0 +1,30 @@
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0670021601/ref=s9_al_bw_i14?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="The Black Cat: A Richard Jury Mystery (Richard Jury Mysteries)">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/41addLmefgL._SL120_.jpg" alt="" width="80" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12239_Image14" class="productImage" />
+                            </div>The Black Cat: A Richard Jury Mystery
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Martha-Grimes/e/B000APFU50/ref=s9_al_bw_al15?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Martha Grimes</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$25.95</span>
+                            <span class="red t14">$17.13</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0312374984/ref=s9_al_bw_i15?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Pray for Silence: A Thriller (Kate Burkholder)">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/51p65qGdCCL._SL120_.jpg" alt="" width="79" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12239_Image15" class="productImage" />
+                            </div>Pray for Silence: A Thriller
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Linda-Castillo/e/B001ITX2XE/ref=s9_al_bw_al16?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Linda Castillo</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>

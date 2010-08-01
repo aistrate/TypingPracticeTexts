@@ -1,0 +1,50 @@
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "from clause to select all orders for customers in London.")]
+		public void DLinqJoin1a()
+		{
+			var q =
+				from c in db.Customers
+				from o in c.Orders.Cast<Order>()
+				where c.City == "London"
+				select new { o.OrderDate, o.ShipRegion };
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "from clause to select all orders for customers in London.")]
+		public void DLinqJoin1b()
+		{
+			var q =
+				from c in db.Customers
+				from o in c.Orders.Cast<Order>()
+				where c.City == "London"
+				select new { c.City, o.OrderDate, o.ShipRegion };
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "from clause to select all orders for customers.")]
+		public void DLinqJoin1c()
+		{
+			var q =
+				from c in db.Customers
+				from o in c.Orders.Cast<Order>()
+				select o;
+
+			var list = q.ToList();
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("JOIN")]
+		[Test(Description = "This sample uses foreign key navigation in the " +
+					 "from clause to select all orders for customers.")]
+		public void DLinqJoin1d()
+		{

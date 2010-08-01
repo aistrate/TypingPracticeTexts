@@ -1,0 +1,7 @@
+Java (software platform)
+
+Java refers to a number of computer software products and specifications from Sun Microsystems that together provide a system for developing application software and deploying it in a cross-platform environment. Java is used in a wide variety of computing platforms from embedded devices and mobile phones on the low end, to enterprise servers and supercomputers on the high end. Java is nearly ubiquitous in mobile phones, Web servers and enterprise applications, and while less common on desktop computers, Java applets are often used to provide improved and secure functionalities while browsing the World Wide Web.
+
+Writing in the Java programming language is the primary way to produce code that will be deployed as Java bytecode, though there are bytecode compilers available for other languages such as JavaScript, Python, Ruby and Scala, and a native Java scripting language called Groovy. Java syntax borrows heavily from C and C++ but it eliminates certain low-level constructs such as pointers and has a very simple memory model where every object is allocated on the heap and all variables of object types are references. Memory management is handled through integrated automatic garbage collection performed by the Java Virtual Machine (JVM).
+
+On November 13, 2006, Sun Microsystems made the bulk of its implementation of Java available under the GNU General Public License, although there are still a few parts distributed as precompiled binaries due to copyright issues with Sun-licensed (not owned) code.

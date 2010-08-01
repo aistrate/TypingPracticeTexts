@@ -1,0 +1,100 @@
+				ISet[] keySets = Transpose(keys);
+
+				IDictionary namedParameterLocMap = BuildNamedParameterLocMap(queryParameters);
+
+				ILoadable[] loadables = EntityPersisters;
+				string[] aliases = Aliases;
+
+				int rowKeysLength = ((EntityKey[]) keys[0]).Length;
+
+				SubselectFetch[] subselectFetches = new SubselectFetch[rowKeysLength];
+				for (int i = 0; i < rowKeysLength; i++)
+				{
+					if (loadables[i].HasSubselectLoadableCollections)
+					{
+						subselectFetches[i] = new SubselectFetch(
+							aliases[i],
+							factory.Dialect,
+							loadables[i],
+							queryParameters,
+							keySets[i],
+							namedParameterLocMap
+							);
+					}
+				}
+
+				foreach (EntityKey[] rowKeys in keys)
+				{
+					for (int i = 0; i < rowKeys.Length; i++)
+					{
+						if (rowKeys[i] != null && subselectFetches[i] != null)
+						{
+							session.PersistenceContext.BatchFetchQueue.AddSubselect(rowKeys[i], subselectFetches[i]);
+						}
+					}
+				}
+			}
+		}
+
+		private IDictionary BuildNamedParameterLocMap(QueryParameters queryParameters)
+		{
+			if (queryParameters.NamedParameters != null)
+			{
+				IDictionary namedParameterLocMap = new Hashtable();
+				foreach (string name in queryParameters.NamedParameters.Keys)
+				{
+					namedParameterLocMap[name] = GetNamedParameterLocs(name);
+				}
+				return namedParameterLocMap;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		internal void InitializeEntitiesAndCollections(IList hydratedObjects, object resultSetId, ISessionImplementor session, bool readOnly)
+		{
+			ICollectionPersister[] collectionPersisters = CollectionPersisters;
+			if (collectionPersisters != null)
+			{
+				for (int i = 0; i < collectionPersisters.Length; i++)
+				{
+					if (collectionPersisters[i].IsArray)
+					{
+						EndCollectionLoad(resultSetId, session, collectionPersisters[i]);
+					}
+				}
+			}
+			PreLoadEvent pre;
+			PostLoadEvent post;
+			if (session.IsEventSource)
+			{
+				pre = new PreLoadEvent((IEventSource) session);
+				post = new PostLoadEvent((IEventSource) session);
+			}
+			else
+			{
+				pre = null;
+				post = null;
+			}
+
+			if (hydratedObjects != null)
+			{
+				int hydratedObjectsSize = hydratedObjects.Count;
+
+				if (log.IsDebugEnabled)
+				{
+					log.Debug(string.Format("total objects hydrated: {0}", hydratedObjectsSize));
+				}
+
+				for (int i = 0; i < hydratedObjectsSize; i++)
+				{
+					TwoPhaseLoad.InitializeEntity(hydratedObjects[i], readOnly, session, pre, post);
+				}
+			}
+
+			if (collectionPersisters != null)
+			{
+				for (int i = 0; i < collectionPersisters.Length; i++)
+				{

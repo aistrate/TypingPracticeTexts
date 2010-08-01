@@ -1,0 +1,49 @@
+{-# OPTIONS_GHC -XNoImplicitPrelude #-}
+
+module Data.Maybe
+   (
+     Maybe(Nothing,Just)
+
+   , maybe
+
+   , isJust
+   , isNothing
+   , fromJust
+   , fromMaybe
+   , listToMaybe
+   , maybeToList
+   , catMaybes
+   , mapMaybe
+   ) where
+
+#ifdef __GLASGOW_HASKELL__
+import GHC.Base
+#endif
+
+#ifdef __NHC__
+import Prelude
+import Prelude (Maybe(..), maybe)
+import Maybe
+    ( isJust
+    , isNothing
+    , fromJust
+    , fromMaybe
+    , listToMaybe
+    , maybeToList
+    , catMaybes
+    , mapMaybe
+    )
+#else
+
+#ifndef __HUGS__
+
+data  Maybe a  =  Nothing | Just a
+  deriving (Eq, Ord)
+
+instance  Functor Maybe  where
+    fmap _ Nothing       = Nothing
+    fmap f (Just a)      = Just (f a)
+
+instance  Monad Maybe  where
+    (Just x) >>= k      = k x
+    Nothing  >>= _      = Nothing

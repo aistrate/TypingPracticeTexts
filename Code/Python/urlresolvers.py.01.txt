@@ -1,0 +1,100 @@
+import re
+
+from django.http import Http404
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.utils.datastructures import MultiValueDict
+from django.utils.encoding import iri_to_uri, force_unicode, smart_str
+from django.utils.functional import memoize
+from django.utils.importlib import import_module
+from django.utils.regex_helper import normalize
+from django.utils.thread_support import currentThread
+
+try:
+    reversed
+except NameError:
+    from django.utils.itercompat import reversed
+    from sets import Set as set
+
+_resolver_cache = {}
+_callable_cache = {}
+
+_prefixes = {}
+
+_urlconfs = {}
+
+class Resolver404(Http404):
+    pass
+
+class NoReverseMatch(Exception):
+    silent_variable_failure = True
+
+def get_callable(lookup_view, can_fail=False):
+    
+    if not callable(lookup_view):
+        try:
+            lookup_view = lookup_view.encode('ascii')
+            mod_name, func_name = get_mod_func(lookup_view)
+            if func_name != '':
+                lookup_view = getattr(import_module(mod_name), func_name)
+                if not callable(lookup_view):
+                    raise AttributeError("'%s.%s' is not a callable." % (mod_name, func_name))
+        except (ImportError, AttributeError):
+            if not can_fail:
+                raise
+        except UnicodeEncodeError:
+            pass
+    return lookup_view
+get_callable = memoize(get_callable, _callable_cache, 1)
+
+def get_resolver(urlconf):
+    if urlconf is None:
+        from django.conf import settings
+        urlconf = settings.ROOT_URLCONF
+    return RegexURLResolver(r'^/', urlconf)
+get_resolver = memoize(get_resolver, _resolver_cache, 1)
+
+def get_mod_func(callback):
+    try:
+        dot = callback.rindex('.')
+    except ValueError:
+        return callback, ''
+    return callback[:dot], callback[dot+1:]
+
+class RegexURLPattern(object):
+    def __init__(self, regex, callback, default_args=None, name=None):
+        self.regex = re.compile(regex, re.UNICODE)
+        if callable(callback):
+            self._callback = callback
+        else:
+            self._callback = None
+            self._callback_str = callback
+        self.default_args = default_args or {}
+        self.name = name
+
+    def __repr__(self):
+        return '<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern)
+
+    def add_prefix(self, prefix):
+        
+        if not prefix or not hasattr(self, '_callback_str'):
+            return
+        self._callback_str = prefix + '.' + self._callback_str
+
+    def resolve(self, path):
+        match = self.regex.search(path)
+        if match:
+            kwargs = match.groupdict()
+            if kwargs:
+                args = ()
+            else:
+                args = match.groups()
+            kwargs.update(self.default_args)
+
+            return self.callback, args, kwargs
+
+    def _get_callback(self):
+        if self._callback is not None:
+            return self._callback
+        try:
+            self._callback = get_callable(self._callback_str)

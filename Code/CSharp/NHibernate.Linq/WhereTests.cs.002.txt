@@ -1,0 +1,49 @@
+		[Test]
+		public void FirstElementWithWhere()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.Name == "ayende"
+						 select user).First();
+			Assert.AreEqual("ayende", query.Name);
+		}
+
+		[Test]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void FirstElementWithQueryThatReturnsNoResults()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.Name == "xxx"
+						 select user).First();
+		}
+
+		[Test]
+		public void FirstOrDefaultElementWithQueryThatReturnsNoResults()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.Name == "xxx"
+						 select user).FirstOrDefault();
+
+			Assert.IsNull(query);
+		}
+
+		[Test]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void SingleElementWithQueryThatReturnsNoResults()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.Name == "xxx"
+						 select user).Single();
+		}
+
+		[Test]
+		public void SingleOrDefaultElementWithQueryThatReturnsNoResults()
+		{
+			var query = (from user in session.Linq<User>()
+						 where user.Name == "xxx"
+						 select user).SingleOrDefault();
+
+			Assert.IsNull(query);
+		}
+
+		[Test]
+		public void UsersRegisteredAtOrAfterY2K()

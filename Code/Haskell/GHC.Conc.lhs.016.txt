@@ -1,0 +1,50 @@
+  b <- fdIsSet fd writefds
+  if b /= 0
+    then do putMVar m (); completeRequests reqs readfds writefds reqs'
+    else completeRequests reqs readfds writefds (Write fd m : reqs')
+
+wakeupAll :: [IOReq] -> IO ()
+wakeupAll [] = return ()
+wakeupAll (Read  _ m : reqs) = do putMVar m (); wakeupAll reqs
+wakeupAll (Write _ m : reqs) = do putMVar m (); wakeupAll reqs
+
+waitForReadEvent :: Fd -> IO ()
+waitForReadEvent fd = do
+  m <- newEmptyMVar
+  atomicModifyIORef pendingEvents (\xs -> (Read fd m : xs, ()))
+  prodServiceThread
+  takeMVar m
+
+waitForWriteEvent :: Fd -> IO ()
+waitForWriteEvent fd = do
+  m <- newEmptyMVar
+  atomicModifyIORef pendingEvents (\xs -> (Write fd m : xs, ()))
+  prodServiceThread
+  takeMVar m
+
+getDelay :: USecs -> Ptr CTimeVal -> [DelayReq] -> IO ([DelayReq], Ptr CTimeVal)
+getDelay _   _        [] = return ([],nullPtr)
+getDelay now ptimeval all@(d : rest) 
+  = case d of
+     Delay time m | now >= time -> do
+        putMVar m ()
+        getDelay now ptimeval rest
+     DelaySTM time t | now >= time -> do
+        atomically $ writeTVar t True
+        getDelay now ptimeval rest
+     _otherwise -> do
+        setTimevalTicks ptimeval (delayTime d - now)
+        return (all,ptimeval)
+
+data CTimeVal
+
+foreign import ccall unsafe "sizeofTimeVal"
+  sizeofTimeVal :: Int
+
+foreign import ccall unsafe "setTimevalTicks" 
+  setTimevalTicks :: Ptr CTimeVal -> USecs -> IO ()
+
+data CFdSet
+
+foreign import ccall safe "select"
+  c_select :: CInt -> Ptr CFdSet -> Ptr CFdSet -> Ptr CFdSet -> Ptr CTimeVal

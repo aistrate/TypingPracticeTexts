@@ -1,0 +1,50 @@
+       case c of
+         '&'           -> do return ()
+         _ | isSpace c -> do skipSpaces; char '\\'; return ()
+         _             -> do pfail
+
+type Base   = Int
+type Digits = [Int]
+
+lexNumber :: ReadP Lexeme
+lexNumber 
+  = lexHexOct  <++
+    lexDecNumber
+                
+lexHexOct :: ReadP Lexeme
+lexHexOct
+  = do  char '0'
+        base <- lexBaseChar
+        digits <- lexDigits base
+        return (Int (val (fromIntegral base) 0 digits))
+
+lexBaseChar :: ReadP Int
+lexBaseChar = do { c <- get;
+                   case c of
+                        'o' -> return 8
+                        'O' -> return 8
+                        'x' -> return 16
+                        'X' -> return 16
+                        _   -> pfail } 
+
+lexDecNumber :: ReadP Lexeme
+lexDecNumber =
+  do xs    <- lexDigits 10
+     mFrac <- lexFrac <++ return Nothing
+     mExp  <- lexExp  <++ return Nothing
+     return (value xs mFrac mExp)
+ where
+  value xs mFrac mExp = valueFracExp (val 10 0 xs) mFrac mExp
+  
+  valueFracExp :: Integer -> Maybe Digits -> Maybe Integer 
+               -> Lexeme
+  valueFracExp a Nothing Nothing        
+    = Int a
+  valueFracExp a Nothing (Just exp)
+    | exp >= 0  = Int (a * (10 ^ exp))
+    | otherwise = Rat (valExp (fromInteger a) exp)
+  valueFracExp a (Just fs) mExp 
+     = case mExp of
+         Nothing  -> Rat rat
+         Just exp -> Rat (valExp rat exp)
+     where

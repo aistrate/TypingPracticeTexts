@@ -1,0 +1,11 @@
+Graphite
+
+The mineral graphite is one of the allotropes of carbon. It was named by Abraham Gottlob Werner in 1789 from the Greek (graphein): "to draw/write", for its use in pencils, where it is commonly called lead, as distinguished from the actual metallic element lead. Unlike diamond (another carbon allotrope), graphite is an electrical conductor, a semimetal, and can be used, for instance, in the electrodes of an arc lamp. Graphite holds the distinction of being the most stable form of carbon under standard conditions. Therefore, it is used in thermochemistry as the standard state for defining the heat of formation of carbon compounds. Graphite may be considered the highest grade of coal, just above anthracite and alternatively called meta-anthracite, although it is not normally used as fuel because it is hard to ignite.
+
+There are three principal types of natural graphite, each occurring in different types of ore deposit:
+
+ 1. Crystalline flake graphite (or flake graphite for short) occurs as isolated, flat, plate-like particles with hexagonal edges if unbroken and when broken the edges can be irregular or angular;
+ 2. Amorphous graphite occurs as fine particles and is the result of thermal metamorphism of coal, the last stage of coalification, and is sometimes called meta-anthracite. Very fine flake graphite is sometimes called amorphous in the trade;
+ 3. Lump graphite (also called vein graphite) occurs in fissure veins or fractures and appears as massive platy intergrowths of fibrous or acicular crystalline aggregates, and is probably hydrothermal in origin.
+
+Highly Ordered Pyrolytic Graphite or Highly Oriented Pyrolytic Graphite (HOPG) refers to graphite with an angular spread of the between the graphite sheets of less than 1 degree. This highest-quality synthetic form is used in scientific research. The name "graphite fiber" is also sometimes used to refer to carbon fiber or carbon fiber-reinforced polymer.

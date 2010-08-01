@@ -1,0 +1,50 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data.Services;
+using System.Linq;
+using System.Reflection;
+using NHibernate.Metadata;
+
+namespace NHibernate.Linq
+{
+	public abstract class NHibernateContext : IDisposable, ICloneable, IUpdatable, IExpandProvider
+	{
+		public readonly IDbMethods Methods;
+
+		private ISession session;
+
+		public NHibernateContext()
+		{
+		}
+
+		public NHibernateContext(ISession session)
+		{
+			this.session = session;
+		}
+
+		public virtual ISession Session
+		{
+			get
+			{
+				if (session == null)
+				{
+					session = ProvideSession();
+				}
+				return session;
+			}
+		}
+
+		protected virtual ISession ProvideSession()
+		{
+			throw new NotImplementedException("If NHibernateContext is constructed with the empty constructor, inheritor is required to override ProvideSession to supply Session.");
+		}
+
+		#region ICloneable Members
+
+		public virtual object Clone()
+		{
+			if (session == null)
+			{
+				throw new ArgumentNullException("session");
+			}

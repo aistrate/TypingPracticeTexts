@@ -1,0 +1,100 @@
+foldl :: (a -> Word8 -> a) -> a -> ByteString -> a
+foldl f z = go z
+  where go a Empty        = a
+        go a (Chunk c cs) = go (S.foldl f a c) cs
+{-# INLINE foldl #-}
+
+foldl' :: (a -> Word8 -> a) -> a -> ByteString -> a
+foldl' f z = go z
+  where go a _ | a `seq` False = undefined
+        go a Empty        = a
+        go a (Chunk c cs) = go (S.foldl f a c) cs
+{-# INLINE foldl' #-}
+
+foldr :: (Word8 -> a -> a) -> a -> ByteString -> a
+foldr k z cs = foldrChunks (flip (S.foldr k)) z cs
+{-# INLINE foldr #-}
+
+foldl1 :: (Word8 -> Word8 -> Word8) -> ByteString -> Word8
+foldl1 _ Empty        = errorEmptyList "foldl1"
+foldl1 f (Chunk c cs) = foldl f (S.unsafeHead c) (Chunk (S.unsafeTail c) cs)
+
+foldl1' :: (Word8 -> Word8 -> Word8) -> ByteString -> Word8
+foldl1' _ Empty        = errorEmptyList "foldl1'"
+foldl1' f (Chunk c cs) = foldl' f (S.unsafeHead c) (Chunk (S.unsafeTail c) cs)
+
+foldr1 :: (Word8 -> Word8 -> Word8) -> ByteString -> Word8
+foldr1 _ Empty          = errorEmptyList "foldr1"
+foldr1 f (Chunk c0 cs0) = go c0 cs0
+  where go c Empty         = S.foldr1 f c
+        go c (Chunk c' cs) = S.foldr  f (go c' cs) c
+
+concat :: [ByteString] -> ByteString
+concat css0 = to css0
+  where
+    go Empty        css = to css
+    go (Chunk c cs) css = Chunk c (go cs css)
+    to []               = Empty
+    to (cs:css)         = go cs css
+
+concatMap :: (Word8 -> ByteString) -> ByteString -> ByteString
+concatMap _ Empty        = Empty
+concatMap f (Chunk c0 cs0) = to c0 cs0
+  where
+    go :: ByteString -> S.ByteString -> ByteString -> ByteString
+    go Empty        c' cs' = to c' cs'
+    go (Chunk c cs) c' cs' = Chunk c (go cs c' cs')
+
+    to :: S.ByteString -> ByteString -> ByteString
+    to c cs | S.null c  = case cs of
+        Empty          -> Empty
+        (Chunk c' cs') -> to c' cs'
+            | otherwise = go (f (S.unsafeHead c)) (S.unsafeTail c) cs
+
+any :: (Word8 -> Bool) -> ByteString -> Bool
+any f cs = foldrChunks (\c rest -> S.any f c || rest) False cs
+{-# INLINE any #-}
+
+all :: (Word8 -> Bool) -> ByteString -> Bool
+all f cs = foldrChunks (\c rest -> S.all f c && rest) True cs
+{-# INLINE all #-}
+
+maximum :: ByteString -> Word8
+maximum Empty        = errorEmptyList "maximum"
+maximum (Chunk c cs) = foldlChunks (\n c' -> n `max` S.maximum c')
+                                   (S.maximum c) cs
+{-# INLINE maximum #-}
+
+minimum :: ByteString -> Word8
+minimum Empty        = errorEmptyList "minimum"
+minimum (Chunk c cs) = foldlChunks (\n c' -> n `min` S.minimum c')
+                                     (S.minimum c) cs
+{-# INLINE minimum #-}
+
+mapAccumL :: (acc -> Word8 -> (acc, Word8)) -> acc -> ByteString -> (acc, ByteString)
+mapAccumL f s0 cs0 = go s0 cs0
+  where
+    go s Empty        = (s, Empty)
+    go s (Chunk c cs) = (s'', Chunk c' cs')
+        where (s',  c')  = S.mapAccumL f s c
+              (s'', cs') = go s' cs
+
+mapAccumR :: (acc -> Word8 -> (acc, Word8)) -> acc -> ByteString -> (acc, ByteString)
+mapAccumR f s0 cs0 = go s0 cs0
+  where
+    go s Empty        = (s, Empty)
+    go s (Chunk c cs) = (s'', Chunk c' cs')
+        where (s'', c') = S.mapAccumR f s' c
+              (s', cs') = go s cs
+
+scanl :: (Word8 -> Word8 -> Word8) -> Word8 -> ByteString -> ByteString
+scanl f z = snd . foldl k (z,singleton z)
+ where
+    k (c,acc) a = let n = f c a in (n, acc `snoc` n)
+{-# INLINE scanl #-}
+
+iterate :: (Word8 -> Word8) -> Word8 -> ByteString
+iterate f = unfoldr (\x -> case f x of x' -> x' `seq` Just (x', x'))
+
+repeat :: Word8 -> ByteString
+repeat w = cs where cs = Chunk (S.replicate smallChunkSize w) cs

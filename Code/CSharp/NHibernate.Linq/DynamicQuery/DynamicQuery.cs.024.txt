@@ -1,0 +1,50 @@
+				{
+					NextToken();
+					propName = GetIdentifier();
+					NextToken();
+				}
+				else
+				{
+					MemberExpression me = expr as MemberExpression;
+					if (me == null) throw ParseError(exprPos, Res.MissingAsClause);
+					propName = me.Member.Name;
+				}
+				expressions.Add(expr);
+				properties.Add(new DynamicProperty(propName, expr.Type));
+				if (token.id != TokenId.Comma) break;
+				NextToken();
+			}
+			ValidateToken(TokenId.CloseParen, Res.CloseParenOrCommaExpected);
+			NextToken();
+			Type type = DynamicExpression.CreateClass(properties);
+			MemberBinding[] bindings = new MemberBinding[properties.Count];
+			for (int i = 0; i < bindings.Length; i++)
+				bindings[i] = Expression.Bind(type.GetProperty(properties[i].Name), expressions[i]);
+			return Expression.MemberInit(Expression.New(type), bindings);
+		}
+
+		Expression ParseLambdaInvocation(LambdaExpression lambda)
+		{
+			int errorPos = token.pos;
+			NextToken();
+			Expression[] args = ParseArgumentList();
+			MethodBase method;
+			if (FindMethod(lambda.Type, "Invoke", false, args, out method) != 1)
+				throw ParseError(errorPos, Res.ArgsIncompatibleWithLambda);
+			return Expression.Invoke(lambda, args);
+		}
+
+		Expression ParseTypeAccess(Type type)
+		{
+			int errorPos = token.pos;
+			NextToken();
+			if (token.id == TokenId.Question)
+			{
+				if (!type.IsValueType || IsNullableType(type))
+					throw ParseError(errorPos, Res.TypeHasNoNullableForm, GetTypeName(type));
+				type = typeof(Nullable<>).MakeGenericType(type);
+				NextToken();
+			}
+			if (token.id == TokenId.OpenParen)
+			{
+				Expression[] args = ParseArgumentList();

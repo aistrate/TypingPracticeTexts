@@ -1,0 +1,30 @@
+      <div id="listsPop_content" style="display:none">
+        <div id="listsPopoverContents" style="background: #fff;display:inline">
+          <ul id="listsPopoverContentsUl">
+            <li class="listsPopoverLi listsPopoverLiPreHr">
+              <span class="listsPopoverContentsHeader">All Lists &amp; Registries</span>
+            </li>
+            <li class="listsPopoverLi listsPopoverLiPostHr">
+              <span class="arrow">&rsaquo;</span>
+              <a href="/gp/registry/wishlist/ref=gno_listpop_wi">Wish List</a>
+            </li>
+            <li id="qlYourListsLink" class="listsPopoverLi">
+              <span class="arrow">&rsaquo;</span>
+              <a href="#quicklist">Quicklist</a>
+            </li>
+            <li class="listsPopoverLi">
+              <span class="arrow">&rsaquo;</span>
+              <a href="/gp/rsl/shoppinglist/yourshoppinglist/ref=gno_listpop_sl">Shopping List</a>
+            </li>
+            <li class="listsPopoverLi listsPopoverLiPreHr">
+              <span class="arrow">&rsaquo;</span>
+              <a href="/gp/gift-central/organizer/ref=gno_listpop_gil">Gift Organizer</a>
+            </li>
+            <li class="listsPopoverLi listsPopoverLiPostHr">
+              <span class="arrow">&rsaquo;</span>
+              <a href="/gp/registry/wedding/ref=gno_listpop_wr">Wedding Registry</a>
+            </li>
+            <li class="listsPopoverLi listsPopoverLiPreHr">
+              <span class="arrow">&rsaquo;</span>
+              <a href="/gp/registry/baby/ref=gno_listpop_br">Baby Registry</a>
+            </li>

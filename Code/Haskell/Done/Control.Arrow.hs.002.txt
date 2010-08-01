@@ -1,0 +1,50 @@
+                second (arr f) = arr (second f)
+"product/arr"   forall f g .
+                arr f *** arr g = arr (f *** g)
+"fanout/arr"    forall f g .
+                arr f &&& arr g = arr (f &&& g)
+"compose/first" forall f g .
+                (first f) . (first g) = first (f . g)
+"compose/second" forall f g .
+                (second f) . (second g) = second (f . g)
+ #-}
+
+instance Arrow (->) where
+        arr f = f
+        first f = f *** id
+        second f = id *** f
+        (***) f g ~(x,y) = (f x, g y)
+
+newtype Kleisli m a b = Kleisli { runKleisli :: a -> m b }
+
+instance Monad m => Category (Kleisli m) where
+        id = Kleisli return
+        (Kleisli f) . (Kleisli g) = Kleisli (\b -> g b >>= f)
+
+instance Monad m => Arrow (Kleisli m) where
+        arr f = Kleisli (return . f)
+        first (Kleisli f) = Kleisli (\ ~(b,d) -> f b >>= \c -> return (c,d))
+        second (Kleisli f) = Kleisli (\ ~(d,b) -> f b >>= \c -> return (d,c))
+
+returnA :: Arrow a => a b b
+returnA = arr id
+
+(^>>) :: Arrow a => (b -> c) -> a c d -> a b d
+f ^>> a = arr f >>> a
+
+(>>^) :: Arrow a => a b c -> (c -> d) -> a b d
+a >>^ f = a >>> arr f
+
+(<<^) :: Arrow a => a c d -> (b -> c) -> a b d
+a <<^ f = a <<< arr f
+
+(^<<) :: Arrow a => (c -> d) -> a b c -> a b d
+f ^<< a = arr f <<< a
+
+class Arrow a => ArrowZero a where
+        zeroArrow :: a b c
+
+instance MonadPlus m => ArrowZero (Kleisli m) where
+        zeroArrow = Kleisli (\_ -> mzero)
+
+class ArrowZero a => ArrowPlus a where

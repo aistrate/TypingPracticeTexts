@@ -1,0 +1,99 @@
+			for (int i = 0; i < entitySpan; i++)
+			{
+				keys[i] = GetKeyFromResultSet(
+					i,
+					persisters[i],
+					i == entitySpan - 1 ?
+					queryParameters.OptionalId : null,
+					resultSet,
+					session);
+			}
+
+			RegisterNonExists(keys, session);
+
+			object[] row = GetRow(
+				resultSet,
+				persisters,
+				keys,
+				queryParameters.OptionalObject,
+				optionalObjectKey,
+				lockModeArray,
+				hydratedObjects,
+				session);
+
+			ReadCollectionElements(row, resultSet, session);
+
+			if (returnProxies)
+			{
+				for (int i = 0; i < entitySpan; i++)
+				{
+					object entity = row[i];
+					object proxy = session.PersistenceContext.ProxyFor(persisters[i], keys[i], entity);
+
+					if (entity != proxy)
+					{
+						((INHibernateProxy) proxy).HibernateLazyInitializer.SetImplementation(entity);
+						row[i] = proxy;
+					}
+				}
+			}
+
+			return GetResultColumnOrRow(row, queryParameters.ResultTransformer, resultSet, session);
+		}
+
+		private void ReadCollectionElements(object[] row, IDataReader resultSet, ISessionImplementor session)
+		{
+
+			ICollectionPersister[] collectionPersisters = CollectionPersisters;
+
+			if (collectionPersisters != null)
+			{
+				ICollectionAliases[] descriptors = CollectionAliases;
+				int[] collectionOwners = CollectionOwners;
+
+				for (int i = 0; i < collectionPersisters.Length; i++)
+				{
+					bool hasCollectionOwners = collectionOwners != null
+					                           && collectionOwners[i] > -1;
+
+					object owner = hasCollectionOwners ? row[collectionOwners[i]] :
+					               null;
+
+					ICollectionPersister collectionPersister = collectionPersisters[i];
+					object key;
+
+					if (owner == null)
+					{
+						key = null;
+					}
+					else
+					{
+						key = collectionPersister.CollectionType.GetKeyOfOwner(owner, session);
+					}
+
+					ReadCollectionElement(
+						owner,
+						key,
+						collectionPersister,
+						descriptors[i],
+						resultSet,
+						session);
+				}
+			}
+		}
+
+		private IList DoQuery(
+			ISessionImplementor session,
+			QueryParameters queryParameters,
+			bool returnProxies)
+		{
+			RowSelection selection = queryParameters.RowSelection;
+			int maxRows = HasMaxRows(selection) ? selection.MaxRows : int.MaxValue;
+
+			int entitySpan = EntityPersisters.Length;
+
+			ArrayList hydratedObjects = entitySpan == 0 ? null : new ArrayList(entitySpan * 10);
+			;
+			IDbCommand st = PrepareQueryCommand(queryParameters, false, session);
+
+			IDataReader rs =

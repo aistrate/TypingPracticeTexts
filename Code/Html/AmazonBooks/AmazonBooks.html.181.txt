@@ -1,0 +1,30 @@
+                    rhfPosition -= $(window).scrollTop();
+                    }
+                    if (rhfElementFound && ( rhfPosition - yPosition < 400 )) {
+                window.RECS_rhfShvlLoading = true;
+                $.ajax({
+                    url: '/gp/history/external/full-rhf-rec-handler.html',
+                    type: "POST",
+                    timeout: 30000,
+                    data: { shovelerName   : 'rhf',
+                      key            : 'rhf',
+                      numToPreload   : '5',
+                      isGateway      : 0,
+                      refTag         : 'pd_rhf_shvl',
+                      parentSession  : '182-0202755-3246608',
+                      excludeASIN    : '',
+                      renderPopover  : 0,
+                      forceSprites   : 0 },
+                    success: function(responseText, textStatus, XMLHttpRequest) {
+                        $("#rhf_container").html(responseText);
+                        $("#rhfShvl").trigger("render-shoveler");
+                        window.RECS_rhfShvlLoaded = true;
+                    },
+                    error: function(responseText, textStatus, XMLHttpRequest) {
+                        $("#rhf_container").hide();
+                        $("#rhf_error").show();
+                        return;
+                    }
+                });
+            }
+        }

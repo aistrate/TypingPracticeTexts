@@ -1,0 +1,30 @@
+                            <div class="tiny byline">
+                              <span class="carat"></span>David Nicholls (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock ">
+                              <span class="listprice"></span>
+                              <strong class="price">$8.22</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/The-Lion-ebook/dp/B0035II952/ref=pd_ts_zgc_kinc_digital-text_8_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Lion">
+                              <img src="http://ecx.images-amazon.com/images/I/51hm9unK8ML._SL75_.jpg" alt="The Lion" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">8.</span>
+                              <span class="arrowSprite arrowUp_s " title="Ranking has gone up in the past 24 hours" >
+                                <span>Ranking has gone up in the past 24 hours</span>
+                              </span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">21 days in the top 100</span>
+                            </div>

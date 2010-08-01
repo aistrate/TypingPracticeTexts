@@ -1,0 +1,30 @@
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0TitleContainer2" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Title2">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ImageContainer2">
+                            <a href="/gp/product/0486256642/ref=s9_qpick_bw_ir03?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="One Two Three . . . Infinity: Facts and Speculations of Science">
+                              <div class="imageContainer">
+                                <img src="http://ecx.images-amazon.com/images/I/715Q28STX1L._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.gif" alt="" width="85" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Image2" />
+                              </div>One Two Three . . . Infinity: Facts...
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span><a class="noLinkDecoration" href="/George-Gamow/e/B001IGHM6U/ref=s9_qpick_bw_al3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155">George Gamow</a>, <a class="noLinkDecoration" href="/George-Gamow/e/B000APEPV0/ref=s9_qpick_bw_al3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155">George Gamow</a>
+                          </div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$10.95</span>
+                          <span class="red t14">$7.88</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec3?ie=UTF8&ASIN=0486256642&reason=0521447712&0521447712.order=0&isRecommendedItem=1&0521447712.source=Purchase&isPopup=0&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_qpick_bw_yrec3?ie=UTF8&ASIN=0486256642&reason=0521447712&0521447712.order=0&isRecommendedItem=1&0521447712.source=Purchase&isPopup=1&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ItemElement3" style="width: 33%; margin-bottom: 0px; display: none;">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0TitleContainer3" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0Title3">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12237_r0ImageContainer3">
+                            <a href="/gp/product/0945053312/ref=s9_qpick_bw_ir04?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-13&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956751&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Electronic Sensor Circuits &amp; Projects">
+                              <div class="imageContainer">

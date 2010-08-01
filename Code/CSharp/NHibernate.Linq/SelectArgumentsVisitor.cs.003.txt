@@ -1,0 +1,50 @@
+			else if ((currentProjection = _rootCriteria.GetProjection() as PropertyProjection) != null)
+			{
+				propertyName = currentProjection.PropertyName;
+			}
+
+			switch (expr.Method.Name)
+			{
+				case "Average":
+					projection = NHProjections.Avg(propertyName);
+					break;
+				case "Count":
+				case "LongCount":
+					if (expr.Arguments.Count > 1)
+						_rootCriteria.Add(WhereArgumentsVisitor.GetCriterion(_rootCriteria, _session, expr.Arguments[1]));
+
+					if (collectionExpr != null)
+					{
+						propertyName = memberVisitor.MemberName + "." + collectionExpr.ElementExpression.MetaData.IdentifierPropertyName;
+						projection = NHProjections.Count(propertyName);
+					}
+					else
+					{
+						projection = NHProjections.RowCount();
+					}
+					break;
+				case "Max":
+					projection = NHProjections.Max(propertyName);
+					break;
+				case "Min":
+					projection = NHProjections.Min(propertyName);
+					break;
+				case "Sum":
+					projection = NHProjections.Sum(propertyName);
+					break;
+				default:
+					throw new NotImplementedException("The method '" + expr.Method.Name + "' is not implemented.");
+			}
+
+			_projections.Add(projection);
+			return expr;
+		}
+
+		protected override Expression VisitConstant(ConstantExpression expr)
+		{
+			_projections.Add(new ConstantProjection(expr.Value));
+			return expr;
+		}
+
+		protected override NewExpression VisitNew(NewExpression expr)
+		{

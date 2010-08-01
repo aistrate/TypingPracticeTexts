@@ -1,0 +1,50 @@
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
+
+module Control.Concurrent (
+
+        ThreadId,
+#ifdef __GLASGOW_HASKELL__
+        myThreadId,
+#endif
+
+        forkIO,
+#ifdef __GLASGOW_HASKELL__
+        killThread,
+        throwTo,
+#endif
+
+        yield,
+
+#ifdef __GLASGOW_HASKELL__
+        threadDelay,
+        threadWaitRead,
+        threadWaitWrite,
+#endif
+
+        module Control.Concurrent.MVar,
+        module Control.Concurrent.Chan,
+        module Control.Concurrent.QSem,
+        module Control.Concurrent.QSemN,
+        module Control.Concurrent.SampleVar,
+
+#ifndef __HUGS__
+        mergeIO,
+        nmergeIO,
+#endif
+
+#ifdef __GLASGOW_HASKELL__
+        rtsSupportsBoundThreads,
+        forkOS,
+        isCurrentThreadBound,
+        runInBoundThread,
+        runInUnboundThread
+#endif
+
+    ) where
+
+import Prelude
+
+import Control.Exception.Base as Exception
+
+#ifdef __GLASGOW_HASKELL__
+import GHC.Exception

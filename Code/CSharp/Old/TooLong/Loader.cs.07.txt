@@ -1,0 +1,100 @@
+				}
+				persistenceContext.LoadContexts.GetCollectionLoadContext(rs).GetLoadingCollection(persister, optionalKey);
+			}
+
+		}
+
+		internal void HandleEmptyCollections(
+			object[] keys,
+			object resultSetId,
+			ISessionImplementor session
+			)
+		{
+			if (keys != null)
+			{
+
+				ICollectionPersister[] collectionPersisters = CollectionPersisters;
+				for (int j = 0; j < collectionPersisters.Length; j++)
+				{
+					for (int i = 0; i < keys.Length; i++)
+					{
+						if (log.IsDebugEnabled)
+						{
+							log.Debug("result set contains (possibly empty) collection: " +
+							          MessageHelper.InfoString(collectionPersisters[j], keys[i]));
+						}
+						session.PersistenceContext.LoadContexts.GetCollectionLoadContext((IDataReader)resultSetId).GetLoadingCollection(collectionPersisters[j], keys[i]);
+					}
+				}
+			}
+		}
+
+		private EntityKey GetKeyFromResultSet(int i, ILoadable persister, object id, IDataReader rs,
+		                                      ISessionImplementor session)
+		{
+			object resultId;
+
+			if (IsSingleRowLoader && id != null)
+			{
+				resultId = id;
+			}
+			else
+			{
+				resultId = persister.IdentifierType.NullSafeGet(rs, EntityAliases[i].SuffixedKeyAliases, session, null);
+
+				if (id != null && resultId != null && id.Equals(resultId))
+				{
+					resultId = id;
+				}
+			}
+
+			return resultId == null ? null : new EntityKey(resultId, persister, session.EntityMode);
+		}
+
+		private void CheckVersion(
+			int i,
+			ILoadable persister,
+			object id,
+			object version,
+			IDataReader rs,
+			ISessionImplementor session)
+		{
+			if (version != null)
+			{
+				IType versionType = persister.VersionType;
+				object currentVersion = versionType.NullSafeGet(rs, EntityAliases[i].SuffixedVersionAliases, session, null);
+				if (!versionType.IsEqual(version, currentVersion, EntityMode.Poco))
+				{
+					if (session.Factory.Statistics.IsStatisticsEnabled)
+					{
+						session.Factory.StatisticsImplementor.OptimisticFailure(persister.EntityName);
+					}
+
+					throw new StaleObjectStateException(persister.EntityName, id);
+				}
+			}
+		}
+
+		private object[] GetRow(
+			IDataReader rs,
+			ILoadable[] persisters,
+			EntityKey[] keys,
+			object optionalObject,
+			EntityKey optionalObjectKey,
+			LockMode[] lockModes,
+			IList hydratedObjects,
+			ISessionImplementor session)
+		{
+			int cols = persisters.Length;
+
+			if (log.IsDebugEnabled)
+			{
+				log.Debug("result row: " + StringHelper.ToString(keys));
+			}
+
+			object[] rowResults = new object[cols];
+
+			for (int i = 0; i < cols; i++)
+			{
+				object obj = null;
+				EntityKey key = keys[i];

@@ -1,0 +1,50 @@
+#ifdef __GLASGOW_HASKELL__
+
+foreign import ccall rtsSupportsBoundThreads :: Bool
+
+forkOS :: IO () -> IO ThreadId
+
+foreign export ccall forkOS_entry
+    :: StablePtr (IO ()) -> IO ()
+
+foreign import ccall "forkOS_entry" forkOS_entry_reimported
+    :: StablePtr (IO ()) -> IO ()
+
+forkOS_entry :: StablePtr (IO ()) -> IO ()
+forkOS_entry stableAction = do
+        action <- deRefStablePtr stableAction
+        action
+
+foreign import ccall forkOS_createThread
+    :: StablePtr (IO ()) -> IO CInt
+
+failNonThreaded :: IO a
+failNonThreaded = fail $ "RTS doesn't support multiple OS threads "
+                       ++"(use ghc -threaded when linking)"
+
+forkOS action0
+    | rtsSupportsBoundThreads = do
+        mv <- newEmptyMVar
+        b <- Exception.blocked
+        let
+            action1 | b = action0
+                    | otherwise = unblock action0
+
+            action_plus = Exception.catch action1 childHandler
+
+        entry <- newStablePtr (myThreadId >>= putMVar mv >> action_plus)
+        err <- forkOS_createThread entry
+        when (err /= 0) $ fail "Cannot create OS thread."
+        tid <- takeMVar mv
+        freeStablePtr entry
+        return tid
+    | otherwise = failNonThreaded
+
+isCurrentThreadBound :: IO Bool
+isCurrentThreadBound = IO $ \ s# ->
+    case isCurrentThreadBound# s# of
+        (# s2#, flg #) -> (# s2#, not (flg ==# 0#) #)
+
+runInBoundThread :: IO a -> IO a
+
+runInBoundThread action

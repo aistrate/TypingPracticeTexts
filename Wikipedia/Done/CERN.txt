@@ -1,0 +1,7 @@
+CERN
+
+The European Organization for Nuclear Research (French: Organisation Europeenne pour la Recherche Nucleaire), known as CERN, is the world's largest particle physics laboratory, situated in the northwest suburbs of Geneva on the Franco-Swiss border, established in 1954. The organization has twenty European member states, and is currently the workplace of approximately 2,600 full-time employees, as well as some 7,931 scientists and engineers (representing 580 universities and research facilities and 80 nationalities).
+
+CERN's main function is to provide the particle accelerators and other infrastructure needed for high-energy physics research. Numerous experiments have been constructed at CERN by international collaborations to make use of them. It is also noted for being the birthplace of the World Wide Web. The main site at Meyrin also has a large computer centre containing very powerful data processing facilities primarily for experimental data analysis, and because of the need to make them available to researchers elsewhere, has historically been (and continues to be) a major wide area networking hub.
+
+As an international facility, the CERN sites are officially under neither Swiss nor French jurisdiction. Member states' contributions to CERN for the year 2008 totalled CHF 1 billion (approximately EUR 664 million).

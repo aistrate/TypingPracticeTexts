@@ -1,0 +1,50 @@
+			Assert.AreEqual(91, items.Count);
+			items.Each(x => Assert.IsNotNull(x));
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses SELECT and anonymous types to return a sequence of just the Customers' contact names and phone numbers.")]
+		public void DLinq10()
+		{
+			var q =
+				from c in db.Customers
+				select new { c.ContactName, c.Phone };
+			var items = q.ToList();
+
+			Assert.AreEqual(91, items.Count);
+
+			items.Each(x =>
+						{
+							Assert.IsNotNull(x.ContactName);
+							Assert.IsNotNull(x.Phone);
+						});
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses SELECT and anonymous types to return " +
+					 "a sequence of just the Employees' names and phone numbers, " +
+					 "with the FirstName and LastName fields combined into a single field, 'Name', " +
+					 "and the HomePhone field renamed to Phone in the resulting sequence.")]
+		public void DLinq11()
+		{
+			var q =
+				from e in db.Employees
+				select new { Name = e.FirstName + " " + e.LastName, Phone = e.HomePhone };
+			var items = q.ToList();
+			Assert.AreEqual(9, items.Count);
+
+			items.Each(x =>
+			{
+				Assert.IsNotNull(x.Name);
+				Assert.IsNotNull(x.Phone);
+			});
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses SELECT and anonymous types to return " +
+					 "a sequence of all Products' IDs and a calculated value " +
+					 "called HalfPrice which is set to the Product's UnitPrice " +
+					 "divided by 2.")]
+		public void DLinq12()
+		{
+			var q =

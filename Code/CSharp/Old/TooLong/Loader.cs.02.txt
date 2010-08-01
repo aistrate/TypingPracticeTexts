@@ -1,0 +1,100 @@
+			}
+			finally
+			{
+				persistenceContext.AfterLoad();
+			}
+			persistenceContext.InitializeNonLazyCollections();
+
+			return result;
+		}
+
+		protected object LoadSingleRow(
+			IDataReader resultSet,
+			ISessionImplementor session,
+			QueryParameters queryParameters,
+			bool returnProxies)
+		{
+			int entitySpan = EntityPersisters.Length;
+			IList hydratedObjects = entitySpan == 0 ?
+			                        null : new ArrayList(entitySpan);
+
+			object result;
+			try
+			{
+				result = GetRowFromResultSet(
+					resultSet,
+					session,
+					queryParameters,
+					GetLockModes(queryParameters.LockModes),
+					null,
+					hydratedObjects,
+					new EntityKey[entitySpan],
+					returnProxies);
+			}
+			catch (HibernateException)
+			{
+				throw;
+			}
+			catch (Exception sqle)
+			{
+				throw ADOExceptionHelper.Convert(Factory.SQLExceptionConverter, sqle, "could not read next row of results", SqlString,
+				                                 queryParameters.PositionalParameterValues, queryParameters.NamedParameters);
+			}
+
+			InitializeEntitiesAndCollections(hydratedObjects, resultSet, session, queryParameters.ReadOnly);
+			session.PersistenceContext.InitializeNonLazyCollections();
+			return result;
+		}
+
+		internal static EntityKey GetOptionalObjectKey(QueryParameters queryParameters, ISessionImplementor session)
+		{
+			object optionalObject = queryParameters.OptionalObject;
+			object optionalId = queryParameters.OptionalId;
+			string optionalEntityName = queryParameters.OptionalEntityName;
+
+			if (optionalObject != null && !string.IsNullOrEmpty(optionalEntityName))
+			{
+				return new EntityKey(optionalId, session.GetEntityPersister(optionalEntityName, optionalObject), session.EntityMode);
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		public virtual SqlCommandInfo GetQueryStringAndTypes(
+			ISessionImplementor session,
+			QueryParameters parameters
+			)
+		{
+			SqlString sqlString = ProcessFilters(parameters, session);
+			Dialect.Dialect dialect = session.Factory.Dialect;
+
+			RowSelection selection = parameters.RowSelection;
+			bool useLimit = UseLimit(selection, dialect);
+			bool hasFirstRow = GetFirstRow(selection) > 0;
+			bool useOffset = hasFirstRow && useLimit && dialect.SupportsLimitOffset;
+
+			if (useLimit)
+			{
+				sqlString = dialect.GetLimitString(sqlString.Trim(),
+				                                   useOffset ? GetFirstRow(selection) : 0,
+				                                   GetMaxOrLimit(dialect, selection));
+			}
+
+			sqlString = PreprocessSQL(sqlString, parameters, dialect);
+			return new SqlCommandInfo(sqlString, GetParameterTypes(parameters, useLimit, useOffset));
+		}
+
+		internal object GetRowFromResultSet(
+			IDataReader resultSet,
+			ISessionImplementor session,
+			QueryParameters queryParameters,
+			LockMode[] lockModeArray,
+			EntityKey optionalObjectKey,
+			IList hydratedObjects,
+			EntityKey[] keys,
+			bool returnProxies)
+		{
+			ILoadable[] persisters = EntityPersisters;
+			int entitySpan = persisters.Length;

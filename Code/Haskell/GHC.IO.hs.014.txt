@@ -1,0 +1,29 @@
+slurpFile :: FilePath -> IO (Ptr (), Int)
+slurpFile fname = do
+  handle <- openFile fname ReadMode
+  sz     <- hFileSize handle
+  if sz > fromIntegral (maxBound::Int) then 
+    ioError (userError "slurpFile: file too big")
+   else do
+    let sz_i = fromIntegral sz
+    if sz_i == 0 then return (nullPtr, 0) else do
+    chunk <- mallocBytes sz_i
+    r <- hGetBuf handle chunk sz_i
+    hClose handle
+    return (chunk, r)
+
+foreign import ccall unsafe "__hscore_memcpy_src_off"
+   memcpy_ba_baoff :: RawBuffer -> RawBuffer -> CInt -> CSize -> IO (Ptr ())
+foreign import ccall unsafe "__hscore_memcpy_src_off"
+   memcpy_ptr_baoff :: Ptr a -> RawBuffer -> CInt -> CSize -> IO (Ptr ())
+foreign import ccall unsafe "__hscore_memcpy_dst_off"
+   memcpy_baoff_ba :: RawBuffer -> CInt -> RawBuffer -> CSize -> IO (Ptr ())
+foreign import ccall unsafe "__hscore_memcpy_dst_off"
+   memcpy_baoff_ptr :: RawBuffer -> CInt -> Ptr a -> CSize -> IO (Ptr ())
+
+illegalBufferSize :: Handle -> String -> Int -> IO a
+illegalBufferSize handle fn sz =
+        ioException (IOError (Just handle)
+                            InvalidArgument  fn
+                            ("illegal buffer size " ++ showsPrec 9 sz [])
+                            Nothing)

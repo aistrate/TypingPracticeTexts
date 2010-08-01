@@ -1,0 +1,30 @@
+                    <a href="/Name-Honor-Richard-North-Patterson/dp/0805087745/ref=amb_link_353320382_8?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                      <img src="http://ecx.images-amazon.com/images/P/0805087745.01._SL110_PE45_OU01_SCLZZZZZZZ_V203793524_.jpg" width="81" alt="In the Name of Honor" height="121" border="0" />
+                    </a>
+                  </div>
+                  <div class="asinTextBlock">
+                    <div class="title">
+                      <a href="/gp/feature.html/ref=amb_link_353320382_7?ie=UTF8&plgroup=2&docId=1000346431&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">Coming Soon</a>
+                    </div>
+                    <ul>
+                      <li>
+                        <a href="/Name-Honor-Richard-North-Patterson/dp/0805087745/ref=amb_link_353320382_9?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                          <i>In the Name of Honor</i> by Richard North Patterson
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Star-Island-Carl-Hiaasen/dp/0307272583/ref=amb_link_353320382_10?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                          <i>Star Island</i> by Carl Hiaasen
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Faithful-Place-Novel-Tana-French/dp/0670021873/ref=amb_link_353320382_11?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                          <i>Faithful Place</i> by Tana French
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Whisperers-Charlie-Parker-Thriller-Mysteries/dp/143916519X/ref=amb_link_353320382_12?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                          <i>The Whisperers</i> by John Connolly
+                        </a>
+                      </li>
+                    </ul>

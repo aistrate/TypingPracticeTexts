@@ -1,0 +1,7 @@
+Statistics
+
+Statistics is the science of making effective use of numerical data relating to groups of individuals or experiments. It deals with all aspects of this, including not only the collection, analysis and interpretation of such data, but also the planning of the collection of data, in terms of the design of surveys and experiments.
+
+A statistician is someone who is particularly versed in the ways of thinking necessary for the successful application of statistical analysis. Often such people have gained this experience after starting work in any of a list of fields of application of statistics. There is also a discipline called mathematical statistics, which is concerned with the theoretical basis of the subject.
+
+The word statistics can either be singular or plural. In its singular form, statistics refers to the mathematical science discussed in this article. In its plural form, statistics is the plural of the word statistic, which refers to a quantity (such as a mean) calculated from a set of data.

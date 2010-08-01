@@ -1,0 +1,50 @@
+    fromInteger i = I# (toInt# i)
+
+quotRemInt :: Int -> Int -> (Int, Int)
+quotRemInt a@(I# _) b@(I# _) = (a `quotInt` b, a `remInt` b)
+
+divModInt ::  Int -> Int -> (Int, Int)
+divModInt x@(I# _) y@(I# _) = (x `divInt` y, x `modInt` y)
+instance  Eq Integer  where
+    (==) = eqInteger
+    (/=) = neqInteger
+
+instance Ord Integer where
+    (<=) = leInteger
+    (>)  = gtInteger
+    (<)  = ltInteger
+    (>=) = geInteger
+    compare = compareInteger
+instance Show Integer where
+    showsPrec p n r
+        | p > 6 && n < 0 = '(' : integerToString n (')' : r)
+        | otherwise = integerToString n r
+    showList = showList__ (showsPrec 0)
+
+integerToString :: Integer -> String -> String
+integerToString n0 cs0
+    | n0 < 0    = '-' : integerToString' (- n0) cs0
+    | otherwise = integerToString' n0 cs0
+    where
+    integerToString' :: Integer -> String -> String
+    integerToString' n cs
+        | n < BASE  = jhead (fromInteger n) cs
+        | otherwise = jprinth (jsplitf (BASE*BASE) n) cs
+
+    jsplitf :: Integer -> Integer -> [Integer]
+    jsplitf p n
+        | p > n     = [n]
+        | otherwise = jsplith p (jsplitf (p*p) n)
+
+    jsplith :: Integer -> [Integer] -> [Integer]
+    jsplith p (n:ns) =
+        case n `quotRemInteger` p of
+        (# q, r #) ->
+            if q > 0 then fromInteger q : fromInteger r : jsplitb p ns
+                     else fromInteger r : jsplitb p ns
+    jsplith _ [] = error "jsplith: []"
+
+    jsplitb :: Integer -> [Integer] -> [Integer]
+    jsplitb _ []     = []
+    jsplitb p (n:ns) = case n `quotRemInteger` p of
+                       (# q, r #) ->

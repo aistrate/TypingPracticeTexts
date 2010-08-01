@@ -1,0 +1,30 @@
+                            <a class="noLinkDecoration" href="/Janet-Evanovich/e/B000APXTY4/ref=s9_al_bw_al6?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Janet Evanovich</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$27.99</span>
+                            <span class="red t14">$14.83</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0446562424/ref=s9_al_bw_i6?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Innocent">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/41bRHaGq%2B3L._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL120_OU01_.jpg" alt="" width="80" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12239_Image6" class="productImage" />
+                            </div>Innocent
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Scott-Turow/e/B000APGVI0/ref=s9_al_bw_al7?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155">Scott Turow</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Hardcover</div>
+                            <span class="listprice gry t11">$27.99</span>
+                            <span class="red t14">$15.39</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/052595158X/ref=s9_al_bw_i7?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-2&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1263890082&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Caught">

@@ -1,0 +1,49 @@
+isInfixOf needle haystack = any (isPrefixOf needle) (tails haystack)
+
+nub                     :: (Eq a) => [a] -> [a]
+#ifdef USE_REPORT_PRELUDE
+nub                     =  nubBy (==)
+#else
+nub l                   = nub' l []
+  where
+    nub' [] _           = []
+    nub' (x:xs) ls
+        | x `elem` ls   = nub' xs ls
+        | otherwise     = x : nub' xs (x:ls)
+#endif
+
+nubBy                   :: (a -> a -> Bool) -> [a] -> [a]
+#ifdef USE_REPORT_PRELUDE
+nubBy eq []             =  []
+nubBy eq (x:xs)         =  x : nubBy eq (filter (\ y -> not (eq x y)) xs)
+#else
+nubBy eq l              = nubBy' l []
+  where
+    nubBy' [] _         = []
+    nubBy' (y:ys) xs
+       | elem_by eq y xs = nubBy' ys xs
+       | otherwise       = y : nubBy' ys (y:xs)
+
+elem_by :: (a -> a -> Bool) -> a -> [a] -> Bool
+elem_by _  _ []         =  False
+elem_by eq y (x:xs)     =  y `eq` x || elem_by eq y xs
+#endif
+
+delete                  :: (Eq a) => a -> [a] -> [a]
+delete                  =  deleteBy (==)
+
+deleteBy                :: (a -> a -> Bool) -> a -> [a] -> [a]
+deleteBy _  _ []        = []
+deleteBy eq x (y:ys)    = if x `eq` y then ys else y : deleteBy eq x ys
+
+(\\)                    :: (Eq a) => [a] -> [a] -> [a]
+(\\)                    =  foldl (flip delete)
+
+union                   :: (Eq a) => [a] -> [a] -> [a]
+union                   = unionBy (==)
+
+unionBy                 :: (a -> a -> Bool) -> [a] -> [a] -> [a]
+unionBy eq xs ys        =  xs ++ foldl (flip (deleteBy eq)) (nubBy eq ys) xs
+
+intersect               :: (Eq a) => [a] -> [a] -> [a]
+intersect               =  intersectBy (==)

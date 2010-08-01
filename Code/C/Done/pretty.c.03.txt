@@ -1,0 +1,100 @@
+			break;
+		if (!is_empty_line(msg, &ll))
+			break;
+		msg += linelen;
+	}
+	return msg;
+}
+
+static void add_merge_info(enum cmit_fmt fmt, struct strbuf *sb,
+			const struct commit *commit, int abbrev)
+{
+	struct commit_list *parent = commit->parents;
+
+	if ((fmt == CMIT_FMT_ONELINE) || (fmt == CMIT_FMT_EMAIL) ||
+	    !parent || !parent->next)
+		return;
+
+	strbuf_addstr(sb, "Merge:");
+
+	while (parent) {
+		struct commit *p = parent->item;
+		const char *hex = NULL;
+		if (abbrev)
+			hex = find_unique_abbrev(p->object.sha1, abbrev);
+		if (!hex)
+			hex = sha1_to_hex(p->object.sha1);
+		parent = parent->next;
+
+		strbuf_addf(sb, " %s", hex);
+	}
+	strbuf_addch(sb, '\n');
+}
+
+static char *get_header(const struct commit *commit, const char *key)
+{
+	int key_len = strlen(key);
+	const char *line = commit->buffer;
+
+	for (;;) {
+		const char *eol = strchr(line, '\n'), *next;
+
+		if (line == eol)
+			return NULL;
+		if (!eol) {
+			eol = line + strlen(line);
+			next = NULL;
+		} else
+			next = eol + 1;
+		if (eol - line > key_len &&
+		    !strncmp(line, key, key_len) &&
+		    line[key_len] == ' ') {
+			return xmemdupz(line + key_len + 1, eol - line - key_len - 1);
+		}
+		line = next;
+	}
+}
+
+static char *replace_encoding_header(char *buf, const char *encoding)
+{
+	struct strbuf tmp = STRBUF_INIT;
+	size_t start, len;
+	char *cp = buf;
+
+	while (strncmp(cp, "encoding ", strlen("encoding "))) {
+		cp = strchr(cp, '\n');
+		if (!cp || *++cp == '\n')
+			return buf;
+	}
+	start = cp - buf;
+	cp = strchr(cp, '\n');
+	if (!cp)
+		return buf; 
+	len = cp + 1 - (buf + start);
+
+	strbuf_attach(&tmp, buf, strlen(buf), strlen(buf) + 1);
+	if (is_encoding_utf8(encoding)) {
+		
+		strbuf_remove(&tmp, start, len);
+	} else {
+		
+		strbuf_splice(&tmp, start + strlen("encoding "),
+					  len - strlen("encoding \n"),
+					  encoding, strlen(encoding));
+	}
+	return strbuf_detach(&tmp, NULL);
+}
+
+static char *logmsg_reencode(const struct commit *commit,
+			     const char *output_encoding)
+{
+	static const char *utf8 = "UTF-8";
+	const char *use_encoding;
+	char *encoding;
+	char *out;
+
+	if (!*output_encoding)
+		return NULL;
+	encoding = get_header(commit, "encoding");
+	use_encoding = encoding ? encoding : utf8;
+	if (!strcmp(use_encoding, output_encoding))

@@ -1,0 +1,49 @@
+        pnlFutureValue.Visible = visible;
+
+        btnCalculate.Text = visible ? "Recalculate" : "Calculate";
+
+        ExtrasSelectedIndex = 0;
+        ExtraPeriodical = 0m;
+        ExtraInitial = 0m;
+        IsSliderReset = true;
+    }
+
+    protected bool IsSliderReset
+    {
+        get
+        {
+            object b = ViewState["IsSliderReset"];
+            return (b == null ? true : (bool)b);
+        }
+        set { ViewState["IsSliderReset"] = value; }
+    }
+
+    private void retrieveAccountDependant()
+    {
+        if (FinancialDataView != null)
+        {
+            mvwModelPortfolio.ActiveViewIndex = 1;
+            lblModelName.Text = FinancialDataView.ModelName;
+
+            mvwPresentValue.ActiveViewIndex = 1;
+            txtPresentValue.Text = "";
+            lblPresentValue.Text = FinancialDataView.TotalPositionDisplayString;
+        }
+        else
+        {
+            mvwModelPortfolio.ActiveViewIndex = 0;
+            mvwModelPortfolio.DataBind();
+
+            mvwPresentValue.ActiveViewIndex = 0;
+        }
+        
+        retrieveModelDependant();
+    }
+
+    private void retrieveModelDependant()
+    {
+        if (FinancialDataView != null && FinancialDataView.ExpectedReturn != 0m)
+        {
+            mvwInterestRatePerYear.ActiveViewIndex = 1;
+            txtInterestRatePerYear.Text = "";
+            lblInterestRatePerYear.Text = string.Format("{0:0.0##} %", FinancialDataView.ExpectedReturn * 100m);

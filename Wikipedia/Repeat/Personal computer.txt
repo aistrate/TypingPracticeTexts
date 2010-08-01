@@ -1,0 +1,9 @@
+Personal computer
+
+A personal computer (PC) is any general-purpose computer whose size, capabilities, and original sales price make it useful for individuals, and which is intended to be operated directly by an end user, with no intervening computer operator. This is in contrast to the batch processing or time-sharing models which allowed large expensive mainframe systems to be used by many people, usually at the same time, or large data processing systems which required a full-time staff to operate efficiently.
+
+A personal computer may be a desktop computer, a laptop, tablet PC or a handheld PC (also called palmtop). The most common microprocessors in personal computers are x86-compatible CPUs. Software applications for personal computers include word processing, spreadsheets, databases, Web browsers and e-mail clients, games, and myriad personal productivity and special-purpose software. Modern personal computers often have high-speed or dial-up connections to the Internet, allowing access to the World Wide Web and a wide range of other resources.
+
+A PC may be used at home, or may be found in an office. Personal computers can be connected to a local area network (LAN) either by a cable or wirelessly.
+
+While early PC owners usually had to write their own programs to do anything useful with the machines, today's users have access to a wide range of commercial and non-commercial software which is provided in ready-to-run form. Since the 1980s, Microsoft and Intel have dominated much of the personal computer market with the Wintel platform.

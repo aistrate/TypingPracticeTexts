@@ -1,0 +1,13 @@
+Hypertext Transfer Protocol
+
+Hypertext Transfer Protocol (HTTP) is an application-level protocol for distributed, collaborative, hypermedia information systems. Its use for retrieving inter-linked resources, called hypertext documents, led to the establishment of the World Wide Web in 1990 by English physicist Tim Berners-Lee. There are two major versions, HTTP/1.0 that uses a separate connection for every document and HTTP/1.1 that can reuse the same connection to download, for instance, images for the just served page. Hence HTTP/1.1 may be faster as it takes time to set up such connections.
+
+The standards development of HTTP has been coordinated by the World Wide Web Consortium and the Internet Engineering Task Force (IETF), culminating in the publication of a series of Requests for Comments (RFCs), most notably RFC 2616 (June 1999), which defines HTTP/1.1, the version of HTTP in common use.
+
+Support for pre-standard HTTP/1.1 based on the then developing RFC 2068 was rapidly adopted by the major browser developers in early 1996. By March 1996, pre-standard HTTP/1.1 was supported in Netscape 2.0, Netscape Navigator Gold 2.01, Mosaic 2.7, Lynx 2.5, and in Internet Explorer 3.0. End user adoption of the new browsers was rapid. In March 1996, one web hosting company reported that over 40% of browsers in use on the Internet were HTTP 1.1 compliant. That same web hosting company reported that by June 1996, 65% of all browsers accessing their servers were HTTP/1.1 compliant. The HTTP/1.1 standard as defined in RFC 2068 was officially released in January 1997. Improvements and updates to the HTTP/1.1 standard were released under RFC 2616 in June 1999.
+
+HTTP is a request/response standard as is typical in client-server computing. The client is an application (e.g. web browser, spider etc) on the computer used by an end-user, the server is an application running on the computer hosting the web site. The client-which submits HTTP requests-is also referred to as the user agent. The responding server-which stores or creates resources such as HTML files and images-may be called the origin server. In between the user agent and origin server may be several intermediaries, such as proxies, gateways, and tunnels.
+
+HTTP is not constrained in principle to using TCP/IP, although this is its most popular application via the Internet. Indeed HTTP can be "implemented on top of any other protocol on the Internet, or on other networks." HTTP only presumes a reliable transport; any protocol that provides such guarantees can be used."
+
+Resources to be accessed by HTTP are identified using Uniform Resource Identifiers (URIs)-or, more specifically, Uniform Resource Locators (URLs)-using the http: or https: URI schemes.

@@ -1,0 +1,49 @@
+				where e.HireDate >= new DateTime(1994, 1, 1)
+				select e;
+			AssertByIds(q, new[] { 7, 8, 9 }, x => x.EmployeeID);
+		}
+
+		[Category("WHERE")]
+		[Test(Description = "This sample uses WHERE to filter for Products that have stock below their reorder level and are not discontinued.")]
+		public void DLinq3()
+		{
+			var q =
+				from p in db.Products
+				where p.UnitsInStock <= p.ReorderLevel && !p.Discontinued
+				select p;
+
+			AssertByIds(q, new[] { 2, 3, 11, 21, 30, 31, 32, 37, 43, 45, 48, 49, 56, 64, 66, 68, 70, 74, }, x => x.ProductID);
+		}
+
+		[Category("WHERE")]
+		[Test(Description = "This sample uses WHERE to filter for Products that have stock below their reorder level and are not discontinued.")]
+		public void DLinq3b()
+		{
+			var q =
+				from p in db.Products
+				where p.UnitsInStock <= p.ReorderLevel && p.Discontinued == false
+				select p;
+
+			AssertByIds(q, new[] { 2, 3, 11, 21, 30, 31, 32, 37, 43, 45, 48, 49, 56, 64, 66, 68, 70, 74, }, x => x.ProductID);
+		}
+
+		[Category("WHERE")]
+		[Test(Description = "This sample uses WHERE to filter out Products that are either UnitPrice is greater than 10 or is discontinued.")]
+		public void DLinq4()
+		{
+			var q =
+				from p in db.Products
+				where p.UnitPrice > 10m || p.Discontinued
+				select p;
+
+			AssertByIds(q,
+				new[]{
+					1 ,2 ,4 ,5 ,6 ,7 ,8 ,9 ,10,
+					11,12,14,15,16,17,18,20,22,
+					24,25,26,27,28,29,30,31,32,
+					34,35,36,37,38,39,40,42,43,
+					44,46,48,49,50,51,53,55,56,
+					57,58,59,60,61,62,63,64,65,
+					66,67,68,69,70,71,72,73,76,
+					77,
+					}, x => x.ProductID);

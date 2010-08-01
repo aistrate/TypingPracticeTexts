@@ -1,0 +1,11 @@
+Fortress (programming language)
+
+Fortress is a draft specification for a programming language, initially developed by Sun Microsystems as part of a DARPA-funded supercomputing initiative. One of the language designers is Guy L. Steele Jr., whose previous work includes Scheme, Common Lisp, and Java. A JVM compliant implementation (Fortress 1.0) was released in April 2008.
+
+The name "Fortress" is intended to connote a secure Fortran, i.e., "a language for high-performance computation that provides abstraction and type safety on par with modern programming language principles". Its improvements include Unicode support and concrete syntax that is similar to mathematical notation. The language is not designed to be similar to Fortran. Syntactically, it most resembles Scala, Standard ML, and Haskell. Fortress is being designed from the outset to have multiple syntactic stylesheets. Source code can be rendered as ASCII text, in Unicode, or as a prettied image. This will allow for support of mathematical symbols and other symbols in the rendered output for easier reading.
+
+Fortress is also designed to be both highly parallel and have rich functionality contained within libraries, drawing from Java but taken to a higher degree. For example, the 'for' loop is a parallel operation, which will not always iterate in a strictly linear manner depending on the underlying software and hardware. However, the 'for' loop is a library function and can be replaced by another 'for' loop of the programmer's liking rather than being built into the language.
+
+Although a preliminary interpreted implementation of the language was produced, the DARPA contract was not renewed in November 2006, leading to uncertainty about the language's future. Steele states that "In January 2007 it became an open-source project with an open-source community. People outside Sun are now writing Fortress code and testing it using the open-source Fortress interpreter."
+
+On 1 April 2008, the first version of the Fortress specification with a compliant implementation (Fortress 1.0) was released.

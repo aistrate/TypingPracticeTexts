@@ -1,0 +1,30 @@
+          .rhfWrapper .shoveler .back-button,
+          .rhfWrapper .shoveler div.disabled-button {
+          left:1px;
+          }
+          .rhfWrapper .shoveler .next-button,
+          .rhfWrapper .shoveler div.disabled-button {
+          right:1px;
+          }
+          .rhfWrapper .shoveler .back-button a,
+          .rhfWrapper .shoveler .next-button a {
+          position: relative;
+          font-size:70%;
+          cursor: pointer;
+          }
+          .rhfWrapper .shoveler .back-button a .bg-text,
+          .rhfWrapper .shoveler .back-button a .bg-image,
+          .rhfWrapper .shoveler .next-button a .bg-text,
+          .rhfWrapper .shoveler .next-button a .bg-image {
+          display: block;
+          height: 50px;
+          width: 25px;
+          left: 0;
+          overflow: hidden;
+          position: absolute;
+          }
+          .rhfWrapper .shoveler .back-button a .bg-image,
+          .rhfWrapper .shoveler .next-button a .bg-image,
+          .rhfWrapper .shoveler div.disabled-button {
+          background-image:  url('http://g-ecx.images-amazon.com/images/G/01/x-locale/personalization/shoveler/left-right-arrow-semi-rd._V236573507_.gif');
+          }

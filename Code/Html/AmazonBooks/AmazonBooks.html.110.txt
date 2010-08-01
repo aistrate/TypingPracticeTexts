@@ -1,0 +1,30 @@
+                  <div class="prodImage">
+                    <a href="/Summer-Reading-Books/b/ref=bhp_9p2_sum_01?ie=UTF8&node=341154011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                      <img src="http://ecx.images-amazon.com/images/P/0312383304.01._SL110_PE47_OU01_SCLZZZZZZZ_V214013274_.jpg" width="80" alt="Sizzling Sixteen" height="121" border="0" />
+                    </a>
+                  </div>
+                  <div class="asinTextBlock">
+                    <div class="title">
+                      <a href="/Summer-Reading-Books/b/ref=bhp_9p2_sum_02?ie=UTF8&node=341154011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Summer Reading</a>
+                    </div>
+                    <ul>
+                      <li>
+                        <a href="/Summer-Reading-Kids-Books/b/ref=bhp_9p2_sum_04?ie=UTF8&node=565572&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Summer Reading for Kids &amp; Teens</a>
+                      </li>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_sum_03?ie=UTF8&docId=1000090241&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Blockbuster New Releases</a>
+                      </li>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_sum_05?ie=UTF8&docId=1000090381&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Paperback Beach Reads</a>
+                      </li>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_sum_06?ie=UTF8&docId=1000345731&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Customer Favorites</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="asinItem">
+                  <div class="prodImage">
+                    <a href="/gp/feature.html/ref=bhp_9p2_4th_02?ie=UTF8&docId=1000520801&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                      <img src="http://ecx.images-amazon.com/images/P/0618267468.01._SL110_PIsitb-sticker-arrow-sm,TopRight,10,-13_PE34_OU01_SCLZZZZZZZ_V210846824_.jpg" width="88" alt="Revolutionaries" height="133" border="0" />
+                    </a>

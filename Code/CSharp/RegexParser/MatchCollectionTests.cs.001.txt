@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NUnit.Framework;
+using RegexParser.Tests.Util;
+using RegexParser.Util;
+
+namespace RegexParser.Tests
+{
+    [TestFixture]
+    public class MatchCollectionTests
+    {
+        [Test]
+        public void NullOrEmptyMatch()
+        {
+            MatchCollection2 coll = Factory.CreateMatchCollection((Match2)null);
+            Assert.AreEqual(0, coll.Count, "Null.");
+
+            coll = Factory.CreateMatchCollection((Func<Match2>)null);
+            Assert.AreEqual(0, coll.Count, "Null/Func/1.");
+
+            coll = Factory.CreateMatchCollection(() => null);
+            Assert.AreEqual(0, coll.Count, "Null/Func/2.");
+
+            coll = Factory.CreateMatchCollection(Match2.Empty);
+            Assert.AreEqual(0, coll.Count, "Empty.");
+
+            coll = Factory.CreateMatchCollection(() => Match2.Empty);
+            Assert.AreEqual(0, coll.Count, "Empty/Func.");
+        }
+        
+        [Test]
+        public void OneMatch()
+        {
+            MatchCollection2 coll = Factory.CreateMatchCollection(Factory.CreateMatch(0, 0, "", null));
+            Assert.AreEqual(1, coll.Count, "Second null.");
+
+            coll = Factory.CreateMatchCollection(Factory.CreateMatch(0, 0, "", () => null));
+            Assert.AreEqual(1, coll.Count, "Second null/Func.");
+
+            coll = Factory.CreateMatchCollection(Factory.CreateMatch(0, 0, "", () => Match2.Empty));
+            Assert.AreEqual(1, coll.Count, "Second empty.");
+        }
+
+        [Test]
+        public void TwoMatches()
+        {
+            MatchCollection2 coll = Factory.CreateMatchCollection(Factory.CreateMatch(100, 10, "One", () =>
+                                                                  Factory.CreateMatch(200, 30, "Two", () => Match2.Empty)));

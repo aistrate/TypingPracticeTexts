@@ -1,0 +1,13 @@
+Electromagnetism
+
+Electromagnetism is one of the four fundamental interactions of nature, along with strong interaction, weak interaction and gravitation. It is the force that causes the interaction between electrically charged particles; the areas in which this happens are called electromagnetic fields.
+
+Electromagnetism is the force responsible for practically all the phenomena encountered in daily life (with the exception of gravity). Ordinary matter takes its form as a result of intermolecular forces between individual molecules in matter. Electromagnetism is also the force which holds electrons and protons together inside atoms, which are the building blocks of molecules. This governs the processes involved in chemistry, which arise from interactions between the electrons orbiting atoms. However, electromagnetic force does not create the "pushing" or "pulling" between two separate material objects (lifting up a coffee cup, for example).
+
+The force of electromagnetism is manifested both in electric fields and magnetic fields; both are simply different aspects of electromagnetism, and hence are intrinsically related to each other. Thus, a changing electric field generates a magnetic field; conversely a changing magnetic field generates an electric field. This effect is called electromagnetic induction, and is the basis of operation for electrical generators, induction motors, and transformers. Mathematically speaking, magnetic fields and electric fields are convertible with relative motion as a four vector.
+
+Electric fields are the cause of several common phenomena, such as electric potential (such as the voltage of a battery) and electric current (such as the flow of electricity through a flashlight). Magnetic fields are the cause of the force associated with magnets.
+
+In quantum electrodynamics, electromagnetic interactions between charged particles can be calculated using the method of Feynman diagrams, in which we picture messenger particles called virtual photons being exchanged between charged particles. This method can be derived from the field picture through perturbation theory.
+
+The theoretical implications of electromagnetism led to the development of special relativity by Albert Einstein in 1905.

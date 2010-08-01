@@ -1,0 +1,9 @@
+Mouse (computing)
+
+In computing, a mouse (plural mouses, mice, or mouse devices) is a pointing device that functions by detecting two-dimensional motion relative to its supporting surface. Physically, a mouse consists of an object held under one of the user's hands, with one or more buttons. It sometimes features other elements, such as "wheels", which allow the user to perform various system-dependent operations, or extra buttons or features can add more control or dimensional input. The mouse's motion typically translates into the motion of a pointer on a display, which allows for fine control of a Graphical User Interface.
+
+The name mouse, originated at the Stanford Research Institute, derives from the resemblance of early models (which had a cord attached to the rear part of the device, suggesting the idea of a tail) to the common mouse.
+
+The first marketed integrated mouse - shipped as a part of a computer and intended for personal computer navigation - came with the Xerox 8010 Star Information System in 1981. However, the mouse remained relatively obscure until the appearance of the Apple Macintosh; in 1984 PC columnist John C. Dvorak ironically commented on the release of this new computer with a mouse: "There is no evidence that people want to use these things."
+
+A mouse now comes with most computers and many other varieties can be bought separately.

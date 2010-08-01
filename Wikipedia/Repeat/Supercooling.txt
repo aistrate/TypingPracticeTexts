@@ -1,0 +1,13 @@
+Supercooling
+
+Supercooling is the process of lowering the temperature of a liquid or a gas below its freezing point, without it becoming a solid.
+
+A liquid below its standard freezing point will crystallize in the presence of a seed crystal or nucleus around which a crystal structure can form. However, lacking any such nucleus, the liquid phase can be maintained all the way down to the temperature at which crystal homogeneous nucleation occurs. The homogeneous nucleation can occur above the glass transition where the system is an amorphous (non-crystalline) solid.
+
+Pure water normally freezes at 273.15 K (0 C or 32 F) but it can also be "supercooled" at standard pressure down to its crystal homogeneous nucleation at almost 231 K (-42 C). If cooled at a rate on the order of 10^6 K/s, the crystal nucleation can be avoided and water becomes a glass. Its glass transition temperature is much colder and harder to determine, but studies estimate it at about 165 K (-108 C). Glassy water can be heated up to approximately 150 K (-123 C). In the range of temperatures between 231 K (-42 C) and 150 K (-123 C) experiments find only crystal ice.
+
+Droplets of supercooled water often exist in stratiform and cumulus clouds. They form into ice when they are struck by the wings of passing airplanes and abruptly crystallize. (This causes problems with lift, so aircraft that are expected to fly in such conditions are equipped with a de-icing system.) Freezing rain is also caused by supercooled droplets.
+
+The process opposite to supercooling, the melting of a solid below the freezing point, is much more difficult, and a solid will almost always melt at the same temperature for a given pressure. For this reason, it is the melting point which is usually identified, using melting point apparatus; even when the subject of a paper is "freezing-point determination", the actual methodology is "the principle of observing the disappearance rather than the formation of ice". It is, however, possible, at a given pressure to superheat a liquid above its boiling point without it becoming gaseous.
+
+Supercooling is often confused with freezing-point depression. Supercooling is the cooling of a liquid below its freezing point without it becoming solid. Freezing point depression is when a solution can be cooled below the freezing point of the corresponding pure liquid due to the presence of the solute; an example of this is the freezing point depression that occurs when sodium chloride is added to pure water.

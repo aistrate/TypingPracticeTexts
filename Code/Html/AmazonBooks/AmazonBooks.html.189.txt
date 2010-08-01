@@ -1,0 +1,42 @@
+                          Small Parts<br/> <span class="navFooterDescText">
+                            Tools, Parts<br/> & Materials
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.warehousedeals.com">
+                          Warehouse Deals<br/> <span class="navFooterDescText">
+                            Open-Box<br/> Discounts
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 4%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://www.zappos.com">
+                          Zappos<br/> <span class="navFooterDescText">
+                            Shoes &<br/> Clothing
+                          </span>
+                        </a>
+                      </td>
+                      <td class="navFooterDescSpacer" style="width: 30.0%"></td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="navFooterLine navFooterLinkLine navFooterPadItemLine">
+                  <a href="/gp/help/customer/display.html/ref=footer_cou?ie=UTF8&nodeId=508088">Conditions of Use</a>
+                  <a href="/gp/help/customer/display.html/ref=footer_privacy?ie=UTF8&nodeId=468496">Privacy Notice</a>
+                  <span>
+                    © 1996-2010, Amazon.com, Inc. or its affiliates
+                  </span>
+                </div>
+              </td>
+            </tr>
+
+          </table>
+        </div>
+        <!-- whfh-w/IAHJchKgsWMLpSDmFQAMJX2Bf4zAA8 rid-1RVCMGP6WPZF34Z5GVPD -->
+      </div>
+    </body>
+</html>
+<!-- MEOW --> 

@@ -1,0 +1,30 @@
+                        <a href="/Herb-n-Lorna-Eric-Kraft/dp/1935597019/ref=bhp_9p2_enc_04?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                          <i>Herb &#8216;n&#8217; Lorna</i> by Eric Kraft
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Greyhound-Steffan-Piper/dp/0982555091/ref=bhp_9p2_enc_05?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                          <i>Greyhound</i> by Steffan Piper
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_enc_06?ie=UTF8&docId=1000373401&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Learn more about AmazonEncore</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="asinItem">
+                  <div class="prodImage">
+                    <a href="/Bargain-Books/b/ref=bhp_9p2_barg_01?ie=UTF8&node=45&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">
+                      <img src="http://g-ecx.images-amazon.com/images/G/01/img10/books/120/bargain-books_120._V213675890_.gif" alt="Bargain Books" border="0" />
+                    </a>
+                  </div>
+                  <div class="asinTextBlock">
+                    <div class="title">
+                      <a href="/Bargain-Books/b/ref=bhp_9p2_barg_02?ie=UTF8&node=45&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Big Deals in Bargain Books</a>
+                    </div>
+                    <ul>
+                      <li>
+                        <a href="/gp/feature.html/ref=bhp_9p2_barg_03?ie=UTF8&docId=550095&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-6&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1267838082&pf_rd_i=283155">Biographies</a>
+                      </li>
+                      <li>

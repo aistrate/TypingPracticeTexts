@@ -1,0 +1,100 @@
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import mimetypes
+import os
+import re
+import stat
+import sys
+import urllib
+
+from django.utils.http import http_date
+from django.utils._os import safe_join
+
+__version__ = "0.1"
+__all__ = ['WSGIServer','WSGIRequestHandler']
+
+server_version = "WSGIServer/" + __version__
+sys_version = "Python/" + sys.version.split()[0]
+software_version = server_version + ' ' + sys_version
+
+class WSGIServerException(Exception):
+    pass
+
+class FileWrapper(object):
+    
+    def __init__(self, filelike, blksize=8192):
+        self.filelike = filelike
+        self.blksize = blksize
+        if hasattr(filelike,'close'):
+            self.close = filelike.close
+
+    def __getitem__(self,key):
+        data = self.filelike.read(self.blksize)
+        if data:
+            return data
+        raise IndexError
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        data = self.filelike.read(self.blksize)
+        if data:
+            return data
+        raise StopIteration
+
+tspecials = re.compile(r'[ \(\)<>@,;:\\"/\[\]\?=]')
+
+def _formatparam(param, value=None, quote=1):
+    
+    if value is not None and len(value) > 0:
+        if quote or tspecials.search(value):
+            value = value.replace('\\', '\\\\').replace('"', r'\"')
+            return '%s="%s"' % (param, value)
+        else:
+            return '%s=%s' % (param, value)
+    else:
+        return param
+
+class Headers(object):
+    
+    def __init__(self,headers):
+        if not isinstance(headers, list):
+            raise TypeError("Headers must be a list of name/value tuples")
+        self._headers = headers
+
+    def __len__(self):
+        
+        return len(self._headers)
+
+    def __setitem__(self, name, val):
+        
+        del self[name]
+        self._headers.append((name, val))
+
+    def __delitem__(self,name):
+        
+        name = name.lower()
+        self._headers[:] = [kv for kv in self._headers if kv[0].lower()<>name]
+
+    def __getitem__(self,name):
+        
+        return self.get(name)
+
+    def has_key(self, name):
+        
+        return self.get(name) is not None
+
+    __contains__ = has_key
+
+    def get_all(self, name):
+        
+        name = name.lower()
+        return [kv[1] for kv in self._headers if kv[0].lower()==name]
+
+    def get(self,name,default=None):
+        
+        name = name.lower()
+        for k,v in self._headers:
+            if k.lower()==name:
+                return v
+        return default

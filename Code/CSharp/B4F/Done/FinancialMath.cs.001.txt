@@ -1,0 +1,50 @@
+using System;
+using System.Linq;
+
+namespace B4F.TotalGiro.ClientApplicationLayer.Common
+{
+    public static class FinancialMath
+    {
+        #region System.Decimal Variants
+
+        public static decimal InternalRateOfReturn(decimal[] values)
+        {
+            return (decimal)InternalRateOfReturn(values.Select(v => (double)v).ToArray());
+        }
+
+        public static decimal CumulativeNormalDistribution(decimal x, decimal mean, decimal standardDeviation)
+        {
+            return (decimal)CumulativeNormalDistribution((double)x, (double)mean, (double)standardDeviation);
+        }
+
+        public static decimal ErrorFunction(decimal x)
+        {
+            return (decimal)ErrorFunction((double)x);
+        }
+
+        public static decimal GoalSeek(Func<decimal, decimal> func, decimal goalY, decimal guessX)
+        {
+            return (decimal)GoalSeek((double x) => (double)func((decimal)x), (double)goalY, (double)guessX);
+        }
+
+        public static decimal Sqrt(decimal x)
+        {
+            return (decimal)Math.Sqrt((double)x);
+        }
+
+        #endregion
+
+        #region System.Double Variants
+
+        public static double InternalRateOfReturn(double[] values)
+        {
+            double[] valuesCopy = values.ToArray();
+            double irrGuess = 0.06;
+
+            while (true)
+            {
+                try
+                {
+                    return Microsoft.VisualBasic.Financial.IRR(ref valuesCopy, irrGuess);
+                }
+                catch (ArgumentException)

@@ -1,0 +1,9 @@
+Internal combustion engine
+
+The internal combustion engine is an engine in which the combustion of a fuel (generally, fossil fuel) occurs with an oxidizer (usually air) in a combustion chamber. In an internal combustion engine the expansion of the high temperature and pressure gases, which are produced by the combustion, directly applies force to a movable component of the engine, such as the pistons or turbine blades and by moving it over a distance, generate useful mechanical energy.
+
+The term internal combustion engine usually refers to an engine in which combustion is intermittent, such as the more familiar four-stroke and two-stroke piston engines, along with variants, such as the Wankel rotary engine. A second class of internal combustion engines use continuous combustion: gas turbines, jet engines and most rocket engines, each of which are internal combustion engines on the same principle as previously described.
+
+The internal combustion engine (or ICE) is quite different from external combustion engines, such as steam or Stirling engines, in which the energy is delivered to a working fluid not consisting of, mixed with, or contaminated by combustion products. Working fluids can be air, hot water, pressurized water or even liquid sodium, heated in some kind of boiler.
+
+A large number of different designs for ICEs have been developed and built, with a variety of different strengths and weaknesses. Powered by an energy-dense fuel (which is very frequently petrol, a liquid derived from fossil fuels), the ICE delivers an excellent power-to-weight ratio with few disadvantages. While there have been and still are many stationary applications, the real strength of internal combustion engines is in mobile applications and they dominate as a power supply for cars, aircraft, and boats, from the smallest to the largest. Only for hand-held power tools do they share part of the market with battery powered devices.

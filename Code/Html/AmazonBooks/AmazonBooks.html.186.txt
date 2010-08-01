@@ -1,0 +1,30 @@
+                    <td class="navFooterColSpacerOuter"></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="navFooterLine navFooterLogoLine">
+                  <a href="/ref=footer_logo">
+                    <img src="http://g-ecx.images-amazon.com/images/G/01/gno/images/general/navAmazonLogoFooter._V192570482_.gif" width="126" alt="amazon.com" height="24" border="0" />
+                  </a>
+                </div>
+                <div class="navFooterLine navFooterLinkLine navFooterPadItemLine">
+                  <a href="http://www.amazon.ca">Canada</a>
+                  <a href="http://www.amazon.cn">China</a>
+                  <a href="http://www.amazon.fr">France</a>
+                  <a href="http://www.amazon.de">Germany</a>
+                  <a href="http://www.amazon.co.jp">Japan</a>
+                  <a href="http://www.amazon.co.uk">United Kingdom</a>
+                </div>
+                <div class="navFooterLine navFooterLinkLine navFooterDescLine">
+                  <table cellspacing="0">
+                    <tr>
+                      <td class="navFooterDescSpacer" style="width: 30.0%"></td>
+                      <td class="navFooterDescItem">
+                        <a href="http://wireless.amazon.com">
+                          AmazonWireless<br/> <span class="navFooterDescText">
+                            Cellphones &<br/> Wireless Plans
+                          </span>
+                        </a>

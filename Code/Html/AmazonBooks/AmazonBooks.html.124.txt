@@ -1,0 +1,30 @@
+                  <div class="asinTextBlock">
+                    <div class="title">
+                      <a href="/gp/feature.html/ref=amb_link_353320382_1?ie=UTF8&plgroup=1&docId=1000346431&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">New Releases</a>
+                    </div>
+                    <ul>
+                      <li>
+                        <a href="/Sizzling-Sixteen-Stephanie-Janet-Evanovich/dp/0312383304/ref=amb_link_353320382_3?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                          <i>Sizzling Sixteen</i> by Janet Evanovich
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Overton-Window-Glenn-Beck/dp/1439184305/ref=amb_link_353320382_4?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                          <i>The Overton Window</i> by Glenn Beck
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Spies-Balkans-Novel-Alan-Furst/dp/1400066034/ref=amb_link_353320382_5?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                          <i>Spies of the Balkans</i> by Alan Furst
+                        </a>
+                      </li>
+                      <li>
+                        <a href="/Private-James-Patterson/dp/0316096156/ref=amb_link_353320382_6?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-8&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265972842&pf_rd_i=283155">
+                          <i>Private</i> by James Patterson
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="asinItem">
+                  <div class="prodImage">

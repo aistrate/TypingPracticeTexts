@@ -1,0 +1,50 @@
+breakEnd f = B.breakEnd (f . w2c)
+{-# INLINE breakEnd #-}
+
+split :: Char -> ByteString -> [ByteString]
+split = B.split . c2w
+{-# INLINE split #-}
+
+splitWith :: (Char -> Bool) -> ByteString -> [ByteString]
+splitWith f = B.splitWith (f . w2c)
+{-# INLINE splitWith #-}
+
+groupBy :: (Char -> Char -> Bool) -> ByteString -> [ByteString]
+groupBy k = B.groupBy (\a b -> k (w2c a) (w2c b))
+
+index :: ByteString -> Int -> Char
+index = (w2c .) . B.index
+{-# INLINE index #-}
+
+elemIndex :: Char -> ByteString -> Maybe Int
+elemIndex = B.elemIndex . c2w
+{-# INLINE elemIndex #-}
+
+elemIndexEnd :: Char -> ByteString -> Maybe Int
+elemIndexEnd = B.elemIndexEnd . c2w
+{-# INLINE elemIndexEnd #-}
+
+elemIndices :: Char -> ByteString -> [Int]
+elemIndices = B.elemIndices . c2w
+{-# INLINE elemIndices #-}
+
+findIndex :: (Char -> Bool) -> ByteString -> Maybe Int
+findIndex f = B.findIndex (f . w2c)
+{-# INLINE findIndex #-}
+
+findIndices :: (Char -> Bool) -> ByteString -> [Int]
+findIndices f = B.findIndices (f . w2c)
+
+count :: Char -> ByteString -> Int
+count c = B.count (c2w c)
+
+elem :: Char -> ByteString -> Bool
+elem    c = B.elem (c2w c)
+{-# INLINE elem #-}
+
+notElem :: Char -> ByteString -> Bool
+notElem c = B.notElem (c2w c)
+{-# INLINE notElem #-}
+
+filter :: (Char -> Bool) -> ByteString -> ByteString
+filter f = B.filter (f . w2c)

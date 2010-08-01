@@ -1,0 +1,30 @@
+                          <div class="gry t11 nt">Hardcover</div>
+                          <span class="listprice gry t11">$26.95</span>
+                          <span class="red t14">$17.79</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec1?ie=UTF8&ASIN=0393072223&reason=0387982698&reason=0195163435&0195163435.order=1&0387982698.order=0&isRecommendedItem=1&0387982698.source=Purchase&isPopup=0&0195163435.source=Purchase&pf_rd_i=283155&pf_rd_s=center-10&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec1?ie=UTF8&ASIN=0393072223&reason=0387982698&reason=0195163435&0195163435.order=1&0387982698.order=0&isRecommendedItem=1&0387982698.source=Purchase&isPopup=1&0195163435.source=Purchase&pf_rd_i=283155&pf_rd_s=center-10&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ItemElement1" style="width: 33%; margin-bottom: 0px; ">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0TitleContainer1" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0Title1">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ImageContainer1">
+                            <a href="/gp/product/1430224312/ref=s9_newr_bw_ir02?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Expert F# 2.0">
+                              <div class="imageContainer">
+                                <img src="http://ecx.images-amazon.com/images/I/51zF07Q7C8L._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="109" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0Image1" />
+                              </div>Expert F# 2.0
+                            </a>
+                          </span>
+                          <div class="t11">Don Syme, Adam Granicz...</div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$69.99</span>
+                          <span class="red t14">$57.27</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec2?ie=UTF8&ASIN=1430224312&reason=0596514980&0596514980.source=Purchase&0596514980.order=0&isRecommendedItem=1&isPopup=0&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec2?ie=UTF8&ASIN=1430224312&reason=0596514980&0596514980.source=Purchase&0596514980.order=0&isRecommendedItem=1&isPopup=1&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>
+                        </div>
+                      </div>

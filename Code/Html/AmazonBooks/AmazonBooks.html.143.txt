@@ -1,0 +1,30 @@
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Andrei-Alexandrescu/e/B001ILKI7K/ref=s9_newr_bw_al5?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155">Andrei Alexandrescu</a>
+                          </div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$49.99</span>
+                          <span class="red t14">$40.65</span>
+                          <div class="recsLink tiny">
+                            <a class="noLinkDecoration" href="/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec5?ie=UTF8&ASIN=0321635361&reason=0596514980&0596514980.source=Purchase&0596514980.order=0&isRecommendedItem=1&isPopup=0&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155" target="RecsWhyWindow" onclick="return amz_js_PopWin('/gp/yourstore/rate-this-asin/ref=s9_newr_bw_yrec5?ie=UTF8&ASIN=0321635361&reason=0596514980&0596514980.source=Purchase&0596514980.order=0&isRecommendedItem=1&isPopup=1&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155','RecsWhyWindow','width=575,height=450,resizable=1,scrollbars=1,toolbar=0,status=1');">Fix this recommendation</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ItemElement5" style="width: 33%; margin-bottom: 0px; display: none;">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0TitleContainer5" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0Title5">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0ImageContainer5">
+                            <a href="/gp/product/0393066320/ref=s9_newr_bw_ir06?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="How Pleasure Works: The New Science of Why We Like What We Like">
+                              <div class="imageContainer">
+                                <img url="http://ecx.images-amazon.com/images/I/310RHfIJy3L._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="89" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12235_r0Image5" />
+                              </div>How Pleasure Works: The New Science...
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Paul-Bloom/e/B001HD1XZU/ref=s9_newr_bw_al6?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-10&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=475956711&pf_rd_i=283155">Paul Bloom</a>
+                          </div>

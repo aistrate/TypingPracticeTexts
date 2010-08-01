@@ -1,0 +1,50 @@
+				from p in db.Products
+				select new { p.ProductID, p.UnitPrice, HalfPrice = p.UnitPrice / 2 };
+			foreach (var item in q)
+			{
+				Assert.IsTrue((item.UnitPrice / 2) == item.HalfPrice);
+			}
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test]
+		public void DLinq12b()
+		{
+			var q =
+				from p in db.Products
+				select new { p.ProductID, p.UnitPrice, HalfPrice = p.UnitPrice * 2 };
+			foreach (var item in q)
+			{
+				Assert.IsTrue(item.UnitPrice * 2 == item.HalfPrice);
+			}
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test]
+		public void DLinq12c()
+		{
+			var q =
+				from p in db.Products
+				select new { p.ProductID, p.UnitPrice, HalfPrice = p.UnitPrice + 2 };
+			foreach (var item in q)
+			{
+				Assert.IsTrue(item.UnitPrice + 2 == item.HalfPrice);
+			}
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test]
+		public void DLinq12d()
+		{
+			var q =
+				from p in db.Products
+				select new { p.ProductID, p.UnitPrice, HalfPrice = p.UnitPrice - 2 };
+			foreach (var item in q)
+			{
+				Assert.IsTrue(item.UnitPrice - 2 == item.HalfPrice);
+			}
+		}
+
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses SELECT and a conditional statment to return a sequence of product " +
+					 " name and product availability.")]

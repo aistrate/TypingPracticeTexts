@@ -1,0 +1,53 @@
+    return ( table{ buckets=newbkts, bmask=newmask } )
+
+deleteBucket :: (key -> Bool) -> [(key,val)] -> ([(key, val)], Int32, ())
+deleteBucket _   [] = ([],0,())
+deleteBucket del (pair@(k,_):bucket) =
+  case deleteBucket del bucket of
+    (bucket', dels, _) | del k     -> dels' `seq` (bucket', dels', ())
+                       | otherwise -> (pair:bucket', dels, ())
+      where dels' = dels - 1
+
+delete :: HashTable key val -> key -> IO ()
+
+delete ht@HashTable{ cmp=eq } key =
+  updatingBucket Can'tInsert (deleteBucket (eq key)) ht key
+
+update :: HashTable key val -> key -> val -> IO Bool
+
+update ht@HashTable{ cmp=eq } key val =
+  updatingBucket CanInsert
+    (\bucket -> let (bucket', dels, _) = deleteBucket (eq key) bucket
+                in  ((key,val):bucket', 1+dels, dels/=0))
+    ht key
+
+lookup :: HashTable key val -> key -> IO (Maybe val)
+
+lookup ht@HashTable{ cmp=eq } key = do
+  recordLookup
+  (_, _, bucket) <- findBucket ht key
+  let firstHit (k,v) r | eq key k  = Just v
+                       | otherwise = r
+  return (foldr firstHit Nothing bucket)
+
+fromList :: (Eq key) => (key -> Int32) -> [(key,val)] -> IO (HashTable key val)
+fromList hash list = do
+  table <- new (==) hash
+  sequence_ [ insert table k v | (k,v) <- list ]
+  return table
+
+toList :: HashTable key val -> IO [(key,val)]
+toList = mapReduce id concat
+
+{-# INLINE mapReduce #-}
+mapReduce :: ([(key,val)] -> r) -> ([r] -> r) -> HashTable key val -> IO r
+mapReduce m r HashTable{ tab=ref } = do
+  HT{ buckets=bckts, bmask=b } <- readIORef ref
+  fmap r (mapM (fmap m . readHTArray bckts) [0..b])
+
+longestChain :: HashTable key val -> IO [(key,val)]
+longestChain = mapReduce id (maximumBy lengthCmp)
+  where lengthCmp (_:x)(_:y) = lengthCmp x y
+        lengthCmp []   []    = EQ
+        lengthCmp []   _     = LT
+        lengthCmp _    []    = GT

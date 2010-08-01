@@ -1,0 +1,50 @@
+bufReadNonBlocking :: FD -> IORef Buffer -> Bool -> Ptr a -> Int -> Int
+                   -> IO Int
+bufReadNonBlocking fd ref is_stream ptr so_far count =
+  seq fd $ seq so_far $ seq count $ do
+  buf@Buffer{ bufBuf=raw, bufWPtr=w, bufRPtr=r, bufSize=sz } <- readIORef ref
+  if bufferEmpty buf
+     then if count > sz
+                then do rest <- readChunkNonBlocking fd is_stream ptr count
+                        return (so_far + rest)
+                else do buf' <- fillReadBufferWithoutBlocking fd is_stream buf
+                        case buf' of { Buffer{ bufWPtr=w' }  ->
+                        if (w' == 0) 
+                           then return so_far
+                           else do writeIORef ref buf'
+                                   bufReadNonBlocking fd ref is_stream ptr
+                                         so_far (min count w')
+                        }
+     else do
+        let avail = w - r
+        if (count == avail)
+           then do 
+                memcpy_ptr_baoff ptr raw (fromIntegral r) (fromIntegral count)
+                writeIORef ref buf{ bufWPtr=0, bufRPtr=0 }
+                return (so_far + count)
+           else do
+        if (count < avail)
+           then do 
+                memcpy_ptr_baoff ptr raw (fromIntegral r) (fromIntegral count)
+                writeIORef ref buf{ bufRPtr = r + count }
+                return (so_far + count)
+           else do
+
+        memcpy_ptr_baoff ptr raw (fromIntegral r) (fromIntegral avail)
+        writeIORef ref buf{ bufWPtr=0, bufRPtr=0 }
+        let remaining = count - avail
+            so_far' = so_far + avail
+            ptr' = ptr `plusPtr` avail
+
+        if remaining < sz
+           then bufReadNonBlocking fd ref is_stream ptr' so_far' remaining
+           else do 
+
+        rest <- readChunkNonBlocking fd is_stream ptr' remaining
+        return (so_far' + rest)
+
+readChunkNonBlocking :: FD -> Bool -> Ptr a -> Int -> IO Int
+readChunkNonBlocking fd is_stream ptr bytes = do
+    fromIntegral `liftM`
+        readRawBufferPtrNoBlock "readChunkNonBlocking" fd is_stream 
+                            (castPtr ptr) 0 (fromIntegral bytes)

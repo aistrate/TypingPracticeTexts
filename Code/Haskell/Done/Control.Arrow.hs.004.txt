@@ -1,0 +1,29 @@
+        app :: a (a b c, b) c
+
+instance ArrowApply (->) where
+        app (f,x) = f x
+
+instance Monad m => ArrowApply (Kleisli m) where
+        app = Kleisli (\(Kleisli f, x) -> f x)
+
+newtype ArrowApply a => ArrowMonad a b = ArrowMonad (a () b)
+
+instance ArrowApply a => Monad (ArrowMonad a) where
+        return x = ArrowMonad (arr (\_ -> x))
+        ArrowMonad m >>= f = ArrowMonad (m >>>
+                        arr (\x -> let ArrowMonad h = f x in (h, ())) >>>
+                        app)
+
+leftApp :: ArrowApply a => a b c -> a (Either b d) (Either c d)
+leftApp f = arr ((\b -> (arr (\() -> b) >>> f >>> arr Left, ())) |||
+                 (\d -> (arr (\() -> d) >>> arr Right, ()))) >>> app
+
+class Arrow a => ArrowLoop a where
+        loop :: a (b,d) (c,d) -> a b c
+
+instance ArrowLoop (->) where
+        loop f b = let (c,d) = f (b,d) in c
+
+instance MonadFix m => ArrowLoop (Kleisli m) where
+        loop (Kleisli f) = Kleisli (liftM fst . mfix . f')
+                where   f' x y = f (x, snd y)

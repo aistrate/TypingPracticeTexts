@@ -1,0 +1,49 @@
+    x `shift`   i | i<0       = x `shiftR` (-i)
+                  | i>0       = x `shiftL` i
+                  | otherwise = x
+
+    rotate            :: a -> Int -> a
+
+    x `rotate`  i | i<0       = x `rotateR` (-i)
+                  | i>0       = x `rotateL` i
+                  | otherwise = x
+
+    bit               :: Int -> a
+
+    setBit            :: a -> Int -> a
+
+    clearBit          :: a -> Int -> a
+
+    complementBit     :: a -> Int -> a
+
+    testBit           :: a -> Int -> Bool
+
+    bitSize           :: a -> Int
+
+    isSigned          :: a -> Bool
+
+    bit i               = 1 `shiftL` i
+    x `setBit` i        = x .|. bit i
+    x `clearBit` i      = x .&. complement (bit i)
+    x `complementBit` i = x `xor` bit i
+    x `testBit` i       = (x .&. bit i) /= 0
+
+    shiftL            :: a -> Int -> a
+    x `shiftL`  i = x `shift`  i
+
+    shiftR            :: a -> Int -> a
+    x `shiftR`  i = x `shift`  (-i)
+
+    rotateL           :: a -> Int -> a
+    x `rotateL` i = x `rotate` i
+
+    rotateR           :: a -> Int -> a
+    x `rotateR` i = x `rotate` (-i)
+
+instance Bits Int where
+    {-# INLINE shift #-}
+
+#ifdef __GLASGOW_HASKELL__
+    (I# x#) .&.   (I# y#)  = I# (word2Int# (int2Word# x# `and#` int2Word# y#))
+
+    (I# x#) .|.   (I# y#)  = I# (word2Int# (int2Word# x# `or#`  int2Word# y#))

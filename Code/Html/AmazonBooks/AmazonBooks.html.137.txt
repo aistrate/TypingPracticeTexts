@@ -1,0 +1,30 @@
+                            <div class="gry t11 nt">Mass Market Paperback</div>
+                            <span class="red t14">$7.99</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/1421531364/ref=s9_al_bw_i15?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Rosario+Vampire, Season II, Vol. 1">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/61wFbe-EtWL._SL120_.jpg" alt="" width="80" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image15" class="productImage" />
+                            </div>Rosario+Vampire, Season II, Vol. 1
+                          </a>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Akihisa-Ikeda/e/B002IPIKOI/ref=s9_al_bw_al16?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155">Akihisa Ikeda</a>
+                          </div>
+                          <span class="optional-hidden">
+                            <div class="gry t11 nt">Paperback</div>
+                            <span class="red t14">$9.99</span>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="asinItem asin shoveler-progress" style="position: relative; display: none;">
+                          <a href="/gp/product/0451229576/ref=s9_al_bw_i16?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-9&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1261620882&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Demonkeepers: A Novel of the Final Prophecy">
+                            <div style="margin-bottom: 4px; ">
+                              <img url="http://ecx.images-amazon.com/images/I/51StkOVCBQL._SL120_.jpg" alt="" width="74" height="120" id="ns_1RVCMGP6WPZF34Z5GVPD_12240_Image16" class="productImage" />
+                            </div>Demonkeepers: A Novel of the Final...
+                          </a>
+                          <div class="t11">Jessica Andersen</div>

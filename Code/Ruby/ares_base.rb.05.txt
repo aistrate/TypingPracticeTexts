@@ -1,0 +1,100 @@
+    def to_param
+      id && id.to_s
+    end
+
+    def ==(other)
+      other.equal?(self) || (other.instance_of?(self.class) && other.id == id && other.prefix_options == prefix_options)
+    end
+
+    def eql?(other)
+      self == other
+    end
+
+    def hash
+      id.hash
+    end
+
+    def dup
+      self.class.new.tap do |resource|
+        resource.attributes     = @attributes
+        resource.prefix_options = @prefix_options
+      end
+    end
+
+    def save
+      new? ? create : update
+    end
+
+    def save!
+      save || raise(ResourceInvalid.new(self))
+    end
+
+    def destroy
+      connection.delete(element_path, self.class.headers)
+    end
+
+    def exists?
+      !new? && self.class.exists?(to_param, :params => prefix_options)
+    end
+
+    def to_xml(options={})
+      attributes.to_xml({:root => self.class.element_name}.merge(options))
+    end
+
+    def as_json(options = nil)
+      attributes.as_json(options)
+    end
+
+    def encode(options={})
+      case self.class.format
+        when ActiveResource::Formats::XmlFormat
+          self.class.format.encode(attributes, {:root => self.class.element_name}.merge(options))
+        else
+          self.class.format.encode(attributes, options)
+      end
+    end
+
+    def reload
+      self.load(self.class.find(to_param, :params => @prefix_options).attributes)
+    end
+
+    def load(attributes)
+      raise ArgumentError, "expected an attributes Hash, got #{attributes.inspect}" unless attributes.is_a?(Hash)
+      @prefix_options, attributes = split_options(attributes)
+      attributes.each do |key, value|
+        @attributes[key.to_s] =
+          case value
+            when Array
+              resource = find_or_create_resource_for_collection(key)
+              value.map do |attrs|
+                if attrs.is_a?(String) || attrs.is_a?(Numeric)
+                  attrs.duplicable? ? attrs.dup : attrs
+                else
+                  resource.new(attrs)
+                end
+              end
+            when Hash
+              resource = find_or_create_resource_for(key)
+              resource.new(value)
+            else
+              value.dup rescue value
+          end
+      end
+      self
+    end
+
+    def update_attribute(name, value)
+      self.send("#{name}=".to_sym, value)
+      self.save
+    end
+
+    def update_attributes(attributes)
+      load(attributes) && save
+    end
+
+    alias_method :respond_to_without_attributes?, :respond_to?
+
+    def respond_to?(method, include_priv = false)
+      method_name = method.to_s
+      if attributes.nil?
+        super

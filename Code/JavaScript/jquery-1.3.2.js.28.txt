@@ -1,0 +1,98 @@
+	if ( document.addEventListener ) {
+		document.addEventListener( "DOMContentLoaded", function(){
+			document.removeEventListener( "DOMContentLoaded", arguments.callee, false );
+			jQuery.ready();
+		}, false );
+
+	} else if ( document.attachEvent ) {
+		document.attachEvent("onreadystatechange", function(){
+			if ( document.readyState === "complete" ) {
+				document.detachEvent( "onreadystatechange", arguments.callee );
+				jQuery.ready();
+			}
+		});
+
+		if ( document.documentElement.doScroll && window == window.top ) (function(){
+			if ( jQuery.isReady ) return;
+
+			try {
+				document.documentElement.doScroll("left");
+			} catch( error ) {
+				setTimeout( arguments.callee, 0 );
+				return;
+			}
+
+			jQuery.ready();
+		})();
+	}
+
+	jQuery.event.add( window, "load", jQuery.ready );
+}
+
+jQuery.each( ("blur,focus,load,resize,scroll,unload,click,dblclick," +
+	"mousedown,mouseup,mousemove,mouseover,mouseout,mouseenter,mouseleave," +
+	"change,select,submit,keydown,keypress,keyup,error").split(","), function(i, name){
+
+	jQuery.fn[name] = function(fn){
+		return fn ? this.bind(name, fn) : this.trigger(name);
+	};
+});
+
+jQuery( window ).bind( 'unload', function(){ 
+	for ( var id in jQuery.cache )
+		if ( id != 1 && jQuery.cache[ id ].handle )
+			jQuery.event.remove( jQuery.cache[ id ].handle.elem );
+}); 
+(function(){
+
+	jQuery.support = {};
+
+	var root = document.documentElement,
+		script = document.createElement("script"),
+		div = document.createElement("div"),
+		id = "script" + (new Date).getTime();
+
+	div.style.display = "none";
+	div.innerHTML = '   <link/><table></table><a href="/a" style="color:red;float:left;opacity:.5;">a</a><select><option>text</option></select><object><param/></object>';
+
+	var all = div.getElementsByTagName("*"),
+		a = div.getElementsByTagName("a")[0];
+
+	if ( !all || !all.length || !a ) {
+		return;
+	}
+
+	jQuery.support = {
+		leadingWhitespace: div.firstChild.nodeType == 3,
+		
+		tbody: !div.getElementsByTagName("tbody").length,
+		
+		objectAll: !!div.getElementsByTagName("object")[0]
+			.getElementsByTagName("*").length,
+		
+		htmlSerialize: !!div.getElementsByTagName("link").length,
+		
+		style: /red/.test( a.getAttribute("style") ),
+		
+		hrefNormalized: a.getAttribute("href") === "/a",
+		
+		opacity: a.style.opacity === "0.5",
+		
+		cssFloat: !!a.style.cssFloat,
+
+		scriptEval: false,
+		noCloneEvent: true,
+		boxModel: null
+	};
+	
+	script.type = "text/javascript";
+	try {
+		script.appendChild( document.createTextNode( "window." + id + "=1;" ) );
+	} catch(e){}
+
+	root.insertBefore( script, root.firstChild );
+	
+	if ( window[ id ] ) {
+		jQuery.support.scriptEval = true;
+		delete window[ id ];
+	}

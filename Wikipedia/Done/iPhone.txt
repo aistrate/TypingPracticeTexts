@@ -1,0 +1,7 @@
+iPhone
+
+The iPhone is an Internet and multimedia enabled smartphone designed and marketed by Apple Inc. The iPhone functions as a camera phone (also including text messaging and visual voicemail), a portable media player (equivalent to a video iPod), and an Internet client (with email, web browsing, and Wi-Fi connectivity) - using the phone's multi-touch screen to render a virtual keyboard in lieu of a physical keyboard.
+
+The first-generation phone (known as the Original) was quad-band GSM with EDGE; the second generation phone (known as 3G) added UMTS with 3.6 Mbps HSDPA; the third generation (known as 3GS) adds support for 7.2 Mbps HSDPA downloading but remains limited to 384 Kbps uploading as Apple had not implemented the HSPA protocol.
+
+Apple announced the iPhone on January 9, 2007, after months of rumors and speculation. The original iPhone was introduced in the United States on June 29, 2007 before being marketed worldwide. Time magazine named it the Invention of the Year in 2007. Released July 11, 2008, the iPhone 3G supports faster 3G data speeds and assisted GPS. On March 17, 2009, Apple announced version 3.0 of the iPhone OS for the iPhone (and iPod Touch), released on June 17, 2009. The iPhone 3GS was announced on June 8, 2009, and has improved performance, a camera with more megapixels and video capability, and voice control. It was released in the U.S., Canada and 6 European countries on June 19, 2009, in Australia and Japan on June 26, and saw international release in July and August, 2009.

@@ -1,0 +1,50 @@
+				MethodBase method;
+				switch (FindBestMethod(type.GetConstructors(), args, out method))
+				{
+					case 0:
+						if (args.Length == 1)
+							return GenerateConversion(args[0], type, errorPos);
+						throw ParseError(errorPos, Res.NoMatchingConstructor, GetTypeName(type));
+					case 1:
+						return Expression.New((ConstructorInfo)method, args);
+					default:
+						throw ParseError(errorPos, Res.AmbiguousConstructorInvocation, GetTypeName(type));
+				}
+			}
+			ValidateToken(TokenId.Dot, Res.DotOrOpenParenExpected);
+			NextToken();
+			return ParseMemberAccess(type, null);
+		}
+
+		Expression GenerateConversion(Expression expr, Type type, int errorPos)
+		{
+			Type exprType = expr.Type;
+			if (exprType == type) return expr;
+			if (exprType.IsValueType && type.IsValueType)
+			{
+				if ((IsNullableType(exprType) || IsNullableType(type)) &&
+					GetNonNullableType(exprType) == GetNonNullableType(type))
+					return Expression.Convert(expr, type);
+				if ((IsNumericType(exprType) || IsEnumType(exprType)) &&
+					(IsNumericType(type)) || IsEnumType(type))
+					return Expression.ConvertChecked(expr, type);
+			}
+			if (exprType.IsAssignableFrom(type) || type.IsAssignableFrom(exprType) ||
+				exprType.IsInterface || type.IsInterface)
+				return Expression.Convert(expr, type);
+			throw ParseError(errorPos, Res.CannotConvertValue,
+				GetTypeName(exprType), GetTypeName(type));
+		}
+
+		Expression ParseMemberAccess(Type type, Expression instance)
+		{
+			if (instance != null) type = instance.Type;
+			int errorPos = token.pos;
+			string id = GetIdentifier();
+			NextToken();
+			if (token.id == TokenId.OpenParen)
+			{
+				if (instance != null && type != typeof(string))
+				{
+					Type enumerableType = FindGenericType(typeof(IEnumerable<>), type);
+					if (enumerableType != null)

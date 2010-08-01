@@ -1,0 +1,30 @@
+        }
+      </style>
+      <script language="Javascript1.1" type="text/javascript">
+        <!--
+function amz_js_PopWin(url,name,options){
+  var ContextWindow = window.open(url,name,options);
+  ContextWindow.focus();
+  return false;
+}
+//-->
+      </script>
+
+      <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+      <meta name="description" content="Online shopping for millions of new &amp; used books on thousands of topics at everyday low prices."/>
+      <meta name="keywords" content="Books, New Books, Used Books, Dictionary, Harry Potter, Bible, Poetry, Magazines, Subscription, Audio Books, Textbooks, Biographies, Children&#39;s Books, Literature, Science Fiction, Fiction, Cookbooks, Psychology Books, Photography, Computers &amp; Internet, Travel, Pregnancy Books, Novels, Romance Novels, Reference Books, Classics, Business, Stephen King, Investing, Nora Roberts, Religion, For Dummies, Spirituality, Health, Parenting, Mystery Novels, Family, Amazon.com"/>
+      <title>Amazon.com Books: New &amp; used books,textbooks,children&#39;s books,biographies &amp; more</title>
+      <link type='text/css' href='http://z-ecx.images-amazon.com/images/G/01/browser-scripts/site-wide/us-site-wide-5699755542.css._V191210835_.css' rel='stylesheet'>
+        <link type='text/css' href='http://z-ecx.images-amazon.com/images/G/01/nav2/gamma/websiteGridCSS/websiteGridCSS-websiteGridCSS-61831._V229339557_.css' rel='stylesheet'>
+          <link type='text/css' href='http://z-ecx.images-amazon.com/images/G/01/s9-campaigns/s9-widget._V189877655_.css' rel='stylesheet'>
+            <link type='text/css' href='http://z-ecx.images-amazon.com/images/G/01/s9-campaigns/amazonShovelerCssTreatmentRedesign-min._V210288923_.css' rel='stylesheet'>
+              <style type="text/css">
+                /* non-sprited */
+                .ap_popover_unsprited .ap_body   .ap_left   { background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/po_left_17._V248144977_.png); }
+                .ap_popover_unsprited .ap_body   .ap_right  { background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/po_right_17._V248144979_.png); }
+                .ap_popover_unsprited .ap_header .ap_left   { background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/po_top_left._V265110087_.png); }
+                .ap_popover_unsprited .ap_header .ap_right  { background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/po_top_right._V265110087_.png); }
+                .ap_popover_unsprited .ap_header .ap_middle { background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/po_top._V265110086_.png); }
+                .ap_popover_unsprited .ap_footer .ap_left   { background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/po_bottom_left._V265110084_.png); }
+                .ap_popover_unsprited .ap_footer .ap_right  { background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/po_bottom_right._V265110087_.png); }
+                .ap_popover_unsprited .ap_footer .ap_middle { background-image: url(http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/po_bottom._V265110084_.png); }

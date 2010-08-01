@@ -1,0 +1,100 @@
+        date_checks = []
+        for check in self.instance._meta.unique_together[:]:
+            fields_on_form = [field for field in check if self.cleaned_data.get(field) is not None]
+            if len(fields_on_form) == len(check):
+                unique_checks.append(check)
+
+        for name in self.fields:
+            try:
+                f = self.instance._meta.get_field_by_name(name)[0]
+            except FieldDoesNotExist:
+                continue
+            if not isinstance(f, ModelField):
+                continue
+            if self.cleaned_data.get(name) is None:
+                continue
+            if f.unique:
+                unique_checks.append((name,))
+            if f.unique_for_date and self.cleaned_data.get(f.unique_for_date) is not None:
+                date_checks.append(('date', name, f.unique_for_date))
+            if f.unique_for_year and self.cleaned_data.get(f.unique_for_year) is not None:
+                date_checks.append(('year', name, f.unique_for_year))
+            if f.unique_for_month and self.cleaned_data.get(f.unique_for_month) is not None:
+                date_checks.append(('month', name, f.unique_for_month))
+        return unique_checks, date_checks
+
+    def _perform_unique_checks(self, unique_checks):
+        bad_fields = set()
+        form_errors = []
+
+        for unique_check in unique_checks:
+
+            lookup_kwargs = {}
+            for field_name in unique_check:
+                lookup_value = self.cleaned_data[field_name]
+                if isinstance(self.fields[field_name], ModelChoiceField):
+                    lookup_value =  lookup_value.pk
+                lookup_kwargs[str(field_name)] = lookup_value
+
+            qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
+
+            if self.instance.pk is not None:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                if len(unique_check) == 1:
+                    self._errors[unique_check[0]] = ErrorList([self.unique_error_message(unique_check)])
+                else:
+                    form_errors.append(self.unique_error_message(unique_check))
+
+                for field_name in unique_check:
+                    bad_fields.add(field_name)
+        return bad_fields, form_errors
+
+    def _perform_date_checks(self, date_checks):
+        bad_fields = set()
+        for lookup_type, field, unique_for in date_checks:
+            lookup_kwargs = {}
+            if lookup_type == 'date':
+                date = self.cleaned_data[unique_for]
+                lookup_kwargs['%s__day' % unique_for] = date.day
+                lookup_kwargs['%s__month' % unique_for] = date.month
+                lookup_kwargs['%s__year' % unique_for] = date.year
+            else:
+                lookup_kwargs['%s__%s' % (unique_for, lookup_type)] = getattr(self.cleaned_data[unique_for], lookup_type)
+            lookup_kwargs[field] = self.cleaned_data[field]
+
+            qs = self.instance.__class__._default_manager.filter(**lookup_kwargs)
+            if self.instance.pk is not None:
+                qs = qs.exclude(pk=self.instance.pk)
+
+            if qs.exists():
+                self._errors[field] = ErrorList([
+                    self.date_error_message(lookup_type, field, unique_for)
+                ])
+                bad_fields.add(field)
+        return bad_fields, []
+
+    def date_error_message(self, lookup_type, field, unique_for):
+        return _(u"%(field_name)s must be unique for %(date_field)s %(lookup)s.") % {
+            'field_name': unicode(self.fields[field].label),
+            'date_field': unicode(self.fields[unique_for].label),
+            'lookup': lookup_type,
+        }
+
+    def unique_error_message(self, unique_check):
+        model_name = capfirst(self.instance._meta.verbose_name)
+
+        if len(unique_check) == 1:
+            field_name = unique_check[0]
+            field_label = self.fields[field_name].label
+            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': unicode(model_name),
+                'field_label': unicode(field_label)
+            }
+        else:
+            field_labels = [self.fields[field_name].label for field_name in unique_check]
+            field_labels = get_text_list(field_labels, _('and'))
+            return _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                'model_name': unicode(model_name),
+                'field_label': unicode(field_labels)

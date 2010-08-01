@@ -1,0 +1,49 @@
+    m >>= k     = bindSTM m k
+
+bindSTM :: STM a -> (a -> STM b) -> STM b
+bindSTM (STM m) k = STM ( \s ->
+  case m s of 
+    (# new_s, a #) -> unSTM (k a) new_s
+  )
+
+thenSTM :: STM a -> STM b -> STM b
+thenSTM (STM m) k = STM ( \s ->
+  case m s of 
+    (# new_s, _ #) -> unSTM k new_s
+  )
+
+returnSTM :: a -> STM a
+returnSTM x = STM (\s -> (# s, x #))
+
+unsafeIOToSTM :: IO a -> STM a
+unsafeIOToSTM (IO m) = STM m
+
+atomically :: STM a -> IO a
+atomically (STM m) = IO (\s -> (atomically# m) s )
+
+retry :: STM a
+retry = STM $ \s# -> retry# s#
+
+orElse :: STM a -> STM a -> STM a
+orElse (STM m) e = STM $ \s -> catchRetry# m (unSTM e) s
+
+catchSTM :: STM a -> (SomeException -> STM a) -> STM a
+catchSTM (STM m) k = STM $ \s -> catchSTM# m (\ex -> unSTM (k ex)) s
+
+checkInv :: STM a -> STM ()
+checkInv (STM m) = STM (\s -> (check# m) s)
+
+alwaysSucceeds :: STM a -> STM ()
+alwaysSucceeds i = do ( do i ; retry ) `orElse` ( return () ) 
+                      checkInv i
+
+always :: STM Bool -> STM ()
+always i = alwaysSucceeds ( do v <- i
+                               if (v) then return () else ( error "Transacional invariant violation" ) )
+
+data TVar a = TVar (TVar# RealWorld a)
+
+INSTANCE_TYPEABLE1(TVar,tvarTc,"TVar")
+
+instance Eq (TVar a) where
+        (TVar tvar1#) == (TVar tvar2#) = sameTVar# tvar1# tvar2#

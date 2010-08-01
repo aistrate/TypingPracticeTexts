@@ -1,0 +1,50 @@
+			{
+				ParameterInfo pi = method.Parameters[i];
+				if (pi.IsOut) return false;
+				Expression promoted = PromoteExpression(args[i], pi.ParameterType, false);
+				if (promoted == null) return false;
+				promotedArgs[i] = promoted;
+			}
+			method.Args = promotedArgs;
+			return true;
+		}
+
+		Expression PromoteExpression(Expression expr, Type type, bool exact)
+		{
+			if (expr.Type == type) return expr;
+			if (expr is ConstantExpression)
+			{
+				ConstantExpression ce = (ConstantExpression)expr;
+				if (ce == nullLiteral)
+				{
+					if (!type.IsValueType || IsNullableType(type))
+						return Expression.Constant(null, type);
+				}
+				else
+				{
+					string text;
+					if (literals.TryGetValue(ce, out text))
+					{
+						Type target = GetNonNullableType(type);
+						Object value = null;
+						switch (Type.GetTypeCode(ce.Type))
+						{
+							case TypeCode.Int32:
+							case TypeCode.UInt32:
+							case TypeCode.Int64:
+							case TypeCode.UInt64:
+								value = ParseNumber(text, target);
+								break;
+							case TypeCode.Double:
+								if (target == typeof(decimal)) value = ParseNumber(text, target);
+								break;
+							case TypeCode.String:
+								value = ParseEnum(text, target);
+								break;
+						}
+						if (value != null)
+							return Expression.Constant(value, type);
+					}
+				}
+			}
+			if (IsCompatibleWith(expr.Type, type))

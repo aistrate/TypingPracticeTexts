@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using NHibernate.Criterion;
+using NHibernate.Dialect.Function;
+using NHibernate.Linq.Expressions;
+using NHibernate.Linq.Transform;
+using NHibernate.Linq.Util;
+using NHibernate.Transform;
+using NHibernate.Type;
+using Expression = System.Linq.Expressions.Expression;
+using NHProjections = NHibernate.Criterion.Projections;
+
+namespace NHibernate.Linq.Visitors
+{
+	public class SelectArgumentsVisitor : NHibernateExpressionVisitor
+	{
+		#region Fields & Properties
+
+		private static readonly ISQLFunction arithmaticAddition = new VarArgsSQLFunction("(", "+", ")");
+		private static readonly ISQLFunction arithmaticDivide = new VarArgsSQLFunction("(", "/", ")");
+		private static readonly ISQLFunction arithmaticMultiply = new VarArgsSQLFunction("(", "*", ")");
+		private static readonly ISQLFunction arithmaticSubstract = new VarArgsSQLFunction("(", "-", ")");
+
+		private readonly ICriteria _rootCriteria;
+		private readonly ISession _session;
+		private readonly List<IProjection> _projections;
+		private IResultTransformer _transformer;
+		private ICriteriaQuery _criteriaQuery;
+
+		public IProjection Projection
+		{
+			get
+			{
+				if (_projections.Count == 0)
+					return null;
+
+				if (_projections.Count == 1)
+					return _projections[0];
+
+				ProjectionList list = NHProjections.ProjectionList();
+				foreach (var projection in _projections)
+					list.Add(projection);
+
+				return list;
+			}
+		}
+
+		public IResultTransformer Transformer

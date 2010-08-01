@@ -1,0 +1,116 @@
+		{
+			get { return idValue; }
+			set { idValue = value; }
+		}
+
+		public bool IsSubselect
+		{
+			get { return !string.IsNullOrEmpty(subselect); }
+		}
+
+		public bool IsPhysicalTable
+		{
+			get { return !IsSubselect && !IsAbstractUnionTable; }
+		}
+
+		public string RowId
+		{
+			get { return rowId; }
+			set { rowId = value; }
+		}
+
+		public bool IsSchemaQuoted
+		{
+			get { return isSchemaQuoted; }
+		}
+
+		public virtual string[] SqlCommentStrings(Dialect.Dialect dialect, string defaultCatalog, string defaultSchema)
+		{
+			List<string> comments = new List<string>();
+			if (dialect.SupportsCommentOn)
+			{
+				string tableName = GetQualifiedName(dialect, defaultCatalog, defaultSchema);
+				if (!string.IsNullOrEmpty(comment))
+				{
+					StringBuilder buf = new StringBuilder()
+						.Append("comment on table ")
+						.Append(tableName)
+						.Append(" is '")
+						.Append(comment)
+						.Append("'");
+					comments.Add(buf.ToString());
+				}
+				foreach (Column column in ColumnIterator)
+				{
+					string columnComment = column.Comment;
+					if (columnComment != null)
+					{
+						StringBuilder buf = new StringBuilder()
+							.Append("comment on column ")
+							.Append(tableName)
+							.Append('.')
+							.Append(column.GetQuotedName(dialect))
+							.Append(" is '")
+							.Append(columnComment).Append("'");
+						comments.Add(buf.ToString());
+					}
+				}
+			}
+			return comments.ToArray();
+		}
+
+		public virtual string SqlTemporaryTableCreateString(Dialect.Dialect dialect, IMapping mapping)
+		{
+			StringBuilder buffer = new StringBuilder(dialect.CreateTemporaryTableString)
+				.Append(' ')
+				.Append(name)
+				.Append(" (");
+			bool commaNeeded = false;
+			foreach (Column column in ColumnIterator)
+			{
+				buffer.Append(column.GetQuotedName(dialect))
+					.Append(' ');
+				buffer.Append(column.GetSqlType(dialect, mapping));
+
+				if (commaNeeded)
+					buffer.Append(StringHelper.CommaSpace);
+				commaNeeded = true;
+
+				if (column.IsNullable)
+				{
+					buffer.Append(dialect.NullColumnString);
+				}
+				else
+				{
+					buffer.Append(" not null");
+				}
+			}
+
+			buffer.Append(") ");
+			buffer.Append(dialect.CreateTemporaryTablePostfix);
+			return buffer.ToString();
+		}
+
+		public override string ToString()
+		{
+			StringBuilder buf = new StringBuilder()
+				.Append(GetType().FullName)
+				.Append('(');
+			if (Catalog != null)
+			{
+				buf.Append(Catalog + ".");
+			}
+			if (Schema != null)
+			{
+				buf.Append(Schema + ".");
+			}
+			buf.Append(Name).Append(')');
+			return buf.ToString();
+		}
+
+		public void ValidateColumns(Dialect.Dialect dialect, IMapping mapping, DataTable tableInfo)
+		{
+			throw new NotSupportedException();
+		}
+	}
+}

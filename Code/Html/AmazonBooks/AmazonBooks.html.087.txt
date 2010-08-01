@@ -1,0 +1,30 @@
+                      <i>Paris Trance</i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/gp/redirect.html/ref=amb_link_84836751_8?location=http://www.omnivoracious.com/2010/04/omni-crush-major-pettigrews-last-stand.html&token=7B08D69EFB23F01C31332A4EB1A38F4804AAB087&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=right-7&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1262404582&pf_rd_i=283155">
+                      <i>Major Pettigrew's Last Stand</i>
+                    </a>
+                  </li>
+                </ul><p class="seeMore">
+                  <span class="carat">&#8250;</span>
+                  <a href="/gp/redirect.html/ref=amb_link_84836751_9?location=http://www.omnivoracious.com/&token=7B08D69EFB23F01C31332A4EB1A38F4804AAB087&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=right-7&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1262404582&pf_rd_i=283155">Read Omnivoracious, the Amazon books blog</a>
+                </p><div class="h_rule"></div>
+              </div>
+            </div>
+          <div class="amabot_center" id="centercol">
+            <div class="unified_widget pageBanner">
+              <h1>
+                <b>Books</b>
+              </h1>
+              <p>
+                <b>
+                  Browse bestsellers in <a href="/gp/redirect.html/ref=bhp_banner_A410_01?location=http://www.amazon.com/gp/bestsellers/books&token=3A0F170E7CEFE27BDC730D3D7344512BC1296B83&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-1&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265356222&pf_rd_i=283155">Books</a> and <a href="/gp/redirect.html/ref=bhp_banner_A410_02?location=http://www.amazon.com/gp/bestsellers/digital-text&token=3A0F170E7CEFE27BDC730D3D7344512BC1296B83&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-1&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265356222&pf_rd_i=283155">Kindle</a>, <a href="/Summer-Reading-Books/b/ref=bhp_banner_A410_03?ie=UTF8&node=341154011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-1&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265356222&pf_rd_i=283155">summer reads</a>, and <a href="/Best-Books-of-the-Month/b/ref=bhp_banner_A410_04?ie=UTF8&node=390919011&pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-1&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=1265356222&pf_rd_i=283155">the best books of the month</a>
+                </b>
+              </p>
+              <div class="h_rule"></div>
+            </div>
+            <div class="unified_widget rcm widget">
+              <script type="text/javascript">
+                if( typeof jQuery != 'undefined' ) {   amznJQ.onReady('s9shoveler', function() {
+                (function($) {

@@ -1,0 +1,49 @@
+            deriving (Eq,Show)
+
+dataTypeName :: DataType -> String
+dataTypeName = tycon
+
+dataTypeRep :: DataType -> DataRep
+dataTypeRep = datarep
+
+constrType :: Constr -> DataType
+constrType = datatype
+
+constrRep :: Constr -> ConstrRep
+constrRep = conrep
+
+repConstr :: DataType -> ConstrRep -> Constr
+repConstr dt cr =
+      case (dataTypeRep dt, cr) of
+        (AlgRep cs, AlgConstr i)      -> cs !! (i-1)
+        (IntRep,    IntConstr i)      -> mkIntConstr dt i
+        (FloatRep,  FloatConstr f)    -> mkFloatConstr dt f
+        (StringRep, StringConstr str) -> mkStringConstr dt str
+        _ -> error "repConstr"
+
+mkDataType :: String -> [Constr] -> DataType
+mkDataType str cs = DataType
+                        { tycon   = str
+                        , datarep = AlgRep cs
+                        }
+
+mkConstr :: DataType -> String -> [String] -> Fixity -> Constr
+mkConstr dt str fields fix =
+        Constr
+                { conrep    = AlgConstr idx
+                , constring = str
+                , confields = fields
+                , confixity = fix
+                , datatype  = dt
+                }
+  where
+    idx = head [ i | (c,i) <- dataTypeConstrs dt `zip` [1..],
+                     showConstr c == str ]
+
+dataTypeConstrs :: DataType -> [Constr]
+dataTypeConstrs dt = case datarep dt of
+                        (AlgRep cons) -> cons
+                        _ -> error "dataTypeConstrs"
+
+constrFields :: Constr -> [String]
+constrFields = confields

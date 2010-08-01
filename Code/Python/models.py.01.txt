@@ -1,0 +1,100 @@
+from django.db import connections
+from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.datastructures import SortedDict
+from django.utils.text import get_text_list, capfirst
+from django.utils.translation import ugettext_lazy as _, ugettext
+
+from util import ValidationError, ErrorList
+from forms import BaseForm, get_declared_fields, NON_FIELD_ERRORS
+from fields import Field, ChoiceField, IntegerField, EMPTY_VALUES
+from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
+from widgets import media_property
+from formsets import BaseFormSet, formset_factory, DELETION_FIELD_NAME
+
+try:
+    set
+except NameError:
+    from sets import Set as set
+
+__all__ = (
+    'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
+    'save_instance', 'form_for_fields', 'ModelChoiceField',
+    'ModelMultipleChoiceField',
+)
+
+def save_instance(form, instance, fields=None, fail_message='saved',
+                  commit=True, exclude=None):
+    
+    from django.db import models
+    opts = instance._meta
+    if form.errors:
+        raise ValueError("The %s could not be %s because the data didn't"
+                         " validate." % (opts.object_name, fail_message))
+    cleaned_data = form.cleaned_data
+    file_field_list = []
+    for f in opts.fields:
+        if not f.editable or isinstance(f, models.AutoField) \
+                or not f.name in cleaned_data:
+            continue
+        if fields and f.name not in fields:
+            continue
+        if exclude and f.name in exclude:
+            continue
+        if isinstance(f, models.OneToOneField) and cleaned_data[f.name] is None:
+            continue
+        if isinstance(f, models.FileField):
+            file_field_list.append(f)
+        else:
+            f.save_form_data(instance, cleaned_data[f.name])
+
+    for f in file_field_list:
+        f.save_form_data(instance, cleaned_data[f.name])
+
+    def save_m2m():
+        opts = instance._meta
+        cleaned_data = form.cleaned_data
+        for f in opts.many_to_many:
+            if fields and f.name not in fields:
+                continue
+            if f.name in cleaned_data:
+                f.save_form_data(instance, cleaned_data[f.name])
+    if commit:
+        instance.save()
+        save_m2m()
+    else:
+        form.save_m2m = save_m2m
+    return instance
+
+def make_model_save(model, fields, fail_message):
+    
+    def save(self, commit=True):
+        return save_instance(self, model(), fields, fail_message, commit)
+    return save
+
+def make_instance_save(instance, fields, fail_message):
+    
+    def save(self, commit=True):
+        return save_instance(self, instance, fields, fail_message, commit)
+    return save
+
+def form_for_fields(field_list):
+    
+    fields = SortedDict([(f.name, f.formfield())
+                         for f in field_list if f.editable])
+    return type('FormForFields', (BaseForm,), {'base_fields': fields})
+
+def model_to_dict(instance, fields=None, exclude=None):
+    
+    from django.db.models.fields.related import ManyToManyField, OneToOneField
+    opts = instance._meta
+    data = {}
+    for f in opts.fields + opts.many_to_many:
+        if not f.editable:
+            continue
+        if fields and not f.name in fields:
+            continue
+        if exclude and f.name in exclude:
+            continue
+        if isinstance(f, ManyToManyField):
+            if instance.pk is None:
+                data[f.name] = []

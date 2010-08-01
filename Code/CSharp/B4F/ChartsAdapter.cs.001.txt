@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using B4F.TotalGiro.Accounts;
+using B4F.TotalGiro.Accounts.Portfolios.FundPositions;
+using B4F.TotalGiro.ClientApplicationLayer.SecurityLayer;
+using B4F.TotalGiro.Dal;
+using B4F.TotalGiro.Valuations;
+
+namespace B4F.TotalGiro.ClientApplicationLayer.Charts
+{
+    public class SeriesInfo
+    {
+        public SeriesInfo(int key, string seriesName, DateTime startDate, DateTime endDate)
+        {
+            Key = key;
+            SeriesName = seriesName;
+            StartDate = startDate;
+            EndDate = endDate;
+        }
+
+        public int Key { get; private set; }
+        public string SeriesName { get; private set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+    }
+
+    public static class ChartsAdapter
+    {
+        #region Utility methods (common between charts)
+
+        public static double GetDateIncrement(DateTime startDate, DateTime endDate)
+        {
+            return GetDateIncrement(startDate, endDate, 100);
+        }
+
+        public static double GetDateIncrement(DateTime startDate, DateTime endDate, int maxDateCount)
+        {
+            return Math.Max(1, (endDate.Date - startDate.Date).TotalDays / maxDateCount + 1);
+        }
+
+        public static DateTime[] GenerateDates(DateTime startDate, DateTime endDate, double increment)
+        {
+            const int maxDateCount = 2000;
+            
+            startDate = startDate.Date;
+            if (startDate < new DateTime(2000, 1, 1))
+                startDate = new DateTime(2000, 1, 1);

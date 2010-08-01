@@ -1,0 +1,49 @@
+instance (Monoid a, Monoid b, Monoid c, Monoid d, Monoid e) =>
+                Monoid (a,b,c,d,e) where
+        mempty = (mempty, mempty, mempty, mempty, mempty)
+        (a1,b1,c1,d1,e1) `mappend` (a2,b2,c2,d2,e2) =
+                (a1 `mappend` a2, b1 `mappend` b2, c1 `mappend` c2,
+                 d1 `mappend` d2, e1 `mappend` e2)
+
+instance Monoid Ordering where
+        mempty         = EQ
+        LT `mappend` _ = LT
+        EQ `mappend` y = y
+        GT `mappend` _ = GT
+
+newtype Dual a = Dual { getDual :: a }
+        deriving (Eq, Ord, Read, Show, Bounded)
+
+instance Monoid a => Monoid (Dual a) where
+        mempty = Dual mempty
+        Dual x `mappend` Dual y = Dual (y `mappend` x)
+
+newtype Endo a = Endo { appEndo :: a -> a }
+
+instance Monoid (Endo a) where
+        mempty = Endo id
+        Endo f `mappend` Endo g = Endo (f . g)
+
+newtype All = All { getAll :: Bool }
+        deriving (Eq, Ord, Read, Show, Bounded)
+
+instance Monoid All where
+        mempty = All True
+        All x `mappend` All y = All (x && y)
+
+newtype Any = Any { getAny :: Bool }
+        deriving (Eq, Ord, Read, Show, Bounded)
+
+instance Monoid Any where
+        mempty = Any False
+        Any x `mappend` Any y = Any (x || y)
+
+newtype Sum a = Sum { getSum :: a }
+        deriving (Eq, Ord, Read, Show, Bounded)
+
+instance Num a => Monoid (Sum a) where
+        mempty = Sum 0
+        Sum x `mappend` Sum y = Sum (x + y)
+
+newtype Product a = Product { getProduct :: a }
+        deriving (Eq, Ord, Read, Show, Bounded)

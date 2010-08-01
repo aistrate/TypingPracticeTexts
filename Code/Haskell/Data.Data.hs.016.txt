@@ -1,0 +1,39 @@
+  gfoldl f z (a,b,c,d,e,f') = z (,,,,,) `f` a `f` b `f` c `f` d `f` e `f` f'
+  toConstr (_,_,_,_,_,_) = tuple6Constr
+  gunfold k z c = case constrIndex c of
+                    1 -> k (k (k (k (k (k (z (,,,,,)))))))
+                    _ -> error "gunfold"
+  dataTypeOf _ = tuple6DataType
+
+tuple7Constr :: Constr
+tuple7Constr = mkConstr tuple7DataType "(,,,,,,)" [] Infix
+
+tuple7DataType :: DataType
+tuple7DataType = mkDataType "Prelude.(,,,,,,)" [tuple7Constr]
+
+instance (Data a, Data b, Data c, Data d, Data e, Data f, Data g)
+         => Data (a,b,c,d,e,f,g) where
+  gfoldl f z (a,b,c,d,e,f',g) =
+    z (,,,,,,) `f` a `f` b `f` c `f` d `f` e `f` f' `f` g
+  toConstr  (_,_,_,_,_,_,_) = tuple7Constr
+  gunfold k z c = case constrIndex c of
+                    1 -> k (k (k (k (k (k (k (z (,,,,,,))))))))
+                    _ -> error "gunfold"
+  dataTypeOf _ = tuple7DataType
+
+instance Typeable a => Data (Ptr a) where
+  toConstr _   = error "toConstr"
+  gunfold _ _  = error "gunfold"
+  dataTypeOf _ = mkNorepType "GHC.Ptr.Ptr"
+
+instance Typeable a => Data (ForeignPtr a) where
+  toConstr _   = error "toConstr"
+  gunfold _ _  = error "gunfold"
+  dataTypeOf _ = mkNorepType "GHC.ForeignPtr.ForeignPtr"
+
+instance (Typeable a, Data b, Ix a) => Data (Array a b)
+ where
+  gfoldl f z a = z (listArray (bounds a)) `f` (elems a)
+  toConstr _   = error "toConstr"
+  gunfold _ _  = error "gunfold"
+  dataTypeOf _ = mkNorepType "Data.Array.Array"

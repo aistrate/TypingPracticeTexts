@@ -1,0 +1,30 @@
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">3.</span>
+                              <span class="arrowSprite arrowUp_s " title="Ranking has gone up in the past 24 hours" >
+                                <span>Ranking has gone up in the past 24 hours</span>
+                              </span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">26 days in the top 100</span>
+                            </div>
+                            <a href="http://www.amazon.com/Delivering-Happiness-Profits-Passion-Purpose/dp/0446563048/ref=pd_ts_zgc_b_books_3?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Delivering Happiness: A Path to Profits, Passion, and Purpose" class="titleLink">Delivering Happiness: A Path to Profits, Passion,&#8230</a>
+                            <div class="tiny byline">
+                              <span class="carat">&#8250</span>
+                              <a href="/Tony-Hsieh/e/B002ZXH4AY/ref=zg_ch_by_1">Tony Hsieh</a>
+                            </div>
+                            <div class="platformBinding">Hardcover</div>
+                            <div class="priceBlock ">
+                              <span class="listprice">$23.99</span>
+                              <strong class="price">$13.19</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Girl-Who-Played-Fire-Vintage/dp/030745455X/ref=pd_ts_zgc_b_books_4_i?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Girl Who Played with Fire (Vintage)">
+                              <img src="http://ecx.images-amazon.com/images/I/51uYwBb%2BPNL._SL75_PIsitb-sticker-arrow-st,TopRight,8,-14_OU01_.jpg" alt="The Girl" />

@@ -1,0 +1,50 @@
+       then Just $ unsafeCoerce x
+       else Nothing
+  getArg :: c x -> x 
+  getArg = undefined
+
+gcast2 :: (Typeable2 t, Typeable2 t') => c (t a b) -> Maybe (c (t' a b)) 
+gcast2 x = r
+ where
+  r = if typeOf2 (getArg x) == typeOf2 (getArg (fromJust r))
+       then Just $ unsafeCoerce x
+       else Nothing
+  getArg :: c x -> x 
+  getArg = undefined
+
+INSTANCE_TYPEABLE0((),unitTc,"()")
+INSTANCE_TYPEABLE1([],listTc,"[]")
+INSTANCE_TYPEABLE1(Maybe,maybeTc,"Maybe")
+INSTANCE_TYPEABLE1(Ratio,ratioTc,"Ratio")
+INSTANCE_TYPEABLE2((->),funTc,"->")
+INSTANCE_TYPEABLE1(IO,ioTc,"IO")
+
+#if defined(__GLASGOW_HASKELL__) || defined(__HUGS__)
+INSTANCE_TYPEABLE1(MVar,mvarTc,"MVar" )
+#endif
+
+INSTANCE_TYPEABLE2(Array,arrayTc,"Array")
+INSTANCE_TYPEABLE2(IOArray,iOArrayTc,"IOArray")
+
+#ifdef __GLASGOW_HASKELL__
+INSTANCE_TYPEABLE2(ST,stTc,"ST")
+INSTANCE_TYPEABLE2(STRef,stRefTc,"STRef")
+INSTANCE_TYPEABLE3(STArray,sTArrayTc,"STArray")
+#endif
+
+#ifndef __NHC__
+INSTANCE_TYPEABLE2((,),pairTc,"(,)")
+INSTANCE_TYPEABLE3((,,),tup3Tc,"(,,)")
+INSTANCE_TYPEABLE4((,,,),tup4Tc,"(,,,)")
+INSTANCE_TYPEABLE5((,,,,),tup5Tc,"(,,,,)")
+INSTANCE_TYPEABLE6((,,,,,),tup6Tc,"(,,,,,)")
+INSTANCE_TYPEABLE7((,,,,,,),tup7Tc,"(,,,,,,)")
+#endif /* __NHC__ */
+
+INSTANCE_TYPEABLE1(Ptr,ptrTc,"Ptr")
+INSTANCE_TYPEABLE1(FunPtr,funPtrTc,"FunPtr")
+#ifndef __GLASGOW_HASKELL__
+INSTANCE_TYPEABLE1(ForeignPtr,foreignPtrTc,"ForeignPtr")
+#endif
+INSTANCE_TYPEABLE1(StablePtr,stablePtrTc,"StablePtr")
+INSTANCE_TYPEABLE1(IORef,iORefTc,"IORef")

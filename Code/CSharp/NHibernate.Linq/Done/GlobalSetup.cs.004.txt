@@ -1,0 +1,50 @@
+                    {
+                        Property1 = "test1",
+                        Property2 = "test2",
+                        OtherComponent = new UserComponent2()
+                        {
+                            OtherProperty1 = "othertest1"
+                        }
+                    }
+                },
+        		new User("rahien", new DateTime(1998, 12, 31))
+                {
+                    Role = roles[1],
+                    InvalidLoginAttempts = 5,
+                    Enum1 = EnumStoredAsString.Small,
+                    Component = new UserComponent()
+                    {
+                        Property2 = "test2"
+                    }
+                },
+        		new User("nhibernate", new DateTime(2000, 1, 1))
+                {
+                    InvalidLoginAttempts = 6,
+                    LastLoginDate = DateTime.Now.AddDays(-1),
+                    Enum1 = EnumStoredAsString.Medium
+                }
+        	};
+
+			var timesheets = new[]
+            {
+                new Timesheet
+                {
+                    SubmittedDate = DateTime.Today,
+                    Submitted = true
+                },
+                new Timesheet
+                {
+                    SubmittedDate = DateTime.Today.AddDays(-1),
+                    Submitted = false, 
+                    Entries = new List<TimesheetEntry>
+                    {
+                        new TimesheetEntry
+                        {
+                            EntryDate = DateTime.Today,
+                            NumberOfHours = 6,
+							Comments = "testing 123"
+                        },
+                        new TimesheetEntry
+                        {
+                            EntryDate = DateTime.Today.AddDays(1),
+                            NumberOfHours = 14

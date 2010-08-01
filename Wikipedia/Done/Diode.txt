@@ -1,0 +1,9 @@
+Diode
+
+In electronics, a diode is a two-terminal electronic component that conducts electric current in only one direction. The term usually refers to a semiconductor diode, the most common type today, which is a crystal of semiconductor connected to two electrical terminals, a P-N junction. A vacuum tube diode, now little used, is a vacuum tube with two electrodes; a plate and a cathode.
+
+The most common function of a diode is to allow an electric current in one direction (called the diode's forward direction) while blocking current in the opposite direction (the reverse direction). Thus, the diode can be thought of as an electronic version of a check valve. This unidirectional behavior is called rectification, and is used to convert alternating current to direct current, and extract modulation from radio signals in radio receivers.
+
+However, diodes can have more complicated behavior than this simple on-off action, due to their complex non-linear electrical characteristics, which can be tailored by varying the construction of their P-N junction. These are exploited in special purpose diodes that perform many different functions. Diodes are used to regulate voltage (Zener diodes), electronically tune radio and TV receivers (varactor diodes), generate radio frequency oscillations (tunnel diodes), and produce light (light emitting diodes).
+
+Diodes were the first semiconductor electronic devices. The discovery of crystals' rectifying abilities was made by German physicist Ferdinand Braun in 1874. The first semiconductor diodes, called cat's whisker diodes were made of crystals of minerals such as galena. Today most diodes are made of silicon, but other semiconductors such as germanium are sometimes used.

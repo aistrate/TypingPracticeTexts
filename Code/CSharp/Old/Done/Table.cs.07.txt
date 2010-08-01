@@ -1,0 +1,100 @@
+			if (column == null)
+				return null;
+
+			Column result;
+			columns.TryGetValue(column.CanonicalName, out result);
+
+			return column.Equals(result) ? result : null;
+		}
+
+		internal IDictionary<string, UniqueKey> UniqueKeys
+		{
+			get
+			{
+				if (uniqueKeys.Count > 1)
+				{
+					Dictionary<string, UniqueKey> finalUniqueKeys = new Dictionary<string, UniqueKey>(uniqueKeys.Count);
+					foreach (KeyValuePair<string, UniqueKey> entry in uniqueKeys)
+					{
+						UniqueKey uk = entry.Value;
+						IList<Column> _columns = uk.Columns;
+						bool skip = false;
+						Dictionary<string, UniqueKey> tempUks = new Dictionary<string, UniqueKey>(finalUniqueKeys);
+						foreach (KeyValuePair<string, UniqueKey> tUk in tempUks)
+						{
+							UniqueKey currentUk = tUk.Value;
+							if (AreSameColumns(currentUk.Columns, _columns))
+							{
+								skip = true;
+								break;
+							}
+						}
+						if (!skip)
+							finalUniqueKeys[entry.Key] = uk;
+					}
+					return finalUniqueKeys;
+				}
+				else
+				{
+					return uniqueKeys;
+				}
+			}
+		}
+
+		private static bool AreSameColumns(ICollection<Column> col1, ICollection<Column> col2)
+		{
+			if(col1.Count!=col2.Count)
+				return false;
+			bool result= true;
+			foreach (Column column in col1)
+			{
+				if(!col2.Contains(column))
+					return false;
+			}
+			foreach (Column column in col2)
+			{
+				if (!col1.Contains(column))
+					return false;
+			}
+			return result;
+		}
+
+		public static string Qualify(string catalog, string schema, string table)
+		{
+			StringBuilder qualifiedName = new StringBuilder();
+
+			if (!string.IsNullOrEmpty(catalog))
+			{
+				qualifiedName.Append(catalog).Append(StringHelper.Dot);
+			}
+			if (!string.IsNullOrEmpty(schema))
+			{
+				qualifiedName.Append(schema).Append(StringHelper.Dot);
+			}
+			return qualifiedName.Append(table).ToString();
+		}
+
+		public bool HasPrimaryKey
+		{
+			get { return PrimaryKey != null; }
+		}
+
+		public string Catalog
+		{
+			get { return catalog; }
+			set { catalog = value; }
+		}
+
+		public string Comment
+		{
+			get { return comment; }
+			set { comment = value; }
+		}
+
+		public string Subselect
+		{
+			get { return subselect; }
+			set { subselect = value; }
+		}
+
+		public IKeyValue IdentifierValue

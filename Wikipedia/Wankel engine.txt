@@ -1,0 +1,7 @@
+Wankel engine
+
+The Wankel engine invented by German engineer Felix Wankel, is a type of internal combustion engine which uses a rotary design to convert pressure into a rotating motion instead of using reciprocating pistons. Its four-stroke cycle takes place in a space between the inside of an oval-like epitrochoid-shaped housing and a rotor that is similar in shape to a Reuleaux triangle but with sides that are somewhat flatter. This design delivers smooth high-rpm power from a compact size. Since its introduction the engine has been commonly referred to as the rotary engine, though this name is also applied to several completely different designs.
+
+The engine was invented by German engineer Felix Wankel. He began its development in the early 1950s at NSU Motorenwerke AG (NSU) before completing a working, running prototype in 1957. NSU then licensed the concept to companies around the world, which have continued to improve the design.
+
+Because of their compact design, Wankel rotary engines have been installed in a variety of vehicles and devices such as automobiles (including racing cars), along with aircraft, go-karts, personal water craft, chain saws, and auxiliary power units. The most extensive automotive use of the Wankel engine has been by the Japanese company Mazda.

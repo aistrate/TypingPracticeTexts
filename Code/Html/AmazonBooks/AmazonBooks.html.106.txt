@@ -1,0 +1,30 @@
+                          <div class="gry t11 nt">Perfect Paperback</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ItemElement4" style="width: 49%; margin-bottom: 0px; display: none;">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_TitleContainer4" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Title4">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ImageContainer4">
+                            <a href="/gp/product/1590592395/ref=s9_simv_bw_p14_i5?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Practical Common Lisp">
+                              <div class="imageContainer">
+                                <img url="http://ecx.images-amazon.com/images/I/51COKo5ONxL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="100" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Image4" />
+                              </div>Practical Common Lisp
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Peter-Seibel/e/B001K8ECUU/ref=s9_simv_bw_p14_al5?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155">Peter Seibel</a>
+                          </div>
+                          <div class="gry t11 nt">Hardcover</div>
+                          <span class="listprice gry t11">$64.99</span>
+                          <span class="red t14">$52.29</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ItemElement5" style="width: 49%; margin-bottom: 0px; display: none;">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_TitleContainer5" style="position: relative">

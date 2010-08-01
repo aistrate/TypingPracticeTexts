@@ -1,0 +1,49 @@
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Internal as B
+import qualified Data.ByteString.Unsafe as B
+
+import Data.ByteString (empty,null,length,tail,init,append
+                       ,inits,tails,reverse,transpose
+                       ,concat,take,drop,splitAt,intercalate
+                       ,sort,isPrefixOf,isSuffixOf,isInfixOf
+                       ,findSubstring,findSubstrings,breakSubstring,copy,group
+
+                       ,getLine, getContents, putStr, putStrLn, interact
+                       ,hGetContents, hGet, hPut, hPutStr, hPutStrLn
+                       ,hGetLine, hGetNonBlocking
+                       ,packCString,packCStringLen
+                       ,useAsCString,useAsCStringLen
+                       )
+
+import Data.ByteString.Internal (ByteString(PS), c2w, w2c, isSpaceWord8
+                                ,inlinePerformIO)
+
+#if defined(__GLASGOW_HASKELL__)
+import Data.ByteString.Unsafe (unsafePackAddress)
+#endif
+
+import Data.Char    ( isSpace )
+import qualified Data.List as List (intersperse)
+
+import System.IO                (openFile,hClose,hFileSize,IOMode(..))
+#ifndef __NHC__
+import Control.Exception        (bracket)
+#else
+import IO			(bracket)
+#endif
+import Foreign
+
+#if defined(__GLASGOW_HASKELL__)
+import GHC.Base                 (Char(..),unpackCString#,ord#,int2Word#)
+import GHC.IOBase               (IO(..),stToIO)
+import GHC.Prim                 (Addr#,writeWord8OffAddr#,plusAddr#)
+import GHC.Ptr                  (Ptr(..))
+import GHC.ST                   (ST(..))
+#endif
+
+#if __GLASGOW_HASKELL__ >= 608
+import Data.String
+#endif
+
+#define STRICT1(f) f a | a `seq` False = undefined
+#define STRICT2(f) f a b | a `seq` b `seq` False = undefined

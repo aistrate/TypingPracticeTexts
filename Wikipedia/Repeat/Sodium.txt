@@ -1,0 +1,9 @@
+Sodium
+
+Sodium is a metallic element with a symbol Na (from Latin natrium or Arabic natrun) and atomic number 11. It is a soft, silvery-white, highly reactive metal and is a member of the alkali metals within "group 1" (formerly known as 'group IA'). It has only one stable isotope, 23Na.
+
+Elemental sodium was first isolated by Sir Humphry Davy in 1806 by passing an electric current through molten sodium hydroxide. Elemental sodium does not occur naturally on Earth, but quickly oxidizes in air and is violently reactive with water, so it must be stored in an inert medium, such as a liquid hydrocarbon. The free metal is used for some chemical synthesis, analysis, and heat transfer applications.
+
+Sodium ion is soluble in water in nearly all of its compounds, and is thus present in great quantities in the Earth's oceans and other stagnant bodies of water. In these bodies it is mostly counterbalanced by the chloride ion, causing evaporated ocean water solids to consist mostly of sodium chloride, or common table salt. Sodium ion is also a component of many minerals.
+
+Sodium is an essential element for all animal life and for some plant species. In animals, sodium ions are used in opposition to potassium ions, to allow the organism to build up an electrostatic charge on cell membranes, and thus allow transmission of nerve impulses when the charge is allowed to dissipate by a moving wave of voltage change. Sodium is thus classified as a "dietary inorganic macro-mineral" for animals. Sodium's relative rarity on land is due to its solubility in water, thus causing it to be leached into bodies of long-standing water by rainfall. Such is its relatively large requirement in animals, in contrast to its relative scarcity in many inland soils, that herbivorous land animals have developed a special taste receptor for sodium ion.

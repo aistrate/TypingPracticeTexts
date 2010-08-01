@@ -1,0 +1,50 @@
+				MethodInfo addMethod = collection.GetType().GetMethod("Add", BindingFlags.Public | BindingFlags.Instance);
+				if (addMethod == null)
+				{
+					throw new DataServiceException(string.Concat("Could not determine the collection type of the ", propertyName, " property."));
+				}
+				addMethod.Invoke(collection, new object[] { resourceToBeAdded });
+			}
+		}
+
+		void IUpdatable.ClearChanges()
+		{
+			UpdateCache.Clear();
+			session.Clear();
+		}
+
+		object IUpdatable.CreateResource(string containerName, string fullTypeName)
+		{
+			IClassMetadata metadata = session.SessionFactory.GetClassMetadata(fullTypeName);
+			object newResource = metadata.Instantiate(null, EntityMode.Poco);
+
+			UpdateCache.Add(newResource);
+
+			return newResource;
+		}
+
+		void IUpdatable.DeleteResource(object targetResource)
+		{
+			if (UpdateCache.Contains(targetResource))
+			{
+				UpdateCache.Remove(targetResource);
+				session.Save(targetResource);
+			}
+
+			if (session.Contains(targetResource)) session.Delete(targetResource);
+		}
+
+		object IUpdatable.GetResource(System.Linq.IQueryable query, string fullTypeName)
+		{
+			IEnumerable results = (IEnumerable)query;
+			object returnValue = null;
+			foreach (object result in results)
+			{
+				if (returnValue != null) break;
+				returnValue = result;
+			}
+
+			if (fullTypeName != null)
+			{
+				if (fullTypeName != returnValue.GetType().FullName)
+				{

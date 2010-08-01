@@ -1,0 +1,30 @@
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">20 days in the top 100</span>
+                            </div>
+                            <a href="http://www.amazon.com/Hide-ebook/dp/B000NJL7LE/ref=pd_ts_zgc_kinc_digital-text_5?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Hide" class="titleLink">Hide</a>
+                            <div class="tiny byline">
+                              <span class="carat"></span>Lisa Gardner (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock ">
+                              <span class="listprice"></span>
+                              <strong class="price">$0.79</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Rules-of-Deception-ebook/dp/B0011UCOCK/ref=pd_ts_zgc_kinc_digital-text_6_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Rules of Deception">
+                              <img src="http://ecx.images-amazon.com/images/I/51FCa4m7KuL._SL75_.jpg" alt="Rules of" />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">6.</span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">115 days in the top 100</span>

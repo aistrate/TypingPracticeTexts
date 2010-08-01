@@ -1,0 +1,9 @@
+Neutron
+
+The neutron is a subatomic particle with no net electric charge and a mass slightly larger than that of a proton.
+
+Neutrons are usually found in atomic nuclei. The nuclei of most atoms consist of protons and neutrons, which are therefore collectively referred to as nucleons. The number of protons in a nucleus is the atomic number and defines the type of element the atom forms. The number of neutrons is the neutron number and determines the isotope of an element. For example, the abundant carbon-12 isotope has 6 protons and 6 neutrons, while the very rare radioactive carbon-14 isotope has 6 protons and 8 neutrons.
+
+While bound neutrons in stable nuclei are stable, free neutrons are unstable; they undergo beta decay with a mean lifetime of just under 15 minutes (885.7 +/- 0.8 s). Free neutrons are produced in nuclear fission and fusion. Dedicated neutron sources like research reactors and spallation sources produce free neutrons for use in irradiation and in neutron scattering experiments.
+
+Even though it is not a chemical element, the free neutron is sometimes included in tables of nuclides. It is then considered to have an atomic number of zero and a mass number of one.

@@ -1,0 +1,50 @@
+		}
+
+		[Category("WHERE")]
+		[Test(Description = "This sample calls WHERE twice to filter out Products that UnitPrice is greater than 10" +
+					 " and is discontinued.")]
+		public void DLinq5()
+		{
+			IEnumerable<Product> q =
+				db.Products.Where(p => p.UnitPrice > 10m).Where(p => p.Discontinued);
+
+			AssertByIds(q, new[] { 5, 9, 17, 28, 29, 42, 53, }, x => x.ProductID);
+
+		}
+
+		[Category("WHERE")]
+		[Test(Description = "This sample uses First to select the first Shipper in the table.")]
+		public void DLinq6()
+		{
+			Shipper shipper = db.Shippers.First();
+			Assert.AreEqual(1, shipper.ShipperID);
+		}
+
+		[Category("WHERE")]
+		[Test(Description = "This sample uses First to select the single Customer with CustomerID 'BONAP'.")]
+		public void DLinq7()
+		{
+			Customer cust = db.Customers.First(c => c.CustomerID == "BONAP");
+			Assert.AreEqual("BONAP", cust.CustomerID);
+		}
+
+		[Category("WHERE")]
+		[Test(Description = "This sample uses First to select an Order with freight greater than 10.00.")]
+		public void DLinq8()
+		{
+			Order ord = db.Orders.First(o => o.Freight > 10.00M);
+			Assert.AreEqual(10248, ord.OrderID);
+		}
+
+		#endregion Where Tests
+
+		#region Select/Distinct Tests
+
+		[Category("SELECT/DISTINCT")]
+		[Test(Description = "This sample uses SELECT to return a sequence of just the Customers' contact names.")]
+		public void DLinq9()
+		{
+			var q =
+				from c in db.Customers
+				select c.ContactName;
+			IList<string> items = q.ToList();

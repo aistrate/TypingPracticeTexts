@@ -1,0 +1,50 @@
+				type = type.BaseType;
+			}
+			return null;
+		}
+
+		Expression ParseAggregate(Expression instance, Type elementType, string methodName, int errorPos)
+		{
+			ParameterExpression outerIt = it;
+			ParameterExpression innerIt = Expression.Parameter(elementType, "");
+			it = innerIt;
+			Expression[] args = ParseArgumentList();
+			it = outerIt;
+			MethodBase signature;
+			if (FindMethod(typeof(IEnumerableSignatures), methodName, false, args, out signature) != 1)
+				throw ParseError(errorPos, Res.NoApplicableAggregate, methodName);
+			Type[] typeArgs;
+			if (signature.Name == "Min" || signature.Name == "Max")
+			{
+				typeArgs = new Type[] { elementType, args[0].Type };
+			}
+			else
+			{
+				typeArgs = new Type[] { elementType };
+			}
+			if (args.Length == 0)
+			{
+				args = new Expression[] { instance };
+			}
+			else
+			{
+				args = new Expression[] { instance, Expression.Lambda(args[0], innerIt) };
+			}
+			return Expression.Call(typeof(Enumerable), signature.Name, typeArgs, args);
+		}
+
+		Expression[] ParseArgumentList()
+		{
+			ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
+			NextToken();
+			Expression[] args = token.id != TokenId.CloseParen ? ParseArguments() : new Expression[0];
+			ValidateToken(TokenId.CloseParen, Res.CloseParenOrCommaExpected);
+			NextToken();
+			return args;
+		}
+
+		Expression[] ParseArguments()
+		{
+			List<Expression> argList = new List<Expression>();
+			while (true)
+			{

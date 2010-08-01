@@ -1,0 +1,50 @@
+        [Test]
+        public void ConvertTwoElements()
+        {
+            conversionTest(new string[] { "James", "Bond" }, "String[]");
+            conversionTest(new int[] { 55, 66 }, "Int32[]");
+            conversionTest(new Regex2[] { new Regex2("abcd"), new Regex2("(a|b)") }, "Regex2[]");
+        }
+
+        [Test]
+        public void ConvertManyElements()
+        {
+            conversionTest(threeLetterStrings, "String[]");
+            conversionTest(Enumerable.Range(1000, 2700), "Int32[]");
+            conversionTest(threeLetterStrings.Select(s => new Regex2(s)).ToArray(), "Regex2[]");
+        }
+
+        private void conversionTest<T>(IEnumerable<T> original, string message)
+        {
+            CollAssert.AreEqual(original.ToArray(), (new CachedList<T>(original)).ToArray(), message);
+        }
+
+        [Test]
+        public void MoveAfterEnd_Int32()
+        {
+            IEnumerable<int> list =
+                new CachedList<int>(new int[] { });
+
+            IEnumerator<int> e = list.GetEnumerator();
+
+            Assert.AreEqual(0, e.Current, "Before MoveNext.");
+            e.MoveNext();
+            Assert.AreEqual(0, e.Current, "After one MoveNext.");
+            e.MoveNext();
+            Assert.AreEqual(0, e.Current, "After two MoveNext's.");
+        }
+
+        [Test]
+        public void MoveAfterEnd_String()
+        {
+            IEnumerable<string> list =
+                new CachedList<string>(new string[] { });
+
+            IEnumerator<string> e = list.GetEnumerator();
+
+            Assert.AreEqual(null, e.Current, "Before MoveNext.");
+            e.MoveNext();
+            Assert.AreEqual(null, e.Current, "After one MoveNext.");
+            e.MoveNext();
+            Assert.AreEqual(null, e.Current, "After two MoveNext's.");
+        }

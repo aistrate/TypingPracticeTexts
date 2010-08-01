@@ -1,0 +1,50 @@
+module Control.Arrow (
+                Arrow(..), Kleisli(..),
+                returnA,
+                (^>>), (>>^),
+                (<<^), (^<<),
+                ArrowZero(..), ArrowPlus(..),
+                ArrowChoice(..),
+                ArrowApply(..), ArrowMonad(..), leftApp,
+                ArrowLoop(..),
+
+                (>>>), (<<<)
+        ) where
+
+import Prelude hiding (id,(.))
+import qualified Prelude
+
+import Control.Monad
+import Control.Monad.Fix
+import Control.Category
+
+infixr 5 <+>
+infixr 3 ***
+infixr 3 &&&
+infixr 2 +++
+infixr 2 |||
+infixr 1 ^>>, >>^
+infixr 1 ^<<, <<^
+
+class Category a => Arrow a where
+
+        arr :: (b -> c) -> a b c
+
+        first :: a b c -> a (b,d) (c,d)
+
+        second :: a b c -> a (d,b) (d,c)
+        second f = arr swap >>> first f >>> arr swap
+                        where   swap ~(x,y) = (y,x)
+
+        (***) :: a b c -> a b' c' -> a (b,b') (c,c')
+        f *** g = first f >>> second g
+
+        (&&&) :: a b c -> a b c' -> a b (c,c')
+        f &&& g = arr (\b -> (b,b)) >>> f *** g
+
+{-# RULES
+"compose/arr"   forall f g .
+                (arr f) . (arr g) = arr (f . g)
+"first/arr"     forall f .
+                first (arr f) = arr (first f)
+"second/arr"    forall f .

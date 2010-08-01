@@ -1,0 +1,30 @@
+                      We have <a href="/gp/yourstore/ref=pd_irl_gw">recommendations</a> for you.
+                    </span>
+                    <span class="navMessage" style="white-space: nowrap;">
+                      (<a href="/gp/flex/sign-out.html/ref=pd_irl_gw_r?ie=UTF8&amp;path=%2Fgp%2Fyourstore&amp;signIn=1&amp;useRedirectOnSuccess=1&amp;action=sign-out">Not Adrian</a>?)
+                    </span>
+                  </div>
+                </td>
+                <td align="left">&nbsp;</td>
+                <td id="navSwmSlot" align="right" valign="center" height="26">
+                  <table id="navSwmSkedPop" border='0' cellspacing='0' cellpadding='0' height="100%" width="100%">
+                    <tr>
+                      <td align="right" valign="bottom">
+                        <div id="navSwmMainHdgDiv" style="padding-bottom: 3px;">
+                          <a id="navSwmMainHeading" href="/gp/product/B0015T963C/ref=nav_swm_kindle189?pf_rd_p=1268027122&pf_rd_s=nav-sitewide-msg&pf_rd_t=4201&pf_rd_i=navbar-4201&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD">
+                            Kindle: Now Just $189
+                          </a>
+                        </div>
+                      </td>
+                      <td align="left" valign="bottom" width="5" rowspan="1">
+                        <div id="navSwmFlyoutTrigger" style="display:none; height:13px; width:13px; margin:2px 3px 3px 3px;">
+                          <a name="navSwmSkedPop|he|navSwmSkedPop_content">
+                            <img src="http://g-ecx.images-amazon.com/images/G/01/x-locale/common/transparent-pixel._V192234675_.gif" width="1" alt="" class="default navSprite" id="navSwmFlyoutImage" height="1" border="0" />
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>

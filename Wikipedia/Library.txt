@@ -1,0 +1,9 @@
+Library
+
+A library is a collection of sources, resources, and services, and the structure in which it is housed; it is organized for use and maintained by a public body, an institution, or a private individual. In the more traditional sense, a library is a collection of books. It can mean the collection, the building or room that houses such a collection, or both. The term "library" has itself acquired a secondary meaning: "a collection of useful material for common use." This sense is used in fields such as computer science, mathematics, statistics, electronics and biology. Libraries often provide a place of silence for studying.
+
+Public and institutional collections and services may be intended for use by people who choose not to -- or cannot afford to -- purchase an extensive collection themselves, who need material no individual can reasonably be expected to have, or who require professional assistance with their research. In addition to providing materials, libraries also provide the services of librarians who are experts at finding and organizing information and at interpreting information needs.
+
+However, with the sets and collection of media and of media other than books for storing information, many libraries are now also repositories and access points for maps, prints, or other documents and various storage media such as microform (microfilm/microfiche), audio tapes, CDs, cassettes, videotapes, DVDs, and video games. Libraries may also provide public facilities to access subscription databases and the Internet.
+
+Thus, modern libraries are increasingly being redefined as places to get unrestricted access to information in many formats and from many sources. They are understood as extending beyond the physical walls of a building, by including material accessible by electronic means, and by providing the assistance of librarians in navigating and analyzing tremendous amounts of knowledge with a variety of digital tools.

@@ -1,0 +1,30 @@
+                              <span class="carat"></span>Janette Oke (Author)
+                            </div>
+                            <div class="platformBinding">Kindle Edition</div>
+                            <div class="priceBlock mapOrRangePrice">
+                              <span class="listprice">Free</span> <span class="listprice"></span> <strong class="price">$9.99</strong>
+                              (<a class="zg_whyfree" onclick="ZeitgeistFVP.displayPricePopover(this,
+      'Why is this not free?'); return false;" href="/gp/help/customer/display.html/ref=pd_ts_zgc_kinc_digital-text-f_3?ie=UTF8&nodeId=200490080" target="AmazonHelp">Why is this not free?</a>)
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Erotique-ebook/dp/B003SX0Y5M/ref=pd_ts_zgc_kinc_digital-text-f_4_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Erotique">
+                              <img src="http://ecx.images-amazon.com/images/I/419gXnszZpL._SL75_.jpg" alt="Erotique " />
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "noDil">
+                              <span class="rank">4.</span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText"></span>
+                            </div>
+                            <a href="http://www.amazon.com/Erotique-ebook/dp/B003SX0Y5M/ref=pd_ts_zgc_kinc_digital-text-f_4?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="Erotique" class="titleLink">Erotique</a>
+                            <div class="tiny byline">
+                              <span class="carat"></span>Nicole Austin (Author)

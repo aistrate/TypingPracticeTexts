@@ -1,0 +1,50 @@
+tuple3Constr = mkConstr tuple3DataType "(,,)" [] Infix
+
+tuple3DataType :: DataType
+tuple3DataType = mkDataType "Prelude.(,,)" [tuple3Constr]
+
+instance (Data a, Data b, Data c) => Data (a,b,c) where
+  gfoldl f z (a,b,c) = z (,,) `f` a `f` b `f` c
+  toConstr (_,_,_) = tuple3Constr
+  gunfold k z c | constrIndex c == 1 = k (k (k (z (,,))))
+  gunfold _ _ _ = error "gunfold"
+  dataTypeOf _  = tuple3DataType
+
+tuple4Constr :: Constr
+tuple4Constr = mkConstr tuple4DataType "(,,,)" [] Infix
+
+tuple4DataType :: DataType
+tuple4DataType = mkDataType "Prelude.(,,,)" [tuple4Constr]
+
+instance (Data a, Data b, Data c, Data d)
+         => Data (a,b,c,d) where
+  gfoldl f z (a,b,c,d) = z (,,,) `f` a `f` b `f` c `f` d
+  toConstr (_,_,_,_) = tuple4Constr
+  gunfold k z c = case constrIndex c of
+                    1 -> k (k (k (k (z (,,,)))))
+                    _ -> error "gunfold"
+  dataTypeOf _ = tuple4DataType
+
+tuple5Constr :: Constr
+tuple5Constr = mkConstr tuple5DataType "(,,,,)" [] Infix
+
+tuple5DataType :: DataType
+tuple5DataType = mkDataType "Prelude.(,,,,)" [tuple5Constr]
+
+instance (Data a, Data b, Data c, Data d, Data e)
+         => Data (a,b,c,d,e) where
+  gfoldl f z (a,b,c,d,e) = z (,,,,) `f` a `f` b `f` c `f` d `f` e
+  toConstr (_,_,_,_,_) = tuple5Constr
+  gunfold k z c = case constrIndex c of
+                    1 -> k (k (k (k (k (z (,,,,))))))
+                    _ -> error "gunfold"
+  dataTypeOf _ = tuple5DataType
+
+tuple6Constr :: Constr
+tuple6Constr = mkConstr tuple6DataType "(,,,,,)" [] Infix
+
+tuple6DataType :: DataType
+tuple6DataType = mkDataType "Prelude.(,,,,,)" [tuple6Constr]
+
+instance (Data a, Data b, Data c, Data d, Data e, Data f)
+         => Data (a,b,c,d,e,f) where

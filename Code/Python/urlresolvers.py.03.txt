@@ -1,0 +1,144 @@
+        raise Resolver404, {'path' : path}
+
+    def _get_urlconf_module(self):
+        try:
+            return self._urlconf_module
+        except AttributeError:
+            self._urlconf_module = import_module(self.urlconf_name)
+            return self._urlconf_module
+    urlconf_module = property(_get_urlconf_module)
+
+    def _get_url_patterns(self):
+        patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+        try:
+            iter(patterns)
+        except TypeError:
+            raise ImproperlyConfigured("The included urlconf %s doesn't have any "
+                "patterns in it" % self.urlconf_name)
+        return patterns
+    url_patterns = property(_get_url_patterns)
+
+    def _resolve_special(self, view_type):
+        callback = getattr(self.urlconf_module, 'handler%s' % view_type)
+        try:
+            return get_callable(callback), {}
+        except (ImportError, AttributeError), e:
+            raise ViewDoesNotExist, "Tried %s. Error was: %s" % (callback, str(e))
+
+    def resolve404(self):
+        return self._resolve_special('404')
+
+    def resolve500(self):
+        return self._resolve_special('500')
+
+    def reverse(self, lookup_view, *args, **kwargs):
+        if args and kwargs:
+            raise ValueError("Don't mix *args and **kwargs in call to reverse()!")
+        try:
+            lookup_view = get_callable(lookup_view, True)
+        except (ImportError, AttributeError), e:
+            raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
+        possibilities = self.reverse_dict.getlist(lookup_view)
+        for possibility, pattern in possibilities:
+            for result, params in possibility:
+                if args:
+                    if len(args) != len(params):
+                        continue
+                    unicode_args = [force_unicode(val) for val in args]
+                    candidate =  result % dict(zip(params, unicode_args))
+                else:
+                    if set(kwargs.keys()) != set(params):
+                        continue
+                    unicode_kwargs = dict([(k, force_unicode(v)) for (k, v) in kwargs.items()])
+                    candidate = result % unicode_kwargs
+                if re.search(u'^%s' % pattern, candidate, re.UNICODE):
+                    return candidate
+        m = getattr(lookup_view, '__module__', None)
+        n = getattr(lookup_view, '__name__', None)
+        if m is not None and n is not None:
+            lookup_view_s = "%s.%s" % (m, n)
+        else:
+            lookup_view_s = lookup_view
+        raise NoReverseMatch("Reverse for '%s' with arguments '%s' and keyword "
+                "arguments '%s' not found." % (lookup_view_s, args, kwargs))
+
+def resolve(path, urlconf=None):
+    if urlconf is None:
+        urlconf = get_urlconf()
+    return get_resolver(urlconf).resolve(path)
+
+def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
+    if urlconf is None:
+        urlconf = get_urlconf()
+    resolver = get_resolver(urlconf)
+    args = args or []
+    kwargs = kwargs or {}
+
+    if prefix is None:
+        prefix = get_script_prefix()
+
+    if not isinstance(viewname, basestring):
+        view = viewname
+    else:
+        parts = viewname.split(':')
+        parts.reverse()
+        view = parts[0]
+        path = parts[1:]
+
+        resolved_path = []
+        while path:
+            ns = path.pop()
+
+            try:
+                app_list = resolver.app_dict[ns]
+                if current_app and current_app in app_list:
+                    ns = current_app
+                elif ns not in app_list:
+                    ns = app_list[0]
+            except KeyError:
+                pass
+
+            try:
+                extra, resolver = resolver.namespace_dict[ns]
+                resolved_path.append(ns)
+                prefix = prefix + extra
+            except KeyError, key:
+                if resolved_path:
+                    raise NoReverseMatch("%s is not a registered namespace inside '%s'" % (key, ':'.join(resolved_path)))
+                else:
+                    raise NoReverseMatch("%s is not a registered namespace" % key)
+
+    return iri_to_uri(u'%s%s' % (prefix, resolver.reverse(view,
+            *args, **kwargs)))
+
+def clear_url_caches():
+    global _resolver_cache
+    global _callable_cache
+    _resolver_cache.clear()
+    _callable_cache.clear()
+
+def set_script_prefix(prefix):
+    
+    if not prefix.endswith('/'):
+        prefix += '/'
+    _prefixes[currentThread()] = prefix
+
+def get_script_prefix():
+    
+    return _prefixes.get(currentThread(), u'/')
+
+def set_urlconf(urlconf_name):
+    
+    thread = currentThread()
+    if urlconf_name:
+        _urlconfs[thread] = urlconf_name
+    else:
+        if thread in _urlconfs:
+            del _urlconfs[thread]
+
+def get_urlconf(default=None):
+    
+    thread = currentThread()
+    if thread in _urlconfs:
+        return _urlconfs[thread]
+    return default

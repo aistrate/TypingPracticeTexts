@@ -1,0 +1,99 @@
+				GetResultSet(st, queryParameters.HasAutoDiscoverScalarTypes, queryParameters.Callable, selection, session);
+
+			LockMode[] lockModeArray = GetLockModes(queryParameters.LockModes);
+			EntityKey optionalObjectKey = GetOptionalObjectKey(queryParameters, session);
+
+			bool createSubselects = IsSubselectLoadingEnabled;
+			IList subselectResultKeys = createSubselects ? new ArrayList() : null;
+			IList results = new ArrayList();
+
+			try
+			{
+				HandleEmptyCollections(queryParameters.CollectionKeys, rs, session);
+				EntityKey[] keys = new EntityKey[entitySpan];
+
+				if (log.IsDebugEnabled)
+				{
+					log.Debug("processing result set");
+				}
+
+				int count;
+				for (count = 0; count < maxRows && rs.Read(); count++)
+				{
+					if (log.IsDebugEnabled)
+					{
+						log.Debug("result set row: " + count);
+					}
+
+					object result =
+						GetRowFromResultSet(rs, session, queryParameters, lockModeArray, optionalObjectKey, hydratedObjects, keys,
+						                    returnProxies);
+					results.Add(result);
+
+					if (createSubselects)
+					{
+						subselectResultKeys.Add(keys);
+						keys = new EntityKey[entitySpan];
+					}
+				}
+
+				if (log.IsDebugEnabled)
+				{
+					log.Debug(string.Format("done processing result set ({0} rows)", count));
+				}
+			}
+			finally
+			{
+				session.Batcher.CloseCommand(st, rs);
+			}
+
+			InitializeEntitiesAndCollections(hydratedObjects, rs, session, queryParameters.ReadOnly);
+
+			if (createSubselects)
+			{
+				CreateSubselects(subselectResultKeys, queryParameters, session);
+			}
+
+			return results;
+		}
+
+		protected internal virtual bool IsSubselectLoadingEnabled
+		{
+			get { return false; }
+		}
+
+		protected bool HasSubselectLoadableCollections()
+		{
+			foreach (ILoadable loadable in EntityPersisters)
+			{
+				if (loadable.HasSubselectLoadableCollections)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private static ISet[] Transpose(IList keys)
+		{
+			ISet[] result = new ISet[((EntityKey[]) keys[0]).Length];
+			for (int j = 0; j < result.Length; j++)
+			{
+				result[j] = new HashedSet();
+				for (int i = 0; i < keys.Count; i++)
+				{
+					object key = ((EntityKey[]) keys[i])[j];
+					if (key != null)
+					{
+						result[j].Add(key);
+					}
+				}
+			}
+			return result;
+		}
+
+		internal void CreateSubselects(IList keys, QueryParameters queryParameters, ISessionImplementor session)
+		{
+			if (keys.Count > 1)
+			{

@@ -1,0 +1,29 @@
+  = GHC.Conc.threadWaitWrite fd
+#endif
+
+#ifdef mingw32_HOST_OS
+foreign import ccall unsafe "rtsSupportsBoundThreads" threaded :: Bool
+
+withThread :: IO a -> IO a
+withThread io = do
+  m <- newEmptyMVar
+  forkIO $ try io >>= putMVar m
+  x <- takeMVar m
+  case x of
+    Right a -> return a
+    Left e  -> throwIO (e :: IOException)
+
+waitFd :: Fd -> CInt -> IO ()
+waitFd fd write = do
+   throwErrnoIfMinus1 "fdReady" $
+        fdReady (fromIntegral fd) write (fromIntegral iNFINITE) 0
+   return ()
+
+iNFINITE :: CInt
+iNFINITE = 0xFFFFFFFF
+
+foreign import ccall safe "fdReady"
+  fdReady :: CInt -> CInt -> CInt -> CInt -> IO CInt
+#endif
+
+#endif /* __GLASGOW_HASKELL__ */

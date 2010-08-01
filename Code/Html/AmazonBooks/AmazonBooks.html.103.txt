@@ -1,0 +1,30 @@
+                    </div>
+                  </div>
+                  <div class="fluid asin" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ItemElement0" style="width: 99%; margin-bottom: 0px; ">
+                    <div class="inner">
+                      <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_TitleContainer0" style="position: relative">
+                        <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Title0">
+                          <span id="ns_1RVCMGP6WPZF34Z5GVPD_12234_ImageContainer0">
+                            <a href="/gp/product/1558601910/ref=s9_simv_bw_p14_i1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155" class="title ntTitle noLinkDecoration" title="Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp">
+                              <div class="imageContainer">
+                                <img src="http://ecx.images-amazon.com/images/I/410NLClvxgL._SL500_PIsitb-sticker-arrow-big,TopRight,35,-73_SL135_OU01_.jpg" alt="" width="103" height="135" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_Image0" />
+                              </div>Paradigms of Artificial Intelligence...
+                            </a>
+                          </span>
+                          <div class="t11">
+                            <span class="carat">&rsaquo;</span>
+                            <a class="noLinkDecoration" href="/Peter-Norvig/e/B000AQ4JBU/ref=s9_simv_bw_p14_al1?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=center-4&pf_rd_r=1RVCMGP6WPZF34Z5GVPD&pf_rd_t=101&pf_rd_p=41171042&pf_rd_i=283155">Peter Norvig</a>
+                          </div>
+                          <div class="gry t11 nt">Paperback</div>
+                          <span class="listprice gry t11">$98.95</span>
+                          <span class="red t14">$88.16</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="s9OtherItems" id="ns_1RVCMGP6WPZF34Z5GVPD_12234_OtherItems" style="float: left; width: 66%;">
+                  <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_OtherItemsHeaderContainer" class="ns_1RVCMGP6WPZF34Z5GVPD_12234_itemHeaderContainer" style="padding-bottom: 3px; height: 2.3em;">
+                    <div id="ns_1RVCMGP6WPZF34Z5GVPD_12234_OtherItemsHeader" class="ns_1RVCMGP6WPZF34Z5GVPD_12234_textWrapper" style="background: white none repeat scroll 0% 0%; float: left; width: 100%; ">
+                      <div>
+                        Customers who viewed this also viewed

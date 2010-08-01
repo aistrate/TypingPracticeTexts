@@ -1,0 +1,102 @@
+		/// <summary>
+		/// Gets the schema qualified name of the Table.
+		/// </summary>
+		/// <param name="dialect">The <see cref="Dialect"/> that knows how to Quote the Table name.</param>
+		/// <returns>The name of the table qualified with the schema if one is specified.</returns>
+		public string GetQualifiedName(Dialect.Dialect dialect)
+		{
+			return GetQualifiedName(dialect, null, null);
+		}
+
+		/// <summary>
+		/// Gets the schema qualified name of the Table using the specified qualifier
+		/// </summary>
+		/// <param name="dialect">The <see cref="Dialect"/> that knows how to Quote the Table name.</param>
+		/// <param name="defaultQualifier">The Qualifier to use when accessing the table.</param>
+		/// <returns>A String representing the Qualified name.</returns>
+		/// <remarks>If this were used with MSSQL it would return a dbo.table_name.</remarks>
+		public string GetQualifiedName(Dialect.Dialect dialect, string defaultQualifier)
+		{
+			return GetQualifiedName(dialect, null, defaultQualifier);
+		}
+
+		public virtual string GetQualifiedName(Dialect.Dialect dialect, string defaultCatalog, string defaultSchema)
+		{
+			if (!string.IsNullOrEmpty(subselect))
+			{
+				return "( " + subselect + " )";
+			}
+			string quotedName = GetQuotedName(dialect);
+			string usedSchema = schema == null ? defaultSchema : GetQuotedSchema(dialect);
+			string usedCatalog = catalog ?? defaultCatalog;
+			return Qualify(usedCatalog, usedSchema, quotedName);
+		}
+
+		/// <summary>
+		/// Gets or sets the name of the Table in the database.
+		/// </summary>
+		/// <value>
+		/// The name of the Table in the database.  The get does 
+		/// not return a Quoted Table name.
+		/// </value>
+		/// <remarks>
+		/// <p>
+		/// If a value is passed in that is wrapped by <c>`</c> then 
+		/// NHibernate will Quote the Table whenever SQL is generated
+		/// for it.  How the Table is quoted depends on the Dialect.
+		/// </p>
+		/// <p>
+		/// The value returned by the getter is not Quoted.  To get the
+		/// column name in quoted form use <see cref="GetQuotedName(Dialect.Dialect)"/>.
+		/// </p>
+		/// </remarks>
+		public string Name
+		{
+			get { return name; }
+			set
+			{
+				if (value[0] == '`')
+				{
+					quoted = true;
+					name = value.Substring(1, value.Length - 2);
+				}
+				else
+				{
+					name = value;
+				}
+			}
+		}
+
+		/// <summary> returns quoted name as it would be in the mapping file.</summary>
+		public string GetQuotedName()
+		{
+			return quoted ? "`" + name + "`" : name;
+		}
+
+		/// <summary>
+		/// Gets the name of this Table in quoted form if it is necessary.
+		/// </summary>
+		/// <param name="dialect">
+		/// The <see cref="Dialect.Dialect"/> that knows how to quote the Table name.
+		/// </param>
+		/// <returns>
+		/// The Table name in a form that is safe to use inside of a SQL statement.
+		/// Quoted if it needs to be, not quoted if it does not need to be.
+		/// </returns>
+		public string GetQuotedName(Dialect.Dialect dialect)
+		{
+			return IsQuoted ?
+			       dialect.QuoteForTableName(name) :
+			       name;
+		}
+
+		/// <summary> returns quoted name as it is in the mapping file.</summary>
+		public string GetQuotedSchema()
+		{
+			return IsSchemaQuoted ? "`" + schema + "`" : schema;
+		}
+		
+		public string GetQuotedSchema(Dialect.Dialect dialect)
+		{
+			return IsSchemaQuoted ? dialect.OpenQuote + schema + dialect.CloseQuote : schema;
+		}

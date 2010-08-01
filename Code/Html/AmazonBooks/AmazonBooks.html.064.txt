@@ -1,0 +1,30 @@
+                <div class="zg_chart_tab_container">
+                  <div id="zg_explore_tabs_zgChart_ns_1RVCMGP6WPZF34Z5GVPD_123_" class="zg_explore_tabs" style="display: none;">
+                    <ul>
+                      <li id="zgTopPaidTab_zgChart_ns_1RVCMGP6WPZF34Z5GVPD_123_" class="zg_explore_currentTab">
+                        <div>
+                          <a onclick="ZeitgeistFVP.displayPaidList('zgChart_ns_1RVCMGP6WPZF34Z5GVPD_123_'); return false;" href="#">Top 100 Paid</a>
+                        </div>
+                      </li>
+                      <li id="zgTopFreeTab_zgChart_ns_1RVCMGP6WPZF34Z5GVPD_123_">
+                        <div>
+                          <a onclick="ZeitgeistFVP.displayFreeList('zgChart_ns_1RVCMGP6WPZF34Z5GVPD_123_'); return false;" href="#">Top 100 Free</a>
+                        </div>
+                      </li>
+                    </ul>
+                    <div style="clear: both;"></div>
+                  </div>
+                  <script type="text/javascript">
+                    jQuery(document).ready(function() {
+                    jQuery("#zg_explore_tabs_zgChart_ns_1RVCMGP6WPZF34Z5GVPD_123_").show();
+                    });
+                  </script>
+                </div>
+                <div class="zgChartBody">
+                  <div id="zgTopPaidList_zgChart_ns_1RVCMGP6WPZF34Z5GVPD_123_">
+                    <table>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">
+                            <a href="http://www.amazon.com/Girl-Dragon-Tattoo-ebook/dp/B0015DROBO/ref=pd_ts_zgc_kinc_digital-text_1_i?ie=UTF8&s=digital-text&pf_rd_p=1263866022&pf_rd_s=right-4&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Girl with the Dragon Tattoo">

@@ -1,0 +1,50 @@
+         , string "ETX" >> return '\ETX'
+         , string "EOT" >> return '\EOT'
+         , string "ENQ" >> return '\ENQ'
+         , string "ACK" >> return '\ACK'
+         , string "BEL" >> return '\BEL'
+         , string "BS"  >> return '\BS'
+         , string "HT"  >> return '\HT'
+         , string "LF"  >> return '\LF'
+         , string "VT"  >> return '\VT'
+         , string "FF"  >> return '\FF'
+         , string "CR"  >> return '\CR'
+         , string "SI"  >> return '\SI'
+         , string "DLE" >> return '\DLE'
+         , string "DC1" >> return '\DC1'
+         , string "DC2" >> return '\DC2'
+         , string "DC3" >> return '\DC3'
+         , string "DC4" >> return '\DC4'
+         , string "NAK" >> return '\NAK'
+         , string "SYN" >> return '\SYN'
+         , string "ETB" >> return '\ETB'
+         , string "CAN" >> return '\CAN'
+         , string "EM"  >> return '\EM'
+         , string "SUB" >> return '\SUB'
+         , string "ESC" >> return '\ESC'
+         , string "FS"  >> return '\FS'
+         , string "GS"  >> return '\GS'
+         , string "RS"  >> return '\RS'
+         , string "US"  >> return '\US'
+         , string "SP"  >> return '\SP'
+         , string "DEL" >> return '\DEL'
+         ]
+
+lexString :: ReadP Lexeme
+lexString =
+  do char '"'
+     body id
+ where
+  body f =
+    do (c,esc) <- lexStrItem
+       if c /= '"' || esc
+         then body (f.(c:))
+         else let s = f "" in
+              return (String s)
+
+  lexStrItem = (lexEmpty >> lexStrItem)
+               +++ lexCharE
+  
+  lexEmpty =
+    do char '\\'
+       c <- get

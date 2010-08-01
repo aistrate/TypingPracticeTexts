@@ -1,0 +1,30 @@
+                            </a>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="rankedItemInfo">
+                            <div class = "">
+                              <span class="rank">4.</span>
+                              <span class="arrowSprite arrowUp_s " title="Ranking has gone up in the past 24 hours" >
+                                <span>Ranking has gone up in the past 24 hours</span>
+                              </span>
+                              <span class="moverRank"></span>
+                              <span class="tiny dilText">123 days in the top 100</span>
+                            </div>
+                            <a href="http://www.amazon.com/Girl-Who-Played-Fire-Vintage/dp/030745455X/ref=pd_ts_zgc_b_books_4?ie=UTF8&s=books&pf_rd_p=475709271&pf_rd_s=right-3&pf_rd_t=101&pf_rd_i=283155&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=1RVCMGP6WPZF34Z5GVPD" title="The Girl Who Played with Fire (Vintage)" class="titleLink">The Girl Who Played with Fire (Vintage)</a>
+                            <div class="tiny byline">
+                              <span class="carat">&#8250</span>
+                              <a href="/Stieg-Larsson/e/B001J95ACO/ref=zg_ch_by_1">Stieg Larsson</a>
+                            </div>
+                            <div class="platformBinding">Paperback</div>
+                            <div class="priceBlock ">
+                              <span class="listprice">$15.95</span>
+                              <strong class="price">$8.45</strong>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr class="rankedItem">
+                        <td class="rankedItemImageCell">
+                          <div class="rankedItemImage">

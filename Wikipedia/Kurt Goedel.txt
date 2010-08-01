@@ -1,0 +1,7 @@
+Kurt Goedel
+
+Kurt Goedel (April 28, 1906, Brno, Moravia, Austria-Hungary - January 14, 1978, Princeton, New Jersey, USA) was an Austrian logician, mathematician and philosopher. Later in his life he emigrated to the United States to escape WWII. One of the most significant logicians of all time, Goedel made an immense impact upon scientific and philosophical thinking in the 20th century, a time when many, such as Bertrand Russell, A. N. Whitehead and David Hilbert, were pioneering the use of logic and set theory to understand the foundations of mathematics.
+
+Goedel is best known for his two incompleteness theorems, published in 1931 when he was 25 years of age, one year after finishing his doctorate at the University of Vienna. The more famous incompleteness theorem states that for any self-consistent recursive axiomatic system powerful enough to describe the arithmetic of the natural numbers (Peano arithmetic), there are true propositions about the naturals that cannot be proved from the axioms. To prove this theorem, Goedel developed a technique now known as Goedel numbering, which codes formal expressions as natural numbers.
+
+He also showed that the continuum hypothesis cannot be disproved from the accepted axioms of set theory, if those axioms are consistent. He made important contributions to proof theory by clarifying the connections between classical logic, intuitionistic logic, and modal logic.

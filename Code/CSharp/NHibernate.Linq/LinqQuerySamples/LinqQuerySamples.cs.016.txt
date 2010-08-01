@@ -1,0 +1,49 @@
+		[Category("JOIN")]
+		[Test(Description = "This sample shows how to construct a join where one side is nullable and the other isn't.")]
+		[Ignore("TODO")]
+		public void DLinqJoin10()
+		{
+			var q =
+				from o in db.Orders
+				join e in db.Employees
+					on o.Employee.EmployeeID equals (int?)e.EmployeeID into emps
+				from e in emps
+				select new { o.OrderID, e.FirstName };
+
+			ObjectDumper.Write(q);
+		}
+
+		#endregion Join Tests
+
+		#region Order By Tests
+
+		[Category("ORDER BY")]
+		[Test(Description = "This sample uses orderby to sort Employees by hire date.")]
+		public void DLinq36()
+		{
+			var q =
+				from e in db.Employees
+				orderby e.HireDate
+				select e;
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("ORDER BY")]
+		[Test(Description = "This sample uses where and orderby to sort Orders " +
+					 "shipped to London by freight.")]
+		public void DLinq37()
+		{
+			var q =
+				from o in db.Orders
+				where o.ShipCity == "London"
+				orderby o.Freight
+				select o;
+
+			ObjectDumper.Write(q);
+		}
+
+		[Category("ORDER BY")]
+		[Test(Description = "This sample uses orderby to sort Products " +
+					 "by unit price from highest to lowest.")]
+		public void DLinq38()

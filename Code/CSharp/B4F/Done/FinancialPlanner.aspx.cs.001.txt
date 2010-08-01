@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using B4F.TotalGiro.ClientApplicationLayer.Common;
+using B4F.TotalGiro.ClientApplicationLayer.Planning;
+using B4F.TotalGiro.Stichting.Login;
+using B4F.TotalGiro.Utils.Tuple;
+using B4F.Web.WebControls;
+using Dundas.Charting.WebControl;
+
+public partial class FinancialPlanner : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        pnlErrorFutureValue.Visible = false;
+        elbGivenFields.Text = "";
+        elbFutureValue.Text = "";
+
+        Utility.EnableScrollToBottom(this, hdnScrollToBottom);
+
+        try
+        {
+            if (!IsPostBack)
+            {
+                ((TotalGiroClient)Master).HeaderText = "Monitor Portefeuille";
+
+                ctlPortfolioNavigationBar.Visible = Initialize && CurrentLoginType != LoginTypes.Customer;
+
+                initializeGivenFields();
+            }
+        }
+        catch (Exception ex) { displayError(ex); }
+    }
+
+    protected bool AccountList_HasEmptyLine { get { return true; } }
+    protected bool ModelList_HasEmptyLine { get { return CurrentLoginType != LoginTypes.Customer; } }
+
+    protected bool ModelMissingExpectedReturn_IsAllowed { get { return true; } }
+
+    protected void Page_Init(object sender, EventArgs e)
+    {
+        odsAccount.SelectParameters["hasEmptyFirstRow"].DefaultValue = AccountList_HasEmptyLine.ToString();
+        odsModelPortfolio.SelectParameters["hasEmptyFirstRow"].DefaultValue = ModelList_HasEmptyLine.ToString();
+
+        Utility.AddParameterContactId(odsAccount, CurrentLoginType == LoginTypes.Customer);
+    }

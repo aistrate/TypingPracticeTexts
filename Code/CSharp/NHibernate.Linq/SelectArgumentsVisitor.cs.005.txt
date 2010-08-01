@@ -1,0 +1,50 @@
+		}
+
+		protected override Expression VisitBinary(BinaryExpression expr)
+		{
+			switch (expr.NodeType)
+			{
+				case ExpressionType.Add:
+					VisitAddExpression(expr);
+					break;
+				case ExpressionType.Divide:
+					VisitDivideExpression(expr);
+					break;
+				case ExpressionType.Multiply:
+					VisitMultiplyExpression(expr);
+					break;
+				case ExpressionType.Subtract:
+					VisitSubtractExpression(expr);
+					break;
+				default:
+					return VisitCriterionExpression(expr);
+			}
+
+			return expr;
+		}
+
+		private Expression VisitCriterionExpression(Expression expr)
+		{
+			IEnumerable<ICriterion> criterion = WhereArgumentsVisitor.GetCriterion(_rootCriteria, _session, expr);
+
+			if (criterion.Count() > 0)
+			{
+				Conjunction conjunction = new Conjunction();
+				foreach (ICriterion crit in criterion)
+				{
+					conjunction.Add(crit);
+				}
+
+				_projections.Add(Projections.Conditional(
+					conjunction,
+					Projections.Constant(true),
+					Projections.Constant(false))
+				);
+			}
+
+			return expr;
+		}
+
+		#region Arithmetic
+
+		private void VisitAddExpression(BinaryExpression expr)

@@ -1,0 +1,99 @@
+    chunks size xs = case L.splitAt size xs of
+                      (xs', xs'') -> xs' : chunks size xs''
+
+unpack :: ByteString -> [Word8]
+unpack cs = L.concatMap S.unpack (toChunks cs)
+
+fromChunks :: [S.ByteString] -> ByteString
+fromChunks cs = L.foldr chunk Empty cs
+
+toChunks :: ByteString -> [S.ByteString]
+toChunks cs = foldrChunks (:) [] cs
+
+null :: ByteString -> Bool
+null Empty = True
+null _     = False
+{-# INLINE null #-}
+
+length :: ByteString -> Int64
+length cs = foldlChunks (\n c -> n + fromIntegral (S.length c)) 0 cs
+{-# INLINE length #-}
+
+cons :: Word8 -> ByteString -> ByteString
+cons c cs = Chunk (S.singleton c) cs
+{-# INLINE cons #-}
+
+cons' :: Word8 -> ByteString -> ByteString
+cons' w (Chunk c cs) | S.length c < 16 = Chunk (S.cons w c) cs
+cons' w cs                             = Chunk (S.singleton w) cs
+{-# INLINE cons' #-}
+
+snoc :: ByteString -> Word8 -> ByteString
+snoc cs w = foldrChunks Chunk (singleton w) cs
+{-# INLINE snoc #-}
+
+head :: ByteString -> Word8
+head Empty       = errorEmptyList "head"
+head (Chunk c _) = S.unsafeHead c
+{-# INLINE head #-}
+
+uncons :: ByteString -> Maybe (Word8, ByteString)
+uncons Empty = Nothing
+uncons (Chunk c cs)
+    = Just (S.unsafeHead c,
+            if S.length c == 1 then cs else Chunk (S.unsafeTail c) cs)
+{-# INLINE uncons #-}
+
+tail :: ByteString -> ByteString
+tail Empty          = errorEmptyList "tail"
+tail (Chunk c cs)
+  | S.length c == 1 = cs
+  | otherwise       = Chunk (S.unsafeTail c) cs
+{-# INLINE tail #-}
+
+last :: ByteString -> Word8
+last Empty          = errorEmptyList "last"
+last (Chunk c0 cs0) = go c0 cs0
+  where go c Empty        = S.last c
+        go _ (Chunk c cs) = go c cs
+
+init :: ByteString -> ByteString
+init Empty          = errorEmptyList "init"
+init (Chunk c0 cs0) = go c0 cs0
+  where go c Empty | S.length c == 1 = Empty
+                   | otherwise       = Chunk (S.init c) Empty
+        go c (Chunk c' cs)           = Chunk c (go c' cs)
+
+append :: ByteString -> ByteString -> ByteString
+append xs ys = foldrChunks Chunk ys xs
+{-# INLINE append #-}
+
+map :: (Word8 -> Word8) -> ByteString -> ByteString
+map f s = go s
+    where
+        go Empty        = Empty
+        go (Chunk x xs) = Chunk y ys
+            where
+                y  = S.map f x
+                ys = go xs
+{-# INLINE map #-}
+
+reverse :: ByteString -> ByteString
+reverse cs0 = rev Empty cs0
+  where rev a Empty        = a
+        rev a (Chunk c cs) = rev (Chunk (S.reverse c) a) cs
+{-# INLINE reverse #-}
+
+intersperse :: Word8 -> ByteString -> ByteString
+intersperse _ Empty        = Empty
+intersperse w (Chunk c cs) = Chunk (S.intersperse w c)
+                                   (foldrChunks (Chunk . intersperse') Empty cs)
+  where intersperse' :: S.ByteString -> S.ByteString
+        intersperse' (S.PS fp o l) =
+          S.unsafeCreate (2*l) $ \p' -> withForeignPtr fp $ \p -> do
+            poke p' w
+            S.c_intersperse (p' `plusPtr` 1) (p `plusPtr` o) (fromIntegral l) w
+
+transpose :: [ByteString] -> [ByteString]
+transpose css = L.map (\ss -> Chunk (S.pack ss) Empty)
+                      (L.transpose (L.map unpack css))

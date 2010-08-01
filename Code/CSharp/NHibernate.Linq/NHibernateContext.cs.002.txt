@@ -1,0 +1,49 @@
+			return Activator.CreateInstance(GetType(), session);
+		}
+
+		#endregion
+
+		#region IDisposable Members
+
+		public virtual void Dispose()
+		{
+			if (session != null)
+			{
+				session.Dispose();
+				session = null;
+			}
+		}
+
+		#endregion
+
+		#region IUpdatable Members
+
+		List<object> _updateCache = null;
+		List<object> UpdateCache
+		{
+			get
+			{
+				if (_updateCache == null)
+				{
+					_updateCache = new List<object>();
+				}
+				return _updateCache;
+			}
+		}
+
+		void IUpdatable.AddReferenceToCollection(object targetResource, string propertyName, object resourceToBeAdded)
+		{
+			IClassMetadata metadata = session.SessionFactory.GetClassMetadata(targetResource.GetType().FullName);
+			if (metadata == null)
+			{
+				throw new DataServiceException("Type not recognized as a valid type for this Context");
+			}
+
+			object collection = metadata.GetPropertyValue(targetResource, propertyName, EntityMode.Poco);
+
+			if (collection is IList)
+			{
+				((IList)collection).Add(resourceToBeAdded);
+			}
+			else
+			{

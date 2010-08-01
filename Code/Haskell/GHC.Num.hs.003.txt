@@ -1,0 +1,50 @@
+                           q : r : jsplitb p ns
+
+    jprinth :: [Integer] -> String -> String
+    jprinth (n:ns) cs =
+        case n `quotRemInteger` BASE of
+        (# q', r' #) ->
+            let q = fromInteger q'
+                r = fromInteger r'
+            in if q > 0 then jhead q $ jblock r $ jprintb ns cs
+                        else jhead r $ jprintb ns cs
+    jprinth [] _ = error "jprinth []"
+
+    jprintb :: [Integer] -> String -> String
+    jprintb []     cs = cs
+    jprintb (n:ns) cs = case n `quotRemInteger` BASE of
+                        (# q', r' #) ->
+                            let q = fromInteger q'
+                                r = fromInteger r'
+                            in jblock q $ jblock r $ jprintb ns cs
+
+    jhead :: Int -> String -> String
+    jhead n cs
+        | n < 10    = case unsafeChr (ord '0' + n) of
+            c@(C# _) -> c : cs
+        | otherwise = case unsafeChr (ord '0' + r) of
+            c@(C# _) -> jhead q (c : cs)
+        where
+        (q, r) = n `quotRemInt` 10
+
+    jblock = jblock'  DIGITS
+
+    jblock' :: Int -> Int -> String -> String
+    jblock' d n cs
+        | d == 1    = case unsafeChr (ord '0' + n) of
+             c@(C# _) -> c : cs
+        | otherwise = case unsafeChr (ord '0' + r) of
+             c@(C# _) -> jblock' (d - 1) q (c : cs)
+        where
+        (q, r) = n `quotRemInt` 10
+instance  Num Integer  where
+    (+) = plusInteger
+    (-) = minusInteger
+    (*) = timesInteger
+    negate         = negateInteger
+    fromInteger x  =  x
+
+    abs = absInteger
+    signum = signumInteger
+instance  Enum Integer  where
+    succ x               = x + 1

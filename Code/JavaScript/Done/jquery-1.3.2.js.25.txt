@@ -1,0 +1,99 @@
+				if( event.isImmediatePropagationStopped() )
+					break;
+
+			}
+		}
+	},
+
+	props: "altKey attrChange attrName bubbles button cancelable charCode clientX clientY ctrlKey currentTarget data detail eventPhase fromElement handler keyCode metaKey newValue originalTarget pageX pageY prevValue relatedNode relatedTarget screenX screenY shiftKey srcElement target toElement view wheelDelta which".split(" "),
+
+	fix: function(event) {
+		if ( event[expando] )
+			return event;
+
+		var originalEvent = event;
+		event = jQuery.Event( originalEvent );
+
+		for ( var i = this.props.length, prop; i; ){
+			prop = this.props[ --i ];
+			event[ prop ] = originalEvent[ prop ];
+		}
+
+		if ( !event.target )
+			event.target = event.srcElement || document;
+
+		if ( event.target.nodeType == 3 )
+			event.target = event.target.parentNode;
+
+		if ( !event.relatedTarget && event.fromElement )
+			event.relatedTarget = event.fromElement == event.target ? event.toElement : event.fromElement;
+
+		if ( event.pageX == null && event.clientX != null ) {
+			var doc = document.documentElement, body = document.body;
+			event.pageX = event.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc.clientLeft || 0);
+			event.pageY = event.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc.clientTop || 0);
+		}
+
+		if ( !event.which && ((event.charCode || event.charCode === 0) ? event.charCode : event.keyCode) )
+			event.which = event.charCode || event.keyCode;
+
+		if ( !event.metaKey && event.ctrlKey )
+			event.metaKey = event.ctrlKey;
+
+		if ( !event.which && event.button )
+			event.which = (event.button & 1 ? 1 : ( event.button & 2 ? 3 : ( event.button & 4 ? 2 : 0 ) ));
+
+		return event;
+	},
+
+	proxy: function( fn, proxy ){
+		proxy = proxy || function(){ return fn.apply(this, arguments); };
+		proxy.guid = fn.guid = fn.guid || proxy.guid || this.guid++;
+		return proxy;
+	},
+
+	special: {
+		ready: {
+			setup: bindReady,
+			teardown: function() {}
+		}
+	},
+	
+	specialAll: {
+		live: {
+			setup: function( selector, namespaces ){
+				jQuery.event.add( this, namespaces[0], liveHandler );
+			},
+			teardown:  function( namespaces ){
+				if ( namespaces.length ) {
+					var remove = 0, name = RegExp("(^|\\.)" + namespaces[0] + "(\\.|$)");
+					
+					jQuery.each( (jQuery.data(this, "events").live || {}), function(){
+						if ( name.test(this.type) )
+							remove++;
+					});
+					
+					if ( remove < 1 )
+						jQuery.event.remove( this, namespaces[0], liveHandler );
+				}
+			}
+		}
+	}
+};
+
+jQuery.Event = function( src ){
+	if( !this.preventDefault )
+		return new jQuery.Event(src);
+	
+	if( src && src.type ){
+		this.originalEvent = src;
+		this.type = src.type;
+	}else
+		this.type = src;
+
+	this.timeStamp = now();
+	
+	this[expando] = true;
+};
+
+function returnFalse(){

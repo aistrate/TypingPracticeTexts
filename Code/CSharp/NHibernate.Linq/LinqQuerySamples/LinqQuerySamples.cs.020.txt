@@ -1,0 +1,50 @@
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								g.Key,
+								TotalPrice = g.Sum(p => p.UnitPrice)
+							};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses group by and Count " +
+					 "to find the number of Products in each CategoryID.")]
+		public void DLinq47()
+		{
+			var q =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								g.Key,
+								NumProducts = g.Count()
+							};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses group by and Count " +
+					 "to find the number of Products in each CategoryID " +
+					 "that are discontinued.")]
+		public void DLinq48()
+		{
+			var q =
+				from p in db.Products
+				group p by p.Category.CategoryID
+					into g
+					select new
+							{
+								g.Key,
+								NumProducts = g.Count(p => p.Discontinued)
+							};
+
+			ObjectDumper.Write(q, 1);
+		}
+
+		[Category("GROUP BY/HAVING")]
+		[Test(Description = "This sample uses group by and Count " +

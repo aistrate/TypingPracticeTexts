@@ -1,0 +1,49 @@
+            pnlStandardDeviation.Visible = false;
+            txtStandardDeviation.Text = "";
+        }
+        else
+        {
+            mvwInterestRatePerYear.ActiveViewIndex = 0;
+            pnlStandardDeviation.Visible = true;
+        }
+    }
+
+    protected void txtExtra_TextChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            displayChanceOfMeetingTarget();
+
+            if (ExtrasSelectedIndex == 1)
+                displayFutureValueAfterAdjust();
+
+            chPortfolioFutureValueDataBind();
+        }
+        catch (Exception ex) { displayError(ex); }
+    }
+
+    protected void lnkChoiceOfExtras_Command(object sender, CommandEventArgs e)
+    {
+        try
+        {
+            ExtrasSelectedIndex = 1 - ExtrasSelectedIndex;
+
+            displayChanceOfMeetingTarget();
+            displayExtras();
+            
+            chPortfolioFutureValueDataBind();
+        }
+        catch (Exception ex) { displayError(ex); }
+    }
+
+    protected void btnCalculate_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            resetPanelFutureValue(true);
+
+            displayFutureValueBeforeAdjust();
+            displayChanceOfMeetingTarget();
+            displayExtras();
+            
+            chPortfolioFutureValueDataBind();

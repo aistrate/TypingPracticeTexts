@@ -1,0 +1,30 @@
+          .rhf_loading_inner {
+          background: no-repeat center url('http://g-ecx.images-amazon.com/images/G/01/ui/loadIndicators/loadIndicator-large._V192195480_.gif');
+          width: 100px;
+          height: 124px;
+          }
+          .rhf_loading_outer {
+          height: 248px;
+          overflow: hidden;
+          position: relative;
+          width: 100%;
+          }
+          .rhf_loading_outer[class] {
+          display: table;
+          position: static;
+          }
+          .rhf_loading_middle {
+          position: absolute;
+          top: 50%;
+          width: 100%;
+          text-align: center;
+          }
+          .rhf_loading_middle[class] {
+          display: table-cell;
+          vertical-align: middle;
+          position: static;
+          }
+          .rhf_loading_inner {
+          position: relative;
+          top: -50%;
+          text-align:

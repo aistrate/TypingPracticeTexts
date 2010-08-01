@@ -1,0 +1,50 @@
+prime :: Int32
+prime = 33554467
+
+tABLE_MAX :: Int32
+tABLE_MAX  = 32 * 1024 * 1024
+tABLE_MIN :: Int32
+tABLE_MIN  = 8
+
+hLOAD :: Int32
+hLOAD = 7
+
+hYSTERESIS :: Int32
+hYSTERESIS = 64
+
+new
+  :: (key -> key -> Bool)
+  -> (key -> Int32)
+  -> IO (HashTable key val)
+
+new cmpr hash = do
+  recordNew
+  let mask = tABLE_MIN-1
+  bkts'  <- newMutArray (0,mask) []
+  bkts   <- freezeArray bkts'
+
+  let
+    kcnt = 0
+    ht = HT {  buckets=bkts, kcount=kcnt, bmask=mask }
+
+  table <- newIORef ht
+  return (HashTable { tab=table, hash_fn=hash, cmp=cmpr })
+
+insert :: HashTable key val -> key -> val -> IO ()
+
+insert ht key val =
+  updatingBucket CanInsert (\bucket -> ((key,val):bucket, 1, ())) ht key
+
+tooBig :: Int32 -> Int32 -> Bool
+tooBig k b = k-hYSTERESIS > hLOAD * b
+
+bucketIndex :: Int32 -> Int32 -> Int32
+bucketIndex mask h = h .&. mask
+
+{-# INLINE findBucket #-}
+findBucket :: HashTable key val -> key -> IO (HT key val, Int32, [(key,val)])
+findBucket HashTable{ tab=ref, hash_fn=hash} key = do
+  table@HT{ buckets=bkts, bmask=b } <- readIORef ref
+  let indx = bucketIndex b (hash key)
+  bucket <- readHTArray bkts indx
+  return (table, indx, bucket)

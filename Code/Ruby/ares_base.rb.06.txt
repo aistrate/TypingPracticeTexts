@@ -1,0 +1,108 @@
+      elsif known_attributes.include?(method_name)
+        true
+      elsif method_name =~ /(?:=|\?)$/ && attributes.include?($`)
+        true
+      else
+        super
+      end
+    end
+
+    protected
+      def connection(refresh = false)
+        self.class.connection(refresh)
+      end
+
+      def update
+        connection.put(element_path(prefix_options), encode, self.class.headers).tap do |response|
+          load_attributes_from_response(response)
+        end
+      end
+
+      def create
+        connection.post(collection_path, encode, self.class.headers).tap do |response|
+          self.id = id_from_response(response)
+          load_attributes_from_response(response)
+        end
+      end
+
+      def load_attributes_from_response(response)
+        if response['Content-Length'] != "0" && response.body.strip.size > 0
+          load(self.class.format.decode(response.body))
+        end
+      end
+
+      def id_from_response(response)
+        response['Location'][/\/([^\/]*?)(\.\w+)?$/, 1] if response['Location']
+      end
+
+      def element_path(options = nil)
+        self.class.element_path(to_param, options || prefix_options)
+      end
+
+      def collection_path(options = nil)
+        self.class.collection_path(options || prefix_options)
+      end
+
+    private
+      def find_or_create_resource_for_collection(name)
+        find_or_create_resource_for(ActiveSupport::Inflector.singularize(name.to_s))
+      end
+
+      def find_resource_in_modules(resource_name, module_names)
+        receiver = Object
+        namespaces = module_names[0, module_names.size-1].map do |module_name|
+          receiver = receiver.const_get(module_name)
+        end
+        if namespace = namespaces.reverse.detect { |ns| ns.const_defined?(resource_name) }
+          return namespace.const_get(resource_name)
+        else
+          raise NameError
+        end
+      end
+
+      def find_or_create_resource_for(name)
+        resource_name = name.to_s.camelize
+        ancestors = self.class.name.split("::")
+        if ancestors.size > 1
+          find_resource_in_modules(resource_name, ancestors)
+        else
+          self.class.const_get(resource_name)
+        end
+      rescue NameError
+        if self.class.const_defined?(resource_name)
+          resource = self.class.const_get(resource_name)
+        else
+          resource = self.class.const_set(resource_name, Class.new(ActiveResource::Base))
+        end
+        resource.prefix = self.class.prefix
+        resource.site   = self.class.site
+        resource
+      end
+
+      def split_options(options = {})
+        self.class.__send__(:split_options, options)
+      end
+
+      def method_missing(method_symbol, *arguments)
+        method_name = method_symbol.to_s
+
+        if method_name =~ /(=|\?)$/
+          case $1
+          when "="
+            attributes[$`] = arguments.first
+          when "?"
+            attributes[$`]
+          end
+        else
+          return attributes[method_name] if attributes.include?(method_name)
+          return nil if known_attributes.include?(method_name)
+          super
+        end
+      end
+  end
+
+  class Base
+    extend ActiveModel::Naming
+    include CustomMethods, Observing, Validations
+  end
+end

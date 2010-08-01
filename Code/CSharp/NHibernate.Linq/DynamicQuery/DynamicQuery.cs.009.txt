@@ -1,0 +1,50 @@
+				typeof(int), Type.EmptyTypes);
+			ILGenerator gen = mb.GetILGenerator();
+			gen.Emit(OpCodes.Ldc_I4_0);
+			foreach (FieldInfo field in fields)
+			{
+				Type ft = field.FieldType;
+				Type ct = typeof(EqualityComparer<>).MakeGenericType(ft);
+				gen.EmitCall(OpCodes.Call, ct.GetMethod("get_Default"), null);
+				gen.Emit(OpCodes.Ldarg_0);
+				gen.Emit(OpCodes.Ldfld, field);
+				gen.EmitCall(OpCodes.Callvirt, ct.GetMethod("GetHashCode", new Type[] { ft }), null);
+				gen.Emit(OpCodes.Xor);
+			}
+			gen.Emit(OpCodes.Ret);
+		}
+	}
+
+	public sealed class ParseException : Exception
+	{
+		int position;
+
+		public ParseException(string message, int position)
+			: base(message)
+		{
+			this.position = position;
+		}
+
+		public int Position
+		{
+			get { return position; }
+		}
+
+		public override string ToString()
+		{
+			return string.Format(Res.ParseExceptionFormat, Message, position);
+		}
+	}
+
+	internal class ExpressionParser
+	{
+		struct Token
+		{
+			public TokenId id;
+			public string text;
+			public int pos;
+		}
+
+		enum TokenId
+		{
+			Unknown,

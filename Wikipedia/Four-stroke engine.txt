@@ -1,0 +1,13 @@
+Four-stroke engine
+
+Today, internal combustion engines in cars, trucks, motorcycles, aircraft, construction machinery and many others, most commonly use a four-stroke cycle. The four strokes refer to intake, compression, combustion (power), and exhaust strokes that occur during two crankshaft rotations per working cycle of the gasoline engine and diesel engine. A less technical description of the four-stroke cycle is "Suck, Squeeze, Bang, Blow"
+
+The cycle begins at Top Dead Center (TDC), when the piston is farthest away from the axis of the crankshaft. A stroke refers to the full travel of the piston from Top Dead Center (TDC) to Bottom Dead Center (BDC).
+
+1. INTAKE stroke. (Suck): On the intake or induction stroke of the piston, the piston descends from the top of the cylinder to the bottom of the cylinder, reducing the pressure inside the cylinder. A mixture of fuel and air is forced by atmospheric (or greater) pressure into the cylinder through the intake port. The intake valve(s) then close.
+
+2. COMPRESSION stroke. (Squeeze): With both intake and exhaust valves closed, the piston returns to the top of the cylinder compressing the fuel-air mixture. This is known as the compression stroke.
+
+3. POWER stroke. (Bang): While the piston is close to Top Dead Center, the compressed air-fuel mixture is ignited, usually by a spark plug (for a gasoline or Otto cycle engine) or by the heat and pressure of compression (for a diesel cycle or compression ignition engine). The resulting massive pressure from the combustion of the compressed fuel-air mixture drives the piston back down toward bottom dead center with tremendous force. This is known as the power stroke. which is the main source of the engine's torque and power.
+
+4. EXHAUST stroke. (Blow): During the exhaust stroke, the piston once again returns to top dead center while the exhaust valve is open. This action evacuates the products of combustion from the cylinder by pushing the spent fuel-air mixture through the exhaust valve(s).

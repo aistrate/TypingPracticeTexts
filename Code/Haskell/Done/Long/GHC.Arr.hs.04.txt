@@ -1,0 +1,100 @@
+    in unsafeAccumArray' f initial (l,u) n
+                         [(safeIndex (l,u) n i, e) | (i, e) <- ies]
+
+{-# INLINE unsafeAccumArray #-}
+unsafeAccumArray :: Ix i => (e -> a -> e) -> e -> (i,i) -> [(Int, a)] -> Array i e
+unsafeAccumArray f initial b ies = unsafeAccumArray' f initial b (rangeSize b) ies
+
+{-# INLINE unsafeAccumArray' #-}
+unsafeAccumArray' :: Ix i => (e -> a -> e) -> e -> (i,i) -> Int -> [(Int, a)] -> Array i e
+unsafeAccumArray' f initial (l,u) n@(I# n#) ies = runST (ST $ \s1# ->
+    case newArray# n# initial s1#          of { (# s2#, marr# #) ->
+    foldr (adjust f marr#) (done l u n marr#) ies s2# })
+
+{-# INLINE adjust #-}
+adjust :: (e -> a -> e) -> MutableArray# s e -> (Int, a) -> STRep s b -> STRep s b
+adjust f marr# (I# i#, new) next s1# =
+    case readArray# marr# i# s1# of
+        (# s2#, old #) ->
+            case writeArray# marr# i# (f old new) s2# of
+                s3# -> next s3#
+
+{-# INLINE (//) #-}
+(//) :: Ix i => Array i e -> [(i, e)] -> Array i e
+arr@(Array l u n _) // ies =
+    unsafeReplace arr [(safeIndex (l,u) n i, e) | (i, e) <- ies]
+
+{-# INLINE unsafeReplace #-}
+unsafeReplace :: Ix i => Array i e -> [(Int, e)] -> Array i e
+unsafeReplace arr ies = runST (do
+    STArray l u n marr# <- thawSTArray arr
+    ST (foldr (fill marr#) (done l u n marr#) ies))
+
+{-# INLINE accum #-}
+accum :: Ix i => (e -> a -> e) -> Array i e -> [(i, a)] -> Array i e
+accum f arr@(Array l u n _) ies =
+    unsafeAccum f arr [(safeIndex (l,u) n i, e) | (i, e) <- ies]
+
+{-# INLINE unsafeAccum #-}
+unsafeAccum :: Ix i => (e -> a -> e) -> Array i e -> [(Int, a)] -> Array i e
+unsafeAccum f arr ies = runST (do
+    STArray l u n marr# <- thawSTArray arr
+    ST (foldr (adjust f marr#) (done l u n marr#) ies))
+
+{-# INLINE amap #-}
+amap :: Ix i => (a -> b) -> Array i a -> Array i b
+amap f arr@(Array l u n _) =
+    unsafeArray' (l,u) n [(i, f (unsafeAt arr i)) | i <- [0 .. n - 1]]
+
+{-# INLINE ixmap #-}
+ixmap :: (Ix i, Ix j) => (i,i) -> (i -> j) -> Array j e -> Array i e
+ixmap (l,u) f arr =
+    array (l,u) [(i, arr ! f i) | i <- range (l,u)]
+
+{-# INLINE eqArray #-}
+eqArray :: (Ix i, Eq e) => Array i e -> Array i e -> Bool
+eqArray arr1@(Array l1 u1 n1 _) arr2@(Array l2 u2 n2 _) =
+    if n1 == 0 then n2 == 0 else
+    l1 == l2 && u1 == u2 &&
+    and [unsafeAt arr1 i == unsafeAt arr2 i | i <- [0 .. n1 - 1]]
+
+{-# INLINE cmpArray #-}
+cmpArray :: (Ix i, Ord e) => Array i e -> Array i e -> Ordering
+cmpArray arr1 arr2 = compare (assocs arr1) (assocs arr2)
+
+{-# INLINE cmpIntArray #-}
+cmpIntArray :: Ord e => Array Int e -> Array Int e -> Ordering
+cmpIntArray arr1@(Array l1 u1 n1 _) arr2@(Array l2 u2 n2 _) =
+    if n1 == 0 then
+        if n2 == 0 then EQ else LT
+    else if n2 == 0 then GT
+    else case compare l1 l2 of
+             EQ    -> foldr cmp (compare u1 u2) [0 .. (n1 `min` n2) - 1]
+             other -> other
+  where
+    cmp i rest = case compare (unsafeAt arr1 i) (unsafeAt arr2 i) of
+        EQ    -> rest
+        other -> other
+
+{-# RULES "cmpArray/Int" cmpArray = cmpIntArray #-}
+instance Ix i => Functor (Array i) where
+    fmap = amap
+
+instance (Ix i, Eq e) => Eq (Array i e) where
+    (==) = eqArray
+
+instance (Ix i, Ord e) => Ord (Array i e) where
+    compare = cmpArray
+
+instance (Ix a, Show a, Show b) => Show (Array a b) where
+    showsPrec p a =
+        showParen (p > appPrec) $
+        showString "array " .
+        showsPrec appPrec1 (bounds a) .
+        showChar ' ' .
+        showsPrec appPrec1 (assocs a)
+
+{-# INLINE newSTArray #-}
+newSTArray :: Ix i => (i,i) -> e -> ST s (STArray s i e)
+newSTArray (l,u) initial = ST $ \s1# ->
+    case safeRangeSize (l,u)            of { n@(I# n#) ->

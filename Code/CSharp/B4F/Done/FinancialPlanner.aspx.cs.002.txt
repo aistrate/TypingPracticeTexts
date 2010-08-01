@@ -1,0 +1,50 @@
+    private void initializeGivenFields()
+    {
+        txtYearsLeft.Text = "20";
+        txtTargetValue.Text = "300000";
+
+        if (Initialize || CurrentLoginType == LoginTypes.Customer)
+        {
+            pnlAccountList.Visible = true;
+            ddlAccount.DataBind();
+
+            selectFirstNonEmptyLine(ddlAccount, AccountList_HasEmptyLine);
+
+            retrieveAccountDependant();
+        }
+
+        FocusCandidates.FocusOnFirstVisible();
+    }
+
+    private void selectFirstNonEmptyLine(DropDownList dropDownList, bool hasEmptyLine)
+    {
+        int emptyCount = hasEmptyLine ? 1 : 0;
+        
+        if (dropDownList.Items.Count > emptyCount)
+            dropDownList.SelectedIndex = emptyCount;
+    }
+
+    protected void ddlAccount_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            resetPanelFutureValue(false);
+            retrieveAccountDependant();
+            FocusCandidates.FocusOnFirstVisible();
+        }
+        catch (Exception ex) { displayError(ex); }
+    }
+
+    protected void ddlModelPortfolio_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            resetPanelFutureValue(false);
+            retrieveModelDependant();
+            FocusCandidates.FocusOnFirstVisible();
+        }
+        catch (Exception ex) { displayError(ex); }
+    }
+
+    private void resetPanelFutureValue(bool visible)
+    {

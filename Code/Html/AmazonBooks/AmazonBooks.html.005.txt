@@ -1,0 +1,30 @@
+                available: function() {
+                this._a.push(arguments)
+                },
+                onReady: function() {
+                this._o.push(arguments)
+                },
+                onCompletion: function() {
+                this._c.push(arguments)
+                },
+                completedStage: function() {
+                this._cs.push(arguments)
+                },
+                metrics: 0,
+                strings: {},
+                chars: {
+                EOL: String.fromCharCode(0x0A),
+                SQUOTE: String.fromCharCode(0x27),
+                DQUOTE: String.fromCharCode(0x22),
+                BACKSLASH: String.fromCharCode(0x5C),
+                YEN: String.fromCharCode(0xA5)
+                }
+                }
+              </script>
+            </head>
+  <body>
+    <script type="text/javascript">
+      window.AmazonPopoverImages = {
+      snake: 'http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/snake._V192571611_.gif',
+      btnClose: 'http://g-ecx.images-amazon.com/images/G/01/javascripts/lib/popover/images/btn_close._V192188154_.gif',
+      closeTan: 'http://g-ecx.images-amazon.com/images/G/01/nav2/images/close-tan-sm._V192185930_.gif',

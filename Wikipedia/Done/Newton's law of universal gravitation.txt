@@ -1,0 +1,23 @@
+Newton's law of universal gravitation
+
+Newton's law of universal gravitation states that every object in this universe attracts every other object with a force which is directly proportional to the product of their masses and inversely proportional to the square of distance between their centres. This is a general physical law derived from empirical observations by what Newton called induction. It is a part of classical mechanics and was formulated in Newton's work Philosophiae Naturalis Principia Mathematica ("the Principia"), first published on 5 July 1687. (When Newton's book was presented in 1686 to the Royal Society, Robert Hooke made a claim that Newton had obtained the inverse square law from him - see History section below.) In modern language, the law states the following:
+
+
+"Every point mass attracts every single other point mass by a force pointing along the line intersecting both points. The force is directly proportional to the product of the two masses and inversely proportional to the square of the distance between the point masses:
+
+        F = G * (m_1 * m_2) / r^2 ,
+
+where:
+
+ * F is the magnitude of the gravitational force between the two point masses,
+ * G is the gravitational constant,
+ * m_1 is the mass of the first point mass,
+ * m_2 is the mass of the second point mass, and
+ * r is the distance between the two point masses."
+
+
+Assuming SI units, F is measured in newtons (N), m1 and m2 in kilograms (kg), r in meters (m), and the constant G is approximately equal to 6.673*10^(-11) N m2 kg^(-2). The value of the constant G was first accurately determined from the results of the Cavendish experiment conducted by the British scientist Henry Cavendish in 1798, although Cavendish did not himself calculate a numerical value for G. This experiment was also the first test of Newton's theory of gravitation between masses in the laboratory. It took place 111 years after the publication of Newton's Principia and 71 years after Newton's death, so none of Newton's calculations could use the value of G; instead he could only calculate a force relative to another force.
+
+Newton's law of gravitation resembles Coulomb's law of electrical forces, which is used to calculate the magnitude of electrical force between two charged bodies. Both are inverse-square laws, in which force is inversely proportional to the square of the distance between the bodies. Coulomb's Law has the product of two charges in place of the product of the masses, and the electrostatic constant in place of the gravitational constant.
+
+Newton's law has since been superseded by Einstein's theory of general relativity, but it continues to be used as an excellent approximation of the effects of gravity. Relativity is only required when there is a need for extreme precision, or when dealing with gravitation for extremely massive and dense objects.

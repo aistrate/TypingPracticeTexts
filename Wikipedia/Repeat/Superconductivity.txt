@@ -1,0 +1,9 @@
+Superconductivity
+
+Superconductivity occurs in certain materials at very low temperatures. When superconductive, a material has an electrical resistance of exactly zero and no interior magnetic field (the Meissner effect). It was discovered by Heike Kamerlingh Onnes in 1911. Like ferromagnetism and atomic spectral lines, superconductivity is a quantum mechanical phenomenon. It cannot be understood simply as the idealization of "perfect conductivity" in classical physics.
+
+The electrical resistivity of a metallic conductor decreases gradually as the temperature is lowered. However, in ordinary conductors such as copper and silver, this decrease is limited by impurities and other defects. Even near absolute zero, a real sample of copper shows some resistance. In a superconductor however, despite these imperfections, the resistance drops abruptly to zero when the material is cooled below its critical temperature. An electric current flowing in a loop of superconducting wire can persist indefinitely with no power source.
+
+Superconductivity occurs in many materials: simple elements like tin and aluminium, various metallic alloys and some heavily-doped semiconductors. Superconductivity does not occur in noble metals like gold and silver, nor in pure samples of ferromagnetic metals.
+
+In 1986, it was discovered that some cuprate-perovskite ceramic materials have critical temperatures of more than 90 kelvin. These high-temperature superconductors renewed interest in the topic because the current theory could not explain them. From a practical perspective, 90 kelvin is easy to reach with the readily available liquid nitrogen (boiling point 77 kelvin). This means more experimentation and more commercial applications are feasible, especially if materials with even higher critical temperatures could be discovered.

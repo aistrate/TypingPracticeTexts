@@ -1,0 +1,50 @@
+		{
+			get { return _transformer; }
+		}
+
+		private ICriteriaQuery CriteriaQuery
+		{
+			get
+			{
+				if (_criteriaQuery == null)
+					_criteriaQuery = _rootCriteria.GenerateCriteriaQuery(_session.SessionFactory, _rootCriteria.GetEntityOrClassName());
+				return _criteriaQuery;
+			}
+		}
+
+		#endregion
+
+		public SelectArgumentsVisitor(ICriteria rootCriteria, ISession session)
+		{
+			_rootCriteria = rootCriteria;
+			_session = session;
+			_projections = new List<IProjection>();
+		}
+
+		public static bool SupportsMethod(string methodName)
+		{
+			return "Average".Equals(methodName)
+				|| "Count".Equals(methodName)
+				|| "LongCount".Equals(methodName)
+				|| "Max".Equals(methodName)
+				|| "Min".Equals(methodName)
+				|| "Sum".Equals(methodName);
+		}
+
+		protected override Expression VisitMethodCall(MethodCallExpression expr)
+		{
+			if (WhereArgumentsVisitor.SupportsMethod(expr.Method.Name))
+				return VisitCriterionExpression(expr);
+
+			MemberNameVisitor memberVisitor = new MemberNameVisitor(_rootCriteria, true);
+			memberVisitor.Visit(expr.Arguments[0]);
+			CollectionAccessExpression collectionExpr = (CollectionAccessExpression)memberVisitor.CurrentExpression;
+
+			string propertyName = null;
+			IProjection projection = null;
+			PropertyProjection currentProjection;
+
+			if (expr.Arguments.Count > 1)
+			{
+				propertyName = MemberNameVisitor.GetMemberName(_rootCriteria, expr.Arguments[1]);
+			}

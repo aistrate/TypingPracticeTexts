@@ -1,0 +1,4 @@
+Doppler effect
+
+aThe Doppler effect (or Doppler shift), named after Austrian     physicist Christian Doppler who proposed it in 1842, is the change in frequency of a wave for an observer moving relative to the source        of the wave. It is commonly heard when a vehicle sounding a siren or horn approaches, passes, and recedes from an observer. The received frequency is higher (compared to the emitted frequency) during the approach, it is identical at the instant of passing by, and it is lower during the recession.
+

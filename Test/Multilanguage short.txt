@@ -1,0 +1,7 @@
+﻿L’effet Doppler est le décalage de fréquence d’une onde acoustique ou électromagnétique entre la mesure à l’émission et la mesure à la réception lorsque la distance entre l’émetteur et le récepteur varie au cours du temps. Si on désigne de façon générale ce phénomène physique sous le nom d’effet Doppler, on réserve le terme d’« effet Doppler-Fizeau » aux ondes lumineuses.
+
+
+Wenn der Krankenwagen am Beobachter vorbei gefahren ist, verhält es sich sinngemäß umgekehrt: der Abstand zwischen den Wellenbergen (Wellenlänge) vergrößert sich, und der Beobachter hört einen tieferen Ton. Rechnerisch gilt obige Formel genauso, man muss nur für v eine negative Geschwindigkeit einsetzen.
+
+
+Efectul Doppler constă în variația frecvenței unei unde emise de o sursă de oscilații, dacă aceasta se află în mișcare față de receptor. Efectul Doppler poate fi constatat atât în cazul undelor electromagnetice (inclusiv lumina), cât și în cazul undelor elastice (inclusiv sunetul). Frecvența măsurată crește atunci când sursa se apropie de receptor și scade când susrsa se depărtează de receptor.

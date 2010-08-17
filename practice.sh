@@ -12,4 +12,7 @@ git push
 echo
 echo Status:
 git status
+
+echo
+echo Press any key to continue...
 read

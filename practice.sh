@@ -12,3 +12,4 @@ git push
 echo
 echo Status:
 git status
+read

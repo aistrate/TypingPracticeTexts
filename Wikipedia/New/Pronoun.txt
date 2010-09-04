@@ -1,0 +1,5 @@
+Pronoun
+
+In linguistics and grammar, a pronoun (Lat: pronomen) is a pro-form that substitutes for a noun (or noun phrase) with or without a determiner, such as you and they in English. The replaced phrase is called the antecedent of the pronoun.
+
+For example, consider the sentence "Lisa gave the coat to Phil." All three nouns in the sentence can be replaced by pronouns: "She gave it to him." If the coat, Lisa, and Phil have been previously mentioned, the listener can deduce what the pronouns she, it and him refer to and therefore understand the meaning of the sentence; however, if the sentence "She gave it to him." is the first presentation of the idea, none of the pronouns have antecedents, and each pronoun is therefore ambiguous. Pronouns without antecedents are also called unprecursed pronouns. English grammar allows pronouns to potentially have multiple candidate antecedents. The process of determining which antecedent was intended is known as anaphore resolution.

@@ -1,5 +1,3 @@
-cd /C/Languages/TypingPracticeTexts
-
 echo Status Before:
 git status
 

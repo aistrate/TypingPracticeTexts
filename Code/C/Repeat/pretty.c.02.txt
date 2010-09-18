@@ -1,0 +1,100 @@
+	return (non_ascii(ch) || (ch == '=') || (ch == '?') || (ch == '_'));
+}
+
+static void add_rfc2047(struct strbuf *sb, const char *line, int len,
+		       const char *encoding)
+{
+	int i, last;
+
+	for (i = 0; i < len; i++) {
+		int ch = line[i];
+		if (non_ascii(ch))
+			goto needquote;
+		if ((i + 1 < len) && (ch == '=' && line[i+1] == '?'))
+			goto needquote;
+	}
+	strbuf_add(sb, line, len);
+	return;
+
+needquote:
+	strbuf_grow(sb, len * 3 + strlen(encoding) + 100);
+	strbuf_addf(sb, "=?%s?q?", encoding);
+	for (i = last = 0; i < len; i++) {
+		unsigned ch = line[i] & 0xFF;
+		
+		if (is_rfc2047_special(ch) || ch == ' ') {
+			strbuf_add(sb, line + last, i - last);
+			strbuf_addf(sb, "=%02X", ch);
+			last = i + 1;
+		}
+	}
+	strbuf_add(sb, line + last, len - last);
+	strbuf_addstr(sb, "?=");
+}
+
+void pp_user_info(const char *what, enum cmit_fmt fmt, struct strbuf *sb,
+		  const char *line, enum date_mode dmode,
+		  const char *encoding)
+{
+	char *date;
+	int namelen;
+	unsigned long time;
+	int tz;
+
+	if (fmt == CMIT_FMT_ONELINE)
+		return;
+	date = strchr(line, '>');
+	if (!date)
+		return;
+	namelen = ++date - line;
+	time = strtoul(date, &date, 10);
+	tz = strtol(date, NULL, 10);
+
+	if (fmt == CMIT_FMT_EMAIL) {
+		char *name_tail = strchr(line, '<');
+		int display_name_length;
+		if (!name_tail)
+			return;
+		while (line < name_tail && isspace(name_tail[-1]))
+			name_tail--;
+		display_name_length = name_tail - line;
+		strbuf_addstr(sb, "From: ");
+		add_rfc2047(sb, line, display_name_length, encoding);
+		strbuf_add(sb, name_tail, namelen - display_name_length);
+		strbuf_addch(sb, '\n');
+	} else {
+		strbuf_addf(sb, "%s: %.*s%.*s\n", what,
+			      (fmt == CMIT_FMT_FULLER) ? 4 : 0,
+			      "    ", namelen, line);
+	}
+	switch (fmt) {
+	case CMIT_FMT_MEDIUM:
+		strbuf_addf(sb, "Date:   %s\n", show_date(time, tz, dmode));
+		break;
+	case CMIT_FMT_EMAIL:
+		strbuf_addf(sb, "Date: %s\n", show_date(time, tz, DATE_RFC2822));
+		break;
+	case CMIT_FMT_FULLER:
+		strbuf_addf(sb, "%sDate: %s\n", what, show_date(time, tz, dmode));
+		break;
+	default:
+		
+		break;
+	}
+}
+
+static int is_empty_line(const char *line, int *len_p)
+{
+	int len = *len_p;
+	while (len && isspace(line[len-1]))
+		len--;
+	*len_p = len;
+	return !len;
+}
+
+static const char *skip_empty_lines(const char *msg)
+{
+	for (;;) {
+		int linelen = get_one_line(msg);
+		int ll = linelen;
+		if (!linelen)

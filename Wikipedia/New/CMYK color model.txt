@@ -1,0 +1,9 @@
+CMYK color model
+
+The CMYK color model (process color, four color) is a subtractive color model, used in color printing, and is also used to describe the printing process itself. CMYK refers to the four inks used in some color printing: cyan, magenta, yellow, and key black. Though it varies by print house, press operator, press manufacturer and press run, ink is typically applied in the order of the abbreviation.
+
+The "K" in CMYK stands for key since in four-color printing cyan, magenta, and yellow printing plates are carefully keyed or aligned with the key of the black key plate. Some sources suggest that the "K" in CMYK comes from the last letter in "black" and was chosen because B already means blue. However, this explanation, though plausible and useful as a mnemonic, is incorrect.
+
+The CMYK model works by partially or entirely masking colors on a lighter, usually white, background. The ink reduces the light that would otherwise be reflected. Such a model is called subtractive because inks "subtract" brightness from white.
+
+In additive color models such as RGB, white is the "additive" combination of all primary colored lights, while black is the absence of light. In the CMYK model, it is the opposite: white is the natural color of the paper or other background, while black results from a full combination of colored inks. To save money on ink, and to produce deeper black tones, unsaturated and dark colors are produced by using black ink instead of the combination of cyan, magenta and yellow.

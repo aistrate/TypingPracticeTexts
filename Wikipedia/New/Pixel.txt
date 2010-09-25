@@ -1,0 +1,7 @@
+Pixel
+
+In digital imaging, a pixel (or picture element) is a single point in a raster image. The pixel is the smallest addressable screen element; it is the smallest unit of picture that can be controlled. Each pixel has its own address. The address of a pixel corresponds to its coordinates. Pixels are normally arranged in a two-dimensional grid, and are often represented using dots or squares. Each pixel is a sample of an original image; more samples typically provide more accurate representations of the original. The intensity of each pixel is variable. In color image systems, a color is typically represented by three or four component intensities such as red, green, and blue, or cyan, magenta, yellow, and black.
+
+In some contexts (such as descriptions of camera sensors), the term pixel is used to refer to a single scalar element of a multi-component representation (more precisely called a photosite in the camera sensor context, although the neologism sensel is also sometimes used to describe the elements of a digital camera's sensor), while in others the term may refer to the entire set of such component intensities for a spatial position. In color systems that use chroma subsampling, the multi-component concept of a pixel can become difficult to apply, since the intensity measures for the different color components correspond to different spatial areas in a such a representation.
+
+The word pixel is based on a contraction of pix ("pictures") and el (for "element"); similar formations with el  for "element" include the words: voxel and texel.

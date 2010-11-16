@@ -1,0 +1,100 @@
+		if (encoding) 
+			out = xstrdup(commit->buffer);
+		else
+			return NULL; 
+	else
+		out = reencode_string(commit->buffer,
+				      output_encoding, use_encoding);
+	if (out)
+		out = replace_encoding_header(out, output_encoding);
+
+	free(encoding);
+	return out;
+}
+
+static int mailmap_name(char *email, int email_len, char *name, int name_len)
+{
+	static struct string_list *mail_map;
+	if (!mail_map) {
+		mail_map = xcalloc(1, sizeof(*mail_map));
+		read_mailmap(mail_map, NULL);
+	}
+	return mail_map->nr && map_user(mail_map, email, email_len, name, name_len);
+}
+
+static size_t format_person_part(struct strbuf *sb, char part,
+				 const char *msg, int len, enum date_mode dmode)
+{
+	
+	const int placeholder_len = 2;
+	int start, end, tz = 0;
+	unsigned long date = 0;
+	char *ep;
+	const char *name_start, *name_end, *mail_start, *mail_end, *msg_end = msg+len;
+	char person_name[1024];
+	char person_mail[1024];
+
+	for (end = 0; end < len && msg[end] != '<'; end++)
+		; 
+
+	if (end >= len - 2)
+		goto skip;
+
+	name_start = msg;
+	name_end = msg+end;
+	while (name_end > name_start && isspace(*(name_end-1)))
+		name_end--;
+	mail_start = msg+end+1;
+	mail_end = mail_start;
+	while (mail_end < msg_end && *mail_end != '>')
+		mail_end++;
+	if (mail_end == msg_end)
+		goto skip;
+	end = mail_end-msg;
+
+	if (part == 'N' || part == 'E') { 
+		strlcpy(person_name, name_start, name_end-name_start+1);
+		strlcpy(person_mail, mail_start, mail_end-mail_start+1);
+		mailmap_name(person_mail, sizeof(person_mail), person_name, sizeof(person_name));
+		name_start = person_name;
+		name_end = name_start + strlen(person_name);
+		mail_start = person_mail;
+		mail_end = mail_start +  strlen(person_mail);
+	}
+	if (part == 'n' || part == 'N') {	
+		strbuf_add(sb, name_start, name_end-name_start);
+		return placeholder_len;
+	}
+	if (part == 'e' || part == 'E') {	
+		strbuf_add(sb, mail_start, mail_end-mail_start);
+		return placeholder_len;
+	}
+
+	for (start = end + 1; start < len && isspace(msg[start]); start++)
+		; 
+	if (start >= len)
+		goto skip;
+	date = strtoul(msg + start, &ep, 10);
+	if (msg + start == ep)
+		goto skip;
+
+	if (part == 't') {	
+		strbuf_add(sb, msg + start, ep - (msg + start));
+		return placeholder_len;
+	}
+
+	for (start = ep - msg + 1; start < len && isspace(msg[start]); start++)
+		; 
+	if (start + 1 < len) {
+		tz = strtoul(msg + start + 1, NULL, 10);
+		if (msg[start] == '-')
+			tz = -tz;
+	}
+
+	switch (part) {
+	case 'd':	
+		strbuf_addstr(sb, show_date(date, tz, dmode));
+		return placeholder_len;
+	case 'D':	
+		strbuf_addstr(sb, show_date(date, tz, DATE_RFC2822));
+		return placeholder_len;

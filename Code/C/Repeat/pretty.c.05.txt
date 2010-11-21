@@ -1,0 +1,100 @@
+	case 'r':	
+		strbuf_addstr(sb, show_date(date, tz, DATE_RELATIVE));
+		return placeholder_len;
+	case 'i':	
+		strbuf_addstr(sb, show_date(date, tz, DATE_ISO8601));
+		return placeholder_len;
+	}
+
+skip:
+	
+	if (part == 'n' || part == 'e' || part == 't' || part == 'd'
+	    || part == 'D' || part == 'r' || part == 'i')
+		return placeholder_len;
+
+	return 0; 
+}
+
+struct chunk {
+	size_t off;
+	size_t len;
+};
+
+struct format_commit_context {
+	const struct commit *commit;
+	const struct pretty_print_context *pretty_ctx;
+	unsigned commit_header_parsed:1;
+	unsigned commit_message_parsed:1;
+	size_t width, indent1, indent2;
+
+	struct chunk author;
+	struct chunk committer;
+	struct chunk encoding;
+	size_t message_off;
+	size_t subject_off;
+	size_t body_off;
+
+	struct chunk abbrev_commit_hash;
+	struct chunk abbrev_tree_hash;
+	struct chunk abbrev_parent_hashes;
+	size_t wrap_start;
+};
+
+static int add_again(struct strbuf *sb, struct chunk *chunk)
+{
+	if (chunk->len) {
+		strbuf_adddup(sb, chunk->off, chunk->len);
+		return 1;
+	}
+
+	chunk->off = sb->len;
+	return 0;
+}
+
+static void parse_commit_header(struct format_commit_context *context)
+{
+	const char *msg = context->commit->buffer;
+	int i;
+
+	for (i = 0; msg[i]; i++) {
+		int eol;
+		for (eol = i; msg[eol] && msg[eol] != '\n'; eol++)
+			; 
+
+		if (i == eol) {
+			break;
+		} else if (!prefixcmp(msg + i, "author ")) {
+			context->author.off = i + 7;
+			context->author.len = eol - i - 7;
+		} else if (!prefixcmp(msg + i, "committer ")) {
+			context->committer.off = i + 10;
+			context->committer.len = eol - i - 10;
+		} else if (!prefixcmp(msg + i, "encoding ")) {
+			context->encoding.off = i + 9;
+			context->encoding.len = eol - i - 9;
+		}
+		i = eol;
+	}
+	context->message_off = i;
+	context->commit_header_parsed = 1;
+}
+
+static int istitlechar(char c)
+{
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+		(c >= '0' && c <= '9') || c == '.' || c == '_';
+}
+
+static void format_sanitized_subject(struct strbuf *sb, const char *msg)
+{
+	size_t trimlen;
+	size_t start_len = sb->len;
+	int space = 2;
+
+	for (; *msg && *msg != '\n'; msg++) {
+		if (istitlechar(*msg)) {
+			if (space == 1)
+				strbuf_addch(sb, '-');
+			space = 0;
+			strbuf_addch(sb, *msg);
+			if (*msg == '.')

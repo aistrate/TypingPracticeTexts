@@ -1,0 +1,100 @@
+				void *context)
+{
+	struct format_commit_context *c = context;
+	const struct commit *commit = c->commit;
+	const char *msg = commit->buffer;
+	struct commit_list *p;
+	int h1, h2;
+
+	switch (placeholder[0]) {
+	case 'C':
+		if (placeholder[1] == '(') {
+			const char *end = strchr(placeholder + 2, ')');
+			char color[COLOR_MAXLEN];
+			if (!end)
+				return 0;
+			color_parse_mem(placeholder + 2,
+					end - (placeholder + 2),
+					"--pretty format", color);
+			strbuf_addstr(sb, color);
+			return end - placeholder + 1;
+		}
+		if (!prefixcmp(placeholder + 1, "red")) {
+			strbuf_addstr(sb, GIT_COLOR_RED);
+			return 4;
+		} else if (!prefixcmp(placeholder + 1, "green")) {
+			strbuf_addstr(sb, GIT_COLOR_GREEN);
+			return 6;
+		} else if (!prefixcmp(placeholder + 1, "blue")) {
+			strbuf_addstr(sb, GIT_COLOR_BLUE);
+			return 5;
+		} else if (!prefixcmp(placeholder + 1, "reset")) {
+			strbuf_addstr(sb, GIT_COLOR_RESET);
+			return 6;
+		} else
+			return 0;
+	case 'n':		
+		strbuf_addch(sb, '\n');
+		return 1;
+	case 'x':
+		
+		if (0 <= (h1 = hexval_table[0xff & placeholder[1]]) &&
+		    h1 <= 16 &&
+		    0 <= (h2 = hexval_table[0xff & placeholder[2]]) &&
+		    h2 <= 16) {
+			strbuf_addch(sb, (h1<<4)|h2);
+			return 3;
+		} else
+			return 0;
+	case 'w':
+		if (placeholder[1] == '(') {
+			unsigned long width = 0, indent1 = 0, indent2 = 0;
+			char *next;
+			const char *start = placeholder + 2;
+			const char *end = strchr(start, ')');
+			if (!end)
+				return 0;
+			if (end > start) {
+				width = strtoul(start, &next, 10);
+				if (*next == ',') {
+					indent1 = strtoul(next + 1, &next, 10);
+					if (*next == ',') {
+						indent2 = strtoul(next + 1,
+								 &next, 10);
+					}
+				}
+				if (*next != ')')
+					return 0;
+			}
+			rewrap_message_tail(sb, c, width, indent1, indent2);
+			return end - placeholder + 1;
+		} else
+			return 0;
+	}
+
+	if (!commit->object.parsed)
+		parse_object(commit->object.sha1);
+
+	switch (placeholder[0]) {
+	case 'H':		
+		strbuf_addstr(sb, sha1_to_hex(commit->object.sha1));
+		return 1;
+	case 'h':		
+		if (add_again(sb, &c->abbrev_commit_hash))
+			return 1;
+		strbuf_addstr(sb, find_unique_abbrev(commit->object.sha1,
+		                                     DEFAULT_ABBREV));
+		c->abbrev_commit_hash.len = sb->len - c->abbrev_commit_hash.off;
+		return 1;
+	case 'T':		
+		strbuf_addstr(sb, sha1_to_hex(commit->tree->object.sha1));
+		return 1;
+	case 't':		
+		if (add_again(sb, &c->abbrev_tree_hash))
+			return 1;
+		strbuf_addstr(sb, find_unique_abbrev(commit->tree->object.sha1,
+		                                     DEFAULT_ABBREV));
+		c->abbrev_tree_hash.len = sb->len - c->abbrev_tree_hash.off;
+		return 1;
+	case 'P':		
+		for (p = commit->parents; p; p = p->next) {

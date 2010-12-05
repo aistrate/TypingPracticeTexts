@@ -1,0 +1,100 @@
+		return jQuery.each( this, callback, args );
+	},
+
+	index: function( elem ) {
+		return jQuery.inArray(
+			elem && elem.jquery ? elem[0] : elem
+		, this );
+	},
+
+	attr: function( name, value, type ) {
+		var options = name;
+
+		if ( typeof name === "string" )
+			if ( value === undefined )
+				return this[0] && jQuery[ type || "attr" ]( this[0], name );
+
+			else {
+				options = {};
+				options[ name ] = value;
+			}
+
+		return this.each(function(i){
+			for ( name in options )
+				jQuery.attr(
+					type ?
+						this.style :
+						this,
+					name, jQuery.prop( this, options[ name ], type, i, name )
+				);
+		});
+	},
+
+	css: function( key, value ) {
+		if ( (key == 'width' || key == 'height') && parseFloat(value) < 0 )
+			value = undefined;
+		return this.attr( key, value, "curCSS" );
+	},
+
+	text: function( text ) {
+		if ( typeof text !== "object" && text != null )
+			return this.empty().append( (this[0] && this[0].ownerDocument || document).createTextNode( text ) );
+
+		var ret = "";
+
+		jQuery.each( text || this, function(){
+			jQuery.each( this.childNodes, function(){
+				if ( this.nodeType != 8 )
+					ret += this.nodeType != 1 ?
+						this.nodeValue :
+						jQuery.fn.text( [ this ] );
+			});
+		});
+
+		return ret;
+	},
+
+	wrapAll: function( html ) {
+		if ( this[0] ) {
+			var wrap = jQuery( html, this[0].ownerDocument ).clone();
+
+			if ( this[0].parentNode )
+				wrap.insertBefore( this[0] );
+
+			wrap.map(function(){
+				var elem = this;
+
+				while ( elem.firstChild )
+					elem = elem.firstChild;
+
+				return elem;
+			}).append(this);
+		}
+
+		return this;
+	},
+
+	wrapInner: function( html ) {
+		return this.each(function(){
+			jQuery( this ).contents().wrapAll( html );
+		});
+	},
+
+	wrap: function( html ) {
+		return this.each(function(){
+			jQuery( this ).wrapAll( html );
+		});
+	},
+
+	append: function() {
+		return this.domManip(arguments, true, function(elem){
+			if (this.nodeType == 1)
+				this.appendChild( elem );
+		});
+	},
+
+	prepend: function() {
+		return this.domManip(arguments, true, function(elem){
+			if (this.nodeType == 1)
+				this.insertBefore( elem, this.firstChild );
+		});

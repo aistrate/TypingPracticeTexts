@@ -1,0 +1,99 @@
+	not: function( selector ) {
+		if ( typeof selector === "string" )
+			if ( isSimple.test( selector ) )
+				return this.pushStack( jQuery.multiFilter( selector, this, true ), "not", selector );
+			else
+				selector = jQuery.multiFilter( selector, this );
+
+		var isArrayLike = selector.length && selector[selector.length - 1] !== undefined && !selector.nodeType;
+		return this.filter(function() {
+			return isArrayLike ? jQuery.inArray( this, selector ) < 0 : this != selector;
+		});
+	},
+
+	add: function( selector ) {
+		return this.pushStack( jQuery.unique( jQuery.merge(
+			this.get(),
+			typeof selector === "string" ?
+				jQuery( selector ) :
+				jQuery.makeArray( selector )
+		)));
+	},
+
+	is: function( selector ) {
+		return !!selector && jQuery.multiFilter( selector, this ).length > 0;
+	},
+
+	hasClass: function( selector ) {
+		return !!selector && this.is( "." + selector );
+	},
+
+	val: function( value ) {
+		if ( value === undefined ) {			
+			var elem = this[0];
+
+			if ( elem ) {
+				if( jQuery.nodeName( elem, 'option' ) )
+					return (elem.attributes.value || {}).specified ? elem.value : elem.text;
+				
+				if ( jQuery.nodeName( elem, "select" ) ) {
+					var index = elem.selectedIndex,
+						values = [],
+						options = elem.options,
+						one = elem.type == "select-one";
+
+					if ( index < 0 )
+						return null;
+
+					for ( var i = one ? index : 0, max = one ? index + 1 : options.length; i < max; i++ ) {
+						var option = options[ i ];
+
+						if ( option.selected ) {
+							value = jQuery(option).val();
+
+							if ( one )
+								return value;
+
+							values.push( value );
+						}
+					}
+
+					return values;				
+				}
+
+				return (elem.value || "").replace(/\r/g, "");
+
+			}
+
+			return undefined;
+		}
+
+		if ( typeof value === "number" )
+			value += '';
+
+		return this.each(function(){
+			if ( this.nodeType != 1 )
+				return;
+
+			if ( jQuery.isArray(value) && /radio|checkbox/.test( this.type ) )
+				this.checked = (jQuery.inArray(this.value, value) >= 0 ||
+					jQuery.inArray(this.name, value) >= 0);
+
+			else if ( jQuery.nodeName( this, "select" ) ) {
+				var values = jQuery.makeArray(value);
+
+				jQuery( "option", this ).each(function(){
+					this.selected = (jQuery.inArray( this.value, values ) >= 0 ||
+						jQuery.inArray( this.text, values ) >= 0);
+				});
+
+				if ( !values.length )
+					this.selectedIndex = -1;
+
+			} else
+				this.value = value;
+		});
+	},
+
+	html: function( value ) {
+		return value === undefined ?

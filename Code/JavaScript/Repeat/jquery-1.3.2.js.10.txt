@@ -1,0 +1,100 @@
+	},
+
+	makeArray: function( array ) {
+		var ret = [];
+
+		if( array != null ){
+			var i = array.length;
+			if( i == null || typeof array === "string" || jQuery.isFunction(array) || array.setInterval )
+				ret[0] = array;
+			else
+				while( i )
+					ret[--i] = array[i];
+		}
+
+		return ret;
+	},
+
+	inArray: function( elem, array ) {
+		for ( var i = 0, length = array.length; i < length; i++ )
+			if ( array[ i ] === elem )
+				return i;
+
+		return -1;
+	},
+
+	merge: function( first, second ) {
+		var i = 0, elem, pos = first.length;
+		if ( !jQuery.support.getAll ) {
+			while ( (elem = second[ i++ ]) != null )
+				if ( elem.nodeType != 8 )
+					first[ pos++ ] = elem;
+
+		} else
+			while ( (elem = second[ i++ ]) != null )
+				first[ pos++ ] = elem;
+
+		return first;
+	},
+
+	unique: function( array ) {
+		var ret = [], done = {};
+
+		try {
+
+			for ( var i = 0, length = array.length; i < length; i++ ) {
+				var id = jQuery.data( array[ i ] );
+
+				if ( !done[ id ] ) {
+					done[ id ] = true;
+					ret.push( array[ i ] );
+				}
+			}
+
+		} catch( e ) {
+			ret = array;
+		}
+
+		return ret;
+	},
+
+	grep: function( elems, callback, inv ) {
+		var ret = [];
+
+		for ( var i = 0, length = elems.length; i < length; i++ )
+			if ( !inv != !callback( elems[ i ], i ) )
+				ret.push( elems[ i ] );
+
+		return ret;
+	},
+
+	map: function( elems, callback ) {
+		var ret = [];
+
+		for ( var i = 0, length = elems.length; i < length; i++ ) {
+			var value = callback( elems[ i ], i );
+
+			if ( value != null )
+				ret[ ret.length ] = value;
+		}
+
+		return ret.concat.apply( [], ret );
+	}
+});
+
+var userAgent = navigator.userAgent.toLowerCase();
+
+jQuery.browser = {
+	version: (userAgent.match( /.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1],
+	safari: /webkit/.test( userAgent ),
+	opera: /opera/.test( userAgent ),
+	msie: /msie/.test( userAgent ) && !/opera/.test( userAgent ),
+	mozilla: /mozilla/.test( userAgent ) && !/(compatible|webkit)/.test( userAgent )
+};
+
+jQuery.each({
+	parent: function(elem){return elem.parentNode;},
+	parents: function(elem){return jQuery.dir(elem,"parentNode");},
+	next: function(elem){return jQuery.nth(elem,2,"nextSibling");},
+	prev: function(elem){return jQuery.nth(elem,2,"previousSibling");},
+	nextAll: function(elem){return jQuery.dir(elem,"nextSibling");},

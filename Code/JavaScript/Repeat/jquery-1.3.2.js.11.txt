@@ -1,0 +1,99 @@
+	prevAll: function(elem){return jQuery.dir(elem,"previousSibling");},
+	siblings: function(elem){return jQuery.sibling(elem.parentNode.firstChild,elem);},
+	children: function(elem){return jQuery.sibling(elem.firstChild);},
+	contents: function(elem){return jQuery.nodeName(elem,"iframe")?elem.contentDocument||elem.contentWindow.document:jQuery.makeArray(elem.childNodes);}
+}, function(name, fn){
+	jQuery.fn[ name ] = function( selector ) {
+		var ret = jQuery.map( this, fn );
+
+		if ( selector && typeof selector == "string" )
+			ret = jQuery.multiFilter( selector, ret );
+
+		return this.pushStack( jQuery.unique( ret ), name, selector );
+	};
+});
+
+jQuery.each({
+	appendTo: "append",
+	prependTo: "prepend",
+	insertBefore: "before",
+	insertAfter: "after",
+	replaceAll: "replaceWith"
+}, function(name, original){
+	jQuery.fn[ name ] = function( selector ) {
+		var ret = [], insert = jQuery( selector );
+
+		for ( var i = 0, l = insert.length; i < l; i++ ) {
+			var elems = (i > 0 ? this.clone(true) : this).get();
+			jQuery.fn[ original ].apply( jQuery(insert[i]), elems );
+			ret = ret.concat( elems );
+		}
+
+		return this.pushStack( ret, name, selector );
+	};
+});
+
+jQuery.each({
+	removeAttr: function( name ) {
+		jQuery.attr( this, name, "" );
+		if (this.nodeType == 1)
+			this.removeAttribute( name );
+	},
+
+	addClass: function( classNames ) {
+		jQuery.className.add( this, classNames );
+	},
+
+	removeClass: function( classNames ) {
+		jQuery.className.remove( this, classNames );
+	},
+
+	toggleClass: function( classNames, state ) {
+		if( typeof state !== "boolean" )
+			state = !jQuery.className.has( this, classNames );
+		jQuery.className[ state ? "add" : "remove" ]( this, classNames );
+	},
+
+	remove: function( selector ) {
+		if ( !selector || jQuery.filter( selector, [ this ] ).length ) {
+			jQuery( "*", this ).add([this]).each(function(){
+				jQuery.event.remove(this);
+				jQuery.removeData(this);
+			});
+			if (this.parentNode)
+				this.parentNode.removeChild( this );
+		}
+	},
+
+	empty: function() {
+		jQuery(this).children().remove();
+
+		while ( this.firstChild )
+			this.removeChild( this.firstChild );
+	}
+}, function(name, fn){
+	jQuery.fn[ name ] = function(){
+		return this.each( fn, arguments );
+	};
+});
+
+function num(elem, prop) {
+	return elem[0] && parseInt( jQuery.curCSS(elem[0], prop, true), 10 ) || 0;
+}
+var expando = "jQuery" + now(), uuid = 0, windowData = {};
+
+jQuery.extend({
+	cache: {},
+
+	data: function( elem, name, data ) {
+		elem = elem == window ?
+			windowData :
+			elem;
+
+		var id = elem[ expando ];
+
+		if ( !id )
+			id = elem[ expando ] = ++uuid;
+
+		if ( name && !jQuery.cache[ id ] )
+			jQuery.cache[ id ] = {};

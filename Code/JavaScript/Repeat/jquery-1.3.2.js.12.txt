@@ -1,0 +1,100 @@
+		if ( data !== undefined )
+			jQuery.cache[ id ][ name ] = data;
+
+		return name ?
+			jQuery.cache[ id ][ name ] :
+			id;
+	},
+
+	removeData: function( elem, name ) {
+		elem = elem == window ?
+			windowData :
+			elem;
+
+		var id = elem[ expando ];
+
+		if ( name ) {
+			if ( jQuery.cache[ id ] ) {
+				delete jQuery.cache[ id ][ name ];
+
+				name = "";
+
+				for ( name in jQuery.cache[ id ] )
+					break;
+
+				if ( !name )
+					jQuery.removeData( elem );
+			}
+
+		} else {
+			try {
+				delete elem[ expando ];
+			} catch(e){
+				if ( elem.removeAttribute )
+					elem.removeAttribute( expando );
+			}
+
+			delete jQuery.cache[ id ];
+		}
+	},
+	queue: function( elem, type, data ) {
+		if ( elem ){
+	
+			type = (type || "fx") + "queue";
+	
+			var q = jQuery.data( elem, type );
+	
+			if ( !q || jQuery.isArray(data) )
+				q = jQuery.data( elem, type, jQuery.makeArray(data) );
+			else if( data )
+				q.push( data );
+	
+		}
+		return q;
+	},
+
+	dequeue: function( elem, type ){
+		var queue = jQuery.queue( elem, type ),
+			fn = queue.shift();
+		
+		if( !type || type === "fx" )
+			fn = queue[0];
+			
+		if( fn !== undefined )
+			fn.call(elem);
+	}
+});
+
+jQuery.fn.extend({
+	data: function( key, value ){
+		var parts = key.split(".");
+		parts[1] = parts[1] ? "." + parts[1] : "";
+
+		if ( value === undefined ) {
+			var data = this.triggerHandler("getData" + parts[1] + "!", [parts[0]]);
+
+			if ( data === undefined && this.length )
+				data = jQuery.data( this[0], key );
+
+			return data === undefined && parts[1] ?
+				this.data( parts[0] ) :
+				data;
+		} else
+			return this.trigger("setData" + parts[1] + "!", [parts[0], value]).each(function(){
+				jQuery.data( this, key, value );
+			});
+	},
+
+	removeData: function( key ){
+		return this.each(function(){
+			jQuery.removeData( this, key );
+		});
+	},
+	queue: function(type, data){
+		if ( typeof type !== "string" ) {
+			data = type;
+			type = "fx";
+		}
+
+		if ( data === undefined )
+			return jQuery.queue( this[0], type );

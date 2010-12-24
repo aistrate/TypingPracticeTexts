@@ -1,0 +1,9 @@
+Cheque
+
+A cheque or check (American English) is a document (usually a piece of paper) that orders a payment of money. The person writing the cheque, the drawer, usually has a chequing account where their money is deposited. The drawer writes the various details including the money amount, date, and a payee on the cheque, and signs it, ordering their bank, know as the drawee, to pay this person or company the amount of money stated.
+
+Cheques are a type of bill of exchange and were developed as a way to make payments without the need to carry around large amounts of gold and silver. Paper money also evolved from bills of exchange, and are similar to cheques in that they are a written order to pay the given amount to whoever had it in their possession (the "bearer").
+
+Technically, a cheque is a negotiable instrument instructing a financial institution to pay a specific amount of a specific currency from a specified demand account held in the drawer/depositor's name with that institution. Both the drawer and payee may be natural persons or legal entities. Specifically, cheques are order instruments, as reflected in the formula "Pay to the order of..."--they are not in general payable simply to the bearer (as bearer instruments are), but rather the payee must endorse the cheque, possibly specifying by order to whom it should be paid.
+
+Although cheques have been around since at least the 9th century, it was during the 20th century that cheques became a highly popular non-cash method for making payments and the usage of cheques peaked. By the second half of the 20th century, as cheque processing became automated, billions were issued each year with volumes peaking in or around the early 1990s. Since that time cheque usage has seen significant decline as electronic payment systems started to replace physical cheques. In a number of countries cheques have become a marginal payment system or have been phased out completely.

@@ -1,0 +1,5 @@
+Spreadsheet
+
+A spreadsheet is a computer application that simulates a paper, accounting worksheet. It displays multiple cells that together make up a grid consisting of rows and columns, each cell containing alphanumeric text, numeric values or formulas. A formula defines how the content of that cell is to be calculated from the contents of any other cell (or combination of cells) each time any cell is updated. Spreadsheets are frequently used for financial information because of their ability to re-calculate the entire sheet automatically after a change to a single cell is made.
+
+Visicalc is usually considered the first electronic spreadsheet (although this has been challenged), and it helped turn the Apple II computer into a success and greatly assisted in their widespread application. Lotus 1-2-3 was the leading spreadsheet when DOS was the dominant operating system. Excel now has the largest market share on the Windows and Macintosh platforms.

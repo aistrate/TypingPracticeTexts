@@ -1,0 +1,9 @@
+Murray Gell-Mann
+
+Murray Gell-Mann (born September 15, 1929) is an American physicist who received the 1969 Nobel Prize in physics for his work on the theory of elementary particles. He is currently the Presidential Professor of Physics and Medicine at the University of Southern California.
+
+He formulated the quark model of hadronic resonances, and identified the SU(3) flavor symmetry of the light quarks, extending isospin to include strangeness, which he also discovered. He discovered the V-A theory of chiral neutrinos in collaboration with Richard Feynman. He created current algebra in the 1960s as a way of extracting predictions from quark models when the fundamental theory was still murky, which led to model-independent sum rules confirmed by experiment.
+
+Gell-Mann, along with Maurice Levy, discovered the sigma model of pions, which describes low energy pion interactions. Modifying the integer-charged quark model of Han and Nambu, Fritzsch and Gell-Mann were the first to write down the modern accepted theory of quantum chromodynamics although they did not anticipate asymptotic freedom.
+
+Gell-Mann is responsible for the see-saw theory of neutrino masses, that produces masses at the inverse-GUT scale in any theory with a right-handed neutrino, like the SO(10) model. He is also known to have played a large role in keeping string theory alive through the 1970s, supporting that line of research at a time when it was unpopular.

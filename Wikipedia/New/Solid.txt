@@ -1,0 +1,5 @@
+Solid
+
+Solid is one of the major states of matter. It is characterized by structural rigidity and resistance to changes of shape or volume. Unlike a liquid, a solid object does not flow to take on the shape of its container, nor does it expand to fill the entire volume available to it like a gas does. The atoms in a solid are tightly bound to each other, either in a regular geometric lattice (crystalline solids, which include metals and ordinary water ice) or irregularly (an amorphous solid such as common window glass).
+
+The branch of physics that deals with solids is called solid-state physics, and is the main branch of condensed matter physics (which also includes liquids). Materials science is primarily concerned with the physical and chemical properties of solids. Solid-state chemistry is especially concerned with the synthesis of novel materials, as well as the science of identification and chemical composition.

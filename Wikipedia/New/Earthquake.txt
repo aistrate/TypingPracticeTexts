@@ -1,0 +1,7 @@
+Earthquake
+
+An earthquake (also known as a quake, tremor or temblor) is the result of a sudden release of energy in the Earth's crust that creates seismic waves. The seismicity or seismic activity of an area refers to the frequency, type and size of earthquakes experienced over a period of time. Earthquakes are measured with a seismometer; a device which also records is known as a seismograph. The moment magnitude (or the related and mostly obsolete Richter magnitude) of an earthquake is conventionally reported, with magnitude 3 or lower earthquakes being mostly imperceptible and magnitude 7 causing serious damage over large areas. Intensity of shaking is measured on the modified Mercalli scale.
+
+At the Earth's surface, earthquakes manifest themselves by shaking and sometimes displacing the ground. When a large earthquake epicenter is located offshore, the seabed sometimes suffers sufficient displacement to cause a tsunami. The shaking in earthquakes can also trigger landslides and occasionally volcanic activity.
+
+In its most generic sense, the word earthquake is used to describe any seismic event--whether a natural phenomenon or an event caused by humans--that generates seismic waves. Earthquakes are caused mostly by rupture of geological faults, but also by volcanic activity, landslides, mine blasts, and nuclear tests. An earthquake's point of initial rupture is called its focus or hypocenter. The term epicenter refers to the point at ground level directly above the hypocenter.

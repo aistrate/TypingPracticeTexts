@@ -1,0 +1,7 @@
+Sun Microsystems
+
+Sun Microsystems, Inc. was a company selling computers, computer components, computer software, and information technology services. Sun was founded on February 24, 1982. The company was headquartered in Santa Clara, California (part of Silicon Valley), on the former west campus of the Agnews Developmental Center.
+
+On January 27, 2010, Sun was acquired by Oracle Corporation for US$7.4 billion, based on an agreement signed on April 20, 2009. Sun Microsystems, Inc. was subsequently renamed Oracle America, Inc. 
+
+Sun products included computer servers and workstations based on its own SPARC processors as well as AMD's Opteron and Intel's Xeon processors; storage systems; and, a suite of software products including the Solaris operating system, developer tools, Web infrastructure software, and identity management applications. Other technologies of note include the Java platform, MySQL, and NFS. Sun was a proponent of open systems in general and Unix in particular, and a major contributor to open source software. Sun's main manufacturing facilities were located in Hillsboro, Oregon and Linlithgow, Scotland.

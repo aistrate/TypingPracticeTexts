@@ -1,0 +1,7 @@
+Scheme (programming language)
+
+Scheme is one of the two main dialects of the programming language Lisp. Unlike Common Lisp, the other main dialect, Scheme follows a minimalist design philosophy specifying a small standard core with powerful tools for language extension. Its compactness and elegance have made it popular with educators, language designers, programmers, implementors, and hobbyists. The language's diverse appeal is seen as a strong point, though the consequently wide divergence between implementations is seen as one of the language's weak points.
+
+Scheme was developed at the MIT AI Lab by Guy L. Steele and Gerald Jay Sussman who introduced it to the academic world via a series of memos, now referred to as the Lambda Papers, over the period 1975-1980. The Scheme language is standardized in the official IEEE standard, and a de facto standard called the Revisedn Report on the Algorithmic Language Scheme (RnRS). The most widely implemented standard is R5RS (1998), and a new standard R6RS was ratified in 2007.
+
+Scheme was the first dialect of Lisp to choose lexical scope and the first to require implementations to perform tail-call optimization. It was also one of the first programming languages to support first-class continuations. It had a significant influence on the effort that led to the development of its sister, Common Lisp.

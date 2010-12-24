@@ -1,0 +1,7 @@
+Dialect
+
+The term dialect (from the Greek Language word 'dialektos') is used in two distinct ways, even by linguists. One usage refers to a variety of a language that is characteristic of a particular group of the language's speakers. The term is applied most often to regional speech patterns, but a dialect may also be defined by other factors, such as social class. A dialect that is associated with a particular social class can be termed a sociolect; a regional dialect may be termed a regiolect or topolect. The other usage refers to a language socially subordinate to a regional or national standard language, often historically cognate to the standard, but not a variety of it or in any other sense derived from it. This more precise usage enables distinguishing between varieties of a language, such as the French spoken in Nice, France, and local languages distinct from the superordinate language, e.g. Nissart, the traditional native Romance language of Nice, known in French as Nicard.
+
+A dialect is distinguished by its vocabulary, grammar, and pronunciation (phonology, including prosody). Where a distinction can be made only in terms of pronunciation, the term accent is appropriate, not dialect. Other speech varieties include: standard languages, which are standardized for public performance (for example, a written standard); jargons, which are characterized by differences in lexicon (vocabulary); slang; patois; pidgins or argots.
+
+The particular speech patterns used by an individual are termed an idiolect.

@@ -1,0 +1,9 @@
+Thermodynamics
+
+Thermodynamics is the science of energy conversion involving heat and other forms of energy, most notably mechanical work. It studies and interrelates the macroscopic variables, such as temperature, volume and pressure, which describe physical, thermodynamic systems.
+
+Historically, thermodynamics developed out of a desire to increase the efficiency of early steam engines, particularly through the work of French physicist Nicolas Leonard Sadi Carnot (1824) who believed that engine efficiency was the key that could help France win the Napoleonic Wars. Scottish physicist Lord Kelvin was the first to formulate a concise definition of thermodynamics when he stated in 1854:
+
+"Thermo-dynamics is the subject of the relation of heat to forces acting between contiguous parts of bodies, and the relation of heat to electrical agency."
+
+Two fields of thermodynamics emerged in the following decades. Statistical thermodynamics, or statistical mechanics, (1860) concerned itself with statistical predictions of the collective motion of particles from their microscopic behavior, while chemical thermodynamics (1873) studies the nature of the role of entropy in the process of chemical reaction.

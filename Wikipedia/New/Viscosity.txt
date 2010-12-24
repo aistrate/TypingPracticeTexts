@@ -1,0 +1,7 @@
+Viscosity
+
+Viscosity is a measure of the resistance of a fluid which is being deformed by either shear stress or tensile stress. In everyday terms (and for fluids only), viscosity is "thickness" or "internal friction". Thus, water is "thin", having a lower viscosity, while honey is "thick", having a higher viscosity. Put simply, the less viscous the fluid is, the greater its ease of movement (fluidity).
+
+Viscosity describes a fluid's internal resistance to flow and may be thought of as a measure of fluid friction. For example, high-viscosity felsic magma will create a tall, steep stratovolcano, because it cannot flow far before it cools, while low-viscosity mafic lava will create a wide, shallow-sloped shield volcano. All real fluids (except superfluids) have some resistance to stress and therefore are viscous, but a fluid which has no resistance to shear stress is known as an ideal fluid or inviscid fluid.
+
+The study of flowing matter is known as rheology, which includes viscosity and related concepts.

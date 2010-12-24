@@ -1,0 +1,11 @@
+First-class function
+
+In computer science, a programming language is said to support first-class functions (also called function literals, function types) if it treats functions as first-class objects. Specifically, this means that the language supports constructing new functions during the execution of a program, storing them in data structures, passing them as arguments to other functions, and returning them as the values of other functions. This concept doesn't cover any means external to the language and program (metaprogramming), such as invoking a compiler or an eval function to create a new function.
+
+These features are a necessity for the functional programming style, in which (for instance) the use of higher-order functions is a standard practice. A simple example of a higher-ordered function is the map or mapcar function, which takes as its arguments a function and a list, and returns the list formed by applying the function to each member of the list. For a language to support map, it must support passing a function as an argument.
+
+There are certain implementation difficulties in passing functions as arguments and returning them as results. Historically, these were termed the funarg problems, the name coming from "function argument".
+
+In type theory, the type of functions accepting values of type A and returning values of type B may be written as A -> B or B^A. In the Curry-Howard correspondence, function types are related to logical implication; lambda abstraction corresponds to discharging hypothetical assumptions and function application corresponds to the modus ponens inference rule. Besides the usual case of programming functions, type theory also uses first-class functions to model associative arrays and similar data structures.
+
+In category-theoretical accounts of programming, the availability of first-class functions corresponds to the closed category assumption. For instance, the simply-typed lambda calculus corresponds to the internal language of cartesian closed categories.

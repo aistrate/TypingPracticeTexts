@@ -1,0 +1,11 @@
+Infinitesimal calculus
+
+Infinitesimal calculus was independently developed by both Leibniz and Newton starting in the 1660s. They drew on the work of such mathematicians as Barrow and Descartes. It consisted of differential calculus and integral calculus, respectively used for the techniques of differentiation and integration.
+
+Newton sought to remove the use of infinitesimals from his fluxional calculus, preferring to talk of velocities as in "For by the ultimate velocity is meant... the ultimate ratio of evanescent quantities". Leibniz embraced the concept fully calling differentials "...an evanescent quantity which yet retains the character of that which is disappearing", and his notation for them is the current symbolism in calculus, though Newton's occasionally appears in physics and other fields.
+
+In early calculus the use of infinitesimal quantities was thought unrigorous, and was fiercely criticized by a number of authors, most notably Michel Rolle and Bishop Berkeley. Bishop Berkeley famously described infinitesimals as the ghosts of departed quantities in his book The Analyst in 1734.
+
+Several mathematicians, including Maclaurin, attempted to prove the soundness of using infinitesimals, but it would be 150 years later, due to the work of Cauchy and Weierstrass, where a means was finally found to avoid mere "notions" of infinitely small quantities, that the foundations of differential and integral calculus were made firm. In Cauchy's writing, we find a versatile spectrum of foundational approaches, including a definition of continuity in terms of infinitesimals, and a (somewhat imprecise) prototype of an (epsilon, delta)-definition of limit in the definition of differentiation. In his work Weierstrass formalized the concept of limit and eliminated infinitesimals. Following the work of Weierstrass, it eventually became common to base calculus on limits instead of infinitesimal quantities.
+
+This approach formalized by Weierstrass came to be known as the standard calculus. Informally, the name "infinitesimal calculus" became commonly used to refer to Weierstrass' approach.

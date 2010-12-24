@@ -1,0 +1,7 @@
+Forth (programming language)
+
+Forth is a structured, imperative, reflective, extensible, stack-based computer programming language and programming environment. Although not an acronym, the language's name is sometimes spelled with all capital letters as FORTH, following the customary usage during its earlier years.
+
+A procedural programming language without type checking, Forth features both interactive execution of commands (making it suitable as a shell for systems that lack a more formal operating system) and the ability to compile sequences of commands for later execution. Some Forth implementations (usually early versions or those written to be extremely portable) compile threaded code, but many implementations today generate optimized machine code like other language compilers.
+
+Although not as popular as other programming systems, Forth has enough support to keep several language vendors and contractors in business. Forth is currently used in boot loaders such as Open Firmware, space applications, and other embedded systems. Gforth, an implementation of Forth by the GNU Project is actively maintained, the last release in December 2008. The 1994 standard is currently undergoing revision, provisionally titled Forth 200x.

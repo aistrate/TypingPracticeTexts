@@ -1,0 +1,7 @@
+Electric charge
+
+Electric charge is a physical property of matter which causes it to experience a force when near other electrically charged matter. Classically, electric charge comes in two types. These are called positive and negative. Two positively charged substances, or objects, experience a mutual repulsive force, as do two negatively charged objects. Positively charged objects and negatively charged objects experience an attractive force. The SI unit of electric charge is the coulomb (C). The study of how charged substances interact is classical electrodynamics, which is accurate insofar as quantum effects can be ignored.
+
+The electric charge is a fundamental conserved property of some subatomic particles, which determines their electromagnetic interaction. Electrically charged matter is influenced by, and produces, electromagnetic fields. The interaction between a moving charge and an electromagnetic field is the source of the electromagnetic force, which is one of the four fundamental forces.
+
+Twentieth-century experiments demonstrated that electric charge is quantized; that is, it comes in multiples of individual small units called the elementary charge, e, approximately equal to 1.602x10^(-19) coulombs (except for particles called quarks which have charges that are multiples of -e). The proton has a charge of e, and the electron has a charge of -e. The study of charged particles, and how their interactions are mediated by photons, is quantum electrodynamics.

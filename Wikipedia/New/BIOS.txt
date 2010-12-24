@@ -1,0 +1,21 @@
+BIOS
+
+In IBM PC Compatible computers, the basic input/output system (BIOS), also known as the System BIOS, is a de facto standard defining a firmware interface.
+
+The BIOS software is built into the PC, and is the first code run by a PC when powered on ('boot firmware'). The primary function of the BIOS is to load and start an operating system. When the PC starts up, the first job for the BIOS is to initialize and identify system devices such as the video display card, keyboard and mouse, hard disk, CD/DVD drive and other hardware. The BIOS then locates software held on a peripheral device (designated as a 'boot device'), such as a hard disk or a CD, and loads and executes that software, giving it control of the PC. This process is known as booting, or booting up, which is short for bootstrapping.
+
+BIOS software is stored on a non-volatile ROM chip built into the system on the mother board. The BIOS software is specifically designed to work with the particular type of system in question, including having a knowledge of the workings of various devices that make up the complementary chipset of the system. In modern computer systems, the BIOS chip's contents can be rewritten allowing BIOS software to be upgraded.
+
+A BIOS will also have a user interface (or UI for short). Typically this is a menu system accessed by pressing a certain key on the keyboard when the PC starts. In the BIOS UI, a user can:
+
+- configure hardware
+- set the system clock
+- enable or disable system components
+- select which devices are eligible to be a potential boot device
+- set various password prompts, such as a password for securing access to the BIOS UI functions itself and preventing malicious users from booting the system from unauthorized peripheral devices.
+
+The BIOS provides a small library of basic input/output functions used to operate and control the peripherals such as the keyboard, text display functions and so forth, and these software library functions are callable by external software. In the IBM PC and AT, certain peripheral cards such as hard-drive controllers and video display adapters carried their own BIOS extension ROM, which provided additional functionality. Operating systems and executive software, designed to supersede this basic firmware functionality, will provide replacement software interfaces to applications.
+
+The role of the BIOS has changed over time; today BIOS is a legacy system, superseded by the more complex EFI (EFI), but BIOS remains in widespread use, and EFI booting has only been supported in Microsoft OS products supporting GPT  and Linux Kernels 2.6.1 and greater builds 
+
+BIOS is primarily associated with the 16-bit, 32-bit, and the beginning of the 64-bit architecture eras, while EFI is used for some newer 32-bit and 64-bit architectures. Today BIOS is primarily used for booting a system and for video initialization (in X.org); but otherwise is not used during the ordinary running of a system, while in early systems (particularly in the 16-bit era), BIOS was used for hardware access - operating systems (notably MS-DOS) would call the BIOS rather than directly accessing the hardware. In the 32-bit era and later, operating systems instead generally directly accessed the hardware using their own device drivers. However, the distinction between BIOS and EFI is rarely made in terminology by the average computer user, making BIOS a catch-all term for both systems.

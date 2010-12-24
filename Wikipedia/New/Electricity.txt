@@ -1,0 +1,15 @@
+Electricity
+
+Electricity (from the New Latin electricus, "amber-like", from the Greek (electron) meaning amber) is a general term encompassing a variety of phenomena resulting from the presence and flow of electric charge. These include many easily recognizable phenomena, such as lightning and static electricity, but in addition, less familiar concepts, such as the electromagnetic field and electromagnetic induction.
+
+Usage
+
+In general usage, the word "electricity" adequately refers to a number of physical effects. In scientific usage, however, the term is vague, and these related, but distinct, concepts are better identified by more precise terms:
+
+- Electric charge: a property of some subatomic particles, which determines their electromagnetic interactions. Electrically charged matter is influenced by, and produces, electromagnetic fields.
+- Electric current: a movement or flow of electrically charged particles, typically measured in amperes.
+- Electric field: an influence produced by an electric charge on other charges in its vicinity.
+- Electric potential: the capacity of an electric field to do work on an electric charge, typically measured in volts.
+- Electromagnetism: a fundamental interaction between the magnetic field and the presence and motion of an electric charge.
+
+Electrical phenomena have been studied since antiquity, though advances in the science were not made until the seventeenth and eighteenth centuries. Practical applications for electricity however remained few, and it would not be until the late nineteenth century that engineers were able to put it to industrial and residential use. The rapid expansion in electrical technology at this time transformed industry and society. Electricity's extraordinary versatility as a source of energy means it can be put to an almost limitless set of applications which include transport, heating, lighting, communications, and computation. Electrical power is the backbone of modern industrial society, and is expected to remain so for the foreseeable future.

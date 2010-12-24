@@ -1,0 +1,9 @@
+Set theory
+
+Set theory is the branch of mathematics that studies sets, which are collections of objects. Although any type of object can be collected into a set, set theory is applied most often to objects that are relevant to mathematics.
+
+The modern study of set theory was initiated by Georg Cantor and Richard Dedekind in the 1870s. After the discovery of paradoxes in naive set theory, numerous axiom systems were proposed in the early twentieth century, of which the Zermelo-Fraenkel axioms, with the axiom of choice, are the best-known.
+
+The language of set theory could be used in the definitions of nearly all mathematical objects, such as functions, and concepts of set theory are integrated throughout the mathematics curriculum. Elementary facts about sets and set membership can be introduced in primary school, along with Venn and Euler diagrams, to study collections of commonplace physical objects. Elementary operations such as set union and intersection can be studied in this context. More advanced concepts such as cardinality are a standard part of the undergraduate mathematics curriculum.
+
+Set theory is commonly employed as a foundational system for mathematics, particularly in the form of Zermelo-Fraenkel set theory with the axiom of choice. Beyond its foundational role, set theory is a branch of mathematics in its own right, with an active research community. Contemporary research into set theory includes a diverse collection of topics, ranging from the structure of the real number line to the study of the consistency of large cardinals.

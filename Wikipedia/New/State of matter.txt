@@ -1,0 +1,13 @@
+State of matter
+
+States of matter are the distinct forms that different phases of matter take on. Historically, the distinction is made based on qualitative differences in bulk properties. Solid is the state in which matter maintains a fixed volume and shape; liquid is the state in which matter maintains a fixed volume but adapts to the shape of its container; and gas is the state in which matter expands to occupy whatever volume is available.
+
+States of matter are also distinguished by pressure and temperature conditions, transitioning to other phases as these conditions change to favor their existence; for example, solid transitions to liquid with an increase in temperature.
+
+More recently, distinctions between states have been based on differences in molecular interrelationships. Solid is the state in which intermolecular attractions keep the molecules in fixed spatial relationships. Liquid is the state in which intermolecular attractions keep molecules in proximity, but do not keep the molecules in fixed relationships. Gas is that state in which the molecules are comparatively separated and intermolecular attractions have relatively little effect on their respective motions. Plasma is a highly ionized gas that occurs at high temperatures. The intermolecular forces created by ionic attractions and repulsions give these compositions distinct properties, for which reason plasma is described as a fourth state of matter.
+
+Forms of matter that are not composed of molecules and are organized by different forces can also be considered different states of matter. Fermionic condensate and the quark-gluon plasma are examples.
+
+Although solid, gas and liquid are the most common states of matter on Earth, much of the baryonic matter of universe is in the form of hot plasma, both as rarefied interstellar medium and as dense stars.
+
+States of matter may also be defined in terms of phase transitions. A phase transition indicates a change in structure and can be recognized by an abrupt change in properties. By this definition, a distinct state of matter is any set of states distinguished from any other set of states by a phase transition. Water can be said to have several distinct solid states. The appearance of superconductivity is associated with a phase transition, so there are superconductive states. Likewise, liquid crystal states and ferromagnetic states are demarcated by phase transitions and have distinctive properties.

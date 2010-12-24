@@ -1,0 +1,9 @@
+iOS (Apple)
+
+iOS (known as iPhone OS prior to June 2010) is Apple's mobile operating system. Developed originally for the iPhone, it has since been used on the iPod Touch, iPad and Apple TV as well. Apple does not permit the OS to run on third-party hardware. As of October 20, 2010 (2010 -10-20), Apple's App Store contains more than 300,000 iOS applications, which have collectively been downloaded more than 7.5 billion times. As of May 2010, it had a 15.4% share of the smartphone operating system market in terms of units sold, third behind Symbian and RIM's Blackberry, but accounted for 59% of mobile web consumption (not including the iPad) in North America.
+
+The user interface of iOS is based on the concept of direct manipulation, using multi-touch gestures. Interface control elements consist of sliders, switches, and buttons. The response to user input is immediate and provides a fluid interface. Interaction with the OS includes gestures such as swiping, tapping, pinching, and reverse pinching. Internal accelerometers are used by some applications to respond to shaking the device (one common result is the undo command) or rotating it in three dimensions (one common result is switching from portrait to landscape mode).
+
+iOS is derived from Mac OS X, with which it shares the Darwin foundation, and is therefore a Unix-like operating system by nature.
+
+In iOS, there are four abstraction layers: the Core OS layer, the Core Services layer, the Media layer, and the Cocoa Touch layer. The operating system uses roughly 500 megabytes of the device's storage, varying for each model.

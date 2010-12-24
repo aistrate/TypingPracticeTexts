@@ -1,0 +1,9 @@
+Henri Poincare
+
+Jules Henri Poincare (29 April 1854 - 17 July 1912) was a French mathematician, theoretical physicist, and a philosopher of science. He is often described as a polymath, and in mathematics as The Last Universalist, since he excelled in all fields of the discipline as it existed during his lifetime.
+
+As a mathematician and physicist, he made many original fundamental contributions to pure and applied mathematics, mathematical physics, and celestial mechanics. He was responsible for formulating the Poincare conjecture, one of the most famous problems in mathematics. In his research on the three-body problem, Poincare became the first person to discover a chaotic deterministic system which laid the foundations of modern chaos theory. He is considered to be one of the founders of the field of topology.
+
+Poincare introduced the modern principle of relativity and was the first to present the Lorentz transformations in their modern symmetrical form. Poincare discovered the remaining relativistic velocity transformations and recorded them in a letter to Dutch physicist Hendrik Lorentz (1853-1928) in 1905. Thus he obtained perfect invariance of all of Maxwell's equations, an important step in the formulation of the theory of special relativity.
+
+The Poincare group used in physics and mathematics was named after him.

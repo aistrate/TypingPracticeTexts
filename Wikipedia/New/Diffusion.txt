@@ -1,0 +1,7 @@
+Diffusion
+
+Diffusion describes the spread of particles through random motion from regions of higher concentration to regions of lower concentration. The time dependence of the statistical distribution in space is given by the diffusion equation. The concept of diffusion is tied to that of mass transfer driven by a concentration gradient, but diffusion can still occur when there is no concentration gradient (but there will be no net flux).
+
+The concept of diffusion emerged from physical sciences. The paradigmatic examples were heat diffusion, molecular diffusion and Brownian motion. Their mathematical description was elaborated by Joseph Fourier in 1822, Adolf Fick in 1855, and by Albert Einstein and Marian Smoluchowski in 1905/06, respectively.
+
+Applications outside physics were pioneered by Louis Bachelier who in 1900 used a random walk model to describe price fluctuations on financial markets. In a less quantitative way, the concept of diffusion is invoked in the social sciences to describe the spread of ideas (Diffusion of innovations, Lexical diffusion, Trans-cultural diffusion).

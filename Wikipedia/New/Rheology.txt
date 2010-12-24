@@ -1,0 +1,11 @@
+Rheology
+
+Rheology is the study of the flow of matter: primarily in the liquid state, but also as 'soft solids' or solids under conditions in which they respond with plastic flow rather than deforming elastically in response to an applied force. It applies to substances which have a complex molecular structure, such as muds, sludges, suspensions, polymers and other glass formers (e.g. silicates), as well as many foods and additives, bodily fluids (e.g. blood) and other biological materials.
+
+The flow of these substances cannot be characterized by a single value of viscosity (at a fixed temperature). While the viscosity of liquids normally varies with temperature, it is variations with other factors which are studied in rheology. For example, ketchup can have its viscosity reduced by shaking (or other forms of mechanical agitation) but water cannot. Since Sir Isaac Newton originated the concept of viscosity, the study of variable viscosity liquids is also often called Non-Newtonian fluid mechanics.
+
+The term rheology was coined by Eugene C. Bingham, a professor at Lafayette College, in 1920, from a suggestion by a colleague, Markus Reiner. The term was inspired by the aphorism of Simplicius (often misattributed to Heraclitus), panta rei, "everything flows" Plato in his dialogue Cratylus recounts on Heraclitus' saying that "all things move and nothing remains still"; he also compares the etymology of the name of the Greek goddess Rhea to the Greek name for flow. He notes the etymological relationship of the names of "streams" given to Cronus (Chronos - time) and Rhea (flow or space) and he argues that this relationship is not accidental.
+
+Compare also words ending in -rhea, such as gonorrhea, galactorrhoea, steatorrhea, diarrhea or diarrhea and similar words.
+
+The experimental characterization of a material's rheological behavior is known as rheometry, although the term rheology is frequently used synonymously with rheometry, particularly by experimentalists. Theoretical aspects of rheology are the relation of the flow/deformation behavior of material and its internal structure (e.g., the orientation and elongation of polymer molecules), and the flow/deformation behavior of materials that cannot be described by classical fluid mechanics or elasticity.

@@ -1,0 +1,49 @@
+int block_write_full_page(struct page *page, get_block_t *get_block,
+			struct writeback_control *wbc)
+{
+	return block_write_full_page_endio(page, get_block, wbc,
+					   end_buffer_async_write);
+}
+EXPORT_SYMBOL(block_write_full_page);
+
+sector_t generic_block_bmap(struct address_space *mapping, sector_t block,
+			    get_block_t *get_block)
+{
+	struct buffer_head tmp;
+	struct inode *inode = mapping->host;
+	tmp.b_state = 0;
+	tmp.b_blocknr = 0;
+	tmp.b_size = 1 << inode->i_blkbits;
+	get_block(inode, block, &tmp, 0);
+	return tmp.b_blocknr;
+}
+EXPORT_SYMBOL(generic_block_bmap);
+
+static void end_bio_bh_io_sync(struct bio *bio, int err)
+{
+	struct buffer_head *bh = bio->bi_private;
+
+	if (err == -EOPNOTSUPP) {
+		set_bit(BIO_EOPNOTSUPP, &bio->bi_flags);
+	}
+
+	if (unlikely (test_bit(BIO_QUIET,&bio->bi_flags)))
+		set_bit(BH_Quiet, &bh->b_state);
+
+	bh->b_end_io(bh, test_bit(BIO_UPTODATE, &bio->bi_flags));
+	bio_put(bio);
+}
+
+int submit_bh(int rw, struct buffer_head * bh)
+{
+	struct bio *bio;
+	int ret = 0;
+
+	BUG_ON(!buffer_locked(bh));
+	BUG_ON(!buffer_mapped(bh));
+	BUG_ON(!bh->b_end_io);
+	BUG_ON(buffer_delay(bh));
+	BUG_ON(buffer_unwritten(bh));
+
+	if (test_set_buffer_req(bh) && (rw & WRITE))
+		clear_buffer_write_io_error(bh);

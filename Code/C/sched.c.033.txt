@@ -1,0 +1,49 @@
+	if (irq_delta && sched_feat(NONIRQ_POWER))
+		sched_rt_avg_update(rq, irq_delta);
+}
+
+#else 
+
+static void update_rq_clock_task(struct rq *rq, s64 delta)
+{
+	rq->clock_task += delta;
+}
+
+#endif 
+
+#include "sched_idletask.c"
+#include "sched_fair.c"
+#include "sched_rt.c"
+#include "sched_stoptask.c"
+#ifdef CONFIG_SCHED_DEBUG
+# include "sched_debug.c"
+#endif
+
+void sched_set_stop_task(int cpu, struct task_struct *stop)
+{
+	struct sched_param param = { .sched_priority = MAX_RT_PRIO - 1 };
+	struct task_struct *old_stop = cpu_rq(cpu)->stop;
+
+	if (stop) {
+		
+		sched_setscheduler_nocheck(stop, SCHED_FIFO, &param);
+
+		stop->sched_class = &stop_sched_class;
+	}
+
+	cpu_rq(cpu)->stop = stop;
+
+	if (old_stop) {
+		
+		old_stop->sched_class = &rt_sched_class;
+	}
+}
+
+static inline int __normal_prio(struct task_struct *p)
+{
+	return p->static_prio;
+}
+
+static inline int normal_prio(struct task_struct *p)
+{
+	int prio;

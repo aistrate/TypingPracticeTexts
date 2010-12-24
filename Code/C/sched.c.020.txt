@@ -1,0 +1,50 @@
+	if (cpu == smp_processor_id())
+		return;
+
+	if (rq->curr != rq->idle)
+		return;
+
+	set_tsk_need_resched(rq->idle);
+
+	smp_mb();
+	if (!tsk_is_polling(rq->idle))
+		smp_send_reschedule(cpu);
+}
+
+#endif 
+
+static u64 sched_avg_period(void)
+{
+	return (u64)sysctl_sched_time_avg * NSEC_PER_MSEC / 2;
+}
+
+static void sched_avg_update(struct rq *rq)
+{
+	s64 period = sched_avg_period();
+
+	while ((s64)(rq->clock - rq->age_stamp) > period) {
+		
+		asm("" : "+rm" (rq->age_stamp));
+		rq->age_stamp += period;
+		rq->rt_avg /= 2;
+	}
+}
+
+static void sched_rt_avg_update(struct rq *rq, u64 rt_delta)
+{
+	rq->rt_avg += rt_delta;
+	sched_avg_update(rq);
+}
+
+#else 
+static void resched_task(struct task_struct *p)
+{
+	assert_raw_spin_locked(&task_rq(p)->lock);
+	set_tsk_need_resched(p);
+}
+
+static void sched_rt_avg_update(struct rq *rq, u64 rt_delta)
+{
+}
+
+static void sched_avg_update(struct rq *rq)

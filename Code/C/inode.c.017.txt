@@ -1,0 +1,50 @@
+			    PageWriteback(page) ||
+			    page->index != idx) {
+				done = 1;
+				unlock_page(page);
+				break;
+			}
+			if (page_has_buffers(page)) {
+				bh = head = page_buffers(page);
+				do {
+					if (!buffer_delay(bh) &&
+					    !buffer_unwritten(bh))
+						done = 1;
+					bh = bh->b_this_page;
+				} while (!done && (bh != head));
+			}
+			unlock_page(page);
+			if (done)
+				break;
+			idx++;
+			num++;
+			if (num >= max_pages) {
+				done = 1;
+				break;
+			}
+		}
+		pagevec_release(&pvec);
+	}
+	return num;
+}
+
+int ext4_map_blocks(handle_t *handle, struct inode *inode,
+		    struct ext4_map_blocks *map, int flags)
+{
+	int retval;
+
+	map->m_flags = 0;
+	ext_debug("ext4_map_blocks(): inode %lu, flag %d, max_blocks %u,"
+		  "logical block %lu\n", inode->i_ino, flags, map->m_len,
+		  (unsigned long) map->m_lblk);
+	
+	down_read((&EXT4_I(inode)->i_data_sem));
+	if (ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS)) {
+		retval = ext4_ext_map_blocks(handle, inode, map, 0);
+	} else {
+		retval = ext4_ind_map_blocks(handle, inode, map, 0);
+	}
+	up_read((&EXT4_I(inode)->i_data_sem));
+
+	if (retval > 0 && map->m_flags & EXT4_MAP_MAPPED) {
+		int ret = check_block_validity(inode, map);

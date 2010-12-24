@@ -1,0 +1,50 @@
+				return ERR_CAST(inode);
+			}
+		}
+	}
+	return d_splice_alias(inode, dentry);
+}
+
+struct dentry *ext3_get_parent(struct dentry *child)
+{
+	unsigned long ino;
+	struct qstr dotdot = {.name = "..", .len = 2};
+	struct ext3_dir_entry_2 * de;
+	struct buffer_head *bh;
+
+	bh = ext3_find_entry(child->d_inode, &dotdot, &de);
+	if (!bh)
+		return ERR_PTR(-ENOENT);
+	ino = le32_to_cpu(de->inode);
+	brelse(bh);
+
+	if (!ext3_valid_inum(child->d_inode->i_sb, ino)) {
+		ext3_error(child->d_inode->i_sb, "ext3_get_parent",
+			   "bad inode number: %lu", ino);
+		return ERR_PTR(-EIO);
+	}
+
+	return d_obtain_alias(ext3_iget(child->d_inode->i_sb, ino));
+}
+
+#define S_SHIFT 12
+static unsigned char ext3_type_by_mode[S_IFMT >> S_SHIFT] = {
+	[S_IFREG >> S_SHIFT]	= EXT3_FT_REG_FILE,
+	[S_IFDIR >> S_SHIFT]	= EXT3_FT_DIR,
+	[S_IFCHR >> S_SHIFT]	= EXT3_FT_CHRDEV,
+	[S_IFBLK >> S_SHIFT]	= EXT3_FT_BLKDEV,
+	[S_IFIFO >> S_SHIFT]	= EXT3_FT_FIFO,
+	[S_IFSOCK >> S_SHIFT]	= EXT3_FT_SOCK,
+	[S_IFLNK >> S_SHIFT]	= EXT3_FT_SYMLINK,
+};
+
+static inline void ext3_set_de_type(struct super_block *sb,
+				struct ext3_dir_entry_2 *de,
+				umode_t mode) {
+	if (EXT3_HAS_INCOMPAT_FEATURE(sb, EXT3_FEATURE_INCOMPAT_FILETYPE))
+		de->file_type = ext3_type_by_mode[(mode & S_IFMT)>>S_SHIFT];
+}
+
+static struct ext3_dir_entry_2 *
+dx_move_dirents(char *from, char *to, struct dx_map_entry *map, int count)
+{

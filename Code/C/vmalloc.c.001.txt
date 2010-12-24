@@ -1,0 +1,50 @@
+#include <linux/vmalloc.h>
+#include <linux/mm.h>
+#include <linux/module.h>
+#include <linux/highmem.h>
+#include <linux/sched.h>
+#include <linux/slab.h>
+#include <linux/spinlock.h>
+#include <linux/interrupt.h>
+#include <linux/proc_fs.h>
+#include <linux/seq_file.h>
+#include <linux/debugobjects.h>
+#include <linux/kallsyms.h>
+#include <linux/list.h>
+#include <linux/rbtree.h>
+#include <linux/radix-tree.h>
+#include <linux/rcupdate.h>
+#include <linux/pfn.h>
+#include <linux/kmemleak.h>
+#include <asm/atomic.h>
+#include <asm/uaccess.h>
+#include <asm/tlbflush.h>
+#include <asm/shmparam.h>
+
+static void vunmap_pte_range(pmd_t *pmd, unsigned long addr, unsigned long end)
+{
+	pte_t *pte;
+
+	pte = pte_offset_kernel(pmd, addr);
+	do {
+		pte_t ptent = ptep_get_and_clear(&init_mm, addr, pte);
+		WARN_ON(!pte_none(ptent) && !pte_present(ptent));
+	} while (pte++, addr += PAGE_SIZE, addr != end);
+}
+
+static void vunmap_pmd_range(pud_t *pud, unsigned long addr, unsigned long end)
+{
+	pmd_t *pmd;
+	unsigned long next;
+
+	pmd = pmd_offset(pud, addr);
+	do {
+		next = pmd_addr_end(addr, end);
+		if (pmd_none_or_clear_bad(pmd))
+			continue;
+		vunmap_pte_range(pmd, addr, next);
+	} while (pmd++, addr = next, addr != end);
+}
+
+static void vunmap_pud_range(pgd_t *pgd, unsigned long addr, unsigned long end)
+{

@@ -1,0 +1,50 @@
+	int uptodate = PageUptodate(page);
+
+	do {
+		if (!buffer_mapped(bh)) {
+			init_buffer(bh, NULL, NULL);
+			bh->b_bdev = bdev;
+			bh->b_blocknr = block;
+			if (uptodate)
+				set_buffer_uptodate(bh);
+			set_buffer_mapped(bh);
+		}
+		block++;
+		bh = bh->b_this_page;
+	} while (bh != head);
+}
+
+static struct page *
+grow_dev_page(struct block_device *bdev, sector_t block,
+		pgoff_t index, int size)
+{
+	struct inode *inode = bdev->bd_inode;
+	struct page *page;
+	struct buffer_head *bh;
+
+	page = find_or_create_page(inode->i_mapping, index,
+		(mapping_gfp_mask(inode->i_mapping) & ~__GFP_FS)|__GFP_MOVABLE);
+	if (!page)
+		return NULL;
+
+	BUG_ON(!PageLocked(page));
+
+	if (page_has_buffers(page)) {
+		bh = page_buffers(page);
+		if (bh->b_size == size) {
+			init_page_buffers(page, bdev, block, size);
+			return page;
+		}
+		if (!try_to_free_buffers(page))
+			goto failed;
+	}
+
+	bh = alloc_page_buffers(page, size, 0);
+	if (!bh)
+		goto failed;
+
+	spin_lock(&inode->i_mapping->private_lock);
+	link_dev_buffers(page, bh);
+	init_page_buffers(page, bdev, block, size);
+	spin_unlock(&inode->i_mapping->private_lock);
+	return page;

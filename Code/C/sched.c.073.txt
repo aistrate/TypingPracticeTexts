@@ -1,0 +1,49 @@
+				struct sched_param *param, bool user)
+{
+	int retval, oldprio, oldpolicy = -1, on_rq, running;
+	unsigned long flags;
+	const struct sched_class *prev_class;
+	struct rq *rq;
+	int reset_on_fork;
+
+	BUG_ON(in_interrupt());
+recheck:
+	
+	if (policy < 0) {
+		reset_on_fork = p->sched_reset_on_fork;
+		policy = oldpolicy = p->policy;
+	} else {
+		reset_on_fork = !!(policy & SCHED_RESET_ON_FORK);
+		policy &= ~SCHED_RESET_ON_FORK;
+
+		if (policy != SCHED_FIFO && policy != SCHED_RR &&
+				policy != SCHED_NORMAL && policy != SCHED_BATCH &&
+				policy != SCHED_IDLE)
+			return -EINVAL;
+	}
+
+	if (param->sched_priority < 0 ||
+	    (p->mm && param->sched_priority > MAX_USER_RT_PRIO-1) ||
+	    (!p->mm && param->sched_priority > MAX_RT_PRIO-1))
+		return -EINVAL;
+	if (rt_policy(policy) != (param->sched_priority != 0))
+		return -EINVAL;
+
+	if (user && !capable(CAP_SYS_NICE)) {
+		if (rt_policy(policy)) {
+			unsigned long rlim_rtprio =
+					task_rlimit(p, RLIMIT_RTPRIO);
+
+			if (policy != p->policy && !rlim_rtprio)
+				return -EPERM;
+
+			if (param->sched_priority > p->rt_priority &&
+			    param->sched_priority > rlim_rtprio)
+				return -EPERM;
+		}
+		
+		if (p->policy == SCHED_IDLE && policy != SCHED_IDLE)
+			return -EPERM;
+
+		if (!check_same_owner(p))
+			return -EPERM;

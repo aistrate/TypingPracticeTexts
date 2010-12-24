@@ -1,0 +1,50 @@
+				return bh;
+			}
+		}
+		brelse (bh);
+		
+		retval = ext3_htree_next_block(dir, hash, frame,
+					       frames, NULL);
+		if (retval < 0) {
+			ext3_warning(sb, __func__,
+			     "error reading index page in directory #%lu",
+			     dir->i_ino);
+			*err = retval;
+			goto errout;
+		}
+	} while (retval == 1);
+
+	*err = -ENOENT;
+errout:
+	dxtrace(printk("%s not found\n", name));
+	dx_release (frames);
+	return NULL;
+}
+
+static struct dentry *ext3_lookup(struct inode * dir, struct dentry *dentry, struct nameidata *nd)
+{
+	struct inode * inode;
+	struct ext3_dir_entry_2 * de;
+	struct buffer_head * bh;
+
+	if (dentry->d_name.len > EXT3_NAME_LEN)
+		return ERR_PTR(-ENAMETOOLONG);
+
+	bh = ext3_find_entry(dir, &dentry->d_name, &de);
+	inode = NULL;
+	if (bh) {
+		unsigned long ino = le32_to_cpu(de->inode);
+		brelse (bh);
+		if (!ext3_valid_inum(dir->i_sb, ino)) {
+			ext3_error(dir->i_sb, "ext3_lookup",
+				   "bad inode number: %lu", ino);
+			return ERR_PTR(-EIO);
+		}
+		inode = ext3_iget(dir->i_sb, ino);
+		if (unlikely(IS_ERR(inode))) {
+			if (PTR_ERR(inode) == -ESTALE) {
+				ext3_error(dir->i_sb, __func__,
+						"deleted inode referenced: %lu",
+						ino);
+				return ERR_PTR(-EIO);
+			} else {

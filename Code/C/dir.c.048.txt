@@ -1,0 +1,49 @@
+static void ocfs2_dx_dir_index_root_block(struct inode *dir,
+					 struct buffer_head *dx_root_bh,
+					 struct buffer_head *dirent_bh)
+{
+	char *de_buf, *limit;
+	struct ocfs2_dx_root_block *dx_root;
+	struct ocfs2_dir_entry *de;
+	struct ocfs2_dx_hinfo hinfo;
+	u64 dirent_blk = dirent_bh->b_blocknr;
+
+	dx_root = (struct ocfs2_dx_root_block *)dx_root_bh->b_data;
+
+	de_buf = dirent_bh->b_data;
+	limit = de_buf + dir->i_sb->s_blocksize;
+
+	while (de_buf < limit) {
+		de = (struct ocfs2_dir_entry *)de_buf;
+
+		if (!de->name_len || !de->inode)
+			goto inc;
+
+		ocfs2_dx_dir_name_hash(dir, de->name, de->name_len, &hinfo);
+
+		mlog(0,
+		     "dir: %llu, major: 0x%x minor: 0x%x, index: %u, name: %.*s\n",
+		     (unsigned long long)dir->i_ino, hinfo.major_hash,
+		     hinfo.minor_hash,
+		     le16_to_cpu(dx_root->dr_entries.de_num_used),
+		     de->name_len, de->name);
+
+		ocfs2_dx_entry_list_insert(&dx_root->dr_entries, &hinfo,
+					   dirent_blk);
+
+		le32_add_cpu(&dx_root->dr_num_entries, 1);
+inc:
+		de_buf += le16_to_cpu(de->rec_len);
+	}
+}
+
+static int ocfs2_new_dx_should_be_inline(struct inode *dir,
+					 struct buffer_head *di_bh)
+{
+	int dirent_count = 0;
+	char *de_buf, *limit;
+	struct ocfs2_dir_entry *de;
+	struct ocfs2_dinode *di = (struct ocfs2_dinode *)di_bh->b_data;
+
+	de_buf = di->id2.i_data.id_data;
+	limit = de_buf + i_size_read(dir);

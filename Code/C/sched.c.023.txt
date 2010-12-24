@@ -1,0 +1,50 @@
+	update_load_sub(&rq->load, load);
+}
+
+#if (defined(CONFIG_SMP) && defined(CONFIG_FAIR_GROUP_SCHED)) || defined(CONFIG_RT_GROUP_SCHED)
+typedef int (*tg_visitor)(struct task_group *, void *);
+
+static int walk_tg_tree(tg_visitor down, tg_visitor up, void *data)
+{
+	struct task_group *parent, *child;
+	int ret;
+
+	rcu_read_lock();
+	parent = &root_task_group;
+down:
+	ret = (*down)(parent, data);
+	if (ret)
+		goto out_unlock;
+	list_for_each_entry_rcu(child, &parent->children, siblings) {
+		parent = child;
+		goto down;
+
+up:
+		continue;
+	}
+	ret = (*up)(parent, data);
+	if (ret)
+		goto out_unlock;
+
+	child = parent;
+	parent = parent->parent;
+	if (parent)
+		goto up;
+out_unlock:
+	rcu_read_unlock();
+
+	return ret;
+}
+
+static int tg_nop(struct task_group *tg, void *data)
+{
+	return 0;
+}
+#endif
+
+#ifdef CONFIG_SMP
+
+static unsigned long weighted_cpuload(const int cpu)
+{
+	return cpu_rq(cpu)->load.weight;
+}

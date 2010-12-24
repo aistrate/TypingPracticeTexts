@@ -1,0 +1,50 @@
+		break;
+next:
+		spin_unlock(&vb->lock);
+	}
+
+	if (purge)
+		purge_fragmented_blocks_thiscpu();
+
+	put_cpu_var(vmap_block_queue);
+	rcu_read_unlock();
+
+	if (!addr) {
+		vb = new_vmap_block(gfp_mask);
+		if (IS_ERR(vb))
+			return vb;
+		goto again;
+	}
+
+	return (void *)addr;
+}
+
+static void vb_free(const void *addr, unsigned long size)
+{
+	unsigned long offset;
+	unsigned long vb_idx;
+	unsigned int order;
+	struct vmap_block *vb;
+
+	BUG_ON(size & ~PAGE_MASK);
+	BUG_ON(size > PAGE_SIZE*VMAP_MAX_ALLOC);
+
+	flush_cache_vunmap((unsigned long)addr, (unsigned long)addr + size);
+
+	order = get_order(size);
+
+	offset = (unsigned long)addr & (VMAP_BLOCK_SIZE - 1);
+
+	vb_idx = addr_to_vb_idx((unsigned long)addr);
+	rcu_read_lock();
+	vb = radix_tree_lookup(&vmap_block_tree, vb_idx);
+	rcu_read_unlock();
+	BUG_ON(!vb);
+
+	vunmap_page_range((unsigned long)addr, (unsigned long)addr + size);
+
+	spin_lock(&vb->lock);
+	BUG_ON(bitmap_allocate_region(vb->dirty_map, offset >> PAGE_SHIFT, order));
+
+	vb->dirty += 1UL << order;
+	if (vb->dirty == VMAP_BBMAP_BITS) {

@@ -1,0 +1,50 @@
+			term_area = area;
+			continue;
+		}
+
+		if (prev && prev->va_end > base + start)  {
+			next = prev;
+			prev = node_to_va(rb_prev(&next->rb_node));
+			base = pvm_determine_end(&next, &prev, align) - end;
+			term_area = area;
+			continue;
+		}
+
+		area = (area + nr_vms - 1) % nr_vms;
+		if (area == term_area)
+			break;
+		start = offsets[area];
+		end = start + sizes[area];
+		pvm_find_next_prev(base + end, &next, &prev);
+	}
+found:
+	
+	for (area = 0; area < nr_vms; area++) {
+		struct vmap_area *va = vas[area];
+
+		va->va_start = base + offsets[area];
+		va->va_end = va->va_start + sizes[area];
+		__insert_vmap_area(va);
+	}
+
+	vmap_area_pcpu_hole = base + offsets[last_area];
+
+	spin_unlock(&vmap_area_lock);
+
+	for (area = 0; area < nr_vms; area++)
+		insert_vmalloc_vm(vms[area], vas[area], VM_ALLOC,
+				  pcpu_get_vm_areas);
+
+	kfree(vas);
+	return vms;
+
+err_free:
+	for (area = 0; area < nr_vms; area++) {
+		if (vas)
+			kfree(vas[area]);
+		if (vms)
+			kfree(vms[area]);
+	}
+	kfree(vas);
+	kfree(vms);
+	return NULL;

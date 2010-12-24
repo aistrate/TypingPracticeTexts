@@ -1,0 +1,49 @@
+		found = ocfs2_search_dirblock(dir_ent_bh, dir, name, namelen,
+					      0, dir_ent_bh->b_data,
+					      dir->i_sb->s_blocksize, &dir_ent);
+		if (found == 1)
+			break;
+
+		if (found == -1) {
+			
+			ret = -EIO;
+			mlog_errno(ret);
+			goto out;
+		}
+
+		brelse(dir_ent_bh);
+		dir_ent_bh = NULL;
+	}
+
+	if (found <= 0) {
+		ret = -ENOENT;
+		goto out;
+	}
+
+	res->dl_leaf_bh = dir_ent_bh;
+	res->dl_entry = dir_ent;
+	res->dl_dx_leaf_bh = dx_leaf_bh;
+	res->dl_dx_entry = dx_entry;
+
+	ret = 0;
+out:
+	if (ret) {
+		brelse(dx_leaf_bh);
+		brelse(dir_ent_bh);
+	}
+	return ret;
+}
+
+static int ocfs2_find_entry_dx(const char *name, int namelen,
+			       struct inode *dir,
+			       struct ocfs2_dir_lookup_result *lookup)
+{
+	int ret;
+	struct buffer_head *di_bh = NULL;
+	struct ocfs2_dinode *di;
+	struct buffer_head *dx_root_bh = NULL;
+	struct ocfs2_dx_root_block *dx_root;
+
+	ret = ocfs2_read_inode_block(dir, &di_bh);
+	if (ret) {
+		mlog_errno(ret);

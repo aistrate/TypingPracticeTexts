@@ -1,0 +1,49 @@
+	if (n == 1) {		
+		ext4_free_data(handle, inode, NULL, i_data+offsets[0],
+			       i_data + EXT4_NDIR_BLOCKS);
+		goto do_indirects;
+	}
+
+	partial = ext4_find_shared(inode, n, offsets, chain, &nr);
+	
+	if (nr) {
+		if (partial == chain) {
+			
+			ext4_free_branches(handle, inode, NULL,
+					   &nr, &nr+1, (chain+n-1) - partial);
+			*partial->p = 0;
+			
+		} else {
+			
+			BUFFER_TRACE(partial->bh, "get_write_access");
+			ext4_free_branches(handle, inode, partial->bh,
+					partial->p,
+					partial->p+1, (chain+n-1) - partial);
+		}
+	}
+	
+	while (partial > chain) {
+		ext4_free_branches(handle, inode, partial->bh, partial->p + 1,
+				   (__le32*)partial->bh->b_data+addr_per_block,
+				   (chain+n-1) - partial);
+		BUFFER_TRACE(partial->bh, "call brelse");
+		brelse(partial->bh);
+		partial--;
+	}
+do_indirects:
+	
+	switch (offsets[0]) {
+	default:
+		nr = i_data[EXT4_IND_BLOCK];
+		if (nr) {
+			ext4_free_branches(handle, inode, NULL, &nr, &nr+1, 1);
+			i_data[EXT4_IND_BLOCK] = 0;
+		}
+	case EXT4_IND_BLOCK:
+		nr = i_data[EXT4_DIND_BLOCK];
+		if (nr) {
+			ext4_free_branches(handle, inode, NULL, &nr, &nr+1, 2);
+			i_data[EXT4_DIND_BLOCK] = 0;
+		}
+	case EXT4_DIND_BLOCK:
+		nr = i_data[EXT4_TIND_BLOCK];

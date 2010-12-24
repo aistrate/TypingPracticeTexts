@@ -1,0 +1,49 @@
+	BUG_ON(offset >= PAGE_SIZE);
+	if (PageHighMem(page))
+		
+		bh->b_data = (char *)(0 + offset);
+	else
+		bh->b_data = page_address(page) + offset;
+}
+EXPORT_SYMBOL(set_bh_page);
+
+static void discard_buffer(struct buffer_head * bh)
+{
+	lock_buffer(bh);
+	clear_buffer_dirty(bh);
+	bh->b_bdev = NULL;
+	clear_buffer_mapped(bh);
+	clear_buffer_req(bh);
+	clear_buffer_new(bh);
+	clear_buffer_delay(bh);
+	clear_buffer_unwritten(bh);
+	unlock_buffer(bh);
+}
+
+void block_invalidatepage(struct page *page, unsigned long offset)
+{
+	struct buffer_head *head, *bh, *next;
+	unsigned int curr_off = 0;
+
+	BUG_ON(!PageLocked(page));
+	if (!page_has_buffers(page))
+		goto out;
+
+	head = page_buffers(page);
+	bh = head;
+	do {
+		unsigned int next_off = curr_off + bh->b_size;
+		next = bh->b_this_page;
+
+		if (offset <= curr_off)
+			discard_buffer(bh);
+		curr_off = next_off;
+		bh = next;
+	} while (bh != head);
+
+	if (offset == 0)
+		try_to_release_page(page, 0);
+out:
+	return;
+}
+EXPORT_SYMBOL(block_invalidatepage);

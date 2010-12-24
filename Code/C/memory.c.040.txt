@@ -1,0 +1,50 @@
+		} else {
+			print_bad_pte(vma, address, orig_pte, NULL);
+			ret = VM_FAULT_SIGBUS;
+		}
+		goto out;
+	}
+	delayacct_set_flag(DELAYACCT_PF_SWAPIN);
+	page = lookup_swap_cache(entry);
+	if (!page) {
+		grab_swap_token(mm); 
+		page = swapin_readahead(entry,
+					GFP_HIGHUSER_MOVABLE, vma, address);
+		if (!page) {
+			
+			page_table = pte_offset_map_lock(mm, pmd, address, &ptl);
+			if (likely(pte_same(*page_table, orig_pte)))
+				ret = VM_FAULT_OOM;
+			delayacct_clear_flag(DELAYACCT_PF_SWAPIN);
+			goto unlock;
+		}
+
+		ret = VM_FAULT_MAJOR;
+		count_vm_event(PGMAJFAULT);
+	} else if (PageHWPoison(page)) {
+		
+		ret = VM_FAULT_HWPOISON;
+		delayacct_clear_flag(DELAYACCT_PF_SWAPIN);
+		goto out_release;
+	}
+
+	locked = lock_page_or_retry(page, mm, flags);
+	delayacct_clear_flag(DELAYACCT_PF_SWAPIN);
+	if (!locked) {
+		ret |= VM_FAULT_RETRY;
+		goto out_release;
+	}
+
+	if (unlikely(!PageSwapCache(page) || page_private(page) != entry.val))
+		goto out_page;
+
+	if (ksm_might_need_to_copy(page, vma, address)) {
+		swapcache = page;
+		page = ksm_does_need_to_copy(page, vma, address);
+
+		if (unlikely(!page)) {
+			ret = VM_FAULT_OOM;
+			page = swapcache;
+			swapcache = NULL;
+			goto out_page;
+		}

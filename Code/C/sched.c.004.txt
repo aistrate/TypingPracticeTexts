@@ -1,0 +1,49 @@
+	raw_spin_lock(&rt_b->rt_runtime_lock);
+	for (;;) {
+		unsigned long delta;
+		ktime_t soft, hard;
+
+		if (hrtimer_active(&rt_b->rt_period_timer))
+			break;
+
+		now = hrtimer_cb_get_time(&rt_b->rt_period_timer);
+		hrtimer_forward(&rt_b->rt_period_timer, now, rt_b->rt_period);
+
+		soft = hrtimer_get_softexpires(&rt_b->rt_period_timer);
+		hard = hrtimer_get_expires(&rt_b->rt_period_timer);
+		delta = ktime_to_ns(ktime_sub(hard, soft));
+		__hrtimer_start_range_ns(&rt_b->rt_period_timer, soft, delta,
+				HRTIMER_MODE_ABS_PINNED, 0);
+	}
+	raw_spin_unlock(&rt_b->rt_runtime_lock);
+}
+
+#ifdef CONFIG_RT_GROUP_SCHED
+static void destroy_rt_bandwidth(struct rt_bandwidth *rt_b)
+{
+	hrtimer_cancel(&rt_b->rt_period_timer);
+}
+#endif
+
+static DEFINE_MUTEX(sched_domains_mutex);
+
+#ifdef CONFIG_CGROUP_SCHED
+
+#include <linux/cgroup.h>
+
+struct cfs_rq;
+
+static LIST_HEAD(task_groups);
+
+struct task_group {
+	struct cgroup_subsys_state css;
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+	
+	struct sched_entity **se;
+	
+	struct cfs_rq **cfs_rq;
+	unsigned long shares;
+#endif
+
+#ifdef CONFIG_RT_GROUP_SCHED

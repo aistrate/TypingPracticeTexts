@@ -1,0 +1,50 @@
+		if (build_numa_sched_groups(&d, cpu_map, i))
+			goto error;
+#endif
+
+#ifdef CONFIG_SCHED_SMT
+	for_each_cpu(i, cpu_map) {
+		sd = &per_cpu(cpu_domains, i).sd;
+		init_sched_groups_power(i, sd);
+	}
+#endif
+#ifdef CONFIG_SCHED_MC
+	for_each_cpu(i, cpu_map) {
+		sd = &per_cpu(core_domains, i).sd;
+		init_sched_groups_power(i, sd);
+	}
+#endif
+#ifdef CONFIG_SCHED_BOOK
+	for_each_cpu(i, cpu_map) {
+		sd = &per_cpu(book_domains, i).sd;
+		init_sched_groups_power(i, sd);
+	}
+#endif
+
+	for_each_cpu(i, cpu_map) {
+		sd = &per_cpu(phys_domains, i).sd;
+		init_sched_groups_power(i, sd);
+	}
+
+#ifdef CONFIG_NUMA
+	for (i = 0; i < nr_node_ids; i++)
+		init_numa_sched_groups_power(d.sched_group_nodes[i]);
+
+	if (d.sd_allnodes) {
+		struct sched_group *sg;
+
+		cpu_to_allnodes_group(cpumask_first(cpu_map), cpu_map, &sg,
+								d.tmpmask);
+		init_numa_sched_groups_power(sg);
+	}
+#endif
+
+	for_each_cpu(i, cpu_map) {
+#ifdef CONFIG_SCHED_SMT
+		sd = &per_cpu(cpu_domains, i).sd;
+#elif defined(CONFIG_SCHED_MC)
+		sd = &per_cpu(core_domains, i).sd;
+#elif defined(CONFIG_SCHED_BOOK)
+		sd = &per_cpu(book_domains, i).sd;
+#else
+		sd = &per_cpu(phys_domains, i).sd;

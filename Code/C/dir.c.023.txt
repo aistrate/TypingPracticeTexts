@@ -1,0 +1,50 @@
+	} else {
+		dx_leaf = (struct ocfs2_dx_leaf *) lookup->dl_dx_leaf_bh->b_data;
+		entry_list = &dx_leaf->dl_list;
+	}
+
+	BUG_ON(le16_to_cpu(entry_list->de_count) <= 0);
+	BUG_ON(le16_to_cpu(entry_list->de_num_used) <= 0);
+
+	index = (char *)dx_entry - (char *)entry_list->de_entries;
+	index /= sizeof(*dx_entry);
+
+	if (index >= le16_to_cpu(entry_list->de_num_used)) {
+		mlog(ML_ERROR, "Dir %llu: Bad dx_entry ptr idx %d, (%p, %p)\n",
+		     (unsigned long long)OCFS2_I(dir)->ip_blkno, index,
+		     entry_list, dx_entry);
+		return -EIO;
+	}
+
+	trailer = ocfs2_trailer_from_bh(leaf_bh, dir->i_sb);
+	if (trailer->db_free_rec_len == 0)
+		add_to_free_list = 1;
+
+	ret = ocfs2_journal_access_dr(handle, INODE_CACHE(dir), dx_root_bh,
+				      OCFS2_JOURNAL_ACCESS_WRITE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	if (!ocfs2_dx_root_inline(dx_root)) {
+		ret = ocfs2_journal_access_dl(handle, INODE_CACHE(dir),
+					      lookup->dl_dx_leaf_bh,
+					      OCFS2_JOURNAL_ACCESS_WRITE);
+		if (ret) {
+			mlog_errno(ret);
+			goto out;
+		}
+	}
+
+	mlog(0, "Dir %llu: delete entry at index: %d\n",
+	     (unsigned long long)OCFS2_I(dir)->ip_blkno, index);
+
+	ret = __ocfs2_delete_entry(handle, dir, lookup->dl_entry,
+				   leaf_bh, leaf_bh->b_data, leaf_bh->b_size);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	max_rec_len = ocfs2_find_max_rec_len(dir->i_sb, leaf_bh);

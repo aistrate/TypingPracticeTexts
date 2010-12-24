@@ -1,0 +1,50 @@
+	}
+	ret2 = generic_write_end(file, mapping, pos, len, copied,
+							page, fsdata);
+	copied = ret2;
+	if (ret2 < 0)
+		ret = ret2;
+	ret2 = ext4_journal_stop(handle);
+	if (!ret)
+		ret = ret2;
+
+	return ret ? ret : copied;
+}
+
+static void ext4_da_invalidatepage(struct page *page, unsigned long offset)
+{
+	
+	BUG_ON(!PageLocked(page));
+	if (!page_has_buffers(page))
+		goto out;
+
+	ext4_da_page_release_reservation(page, offset);
+
+out:
+	ext4_invalidatepage(page, offset);
+
+	return;
+}
+
+int ext4_alloc_da_blocks(struct inode *inode)
+{
+	trace_ext4_alloc_da_blocks(inode);
+
+	if (!EXT4_I(inode)->i_reserved_data_blocks &&
+	    !EXT4_I(inode)->i_reserved_meta_blocks)
+		return 0;
+
+	return filemap_flush(inode->i_mapping);
+}
+
+static sector_t ext4_bmap(struct address_space *mapping, sector_t block)
+{
+	struct inode *inode = mapping->host;
+	journal_t *journal;
+	int err;
+
+	if (mapping_tagged(mapping, PAGECACHE_TAG_DIRTY) &&
+			test_opt(inode->i_sb, DELALLOC)) {
+		
+		filemap_write_and_wait(mapping);
+	}

@@ -1,0 +1,50 @@
+			lock_buffer(bh);
+		} else if (!trylock_buffer(bh)) {
+			redirty_page_for_writepage(wbc, page);
+			continue;
+		}
+		if (test_clear_buffer_dirty(bh)) {
+			mark_buffer_async_write_endio(bh, handler);
+		} else {
+			unlock_buffer(bh);
+		}
+	} while ((bh = bh->b_this_page) != head);
+
+	BUG_ON(PageWriteback(page));
+	set_page_writeback(page);
+
+	do {
+		struct buffer_head *next = bh->b_this_page;
+		if (buffer_async_write(bh)) {
+			submit_bh(write_op, bh);
+			nr_underway++;
+		}
+		bh = next;
+	} while (bh != head);
+	unlock_page(page);
+
+	err = 0;
+done:
+	if (nr_underway == 0) {
+		
+		end_page_writeback(page);
+
+	}
+	return err;
+
+recover:
+	
+	bh = head;
+	
+	do {
+		if (buffer_mapped(bh) && buffer_dirty(bh) &&
+		    !buffer_delay(bh)) {
+			lock_buffer(bh);
+			mark_buffer_async_write_endio(bh, handler);
+		} else {
+			
+			clear_buffer_dirty(bh);
+		}
+	} while ((bh = bh->b_this_page) != head);
+	SetPageError(page);
+	BUG_ON(PageWriteback(page));

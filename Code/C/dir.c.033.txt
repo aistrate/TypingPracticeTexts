@@ -1,0 +1,50 @@
+	struct buffer_head * bh, * tmp;
+	struct ocfs2_dir_entry * de;
+	struct super_block * sb = inode->i_sb;
+	unsigned int ra_sectors = 16;
+
+	stored = 0;
+	bh = NULL;
+
+	offset = (*f_pos) & (sb->s_blocksize - 1);
+
+	while (!error && !stored && *f_pos < i_size_read(inode)) {
+		blk = (*f_pos) >> sb->s_blocksize_bits;
+		if (ocfs2_read_dir_block(inode, blk, &bh, 0)) {
+			
+			*f_pos += sb->s_blocksize - offset;
+			continue;
+		}
+
+		if (!last_ra_blk
+		    || (((last_ra_blk - blk) << 9) <= (ra_sectors / 2))) {
+			for (i = ra_sectors >> (sb->s_blocksize_bits - 9);
+			     i > 0; i--) {
+				tmp = NULL;
+				if (!ocfs2_read_dir_block(inode, ++blk, &tmp,
+							  OCFS2_BH_READAHEAD))
+					brelse(tmp);
+			}
+			last_ra_blk = blk;
+			ra_sectors = 8;
+		}
+
+revalidate:
+		
+		if (*f_version != inode->i_version) {
+			for (i = 0; i < sb->s_blocksize && i < offset; ) {
+				de = (struct ocfs2_dir_entry *) (bh->b_data + i);
+				
+				if (le16_to_cpu(de->rec_len) <
+				    OCFS2_DIR_REC_LEN(1))
+					break;
+				i += le16_to_cpu(de->rec_len);
+			}
+			offset = i;
+			*f_pos = ((*f_pos) & ~(sb->s_blocksize - 1))
+				| offset;
+			*f_version = inode->i_version;
+		}
+
+		while (!error && *f_pos < i_size_read(inode)
+		       && offset < sb->s_blocksize) {

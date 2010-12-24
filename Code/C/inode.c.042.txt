@@ -1,0 +1,49 @@
+	range_cyclic = wbc->range_cyclic;
+	if (wbc->range_cyclic) {
+		index = mapping->writeback_index;
+		if (index)
+			cycled = 0;
+		wbc->range_start = index << PAGE_CACHE_SHIFT;
+		wbc->range_end  = LLONG_MAX;
+		wbc->range_cyclic = 0;
+		end = -1;
+	} else {
+		index = wbc->range_start >> PAGE_CACHE_SHIFT;
+		end = wbc->range_end >> PAGE_CACHE_SHIFT;
+	}
+
+	max_pages = sbi->s_max_writeback_mb_bump << (20 - PAGE_CACHE_SHIFT);
+	if (!range_cyclic && range_whole) {
+		if (wbc->nr_to_write == LONG_MAX)
+			desired_nr_to_write = wbc->nr_to_write;
+		else
+			desired_nr_to_write = wbc->nr_to_write * 8;
+	} else
+		desired_nr_to_write = ext4_num_dirty_pages(inode, index,
+							   max_pages);
+	if (desired_nr_to_write > max_pages)
+		desired_nr_to_write = max_pages;
+
+	if (wbc->nr_to_write < desired_nr_to_write) {
+		nr_to_writebump = desired_nr_to_write - wbc->nr_to_write;
+		wbc->nr_to_write = desired_nr_to_write;
+	}
+
+	mpd.wbc = wbc;
+	mpd.inode = mapping->host;
+
+	pages_skipped = wbc->pages_skipped;
+
+retry:
+	if (wbc->sync_mode == WB_SYNC_ALL)
+		tag_pages_for_writeback(mapping, index, end);
+
+	while (!ret && wbc->nr_to_write > 0) {
+
+		BUG_ON(ext4_should_journal_data(inode));
+		needed_blocks = ext4_da_writepages_trans_blocks(inode);
+
+		handle = ext4_journal_start(inode, needed_blocks);
+		if (IS_ERR(handle)) {
+			ret = PTR_ERR(handle);
+			ext4_msg(inode->i_sb, KERN_CRIT, "%s: jbd2_start: "

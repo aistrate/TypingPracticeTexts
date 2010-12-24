@@ -1,0 +1,49 @@
+static int
+drop_buffers(struct page *page, struct buffer_head **buffers_to_free)
+{
+	struct buffer_head *head = page_buffers(page);
+	struct buffer_head *bh;
+
+	bh = head;
+	do {
+		if (buffer_write_io_error(bh) && page->mapping)
+			set_bit(AS_EIO, &page->mapping->flags);
+		if (buffer_busy(bh))
+			goto failed;
+		bh = bh->b_this_page;
+	} while (bh != head);
+
+	do {
+		struct buffer_head *next = bh->b_this_page;
+
+		if (bh->b_assoc_map)
+			__remove_assoc_queue(bh);
+		bh = next;
+	} while (bh != head);
+	*buffers_to_free = head;
+	__clear_page_buffers(page);
+	return 1;
+failed:
+	return 0;
+}
+
+int try_to_free_buffers(struct page *page)
+{
+	struct address_space * const mapping = page->mapping;
+	struct buffer_head *buffers_to_free = NULL;
+	int ret = 0;
+
+	BUG_ON(!PageLocked(page));
+	if (PageWriteback(page))
+		return 0;
+
+	if (mapping == NULL) {		
+		ret = drop_buffers(page, &buffers_to_free);
+		goto out;
+	}
+
+	spin_lock(&mapping->private_lock);
+	ret = drop_buffers(page, &buffers_to_free);
+
+	if (ret)
+		cancel_dirty_page(page, PAGE_CACHE_SIZE);

@@ -1,0 +1,49 @@
+	rq->prev_mm = NULL;
+
+	prev_state = prev->state;
+	finish_arch_switch(prev);
+#ifdef __ARCH_WANT_INTERRUPTS_ON_CTXSW
+	local_irq_disable();
+#endif 
+	perf_event_task_sched_in(current);
+#ifdef __ARCH_WANT_INTERRUPTS_ON_CTXSW
+	local_irq_enable();
+#endif 
+	finish_lock_switch(rq, prev);
+
+	fire_sched_in_preempt_notifiers(current);
+	if (mm)
+		mmdrop(mm);
+	if (unlikely(prev_state == TASK_DEAD)) {
+		
+		kprobe_flush_task(prev);
+		put_task_struct(prev);
+	}
+}
+
+#ifdef CONFIG_SMP
+
+static inline void pre_schedule(struct rq *rq, struct task_struct *prev)
+{
+	if (prev->sched_class->pre_schedule)
+		prev->sched_class->pre_schedule(rq, prev);
+}
+
+static inline void post_schedule(struct rq *rq)
+{
+	if (rq->post_schedule) {
+		unsigned long flags;
+
+		raw_spin_lock_irqsave(&rq->lock, flags);
+		if (rq->curr->sched_class->post_schedule)
+			rq->curr->sched_class->post_schedule(rq);
+		raw_spin_unlock_irqrestore(&rq->lock, flags);
+
+		rq->post_schedule = 0;
+	}
+}
+
+#else
+
+static inline void pre_schedule(struct rq *rq, struct task_struct *p)
+{

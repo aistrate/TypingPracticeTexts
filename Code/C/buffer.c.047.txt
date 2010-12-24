@@ -1,0 +1,49 @@
+	spin_unlock(&mapping->private_lock);
+out:
+	if (buffers_to_free) {
+		struct buffer_head *bh = buffers_to_free;
+
+		do {
+			struct buffer_head *next = bh->b_this_page;
+			free_buffer_head(bh);
+			bh = next;
+		} while (bh != buffers_to_free);
+	}
+	return ret;
+}
+EXPORT_SYMBOL(try_to_free_buffers);
+
+void block_sync_page(struct page *page)
+{
+	struct address_space *mapping;
+
+	smp_mb();
+	mapping = page_mapping(page);
+	if (mapping)
+		blk_run_backing_dev(mapping->backing_dev_info, page);
+}
+EXPORT_SYMBOL(block_sync_page);
+
+SYSCALL_DEFINE2(bdflush, int, func, long, data)
+{
+	static int msg_count;
+
+	if (!capable(CAP_SYS_ADMIN))
+		return -EPERM;
+
+	if (msg_count < 5) {
+		msg_count++;
+		printk(KERN_INFO
+			"warning: process `%s' used the obsolete bdflush"
+			" system call\n", current->comm);
+		printk(KERN_INFO "Fix your initscripts?\n");
+	}
+
+	if (func == 1)
+		do_exit(0);
+	return 0;
+}
+
+static struct kmem_cache *bh_cachep;
+
+static int max_buffer_heads;

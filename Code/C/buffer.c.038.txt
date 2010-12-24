@@ -1,0 +1,50 @@
+out_release:
+	unlock_page(page);
+	page_cache_release(page);
+	*pagep = NULL;
+
+	return ret;
+}
+EXPORT_SYMBOL(nobh_write_begin);
+
+int nobh_write_end(struct file *file, struct address_space *mapping,
+			loff_t pos, unsigned len, unsigned copied,
+			struct page *page, void *fsdata)
+{
+	struct inode *inode = page->mapping->host;
+	struct buffer_head *head = fsdata;
+	struct buffer_head *bh;
+	BUG_ON(fsdata != NULL && page_has_buffers(page));
+
+	if (unlikely(copied < len) && head)
+		attach_nobh_buffers(page, head);
+	if (page_has_buffers(page))
+		return generic_write_end(file, mapping, pos, len,
+					copied, page, fsdata);
+
+	SetPageUptodate(page);
+	set_page_dirty(page);
+	if (pos+copied > inode->i_size) {
+		i_size_write(inode, pos+copied);
+		mark_inode_dirty(inode);
+	}
+
+	unlock_page(page);
+	page_cache_release(page);
+
+	while (head) {
+		bh = head;
+		head = head->b_this_page;
+		free_buffer_head(bh);
+	}
+
+	return copied;
+}
+EXPORT_SYMBOL(nobh_write_end);
+
+int nobh_writepage(struct page *page, get_block_t *get_block,
+			struct writeback_control *wbc)
+{
+	struct inode * const inode = page->mapping->host;
+	loff_t i_size = i_size_read(inode);
+	const pgoff_t end_index = i_size >> PAGE_CACHE_SHIFT;

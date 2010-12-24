@@ -1,0 +1,50 @@
+		block_commit_write(page, 0, len);
+
+	if (PageChecked(page) && ext4_should_journal_data(inode))
+		
+		return __ext4_journalled_writepage(page, len);
+
+	if (buffer_uninit(page_bufs)) {
+		ext4_set_bh_endio(page_bufs, inode);
+		ret = block_write_full_page_endio(page, noalloc_get_block_write,
+					    wbc, ext4_end_io_buffer_write);
+	} else
+		ret = block_write_full_page(page, noalloc_get_block_write,
+					    wbc);
+
+	return ret;
+}
+
+static int ext4_da_writepages_trans_blocks(struct inode *inode)
+{
+	int max_blocks = EXT4_I(inode)->i_reserved_data_blocks;
+
+	if (!(ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS)) &&
+	    (max_blocks > EXT4_MAX_TRANS_DATA))
+		max_blocks = EXT4_MAX_TRANS_DATA;
+
+	return ext4_chunk_trans_blocks(inode, max_blocks);
+}
+
+static int write_cache_pages_da(struct address_space *mapping,
+				struct writeback_control *wbc,
+				struct mpage_da_data *mpd,
+				pgoff_t *done_index)
+{
+	int ret = 0;
+	int done = 0;
+	struct pagevec pvec;
+	unsigned nr_pages;
+	pgoff_t index;
+	pgoff_t end;		
+	long nr_to_write = wbc->nr_to_write;
+	int tag;
+
+	pagevec_init(&pvec, 0);
+	index = wbc->range_start >> PAGE_CACHE_SHIFT;
+	end = wbc->range_end >> PAGE_CACHE_SHIFT;
+
+	if (wbc->sync_mode == WB_SYNC_ALL)
+		tag = PAGECACHE_TAG_TOWRITE;
+	else
+		tag = PAGECACHE_TAG_DIRTY;

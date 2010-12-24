@@ -1,0 +1,50 @@
+	if (ocfs2_dx_root_inline(dx_root)) {
+		entry_list = &dx_root->dr_entries;
+		goto search;
+	}
+
+	dr_el = &dx_root->dr_list;
+
+	ret = ocfs2_dx_dir_lookup(dir, dr_el, hinfo, NULL, &phys);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	mlog(0, "Dir %llu: name: \"%.*s\", lookup of hash: %u.0x%x "
+	     "returns: %llu\n",
+	     (unsigned long long)OCFS2_I(dir)->ip_blkno,
+	     namelen, name, hinfo->major_hash, hinfo->minor_hash,
+	     (unsigned long long)phys);
+
+	ret = ocfs2_read_dx_leaf(dir, phys, &dx_leaf_bh);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	dx_leaf = (struct ocfs2_dx_leaf *) dx_leaf_bh->b_data;
+
+	mlog(0, "leaf info: num_used: %d, count: %d\n",
+	     le16_to_cpu(dx_leaf->dl_list.de_num_used),
+	     le16_to_cpu(dx_leaf->dl_list.de_count));
+
+	entry_list = &dx_leaf->dl_list;
+
+search:
+	
+	found = 0;
+	for (i = 0; i < le16_to_cpu(entry_list->de_num_used); i++) {
+		dx_entry = &entry_list->de_entries[i];
+
+		if (hinfo->major_hash != le32_to_cpu(dx_entry->dx_major_hash)
+		    || hinfo->minor_hash != le32_to_cpu(dx_entry->dx_minor_hash))
+			continue;
+
+		ret = ocfs2_read_dir_block_direct(dir,
+					  le64_to_cpu(dx_entry->dx_dirent_blk),
+					  &dir_ent_bh);
+		if (ret) {
+			mlog_errno(ret);
+			goto out;
+		}

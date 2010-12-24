@@ -1,0 +1,49 @@
+#include <linux/fs.h>
+#include <linux/types.h>
+#include <linux/slab.h>
+#include <linux/highmem.h>
+#include <linux/quotaops.h>
+#include <linux/sort.h>
+
+#define MLOG_MASK_PREFIX ML_NAMEI
+#include <cluster/masklog.h>
+
+#include "ocfs2.h"
+
+#include "alloc.h"
+#include "blockcheck.h"
+#include "dir.h"
+#include "dlmglue.h"
+#include "extent_map.h"
+#include "file.h"
+#include "inode.h"
+#include "journal.h"
+#include "namei.h"
+#include "suballoc.h"
+#include "super.h"
+#include "sysfile.h"
+#include "uptodate.h"
+
+#include "buffer_head_io.h"
+
+#define NAMEI_RA_CHUNKS  2
+#define NAMEI_RA_BLOCKS  4
+#define NAMEI_RA_SIZE        (NAMEI_RA_CHUNKS * NAMEI_RA_BLOCKS)
+#define NAMEI_RA_INDEX(c,b)  (((c) * NAMEI_RA_BLOCKS) + (b))
+
+static unsigned char ocfs2_filetype_table[] = {
+	DT_UNKNOWN, DT_REG, DT_DIR, DT_CHR, DT_BLK, DT_FIFO, DT_SOCK, DT_LNK
+};
+
+static int ocfs2_do_extend_dir(struct super_block *sb,
+			       handle_t *handle,
+			       struct inode *dir,
+			       struct buffer_head *parent_fe_bh,
+			       struct ocfs2_alloc_context *data_ac,
+			       struct ocfs2_alloc_context *meta_ac,
+			       struct buffer_head **new_bh);
+static int ocfs2_dir_indexed(struct inode *inode);
+
+static int ocfs2_supports_dir_trailer(struct inode *dir)
+{
+	struct ocfs2_super *osb = OCFS2_SB(dir->i_sb);

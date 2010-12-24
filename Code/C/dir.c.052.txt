@@ -1,0 +1,50 @@
+	bytes_allocated += ocfs2_clusters_to_bytes(dir->i_sb, 1);
+
+	blkno = ocfs2_clusters_to_blocks(dir->i_sb, bit_off);
+	dirdata_bh = sb_getblk(sb, blkno);
+	if (!dirdata_bh) {
+		ret = -EIO;
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	ocfs2_set_new_buffer_uptodate(INODE_CACHE(dir), dirdata_bh);
+
+	ret = ocfs2_journal_access_db(handle, INODE_CACHE(dir), dirdata_bh,
+				      OCFS2_JOURNAL_ACCESS_CREATE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	memcpy(dirdata_bh->b_data, di->id2.i_data.id_data, i_size_read(dir));
+	memset(dirdata_bh->b_data + i_size_read(dir), 0,
+	       sb->s_blocksize - i_size_read(dir));
+	i = ocfs2_expand_last_dirent(dirdata_bh->b_data, i_size_read(dir), dir);
+	if (ocfs2_new_dir_wants_trailer(dir)) {
+		
+		ocfs2_init_dir_trailer(dir, dirdata_bh, i);
+	}
+
+	ocfs2_journal_dirty(handle, dirdata_bh);
+
+	if (ocfs2_supports_indexed_dirs(osb) && !dx_inline) {
+		
+		ret = ocfs2_dx_dir_index_block(dir, handle, dx_leaves,
+					       num_dx_leaves, &num_dx_entries,
+					       dirdata_bh);
+		if (ret) {
+			mlog_errno(ret);
+			goto out_commit;
+		}
+	}
+
+	ret = ocfs2_journal_access_di(handle, INODE_CACHE(dir), di_bh,
+				      OCFS2_JOURNAL_ACCESS_CREATE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	spin_lock(&oi->ip_lock);
+	oi->ip_dyn_features &= ~OCFS2_INLINE_DATA_FL;

@@ -1,0 +1,50 @@
+#define ext4_check_indirect_blockref(inode, bh)                         \
+	__ext4_check_blockref(__func__, __LINE__, inode,		\
+			      (__le32 *)(bh)->b_data,			\
+			      EXT4_ADDR_PER_BLOCK((inode)->i_sb))
+
+#define ext4_check_inode_blockref(inode)                                \
+	__ext4_check_blockref(__func__, __LINE__, inode,		\
+			      EXT4_I(inode)->i_data,			\
+			      EXT4_NDIR_BLOCKS)
+
+static Indirect *ext4_get_branch(struct inode *inode, int depth,
+				 ext4_lblk_t  *offsets,
+				 Indirect chain[4], int *err)
+{
+	struct super_block *sb = inode->i_sb;
+	Indirect *p = chain;
+	struct buffer_head *bh;
+
+	*err = 0;
+	
+	add_chain(chain, NULL, EXT4_I(inode)->i_data + *offsets);
+	if (!p->key)
+		goto no_block;
+	while (--depth) {
+		bh = sb_getblk(sb, le32_to_cpu(p->key));
+		if (unlikely(!bh))
+			goto failure;
+
+		if (!bh_uptodate_or_lock(bh)) {
+			if (bh_submit_read(bh) < 0) {
+				put_bh(bh);
+				goto failure;
+			}
+			
+			if (ext4_check_indirect_blockref(inode, bh)) {
+				put_bh(bh);
+				goto failure;
+			}
+		}
+
+		add_chain(++p, bh, (__le32 *)bh->b_data + *++offsets);
+		
+		if (!p->key)
+			goto no_block;
+	}
+	return NULL;
+
+failure:
+	*err = -EIO;
+no_block:

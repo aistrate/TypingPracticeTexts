@@ -1,0 +1,49 @@
+		credits = ocfs2_calc_extend_credits(sb, el, 1);
+	} else {
+		spin_unlock(&OCFS2_I(dir)->ip_lock);
+		credits = OCFS2_SIMPLE_DIR_EXTEND_CREDITS;
+	}
+
+do_extend:
+	if (ocfs2_dir_indexed(dir))
+		credits++; 
+
+	handle = ocfs2_start_trans(osb, credits);
+	if (IS_ERR(handle)) {
+		status = PTR_ERR(handle);
+		handle = NULL;
+		mlog_errno(status);
+		goto bail;
+	}
+
+	status = ocfs2_do_extend_dir(osb->sb, handle, dir, parent_fe_bh,
+				     data_ac, meta_ac, &new_bh);
+	if (status < 0) {
+		mlog_errno(status);
+		goto bail;
+	}
+
+	ocfs2_set_new_buffer_uptodate(INODE_CACHE(dir), new_bh);
+
+	status = ocfs2_journal_access_db(handle, INODE_CACHE(dir), new_bh,
+					 OCFS2_JOURNAL_ACCESS_CREATE);
+	if (status < 0) {
+		mlog_errno(status);
+		goto bail;
+	}
+	memset(new_bh->b_data, 0, sb->s_blocksize);
+
+	de = (struct ocfs2_dir_entry *) new_bh->b_data;
+	de->inode = 0;
+	if (ocfs2_supports_dir_trailer(dir)) {
+		de->rec_len = cpu_to_le16(ocfs2_dir_trailer_blk_off(sb));
+
+		ocfs2_init_dir_trailer(dir, new_bh, le16_to_cpu(de->rec_len));
+
+		if (ocfs2_dir_indexed(dir)) {
+			status = ocfs2_dx_dir_link_trailer(dir, handle,
+							   dx_root_bh, new_bh);
+			if (status) {
+				mlog_errno(status);
+				goto bail;
+			}

@@ -1,0 +1,50 @@
+				      OCFS2_JOURNAL_ACCESS_CREATE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	di->i_dx_root = cpu_to_le64(dr_blkno);
+
+	OCFS2_I(dir)->ip_dyn_features |= OCFS2_INDEXED_DIR_FL;
+	di->i_dyn_features = cpu_to_le16(OCFS2_I(dir)->ip_dyn_features);
+
+	ocfs2_journal_dirty(handle, di_bh);
+
+	*ret_dx_root_bh = dx_root_bh;
+	dx_root_bh = NULL;
+
+out:
+	brelse(dx_root_bh);
+	return ret;
+}
+
+static int ocfs2_dx_dir_format_cluster(struct ocfs2_super *osb,
+				       handle_t *handle, struct inode *dir,
+				       struct buffer_head **dx_leaves,
+				       int num_dx_leaves, u64 start_blk)
+{
+	int ret, i;
+	struct ocfs2_dx_leaf *dx_leaf;
+	struct buffer_head *bh;
+
+	for (i = 0; i < num_dx_leaves; i++) {
+		bh = sb_getblk(osb->sb, start_blk + i);
+		if (bh == NULL) {
+			ret = -EIO;
+			goto out;
+		}
+		dx_leaves[i] = bh;
+
+		ocfs2_set_new_buffer_uptodate(INODE_CACHE(dir), bh);
+
+		ret = ocfs2_journal_access_dl(handle, INODE_CACHE(dir), bh,
+					      OCFS2_JOURNAL_ACCESS_CREATE);
+		if (ret < 0) {
+			mlog_errno(ret);
+			goto out;
+		}
+
+		dx_leaf = (struct ocfs2_dx_leaf *) bh->b_data;
+
+		memset(dx_leaf, 0, osb->sb->s_blocksize);

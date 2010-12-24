@@ -1,0 +1,69 @@
+		new_inode->i_ctime = CURRENT_TIME_SEC;
+	}
+	old_dir->i_ctime = old_dir->i_mtime = CURRENT_TIME_SEC;
+	ext3_update_dx_flag(old_dir);
+	if (dir_bh) {
+		BUFFER_TRACE(dir_bh, "get_write_access");
+		ext3_journal_get_write_access(handle, dir_bh);
+		PARENT_INO(dir_bh->b_data) = cpu_to_le32(new_dir->i_ino);
+		BUFFER_TRACE(dir_bh, "call ext3_journal_dirty_metadata");
+		ext3_journal_dirty_metadata(handle, dir_bh);
+		drop_nlink(old_dir);
+		if (new_inode) {
+			drop_nlink(new_inode);
+		} else {
+			inc_nlink(new_dir);
+			ext3_update_dx_flag(new_dir);
+			ext3_mark_inode_dirty(handle, new_dir);
+		}
+	}
+	ext3_mark_inode_dirty(handle, old_dir);
+	if (new_inode) {
+		ext3_mark_inode_dirty(handle, new_inode);
+		if (!new_inode->i_nlink)
+			ext3_orphan_add(handle, new_inode);
+		if (ext3_should_writeback_data(new_inode))
+			flush_file = 1;
+	}
+	retval = 0;
+
+end_rename:
+	brelse (dir_bh);
+	brelse (old_bh);
+	brelse (new_bh);
+	ext3_journal_stop(handle);
+	if (retval == 0 && flush_file)
+		filemap_flush(old_inode->i_mapping);
+	return retval;
+}
+
+const struct inode_operations ext3_dir_inode_operations = {
+	.create		= ext3_create,
+	.lookup		= ext3_lookup,
+	.link		= ext3_link,
+	.unlink		= ext3_unlink,
+	.symlink	= ext3_symlink,
+	.mkdir		= ext3_mkdir,
+	.rmdir		= ext3_rmdir,
+	.mknod		= ext3_mknod,
+	.rename		= ext3_rename,
+	.setattr	= ext3_setattr,
+#ifdef CONFIG_EXT3_FS_XATTR
+	.setxattr	= generic_setxattr,
+	.getxattr	= generic_getxattr,
+	.listxattr	= ext3_listxattr,
+	.removexattr	= generic_removexattr,
+#endif
+	.check_acl	= ext3_check_acl,
+};
+
+const struct inode_operations ext3_special_inode_operations = {
+	.setattr	= ext3_setattr,
+#ifdef CONFIG_EXT3_FS_XATTR
+	.setxattr	= generic_setxattr,
+	.getxattr	= generic_getxattr,
+	.listxattr	= ext3_listxattr,
+	.removexattr	= generic_removexattr,
+#endif
+	.check_acl	= ext3_check_acl,
+};

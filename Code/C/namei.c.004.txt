@@ -1,0 +1,49 @@
+static inline unsigned dx_get_block (struct dx_entry *entry)
+{
+	return le32_to_cpu(entry->block) & 0x00ffffff;
+}
+
+static inline void dx_set_block (struct dx_entry *entry, unsigned value)
+{
+	entry->block = cpu_to_le32(value);
+}
+
+static inline unsigned dx_get_hash (struct dx_entry *entry)
+{
+	return le32_to_cpu(entry->hash);
+}
+
+static inline void dx_set_hash (struct dx_entry *entry, unsigned value)
+{
+	entry->hash = cpu_to_le32(value);
+}
+
+static inline unsigned dx_get_count (struct dx_entry *entries)
+{
+	return le16_to_cpu(((struct dx_countlimit *) entries)->count);
+}
+
+static inline unsigned dx_get_limit (struct dx_entry *entries)
+{
+	return le16_to_cpu(((struct dx_countlimit *) entries)->limit);
+}
+
+static inline void dx_set_count (struct dx_entry *entries, unsigned value)
+{
+	((struct dx_countlimit *) entries)->count = cpu_to_le16(value);
+}
+
+static inline void dx_set_limit (struct dx_entry *entries, unsigned value)
+{
+	((struct dx_countlimit *) entries)->limit = cpu_to_le16(value);
+}
+
+static inline unsigned dx_root_limit (struct inode *dir, unsigned infosize)
+{
+	unsigned entry_space = dir->i_sb->s_blocksize - EXT3_DIR_REC_LEN(1) -
+		EXT3_DIR_REC_LEN(2) - infosize;
+	return entry_space / sizeof(struct dx_entry);
+}
+
+static inline unsigned dx_node_limit (struct inode *dir)
+{

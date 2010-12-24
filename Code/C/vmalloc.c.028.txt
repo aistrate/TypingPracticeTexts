@@ -1,0 +1,49 @@
+void *vmalloc_exec(unsigned long size)
+{
+	return __vmalloc_node(size, 1, GFP_KERNEL | __GFP_HIGHMEM, PAGE_KERNEL_EXEC,
+			      -1, __builtin_return_address(0));
+}
+
+#if defined(CONFIG_64BIT) && defined(CONFIG_ZONE_DMA32)
+#define GFP_VMALLOC32 GFP_DMA32 | GFP_KERNEL
+#elif defined(CONFIG_64BIT) && defined(CONFIG_ZONE_DMA)
+#define GFP_VMALLOC32 GFP_DMA | GFP_KERNEL
+#else
+#define GFP_VMALLOC32 GFP_KERNEL
+#endif
+
+void *vmalloc_32(unsigned long size)
+{
+	return __vmalloc_node(size, 1, GFP_VMALLOC32, PAGE_KERNEL,
+			      -1, __builtin_return_address(0));
+}
+EXPORT_SYMBOL(vmalloc_32);
+
+void *vmalloc_32_user(unsigned long size)
+{
+	struct vm_struct *area;
+	void *ret;
+
+	ret = __vmalloc_node(size, 1, GFP_VMALLOC32 | __GFP_ZERO, PAGE_KERNEL,
+			     -1, __builtin_return_address(0));
+	if (ret) {
+		area = find_vm_area(ret);
+		area->flags |= VM_USERMAP;
+	}
+	return ret;
+}
+EXPORT_SYMBOL(vmalloc_32_user);
+
+static int aligned_vread(char *buf, char *addr, unsigned long count)
+{
+	struct page *p;
+	int copied = 0;
+
+	while (count) {
+		unsigned long offset, length;
+
+		offset = (unsigned long)addr & ~PAGE_MASK;
+		length = PAGE_SIZE - offset;
+		if (length > count)
+			length = count;
+		p = vmalloc_to_page(addr);

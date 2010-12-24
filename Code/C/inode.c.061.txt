@@ -1,0 +1,49 @@
+		if ((EXT4_JOURNAL(inode) == NULL) || bh2jh(this_bh))
+			ext4_handle_dirty_metadata(handle, inode, this_bh);
+		else
+			EXT4_ERROR_INODE(inode,
+					 "circular indirect block detected at "
+					 "block %llu",
+				(unsigned long long) this_bh->b_blocknr);
+	}
+}
+
+static void ext4_free_branches(handle_t *handle, struct inode *inode,
+			       struct buffer_head *parent_bh,
+			       __le32 *first, __le32 *last, int depth)
+{
+	ext4_fsblk_t nr;
+	__le32 *p;
+
+	if (ext4_handle_is_aborted(handle))
+		return;
+
+	if (depth--) {
+		struct buffer_head *bh;
+		int addr_per_block = EXT4_ADDR_PER_BLOCK(inode->i_sb);
+		p = last;
+		while (--p >= first) {
+			nr = le32_to_cpu(*p);
+			if (!nr)
+				continue;		
+
+			if (!ext4_data_block_valid(EXT4_SB(inode->i_sb),
+						   nr, 1)) {
+				EXT4_ERROR_INODE(inode,
+						 "invalid indirect mapped "
+						 "block %lu (level %d)",
+						 (unsigned long) nr, depth);
+				break;
+			}
+
+			bh = sb_bread(inode->i_sb, nr);
+
+			if (!bh) {
+				EXT4_ERROR_INODE_BLOCK(inode, nr,
+						       "Read failure");
+				continue;
+			}
+
+			BUFFER_TRACE(bh, "free child branches");
+			ext4_free_branches(handle, inode, bh,
+					(__le32 *) bh->b_data,

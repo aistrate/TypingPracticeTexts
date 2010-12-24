@@ -1,0 +1,50 @@
+					int wake_flags, bool success)
+{
+	trace_sched_wakeup(p, success);
+	check_preempt_curr(rq, p, wake_flags);
+
+	p->state = TASK_RUNNING;
+#ifdef CONFIG_SMP
+	if (p->sched_class->task_woken)
+		p->sched_class->task_woken(rq, p);
+
+	if (unlikely(rq->idle_stamp)) {
+		u64 delta = rq->clock - rq->idle_stamp;
+		u64 max = 2*sysctl_sched_migration_cost;
+
+		if (delta > max)
+			rq->avg_idle = max;
+		else
+			update_avg(&rq->avg_idle, delta);
+		rq->idle_stamp = 0;
+	}
+#endif
+	
+	if ((p->flags & PF_WQ_WORKER) && success)
+		wq_worker_waking_up(p, cpu_of(rq));
+}
+
+static int try_to_wake_up(struct task_struct *p, unsigned int state,
+			  int wake_flags)
+{
+	int cpu, orig_cpu, this_cpu, success = 0;
+	unsigned long flags;
+	unsigned long en_flags = ENQUEUE_WAKEUP;
+	struct rq *rq;
+
+	this_cpu = get_cpu();
+
+	smp_wmb();
+	rq = task_rq_lock(p, &flags);
+	if (!(p->state & state))
+		goto out;
+
+	if (p->se.on_rq)
+		goto out_running;
+
+	cpu = task_cpu(p);
+	orig_cpu = cpu;
+
+#ifdef CONFIG_SMP
+	if (unlikely(task_running(rq, p)))
+		goto out_activate;

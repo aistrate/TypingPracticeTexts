@@ -1,0 +1,50 @@
+oom_free_new:
+	page_cache_release(new_page);
+oom:
+	if (old_page) {
+		if (page_mkwrite) {
+			unlock_page(old_page);
+			page_cache_release(old_page);
+		}
+		page_cache_release(old_page);
+	}
+	return VM_FAULT_OOM;
+
+unwritable_page:
+	page_cache_release(old_page);
+	return ret;
+}
+
+#define is_restart_addr(truncate_count) (!((truncate_count) & ~PAGE_MASK))
+
+static void reset_vma_truncate_counts(struct address_space *mapping)
+{
+	struct vm_area_struct *vma;
+	struct prio_tree_iter iter;
+
+	vma_prio_tree_foreach(vma, &iter, &mapping->i_mmap, 0, ULONG_MAX)
+		vma->vm_truncate_count = 0;
+	list_for_each_entry(vma, &mapping->i_mmap_nonlinear, shared.vm_set.list)
+		vma->vm_truncate_count = 0;
+}
+
+static int unmap_mapping_range_vma(struct vm_area_struct *vma,
+		unsigned long start_addr, unsigned long end_addr,
+		struct zap_details *details)
+{
+	unsigned long restart_addr;
+	int need_break;
+
+again:
+	restart_addr = vma->vm_truncate_count;
+	if (is_restart_addr(restart_addr) && start_addr < restart_addr) {
+		start_addr = restart_addr;
+		if (start_addr >= end_addr) {
+			
+			vma->vm_truncate_count = details->truncate_count;
+			return 0;
+		}
+	}
+
+	restart_addr = zap_page_range(vma, start_addr,
+					end_addr - start_addr, details);

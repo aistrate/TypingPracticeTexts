@@ -1,0 +1,50 @@
+			}
+			*f_pos = offset = i;
+			*f_version = inode->i_version;
+		}
+
+		de = (struct ocfs2_dir_entry *) (data->id_data + *f_pos);
+		if (!ocfs2_check_dir_entry(inode, de, di_bh, *f_pos)) {
+			
+			*f_pos = i_size_read(inode);
+			goto out;
+		}
+		offset += le16_to_cpu(de->rec_len);
+		if (le64_to_cpu(de->inode)) {
+			
+			u64 version = *f_version;
+			unsigned char d_type = DT_UNKNOWN;
+
+			if (de->file_type < OCFS2_FT_MAX)
+				d_type = ocfs2_filetype_table[de->file_type];
+
+			filldir_ret = filldir(priv, de->name,
+					      de->name_len,
+					      *f_pos,
+					      le64_to_cpu(de->inode),
+					      d_type);
+			if (filldir_ret) {
+				if (filldir_err)
+					*filldir_err = filldir_ret;
+				break;
+			}
+			if (version != *f_version)
+				goto revalidate;
+		}
+		*f_pos += le16_to_cpu(de->rec_len);
+	}
+
+out:
+	brelse(di_bh);
+
+	return 0;
+}
+
+static int ocfs2_dir_foreach_blk_el(struct inode *inode,
+				    u64 *f_version,
+				    loff_t *f_pos, void *priv,
+				    filldir_t filldir, int *filldir_err)
+{
+	int error = 0;
+	unsigned long offset, blk, last_ra_blk = 0;
+	int i, stored;

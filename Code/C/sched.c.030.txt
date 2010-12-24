@@ -1,0 +1,49 @@
+	rq->nr_running--;
+}
+
+static void set_load_weight(struct task_struct *p)
+{
+	
+	if (p->policy == SCHED_IDLE) {
+		p->se.load.weight = WEIGHT_IDLEPRIO;
+		p->se.load.inv_weight = WMULT_IDLEPRIO;
+		return;
+	}
+
+	p->se.load.weight = prio_to_weight[p->static_prio - MAX_RT_PRIO];
+	p->se.load.inv_weight = prio_to_wmult[p->static_prio - MAX_RT_PRIO];
+}
+
+static void enqueue_task(struct rq *rq, struct task_struct *p, int flags)
+{
+	update_rq_clock(rq);
+	sched_info_queued(p);
+	p->sched_class->enqueue_task(rq, p, flags);
+	p->se.on_rq = 1;
+}
+
+static void dequeue_task(struct rq *rq, struct task_struct *p, int flags)
+{
+	update_rq_clock(rq);
+	sched_info_dequeued(p);
+	p->sched_class->dequeue_task(rq, p, flags);
+	p->se.on_rq = 0;
+}
+
+static void activate_task(struct rq *rq, struct task_struct *p, int flags)
+{
+	if (task_contributes_to_load(p))
+		rq->nr_uninterruptible--;
+
+	enqueue_task(rq, p, flags);
+	inc_nr_running(rq);
+}
+
+static void deactivate_task(struct rq *rq, struct task_struct *p, int flags)
+{
+	if (task_contributes_to_load(p))
+		rq->nr_uninterruptible++;
+
+	dequeue_task(rq, p, flags);
+	dec_nr_running(rq);
+}

@@ -1,0 +1,49 @@
+	if (EXT4_JOURNAL(inode) &&
+	    ext4_test_inode_state(inode, EXT4_STATE_JDATA)) {
+		
+		ext4_clear_inode_state(inode, EXT4_STATE_JDATA);
+		journal = EXT4_JOURNAL(inode);
+		jbd2_journal_lock_updates(journal);
+		err = jbd2_journal_flush(journal);
+		jbd2_journal_unlock_updates(journal);
+
+		if (err)
+			return 0;
+	}
+
+	return generic_block_bmap(mapping, block, ext4_get_block);
+}
+
+static int ext4_readpage(struct file *file, struct page *page)
+{
+	return mpage_readpage(page, ext4_get_block);
+}
+
+static int
+ext4_readpages(struct file *file, struct address_space *mapping,
+		struct list_head *pages, unsigned nr_pages)
+{
+	return mpage_readpages(mapping, pages, nr_pages, ext4_get_block);
+}
+
+static void ext4_invalidatepage_free_endio(struct page *page, unsigned long offset)
+{
+	struct buffer_head *head, *bh;
+	unsigned int curr_off = 0;
+
+	if (!page_has_buffers(page))
+		return;
+	head = bh = page_buffers(page);
+	do {
+		if (offset <= curr_off && test_clear_buffer_uninit(bh)
+					&& bh->b_private) {
+			ext4_free_io_end(bh->b_private);
+			bh->b_private = NULL;
+			bh->b_end_io = NULL;
+		}
+		curr_off = curr_off + bh->b_size;
+		bh = bh->b_this_page;
+	} while (bh != head);
+}
+
+static void ext4_invalidatepage(struct page *page, unsigned long offset)

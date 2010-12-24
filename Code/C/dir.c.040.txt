@@ -1,0 +1,49 @@
+	i_size_write(inode, size);
+	inode->i_nlink = 2;
+	inode->i_blocks = ocfs2_inode_sector_count(inode);
+
+	ret = ocfs2_mark_inode_dirty(handle, inode, di_bh);
+	if (ret < 0)
+		mlog_errno(ret);
+
+out:
+	return ret;
+}
+
+static int ocfs2_fill_new_dir_el(struct ocfs2_super *osb,
+				 handle_t *handle,
+				 struct inode *parent,
+				 struct inode *inode,
+				 struct buffer_head *fe_bh,
+				 struct ocfs2_alloc_context *data_ac,
+				 struct buffer_head **ret_new_bh)
+{
+	int status;
+	unsigned int size = osb->sb->s_blocksize;
+	struct buffer_head *new_bh = NULL;
+	struct ocfs2_dir_entry *de;
+
+	mlog_entry_void();
+
+	if (ocfs2_new_dir_wants_trailer(inode))
+		size = ocfs2_dir_trailer_blk_off(parent->i_sb);
+
+	status = ocfs2_do_extend_dir(osb->sb, handle, inode, fe_bh,
+				     data_ac, NULL, &new_bh);
+	if (status < 0) {
+		mlog_errno(status);
+		goto bail;
+	}
+
+	ocfs2_set_new_buffer_uptodate(INODE_CACHE(inode), new_bh);
+
+	status = ocfs2_journal_access_db(handle, INODE_CACHE(inode), new_bh,
+					 OCFS2_JOURNAL_ACCESS_CREATE);
+	if (status < 0) {
+		mlog_errno(status);
+		goto bail;
+	}
+	memset(new_bh->b_data, 0, osb->sb->s_blocksize);
+
+	de = ocfs2_fill_initial_dirents(inode, parent, new_bh->b_data, size);
+	if (ocfs2_new_dir_wants_trailer(inode)) {

@@ -1,0 +1,50 @@
+		struct buffer_head *bh;
+
+		if (ocfs2_free_list_at_root(lookup)) {
+			bh = lookup->dl_dx_root_bh;
+			retval = ocfs2_journal_access_dr(handle,
+						 INODE_CACHE(dir), bh,
+						 OCFS2_JOURNAL_ACCESS_WRITE);
+		} else {
+			bh = lookup->dl_prev_leaf_bh;
+			retval = ocfs2_journal_access_db(handle,
+						 INODE_CACHE(dir), bh,
+						 OCFS2_JOURNAL_ACCESS_WRITE);
+		}
+		if (retval) {
+			mlog_errno(retval);
+			return retval;
+		}
+	} else if (OCFS2_I(dir)->ip_dyn_features & OCFS2_INLINE_DATA_FL) {
+		data_start = di->id2.i_data.id_data;
+		size = i_size_read(dir);
+
+		BUG_ON(insert_bh != parent_fe_bh);
+	}
+
+	rec_len = OCFS2_DIR_REC_LEN(namelen);
+	offset = 0;
+	de = (struct ocfs2_dir_entry *) data_start;
+	while (1) {
+		BUG_ON((char *)de >= (size + data_start));
+
+		if (!ocfs2_check_dir_entry(dir, de, insert_bh, offset)) {
+			retval = -ENOENT;
+			goto bail;
+		}
+		if (ocfs2_match(namelen, name, de)) {
+			retval = -EEXIST;
+			goto bail;
+		}
+
+		mlog_bug_on_msg(ocfs2_skip_dir_trailer(dir, de, offset, size),
+				"Hit dir trailer trying to insert %.*s "
+			        "(namelen %d) into directory %llu.  "
+				"offset is %lu, trailer offset is %d\n",
+				namelen, name, namelen,
+				(unsigned long long)parent_fe_bh->b_blocknr,
+				offset, ocfs2_dir_trailer_blk_off(dir->i_sb));
+
+		if (ocfs2_dirent_would_fit(de, rec_len)) {
+			dir->i_mtime = dir->i_ctime = CURRENT_TIME;
+			retval = ocfs2_mark_inode_dirty(handle, dir, parent_fe_bh);

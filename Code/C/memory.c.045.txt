@@ -1,0 +1,50 @@
+				page_cache_release(page);
+				goto out;
+			}
+			charged = 1;
+			
+			if (vma->vm_flags & VM_LOCKED)
+				clear_page_mlock(vmf.page);
+			copy_user_highpage(page, vmf.page, address, vma);
+			__SetPageUptodate(page);
+		} else {
+			
+			if (vma->vm_ops->page_mkwrite) {
+				int tmp;
+
+				unlock_page(page);
+				vmf.flags = FAULT_FLAG_WRITE|FAULT_FLAG_MKWRITE;
+				tmp = vma->vm_ops->page_mkwrite(vma, &vmf);
+				if (unlikely(tmp &
+					  (VM_FAULT_ERROR | VM_FAULT_NOPAGE))) {
+					ret = tmp;
+					goto unwritable_page;
+				}
+				if (unlikely(!(tmp & VM_FAULT_LOCKED))) {
+					lock_page(page);
+					if (!page->mapping) {
+						ret = 0; 
+						unlock_page(page);
+						goto unwritable_page;
+					}
+				} else
+					VM_BUG_ON(!PageLocked(page));
+				page_mkwrite = 1;
+			}
+		}
+
+	}
+
+	page_table = pte_offset_map_lock(mm, pmd, address, &ptl);
+
+	if (likely(pte_same(*page_table, orig_pte))) {
+		flush_icache_page(vma, page);
+		entry = mk_pte(page, vma->vm_page_prot);
+		if (flags & FAULT_FLAG_WRITE)
+			entry = maybe_mkwrite(pte_mkdirty(entry), vma);
+		if (anon) {
+			inc_mm_counter_fast(mm, MM_ANONPAGES);
+			page_add_new_anon_rmap(page, vma, address);
+		} else {
+			inc_mm_counter_fast(mm, MM_FILEPAGES);
+			page_add_file_rmap(page);

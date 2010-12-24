@@ -1,0 +1,50 @@
+				offset >> EXT3_BLOCK_SIZE_BITS(sb), 0, &err);
+			if (!bh) {
+				if (err)
+					ext3_error(sb, __func__,
+						   "error %d reading directory"
+						   " #%lu offset %lu",
+						   err, inode->i_ino, offset);
+				offset += sb->s_blocksize;
+				continue;
+			}
+			de = (struct ext3_dir_entry_2 *) bh->b_data;
+		}
+		if (!ext3_check_dir_entry("empty_dir", inode, de, bh, offset)) {
+			de = (struct ext3_dir_entry_2 *)(bh->b_data +
+							 sb->s_blocksize);
+			offset = (offset | (sb->s_blocksize - 1)) + 1;
+			continue;
+		}
+		if (le32_to_cpu(de->inode)) {
+			brelse (bh);
+			return 0;
+		}
+		offset += ext3_rec_len_from_disk(de->rec_len);
+		de = ext3_next_entry(de);
+	}
+	brelse (bh);
+	return 1;
+}
+
+int ext3_orphan_add(handle_t *handle, struct inode *inode)
+{
+	struct super_block *sb = inode->i_sb;
+	struct ext3_iloc iloc;
+	int err = 0, rc;
+
+	mutex_lock(&EXT3_SB(sb)->s_orphan_lock);
+	if (!list_empty(&EXT3_I(inode)->i_orphan))
+		goto out_unlock;
+
+	J_ASSERT ((S_ISREG(inode->i_mode) || S_ISDIR(inode->i_mode) ||
+		S_ISLNK(inode->i_mode)) || inode->i_nlink == 0);
+
+	BUFFER_TRACE(EXT3_SB(sb)->s_sbh, "get_write_access");
+	err = ext3_journal_get_write_access(handle, EXT3_SB(sb)->s_sbh);
+	if (err)
+		goto out_unlock;
+
+	err = ext3_reserve_inode_write(handle, inode, &iloc);
+	if (err)
+		goto out_unlock;

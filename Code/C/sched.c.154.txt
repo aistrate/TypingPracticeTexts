@@ -1,0 +1,28 @@
+	int snap, trycount = 0;
+
+	smp_mb();  
+	snap = atomic_read(&synchronize_sched_expedited_count) + 1;
+	get_online_cpus();
+	while (try_stop_cpus(cpu_online_mask,
+			     synchronize_sched_expedited_cpu_stop,
+			     NULL) == -EAGAIN) {
+		put_online_cpus();
+		if (trycount++ < 10)
+			udelay(trycount * num_online_cpus());
+		else {
+			synchronize_sched();
+			return;
+		}
+		if (atomic_read(&synchronize_sched_expedited_count) - snap > 0) {
+			smp_mb(); 
+			return;
+		}
+		get_online_cpus();
+	}
+	atomic_inc(&synchronize_sched_expedited_count);
+	smp_mb__after_atomic_inc(); 
+	put_online_cpus();
+}
+EXPORT_SYMBOL_GPL(synchronize_sched_expedited);
+
+#endif 

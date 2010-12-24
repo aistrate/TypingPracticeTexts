@@ -1,0 +1,50 @@
+	}
+	
+	while (partial > p) {
+		brelse(partial->bh);
+		partial--;
+	}
+no_top:
+	return partial;
+}
+
+static int ext4_clear_blocks(handle_t *handle, struct inode *inode,
+			     struct buffer_head *bh,
+			     ext4_fsblk_t block_to_free,
+			     unsigned long count, __le32 *first,
+			     __le32 *last)
+{
+	__le32 *p;
+	int	flags = EXT4_FREE_BLOCKS_FORGET | EXT4_FREE_BLOCKS_VALIDATED;
+
+	if (S_ISDIR(inode->i_mode) || S_ISLNK(inode->i_mode))
+		flags |= EXT4_FREE_BLOCKS_METADATA;
+
+	if (!ext4_data_block_valid(EXT4_SB(inode->i_sb), block_to_free,
+				   count)) {
+		EXT4_ERROR_INODE(inode, "attempt to clear invalid "
+				 "blocks %llu len %lu",
+				 (unsigned long long) block_to_free, count);
+		return 1;
+	}
+
+	if (try_to_extend_transaction(handle, inode)) {
+		if (bh) {
+			BUFFER_TRACE(bh, "call ext4_handle_dirty_metadata");
+			ext4_handle_dirty_metadata(handle, inode, bh);
+		}
+		ext4_mark_inode_dirty(handle, inode);
+		ext4_truncate_restart_trans(handle, inode,
+					    blocks_for_truncate(inode));
+		if (bh) {
+			BUFFER_TRACE(bh, "retaking write access");
+			ext4_journal_get_write_access(handle, bh);
+		}
+	}
+
+	for (p = first; p < last; p++)
+		*p = 0;
+
+	ext4_free_blocks(handle, inode, 0, block_to_free, count, flags);
+	return 0;
+}

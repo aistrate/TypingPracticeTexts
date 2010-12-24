@@ -1,0 +1,49 @@
+	if (le16_to_cpu(entry_list->de_num_used) >=
+	    le16_to_cpu(entry_list->de_count))
+		return -ENOSPC;
+
+	return 0;
+}
+
+static int ocfs2_prepare_dx_dir_for_insert(struct inode *dir,
+					   struct buffer_head *di_bh,
+					   const char *name,
+					   int namelen,
+					   struct ocfs2_dir_lookup_result *lookup)
+{
+	int ret, free_dx_root = 1;
+	struct ocfs2_super *osb = OCFS2_SB(dir->i_sb);
+	struct buffer_head *dx_root_bh = NULL;
+	struct buffer_head *leaf_bh = NULL;
+	struct ocfs2_dinode *di = (struct ocfs2_dinode *)di_bh->b_data;
+	struct ocfs2_dx_root_block *dx_root;
+
+	ret = ocfs2_read_dx_root(dir, di, &dx_root_bh);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	dx_root = (struct ocfs2_dx_root_block *)dx_root_bh->b_data;
+	if (le32_to_cpu(dx_root->dr_num_entries) == OCFS2_DX_ENTRIES_MAX) {
+		ret = -ENOSPC;
+		mlog_errno(ret);
+		goto out;
+	}
+
+	if (ocfs2_dx_root_inline(dx_root)) {
+		ret = ocfs2_inline_dx_has_space(dx_root_bh);
+
+		if (ret == 0)
+			goto search_el;
+
+		ret = ocfs2_expand_inline_dx_root(dir, dx_root_bh);
+		if (ret) {
+			mlog_errno(ret);
+			goto out;
+		}
+	}
+
+	ret = ocfs2_find_dir_space_dx(osb, dir, di_bh, dx_root_bh, name,
+				      namelen, lookup);
+	if (ret) {

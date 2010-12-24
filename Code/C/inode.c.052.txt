@@ -1,0 +1,49 @@
+	io_end->offset = offset;
+	io_end->size = size;
+	if (is_async) {
+		io_end->iocb = iocb;
+		io_end->result = ret;
+	}
+	wq = EXT4_SB(io_end->inode->i_sb)->dio_unwritten_wq;
+
+	ei = EXT4_I(io_end->inode);
+	spin_lock_irqsave(&ei->i_completed_io_lock, flags);
+	list_add_tail(&io_end->list, &ei->i_completed_io_list);
+	spin_unlock_irqrestore(&ei->i_completed_io_lock, flags);
+
+	queue_work(wq, &io_end->work);
+	iocb->private = NULL;
+}
+
+static void ext4_end_io_buffer_write(struct buffer_head *bh, int uptodate)
+{
+	ext4_io_end_t *io_end = bh->b_private;
+	struct workqueue_struct *wq;
+	struct inode *inode;
+	unsigned long flags;
+
+	if (!test_clear_buffer_uninit(bh) || !io_end)
+		goto out;
+
+	if (!(io_end->inode->i_sb->s_flags & MS_ACTIVE)) {
+		printk("sb umounted, discard end_io request for inode %lu\n",
+			io_end->inode->i_ino);
+		ext4_free_io_end(io_end);
+		goto out;
+	}
+
+	io_end->flag = EXT4_IO_END_UNWRITTEN;
+	inode = io_end->inode;
+
+	spin_lock_irqsave(&EXT4_I(inode)->i_completed_io_lock, flags);
+	list_add_tail(&io_end->list, &EXT4_I(inode)->i_completed_io_list);
+	spin_unlock_irqrestore(&EXT4_I(inode)->i_completed_io_lock, flags);
+
+	wq = EXT4_SB(inode->i_sb)->dio_unwritten_wq;
+	
+	queue_work(wq, &io_end->work);
+out:
+	bh->b_private = NULL;
+	bh->b_end_io = NULL;
+	clear_buffer_uninit(bh);
+	end_buffer_async_write(bh, uptodate);

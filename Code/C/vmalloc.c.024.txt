@@ -1,0 +1,50 @@
+			kfree(area->pages);
+	}
+
+	kfree(area);
+	return;
+}
+
+void vfree(const void *addr)
+{
+	BUG_ON(in_interrupt());
+
+	kmemleak_free(addr);
+
+	__vunmap(addr, 1);
+}
+EXPORT_SYMBOL(vfree);
+
+void vunmap(const void *addr)
+{
+	BUG_ON(in_interrupt());
+	might_sleep();
+	__vunmap(addr, 0);
+}
+EXPORT_SYMBOL(vunmap);
+
+void *vmap(struct page **pages, unsigned int count,
+		unsigned long flags, pgprot_t prot)
+{
+	struct vm_struct *area;
+
+	might_sleep();
+
+	if (count > totalram_pages)
+		return NULL;
+
+	area = get_vm_area_caller((count << PAGE_SHIFT), flags,
+					__builtin_return_address(0));
+	if (!area)
+		return NULL;
+
+	if (map_vm_area(area, prot, &pages)) {
+		vunmap(area->addr);
+		return NULL;
+	}
+
+	return area->addr;
+}
+EXPORT_SYMBOL(vmap);
+
+static void *__vmalloc_node(unsigned long size, unsigned long align,

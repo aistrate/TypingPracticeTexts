@@ -1,0 +1,49 @@
+	if (unlikely(!prio_tree_empty(&mapping->i_mmap)))
+		unmap_mapping_range_tree(&mapping->i_mmap, &details);
+	if (unlikely(!list_empty(&mapping->i_mmap_nonlinear)))
+		unmap_mapping_range_list(&mapping->i_mmap_nonlinear, &details);
+	spin_unlock(&mapping->i_mmap_lock);
+}
+EXPORT_SYMBOL(unmap_mapping_range);
+
+int vmtruncate_range(struct inode *inode, loff_t offset, loff_t end)
+{
+	struct address_space *mapping = inode->i_mapping;
+
+	if (!inode->i_op->truncate_range)
+		return -ENOSYS;
+
+	mutex_lock(&inode->i_mutex);
+	down_write(&inode->i_alloc_sem);
+	unmap_mapping_range(mapping, offset, (end - offset), 1);
+	truncate_inode_pages_range(mapping, offset, end);
+	unmap_mapping_range(mapping, offset, (end - offset), 1);
+	inode->i_op->truncate_range(inode, offset, end);
+	up_write(&inode->i_alloc_sem);
+	mutex_unlock(&inode->i_mutex);
+
+	return 0;
+}
+
+static int do_swap_page(struct mm_struct *mm, struct vm_area_struct *vma,
+		unsigned long address, pte_t *page_table, pmd_t *pmd,
+		unsigned int flags, pte_t orig_pte)
+{
+	spinlock_t *ptl;
+	struct page *page, *swapcache = NULL;
+	swp_entry_t entry;
+	pte_t pte;
+	int locked;
+	struct mem_cgroup *ptr = NULL;
+	int exclusive = 0;
+	int ret = 0;
+
+	if (!pte_unmap_same(mm, pmd, page_table, orig_pte))
+		goto out;
+
+	entry = pte_to_swp_entry(orig_pte);
+	if (unlikely(non_swap_entry(entry))) {
+		if (is_migration_entry(entry)) {
+			migration_entry_wait(mm, pmd, address);
+		} else if (is_hwpoison_entry(entry)) {
+			ret = VM_FAULT_HWPOISON;

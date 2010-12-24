@@ -1,0 +1,49 @@
+	if (!cpumask_intersects(new_mask, cpu_active_mask)) {
+		ret = -EINVAL;
+		goto out;
+	}
+
+	if (unlikely((p->flags & PF_THREAD_BOUND) && p != current &&
+		     !cpumask_equal(&p->cpus_allowed, new_mask))) {
+		ret = -EINVAL;
+		goto out;
+	}
+
+	if (p->sched_class->set_cpus_allowed)
+		p->sched_class->set_cpus_allowed(p, new_mask);
+	else {
+		cpumask_copy(&p->cpus_allowed, new_mask);
+		p->rt.nr_cpus_allowed = cpumask_weight(new_mask);
+	}
+
+	if (cpumask_test_cpu(task_cpu(p), new_mask))
+		goto out;
+
+	dest_cpu = cpumask_any_and(cpu_active_mask, new_mask);
+	if (migrate_task(p, dest_cpu)) {
+		struct migration_arg arg = { p, dest_cpu };
+		
+		task_rq_unlock(rq, &flags);
+		stop_one_cpu(cpu_of(rq), migration_cpu_stop, &arg);
+		tlb_migrate_finish(p->mm);
+		return 0;
+	}
+out:
+	task_rq_unlock(rq, &flags);
+
+	return ret;
+}
+EXPORT_SYMBOL_GPL(set_cpus_allowed_ptr);
+
+static int __migrate_task(struct task_struct *p, int src_cpu, int dest_cpu)
+{
+	struct rq *rq_dest, *rq_src;
+	int ret = 0;
+
+	if (unlikely(!cpu_active(dest_cpu)))
+		return ret;
+
+	rq_src = cpu_rq(src_cpu);
+	rq_dest = cpu_rq(dest_cpu);
+
+	double_rq_lock(rq_src, rq_dest);

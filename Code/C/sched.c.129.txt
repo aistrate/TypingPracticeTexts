@@ -1,0 +1,50 @@
+#endif 
+
+#ifdef CONFIG_CGROUP_SCHED
+	list_add(&init_task_group.list, &task_groups);
+	INIT_LIST_HEAD(&init_task_group.children);
+
+#endif 
+
+#if defined CONFIG_FAIR_GROUP_SCHED && defined CONFIG_SMP
+	update_shares_data = __alloc_percpu(nr_cpu_ids * sizeof(unsigned long),
+					    __alignof__(unsigned long));
+#endif
+	for_each_possible_cpu(i) {
+		struct rq *rq;
+
+		rq = cpu_rq(i);
+		raw_spin_lock_init(&rq->lock);
+		rq->nr_running = 0;
+		rq->calc_load_active = 0;
+		rq->calc_load_update = jiffies + LOAD_FREQ;
+		init_cfs_rq(&rq->cfs, rq);
+		init_rt_rq(&rq->rt, rq);
+#ifdef CONFIG_FAIR_GROUP_SCHED
+		init_task_group.shares = init_task_group_load;
+		INIT_LIST_HEAD(&rq->leaf_cfs_rq_list);
+#ifdef CONFIG_CGROUP_SCHED
+		
+		init_tg_cfs_entry(&init_task_group, &rq->cfs, NULL, i, 1, NULL);
+#endif
+#endif 
+
+		rq->rt.rt_runtime = def_rt_bandwidth.rt_runtime;
+#ifdef CONFIG_RT_GROUP_SCHED
+		INIT_LIST_HEAD(&rq->leaf_rt_rq_list);
+#ifdef CONFIG_CGROUP_SCHED
+		init_tg_rt_entry(&init_task_group, &rq->rt, NULL, i, 1, NULL);
+#endif
+#endif
+
+		for (j = 0; j < CPU_LOAD_IDX_MAX; j++)
+			rq->cpu_load[j] = 0;
+
+		rq->last_load_update_tick = jiffies;
+
+#ifdef CONFIG_SMP
+		rq->sd = NULL;
+		rq->rd = NULL;
+		rq->cpu_power = SCHED_LOAD_SCALE;
+		rq->post_schedule = 0;
+		rq->active_balance = 0;

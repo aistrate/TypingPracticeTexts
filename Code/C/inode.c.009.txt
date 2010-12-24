@@ -1,0 +1,50 @@
+			*err = -EIO;
+			goto failed_out;
+		}
+
+		target -= count;
+		
+		while (index < indirect_blks && count) {
+			new_blocks[index++] = current_block++;
+			count--;
+		}
+		if (count > 0) {
+			
+			new_blocks[index] = current_block;
+			printk(KERN_INFO "%s returned more blocks than "
+						"requested\n", __func__);
+			WARN_ON(1);
+			break;
+		}
+	}
+
+	target = blks - count ;
+	blk_allocated = count;
+	if (!target)
+		goto allocated;
+	
+	memset(&ar, 0, sizeof(ar));
+	ar.inode = inode;
+	ar.goal = goal;
+	ar.len = target;
+	ar.logical = iblock;
+	if (S_ISREG(inode->i_mode))
+		
+		ar.flags = EXT4_MB_HINT_DATA;
+
+	current_block = ext4_mb_new_blocks(handle, &ar, err);
+	if (unlikely(current_block + ar.len > EXT4_MAX_BLOCK_FILE_PHYS)) {
+		EXT4_ERROR_INODE(inode,
+				 "current_block %llu + ar.len %d > %d!",
+				 current_block, ar.len,
+				 EXT4_MAX_BLOCK_FILE_PHYS);
+		*err = -EIO;
+		goto failed_out;
+	}
+
+	if (*err && (target == blks)) {
+		
+		goto failed_out;
+	}
+	if (!*err) {
+		if (target == blks) {

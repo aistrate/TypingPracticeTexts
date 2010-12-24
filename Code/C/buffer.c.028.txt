@@ -1,0 +1,50 @@
+		if (block_end <= from || block_start >= to) {
+			if (!buffer_uptodate(bh))
+				partial = 1;
+		} else {
+			set_buffer_uptodate(bh);
+			mark_buffer_dirty(bh);
+		}
+		clear_buffer_new(bh);
+	}
+
+	if (!partial)
+		SetPageUptodate(page);
+	return 0;
+}
+
+int block_write_begin(struct address_space *mapping, loff_t pos, unsigned len,
+		unsigned flags, struct page **pagep, get_block_t *get_block)
+{
+	pgoff_t index = pos >> PAGE_CACHE_SHIFT;
+	struct page *page;
+	int status;
+
+	page = grab_cache_page_write_begin(mapping, index, flags);
+	if (!page)
+		return -ENOMEM;
+
+	status = __block_write_begin(page, pos, len, get_block);
+	if (unlikely(status)) {
+		unlock_page(page);
+		page_cache_release(page);
+		page = NULL;
+	}
+
+	*pagep = page;
+	return status;
+}
+EXPORT_SYMBOL(block_write_begin);
+
+int block_write_end(struct file *file, struct address_space *mapping,
+			loff_t pos, unsigned len, unsigned copied,
+			struct page *page, void *fsdata)
+{
+	struct inode *inode = mapping->host;
+	unsigned start;
+
+	start = pos & (PAGE_CACHE_SIZE - 1);
+
+	if (unlikely(copied < len)) {
+		
+		if (!PageUptodate(page))

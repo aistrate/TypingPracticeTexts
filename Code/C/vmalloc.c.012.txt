@@ -1,0 +1,49 @@
+static bool vmap_initialized __read_mostly = false;
+
+struct vmap_block_queue {
+	spinlock_t lock;
+	struct list_head free;
+};
+
+struct vmap_block {
+	spinlock_t lock;
+	struct vmap_area *va;
+	struct vmap_block_queue *vbq;
+	unsigned long free, dirty;
+	DECLARE_BITMAP(alloc_map, VMAP_BBMAP_BITS);
+	DECLARE_BITMAP(dirty_map, VMAP_BBMAP_BITS);
+	struct list_head free_list;
+	struct rcu_head rcu_head;
+	struct list_head purge;
+};
+
+static DEFINE_PER_CPU(struct vmap_block_queue, vmap_block_queue);
+
+static DEFINE_SPINLOCK(vmap_block_tree_lock);
+static RADIX_TREE(vmap_block_tree, GFP_ATOMIC);
+
+static unsigned long addr_to_vb_idx(unsigned long addr)
+{
+	addr -= VMALLOC_START & ~(VMAP_BLOCK_SIZE-1);
+	addr /= VMAP_BLOCK_SIZE;
+	return addr;
+}
+
+static struct vmap_block *new_vmap_block(gfp_t gfp_mask)
+{
+	struct vmap_block_queue *vbq;
+	struct vmap_block *vb;
+	struct vmap_area *va;
+	unsigned long vb_idx;
+	int node, err;
+
+	node = numa_node_id();
+
+	vb = kmalloc_node(sizeof(struct vmap_block),
+			gfp_mask & GFP_RECLAIM_MASK, node);
+	if (unlikely(!vb))
+		return ERR_PTR(-ENOMEM);
+
+	va = alloc_vmap_area(VMAP_BLOCK_SIZE, VMAP_BLOCK_SIZE,
+					VMALLOC_START, VMALLOC_END,
+					node, gfp_mask);

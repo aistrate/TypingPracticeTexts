@@ -1,0 +1,50 @@
+	unlock_new_inode(inode);
+out_stop:
+	ext3_journal_stop(handle);
+	if (err == -ENOSPC && ext3_should_retry_alloc(dir->i_sb, &retries))
+		goto retry;
+	return err;
+}
+
+static int empty_dir (struct inode * inode)
+{
+	unsigned long offset;
+	struct buffer_head * bh;
+	struct ext3_dir_entry_2 * de, * de1;
+	struct super_block * sb;
+	int err = 0;
+
+	sb = inode->i_sb;
+	if (inode->i_size < EXT3_DIR_REC_LEN(1) + EXT3_DIR_REC_LEN(2) ||
+	    !(bh = ext3_bread (NULL, inode, 0, 0, &err))) {
+		if (err)
+			ext3_error(inode->i_sb, __func__,
+				   "error %d reading directory #%lu offset 0",
+				   err, inode->i_ino);
+		else
+			ext3_warning(inode->i_sb, __func__,
+				     "bad directory (dir #%lu) - no data block",
+				     inode->i_ino);
+		return 1;
+	}
+	de = (struct ext3_dir_entry_2 *) bh->b_data;
+	de1 = ext3_next_entry(de);
+	if (le32_to_cpu(de->inode) != inode->i_ino ||
+			!le32_to_cpu(de1->inode) ||
+			strcmp (".", de->name) ||
+			strcmp ("..", de1->name)) {
+		ext3_warning (inode->i_sb, "empty_dir",
+			      "bad directory (dir #%lu) - no `.' or `..'",
+			      inode->i_ino);
+		brelse (bh);
+		return 1;
+	}
+	offset = ext3_rec_len_from_disk(de->rec_len) +
+			ext3_rec_len_from_disk(de1->rec_len);
+	de = ext3_next_entry(de1);
+	while (offset < inode->i_size ) {
+		if (!bh ||
+			(void *) de >= (void *) (bh->b_data+sb->s_blocksize)) {
+			err = 0;
+			brelse (bh);
+			bh = ext3_bread (NULL, inode,

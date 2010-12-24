@@ -1,0 +1,49 @@
+	trailer = ocfs2_trailer_from_bh(bh, inode->i_sb);
+	strcpy(trailer->db_signature, OCFS2_DIR_TRAILER_SIGNATURE);
+	trailer->db_compat_rec_len =
+			cpu_to_le16(sizeof(struct ocfs2_dir_block_trailer));
+	trailer->db_parent_dinode = cpu_to_le64(OCFS2_I(inode)->ip_blkno);
+	trailer->db_blkno = cpu_to_le64(bh->b_blocknr);
+	trailer->db_free_rec_len = cpu_to_le16(rec_len);
+}
+
+static int ocfs2_dx_dir_link_trailer(struct inode *dir, handle_t *handle,
+				     struct buffer_head *dx_root_bh,
+				     struct buffer_head *dirdata_bh)
+{
+	int ret;
+	struct ocfs2_dx_root_block *dx_root;
+	struct ocfs2_dir_block_trailer *trailer;
+
+	ret = ocfs2_journal_access_dr(handle, INODE_CACHE(dir), dx_root_bh,
+				      OCFS2_JOURNAL_ACCESS_WRITE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+	trailer = ocfs2_trailer_from_bh(dirdata_bh, dir->i_sb);
+	dx_root = (struct ocfs2_dx_root_block *)dx_root_bh->b_data;
+
+	trailer->db_free_next = dx_root->dr_free_blk;
+	dx_root->dr_free_blk = cpu_to_le64(dirdata_bh->b_blocknr);
+
+	ocfs2_journal_dirty(handle, dx_root_bh);
+
+out:
+	return ret;
+}
+
+static int ocfs2_free_list_at_root(struct ocfs2_dir_lookup_result *res)
+{
+	return res->dl_prev_leaf_bh == NULL;
+}
+
+void ocfs2_free_dir_lookup_result(struct ocfs2_dir_lookup_result *res)
+{
+	brelse(res->dl_dx_root_bh);
+	brelse(res->dl_leaf_bh);
+	brelse(res->dl_dx_leaf_bh);
+	brelse(res->dl_prev_leaf_bh);
+}
+
+static int ocfs2_dir_indexed(struct inode *inode)

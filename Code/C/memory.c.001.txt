@@ -1,0 +1,50 @@
+#include <linux/kernel_stat.h>
+#include <linux/mm.h>
+#include <linux/hugetlb.h>
+#include <linux/mman.h>
+#include <linux/swap.h>
+#include <linux/highmem.h>
+#include <linux/pagemap.h>
+#include <linux/ksm.h>
+#include <linux/rmap.h>
+#include <linux/module.h>
+#include <linux/delayacct.h>
+#include <linux/init.h>
+#include <linux/writeback.h>
+#include <linux/memcontrol.h>
+#include <linux/mmu_notifier.h>
+#include <linux/kallsyms.h>
+#include <linux/swapops.h>
+#include <linux/elf.h>
+#include <linux/gfp.h>
+
+#include <asm/io.h>
+#include <asm/pgalloc.h>
+#include <asm/uaccess.h>
+#include <asm/tlb.h>
+#include <asm/tlbflush.h>
+#include <asm/pgtable.h>
+
+#include "internal.h"
+
+#ifndef CONFIG_NEED_MULTIPLE_NODES
+
+unsigned long max_mapnr;
+struct page *mem_map;
+
+EXPORT_SYMBOL(max_mapnr);
+EXPORT_SYMBOL(mem_map);
+#endif
+
+unsigned long num_physpages;
+
+void * high_memory;
+
+EXPORT_SYMBOL(num_physpages);
+EXPORT_SYMBOL(high_memory);
+
+int randomize_va_space __read_mostly =
+#ifdef CONFIG_COMPAT_BRK
+					1;
+#else
+					2;

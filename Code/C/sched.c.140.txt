@@ -1,0 +1,50 @@
+	tg->shares = shares;
+	for_each_possible_cpu(i) {
+		
+		cfs_rq_set_shares(tg->cfs_rq[i], 0);
+		set_se_shares(tg->se[i], shares);
+	}
+
+	spin_lock_irqsave(&task_group_lock, flags);
+	for_each_possible_cpu(i)
+		register_fair_sched_group(tg, i);
+	list_add_rcu(&tg->siblings, &tg->parent->children);
+	spin_unlock_irqrestore(&task_group_lock, flags);
+done:
+	mutex_unlock(&shares_mutex);
+	return 0;
+}
+
+unsigned long sched_group_shares(struct task_group *tg)
+{
+	return tg->shares;
+}
+#endif
+
+#ifdef CONFIG_RT_GROUP_SCHED
+
+static DEFINE_MUTEX(rt_constraints_mutex);
+
+static unsigned long to_ratio(u64 period, u64 runtime)
+{
+	if (runtime == RUNTIME_INF)
+		return 1ULL << 20;
+
+	return div64_u64(runtime << 20, period);
+}
+
+static inline int tg_has_rt_tasks(struct task_group *tg)
+{
+	struct task_struct *g, *p;
+
+	do_each_thread(g, p) {
+		if (rt_task(p) && rt_rq_of_se(&p->rt)->tg == tg)
+			return 1;
+	} while_each_thread(g, p);
+
+	return 0;
+}
+
+struct rt_schedulable_data {
+	struct task_group *tg;
+	u64 rt_period;

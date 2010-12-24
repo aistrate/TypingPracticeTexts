@@ -1,0 +1,50 @@
+			continue;
+
+		for (i = 0; i < nr_node_ids; i++) {
+			struct sched_group *oldsg, *sg = sched_group_nodes[i];
+
+			cpumask_and(nodemask, cpumask_of_node(i), cpu_map);
+			if (cpumask_empty(nodemask))
+				continue;
+
+			if (sg == NULL)
+				continue;
+			sg = sg->next;
+next_sg:
+			oldsg = sg;
+			sg = sg->next;
+			kfree(oldsg);
+			if (oldsg != sched_group_nodes[i])
+				goto next_sg;
+		}
+		kfree(sched_group_nodes);
+		sched_group_nodes_bycpu[cpu] = NULL;
+	}
+}
+#else 
+static void free_sched_groups(const struct cpumask *cpu_map,
+			      struct cpumask *nodemask)
+{
+}
+#endif 
+
+static void init_sched_groups_power(int cpu, struct sched_domain *sd)
+{
+	struct sched_domain *child;
+	struct sched_group *group;
+	long power;
+	int weight;
+
+	WARN_ON(!sd || !sd->groups);
+
+	if (cpu != group_first_cpu(sd->groups))
+		return;
+
+	sd->groups->group_weight = cpumask_weight(sched_group_cpus(sd->groups));
+
+	child = sd->child;
+
+	sd->groups->cpu_power = 0;
+
+	if (!child) {
+		power = SCHED_LOAD_SCALE;

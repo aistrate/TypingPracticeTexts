@@ -1,0 +1,49 @@
+static void cpuacct_update_stats(struct task_struct *tsk,
+		enum cpuacct_stat_index idx, cputime_t val)
+{
+	struct cpuacct *ca;
+	int batch = CPUACCT_BATCH;
+
+	if (unlikely(!cpuacct_subsys.active))
+		return;
+
+	rcu_read_lock();
+	ca = task_ca(tsk);
+
+	do {
+		__percpu_counter_add(&ca->cpustat[idx], val, batch);
+		ca = ca->parent;
+	} while (ca);
+	rcu_read_unlock();
+}
+
+struct cgroup_subsys cpuacct_subsys = {
+	.name = "cpuacct",
+	.create = cpuacct_create,
+	.destroy = cpuacct_destroy,
+	.populate = cpuacct_populate,
+	.subsys_id = cpuacct_subsys_id,
+};
+#endif	
+
+#ifndef CONFIG_SMP
+
+void synchronize_sched_expedited(void)
+{
+	barrier();
+}
+EXPORT_SYMBOL_GPL(synchronize_sched_expedited);
+
+#else 
+
+static atomic_t synchronize_sched_expedited_count = ATOMIC_INIT(0);
+
+static int synchronize_sched_expedited_cpu_stop(void *data)
+{
+	
+	smp_mb(); 
+	return 0;
+}
+
+void synchronize_sched_expedited(void)
+{

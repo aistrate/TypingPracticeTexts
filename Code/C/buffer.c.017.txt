@@ -1,0 +1,50 @@
+}
+EXPORT_SYMBOL(__brelse);
+
+void __bforget(struct buffer_head *bh)
+{
+	clear_buffer_dirty(bh);
+	if (bh->b_assoc_map) {
+		struct address_space *buffer_mapping = bh->b_page->mapping;
+
+		spin_lock(&buffer_mapping->private_lock);
+		list_del_init(&bh->b_assoc_buffers);
+		bh->b_assoc_map = NULL;
+		spin_unlock(&buffer_mapping->private_lock);
+	}
+	__brelse(bh);
+}
+EXPORT_SYMBOL(__bforget);
+
+static struct buffer_head *__bread_slow(struct buffer_head *bh)
+{
+	lock_buffer(bh);
+	if (buffer_uptodate(bh)) {
+		unlock_buffer(bh);
+		return bh;
+	} else {
+		get_bh(bh);
+		bh->b_end_io = end_buffer_read_sync;
+		submit_bh(READ, bh);
+		wait_on_buffer(bh);
+		if (buffer_uptodate(bh))
+			return bh;
+	}
+	brelse(bh);
+	return NULL;
+}
+
+#define BH_LRU_SIZE	8
+
+struct bh_lru {
+	struct buffer_head *bhs[BH_LRU_SIZE];
+};
+
+static DEFINE_PER_CPU(struct bh_lru, bh_lrus) = {{ NULL }};
+
+#ifdef CONFIG_SMP
+#define bh_lru_lock()	local_irq_disable()
+#define bh_lru_unlock()	local_irq_enable()
+#else
+#define bh_lru_lock()	preempt_disable()
+#define bh_lru_unlock()	preempt_enable()

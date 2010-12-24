@@ -1,0 +1,49 @@
+	copied = block_write_end(file, mapping, pos, len, copied, page, fsdata);
+
+	if (pos + copied > inode->i_size) {
+		i_size_write(inode, pos + copied);
+		i_size_changed = 1;
+	}
+
+	if (pos + copied >  EXT4_I(inode)->i_disksize) {
+		
+		ext4_update_i_disksize(inode, (pos + copied));
+		i_size_changed = 1;
+	}
+	unlock_page(page);
+	page_cache_release(page);
+
+	if (i_size_changed)
+		ext4_mark_inode_dirty(handle, inode);
+
+	return copied;
+}
+
+static int ext4_ordered_write_end(struct file *file,
+				  struct address_space *mapping,
+				  loff_t pos, unsigned len, unsigned copied,
+				  struct page *page, void *fsdata)
+{
+	handle_t *handle = ext4_journal_current_handle();
+	struct inode *inode = mapping->host;
+	int ret = 0, ret2;
+
+	trace_ext4_ordered_write_end(inode, pos, len, copied);
+	ret = ext4_jbd2_file_inode(handle, inode);
+
+	if (ret == 0) {
+		ret2 = ext4_generic_write_end(file, mapping, pos, len, copied,
+							page, fsdata);
+		copied = ret2;
+		if (pos + len > inode->i_size && ext4_can_truncate(inode))
+			
+			ext4_orphan_add(handle, inode);
+		if (ret2 < 0)
+			ret = ret2;
+	}
+	ret2 = ext4_journal_stop(handle);
+	if (!ret)
+		ret = ret2;
+
+	if (pos + len > inode->i_size) {
+		ext4_truncate_failed_write(inode);

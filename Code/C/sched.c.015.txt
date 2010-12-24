@@ -1,0 +1,49 @@
+static inline void finish_lock_switch(struct rq *rq, struct task_struct *prev)
+{
+#ifdef CONFIG_SMP
+	
+	smp_wmb();
+	prev->oncpu = 0;
+#endif
+#ifndef __ARCH_WANT_INTERRUPTS_ON_CTXSW
+	local_irq_enable();
+#endif
+}
+#endif 
+
+static inline int task_is_waking(struct task_struct *p)
+{
+	return unlikely(p->state == TASK_WAKING);
+}
+
+static inline struct rq *__task_rq_lock(struct task_struct *p)
+	__acquires(rq->lock)
+{
+	struct rq *rq;
+
+	for (;;) {
+		rq = task_rq(p);
+		raw_spin_lock(&rq->lock);
+		if (likely(rq == task_rq(p)))
+			return rq;
+		raw_spin_unlock(&rq->lock);
+	}
+}
+
+static struct rq *task_rq_lock(struct task_struct *p, unsigned long *flags)
+	__acquires(rq->lock)
+{
+	struct rq *rq;
+
+	for (;;) {
+		local_irq_save(*flags);
+		rq = task_rq(p);
+		raw_spin_lock(&rq->lock);
+		if (likely(rq == task_rq(p)))
+			return rq;
+		raw_spin_unlock_irqrestore(&rq->lock, *flags);
+	}
+}
+
+static void __task_rq_unlock(struct rq *rq)
+	__releases(rq->lock)

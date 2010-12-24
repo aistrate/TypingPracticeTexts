@@ -1,0 +1,50 @@
+}
+
+static int ext4_blks_to_allocate(Indirect *branch, int k, unsigned int blks,
+				 int blocks_to_boundary)
+{
+	unsigned int count = 0;
+
+	if (k > 0) {
+		
+		if (blks < blocks_to_boundary + 1)
+			count += blks;
+		else
+			count += blocks_to_boundary + 1;
+		return count;
+	}
+
+	count++;
+	while (count < blks && count <= blocks_to_boundary &&
+		le32_to_cpu(*(branch[0].p + count)) == 0) {
+		count++;
+	}
+	return count;
+}
+
+static int ext4_alloc_blocks(handle_t *handle, struct inode *inode,
+			     ext4_lblk_t iblock, ext4_fsblk_t goal,
+			     int indirect_blks, int blks,
+			     ext4_fsblk_t new_blocks[4], int *err)
+{
+	struct ext4_allocation_request ar;
+	int target, i;
+	unsigned long count = 0, blk_allocated = 0;
+	int index = 0;
+	ext4_fsblk_t current_block = 0;
+	int ret = 0;
+
+	target = indirect_blks;
+	while (target > 0) {
+		count = target;
+		
+		current_block = ext4_new_meta_blocks(handle, inode,
+							goal, &count, err);
+		if (*err)
+			goto failed_out;
+
+		if (unlikely(current_block + count > EXT4_MAX_BLOCK_FILE_PHYS)) {
+			EXT4_ERROR_INODE(inode,
+					 "current_block %llu + count %lu > %d!",
+					 current_block, count,
+					 EXT4_MAX_BLOCK_FILE_PHYS);

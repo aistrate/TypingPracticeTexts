@@ -1,0 +1,50 @@
+	int blocks_to_boundary = 0;
+	int depth;
+	int count = 0;
+	ext4_fsblk_t first_block = 0;
+
+	J_ASSERT(!(ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS)));
+	J_ASSERT(handle != NULL || (flags & EXT4_GET_BLOCKS_CREATE) == 0);
+	depth = ext4_block_to_path(inode, map->m_lblk, offsets,
+				   &blocks_to_boundary);
+
+	if (depth == 0)
+		goto out;
+
+	partial = ext4_get_branch(inode, depth, offsets, chain, &err);
+
+	if (!partial) {
+		first_block = le32_to_cpu(chain[depth - 1].key);
+		count++;
+		
+		while (count < map->m_len && count <= blocks_to_boundary) {
+			ext4_fsblk_t blk;
+
+			blk = le32_to_cpu(*(chain[depth-1].p + count));
+
+			if (blk == first_block + count)
+				count++;
+			else
+				break;
+		}
+		goto got_it;
+	}
+
+	if ((flags & EXT4_GET_BLOCKS_CREATE) == 0 || err == -EIO)
+		goto cleanup;
+
+	goal = ext4_find_goal(inode, map->m_lblk, partial);
+
+	indirect_blks = (chain + depth) - partial - 1;
+
+	count = ext4_blks_to_allocate(partial, indirect_blks,
+				      map->m_len, blocks_to_boundary);
+	
+	err = ext4_alloc_branch(handle, inode, map->m_lblk, indirect_blks,
+				&count, goal,
+				offsets + (partial - chain), partial);
+
+	if (!err)
+		err = ext4_splice_branch(handle, inode, map->m_lblk,
+					 partial, indirect_blks, count);
+	if (err)

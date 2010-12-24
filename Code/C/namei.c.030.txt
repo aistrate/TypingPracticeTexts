@@ -1,0 +1,50 @@
+		unlock_new_inode(inode);
+		return 0;
+	}
+	drop_nlink(inode);
+	unlock_new_inode(inode);
+	iput(inode);
+	return err;
+}
+
+static int ext3_create (struct inode * dir, struct dentry * dentry, int mode,
+		struct nameidata *nd)
+{
+	handle_t *handle;
+	struct inode * inode;
+	int err, retries = 0;
+
+	dquot_initialize(dir);
+
+retry:
+	handle = ext3_journal_start(dir, EXT3_DATA_TRANS_BLOCKS(dir->i_sb) +
+					EXT3_INDEX_EXTRA_TRANS_BLOCKS + 3 +
+					EXT3_MAXQUOTAS_INIT_BLOCKS(dir->i_sb));
+	if (IS_ERR(handle))
+		return PTR_ERR(handle);
+
+	if (IS_DIRSYNC(dir))
+		handle->h_sync = 1;
+
+	inode = ext3_new_inode (handle, dir, mode);
+	err = PTR_ERR(inode);
+	if (!IS_ERR(inode)) {
+		inode->i_op = &ext3_file_inode_operations;
+		inode->i_fop = &ext3_file_operations;
+		ext3_set_aops(inode);
+		err = ext3_add_nondir(handle, dentry, inode);
+	}
+	ext3_journal_stop(handle);
+	if (err == -ENOSPC && ext3_should_retry_alloc(dir->i_sb, &retries))
+		goto retry;
+	return err;
+}
+
+static int ext3_mknod (struct inode * dir, struct dentry *dentry,
+			int mode, dev_t rdev)
+{
+	handle_t *handle;
+	struct inode *inode;
+	int err, retries = 0;
+
+	if (!new_valid_dev(rdev))

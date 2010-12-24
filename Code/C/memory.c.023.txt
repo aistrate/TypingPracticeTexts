@@ -1,0 +1,50 @@
+			continue;
+		}
+
+		if (!vma ||
+		    (vma->vm_flags & (VM_IO | VM_PFNMAP)) ||
+		    !(vm_flags & vma->vm_flags))
+			return i ? : -EFAULT;
+
+		if (is_vm_hugetlb_page(vma)) {
+			i = follow_hugetlb_page(mm, vma, pages, vmas,
+					&start, &nr_pages, i, gup_flags);
+			continue;
+		}
+
+		do {
+			struct page *page;
+			unsigned int foll_flags = gup_flags;
+
+			if (unlikely(fatal_signal_pending(current)))
+				return i ? i : -ERESTARTSYS;
+
+			cond_resched();
+			while (!(page = follow_page(vma, start, foll_flags))) {
+				int ret;
+
+				ret = handle_mm_fault(mm, vma, start,
+					(foll_flags & FOLL_WRITE) ?
+					FAULT_FLAG_WRITE : 0);
+
+				if (ret & VM_FAULT_ERROR) {
+					if (ret & VM_FAULT_OOM)
+						return i ? i : -ENOMEM;
+					if (ret &
+					    (VM_FAULT_HWPOISON|VM_FAULT_HWPOISON_LARGE|
+					     VM_FAULT_SIGBUS))
+						return i ? i : -EFAULT;
+					BUG();
+				}
+				if (ret & VM_FAULT_MAJOR)
+					tsk->maj_flt++;
+				else
+					tsk->min_flt++;
+
+				if ((ret & VM_FAULT_WRITE) &&
+				    !(vma->vm_flags & VM_WRITE))
+					foll_flags &= ~FOLL_WRITE;
+
+				cond_resched();
+			}
+			if (IS_ERR(page))

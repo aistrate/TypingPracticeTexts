@@ -1,0 +1,49 @@
+void __sched interruptible_sleep_on(wait_queue_head_t *q)
+{
+	sleep_on_common(q, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
+}
+EXPORT_SYMBOL(interruptible_sleep_on);
+
+long __sched
+interruptible_sleep_on_timeout(wait_queue_head_t *q, long timeout)
+{
+	return sleep_on_common(q, TASK_INTERRUPTIBLE, timeout);
+}
+EXPORT_SYMBOL(interruptible_sleep_on_timeout);
+
+void __sched sleep_on(wait_queue_head_t *q)
+{
+	sleep_on_common(q, TASK_UNINTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
+}
+EXPORT_SYMBOL(sleep_on);
+
+long __sched sleep_on_timeout(wait_queue_head_t *q, long timeout)
+{
+	return sleep_on_common(q, TASK_UNINTERRUPTIBLE, timeout);
+}
+EXPORT_SYMBOL(sleep_on_timeout);
+
+#ifdef CONFIG_RT_MUTEXES
+
+void rt_mutex_setprio(struct task_struct *p, int prio)
+{
+	unsigned long flags;
+	int oldprio, on_rq, running;
+	struct rq *rq;
+	const struct sched_class *prev_class;
+
+	BUG_ON(prio < 0 || prio > MAX_PRIO);
+
+	rq = task_rq_lock(p, &flags);
+
+	trace_sched_pi_setprio(p, prio);
+	oldprio = p->prio;
+	prev_class = p->sched_class;
+	on_rq = p->se.on_rq;
+	running = task_current(rq, p);
+	if (on_rq)
+		dequeue_task(rq, p, 0);
+	if (running)
+		p->sched_class->put_prev_task(rq, p);
+
+	if (rt_prio(prio))

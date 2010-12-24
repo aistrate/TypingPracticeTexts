@@ -1,0 +1,49 @@
+	struct ocfs2_dx_root_block *dx_root;
+
+	priv->dx_dir = 1;
+
+	ret = ocfs2_read_inode_block(inode, &di_bh);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+	di = (struct ocfs2_dinode *)di_bh->b_data;
+
+	ret = ocfs2_read_dx_root(inode, di, &dx_root_bh);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+	dx_root = (struct ocfs2_dx_root_block *)dx_root_bh->b_data;
+
+	if (le32_to_cpu(dx_root->dr_num_entries) != 2)
+		priv->seen_other = 1;
+
+out:
+	brelse(di_bh);
+	brelse(dx_root_bh);
+	return ret;
+}
+
+int ocfs2_empty_dir(struct inode *inode)
+{
+	int ret;
+	loff_t start = 0;
+	struct ocfs2_empty_dir_priv priv;
+
+	memset(&priv, 0, sizeof(priv));
+
+	if (ocfs2_dir_indexed(inode)) {
+		ret = ocfs2_empty_dir_dx(inode, &priv);
+		if (ret)
+			mlog_errno(ret);
+		
+	}
+
+	ret = ocfs2_dir_foreach(inode, &start, &priv, ocfs2_empty_dir_filldir);
+	if (ret)
+		mlog_errno(ret);
+
+	if (!priv.seen_dot || !priv.seen_dot_dot) {
+		mlog(ML_ERROR, "bad directory (dir #%llu) - no `.' or `..'\n",
+		     (unsigned long long)OCFS2_I(inode)->ip_blkno);

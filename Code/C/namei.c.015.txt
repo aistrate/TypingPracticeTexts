@@ -1,0 +1,49 @@
+		de_len = ext3_rec_len_from_disk(de->rec_len);
+		if (de_len <= 0)
+			return -1;
+		offset += de_len;
+		de = (struct ext3_dir_entry_2 *) ((char *) de + de_len);
+	}
+	return 0;
+}
+
+static struct buffer_head *ext3_find_entry(struct inode *dir,
+					struct qstr *entry,
+					struct ext3_dir_entry_2 **res_dir)
+{
+	struct super_block * sb;
+	struct buffer_head * bh_use[NAMEI_RA_SIZE];
+	struct buffer_head * bh, *ret = NULL;
+	unsigned long start, block, b;
+	int ra_max = 0;		
+
+	int ra_ptr = 0;		
+
+	int num = 0;
+	int nblocks, i, err;
+	int namelen;
+
+	*res_dir = NULL;
+	sb = dir->i_sb;
+	namelen = entry->len;
+	if (namelen > EXT3_NAME_LEN)
+		return NULL;
+	if (is_dx(dir)) {
+		bh = ext3_dx_find_entry(dir, entry, res_dir, &err);
+		
+		if (bh || (err != ERR_BAD_DX_DIR))
+			return bh;
+		dxtrace(printk("ext3_find_entry: dx failed, falling back\n"));
+	}
+	nblocks = dir->i_size >> EXT3_BLOCK_SIZE_BITS(sb);
+	start = EXT3_I(dir)->i_dir_start_lookup;
+	if (start >= nblocks)
+		start = 0;
+	block = start;
+restart:
+	do {
+		
+		if (ra_ptr >= ra_max) {
+			
+			ra_ptr = 0;
+			b = block;

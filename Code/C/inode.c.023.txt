@@ -1,0 +1,48 @@
+	if (ext4_should_dioread_nolock(inode))
+		ret = __block_write_begin(page, pos, len, ext4_get_block_write);
+	else
+		ret = __block_write_begin(page, pos, len, ext4_get_block);
+
+	if (!ret && ext4_should_journal_data(inode)) {
+		ret = walk_page_buffers(handle, page_buffers(page),
+				from, to, NULL, do_journal_get_write_access);
+	}
+
+	if (ret) {
+		unlock_page(page);
+		page_cache_release(page);
+		
+		if (pos + len > inode->i_size && ext4_can_truncate(inode))
+			ext4_orphan_add(handle, inode);
+
+		ext4_journal_stop(handle);
+		if (pos + len > inode->i_size) {
+			ext4_truncate_failed_write(inode);
+			
+			if (inode->i_nlink)
+				ext4_orphan_del(NULL, inode);
+		}
+	}
+
+	if (ret == -ENOSPC && ext4_should_retry_alloc(inode->i_sb, &retries))
+		goto retry;
+out:
+	return ret;
+}
+
+static int write_end_fn(handle_t *handle, struct buffer_head *bh)
+{
+	if (!buffer_mapped(bh) || buffer_freed(bh))
+		return 0;
+	set_buffer_uptodate(bh);
+	return ext4_handle_dirty_metadata(handle, NULL, bh);
+}
+
+static int ext4_generic_write_end(struct file *file,
+				  struct address_space *mapping,
+				  loff_t pos, unsigned len, unsigned copied,
+				  struct page *page, void *fsdata)
+{
+	int i_size_changed = 0;
+	struct inode *inode = mapping->host;
+	handle_t *handle = ext4_journal_current_handle();

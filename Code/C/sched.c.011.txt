@@ -1,0 +1,49 @@
+int runqueue_is_locked(int cpu)
+{
+	return raw_spin_is_locked(&cpu_rq(cpu)->lock);
+}
+
+#define SCHED_FEAT(name, enabled)	\
+	__SCHED_FEAT_##name ,
+
+enum {
+#include "sched_features.h"
+};
+
+#undef SCHED_FEAT
+
+#define SCHED_FEAT(name, enabled)	\
+	(1UL << __SCHED_FEAT_##name) * enabled |
+
+const_debug unsigned int sysctl_sched_features =
+#include "sched_features.h"
+	0;
+
+#undef SCHED_FEAT
+
+#ifdef CONFIG_SCHED_DEBUG
+#define SCHED_FEAT(name, enabled)	\
+	#name ,
+
+static __read_mostly char *sched_feat_names[] = {
+#include "sched_features.h"
+	NULL
+};
+
+#undef SCHED_FEAT
+
+static int sched_feat_show(struct seq_file *m, void *v)
+{
+	int i;
+
+	for (i = 0; sched_feat_names[i]; i++) {
+		if (!(sysctl_sched_features & (1UL << i)))
+			seq_puts(m, "NO_");
+		seq_printf(m, "%s ", sched_feat_names[i]);
+	}
+	seq_puts(m, "\n");
+
+	return 0;
+}
+
+static ssize_t

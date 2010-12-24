@@ -1,0 +1,50 @@
+	dquot_initialize(dir);
+	dquot_initialize(dentry->d_inode);
+
+	handle = ext3_journal_start(dir, EXT3_DELETE_TRANS_BLOCKS(dir->i_sb));
+	if (IS_ERR(handle))
+		return PTR_ERR(handle);
+
+	if (IS_DIRSYNC(dir))
+		handle->h_sync = 1;
+
+	retval = -ENOENT;
+	bh = ext3_find_entry(dir, &dentry->d_name, &de);
+	if (!bh)
+		goto end_unlink;
+
+	inode = dentry->d_inode;
+
+	retval = -EIO;
+	if (le32_to_cpu(de->inode) != inode->i_ino)
+		goto end_unlink;
+
+	if (!inode->i_nlink) {
+		ext3_warning (inode->i_sb, "ext3_unlink",
+			      "Deleting nonexistent file (%lu), %d",
+			      inode->i_ino, inode->i_nlink);
+		inode->i_nlink = 1;
+	}
+	retval = ext3_delete_entry(handle, dir, de, bh);
+	if (retval)
+		goto end_unlink;
+	dir->i_ctime = dir->i_mtime = CURRENT_TIME_SEC;
+	ext3_update_dx_flag(dir);
+	ext3_mark_inode_dirty(handle, dir);
+	drop_nlink(inode);
+	if (!inode->i_nlink)
+		ext3_orphan_add(handle, inode);
+	inode->i_ctime = dir->i_ctime;
+	ext3_mark_inode_dirty(handle, inode);
+	retval = 0;
+
+end_unlink:
+	ext3_journal_stop(handle);
+	brelse (bh);
+	return retval;
+}
+
+static int ext3_symlink (struct inode * dir,
+		struct dentry *dentry, const char * symname)
+{
+	handle_t *handle;

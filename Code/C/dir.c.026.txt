@@ -1,0 +1,50 @@
+				       struct ocfs2_dx_hinfo *hinfo,
+				       u64 dirent_blk)
+{
+	int i;
+	struct ocfs2_dx_entry *dx_entry;
+
+	i = le16_to_cpu(entry_list->de_num_used);
+	dx_entry = &entry_list->de_entries[i];
+
+	memset(dx_entry, 0, sizeof(*dx_entry));
+	dx_entry->dx_major_hash = cpu_to_le32(hinfo->major_hash);
+	dx_entry->dx_minor_hash = cpu_to_le32(hinfo->minor_hash);
+	dx_entry->dx_dirent_blk = cpu_to_le64(dirent_blk);
+
+	le16_add_cpu(&entry_list->de_num_used, 1);
+}
+
+static int __ocfs2_dx_dir_leaf_insert(struct inode *dir, handle_t *handle,
+				      struct ocfs2_dx_hinfo *hinfo,
+				      u64 dirent_blk,
+				      struct buffer_head *dx_leaf_bh)
+{
+	int ret;
+	struct ocfs2_dx_leaf *dx_leaf;
+
+	ret = ocfs2_journal_access_dl(handle, INODE_CACHE(dir), dx_leaf_bh,
+				      OCFS2_JOURNAL_ACCESS_WRITE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	dx_leaf = (struct ocfs2_dx_leaf *)dx_leaf_bh->b_data;
+	ocfs2_dx_entry_list_insert(&dx_leaf->dl_list, hinfo, dirent_blk);
+	ocfs2_journal_dirty(handle, dx_leaf_bh);
+
+out:
+	return ret;
+}
+
+static void ocfs2_dx_inline_root_insert(struct inode *dir, handle_t *handle,
+					struct ocfs2_dx_hinfo *hinfo,
+					u64 dirent_blk,
+					struct ocfs2_dx_root_block *dx_root)
+{
+	ocfs2_dx_entry_list_insert(&dx_root->dr_entries, hinfo, dirent_blk);
+}
+
+static int ocfs2_dx_dir_insert(struct inode *dir, handle_t *handle,
+			       struct ocfs2_dir_lookup_result *lookup)

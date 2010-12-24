@@ -1,0 +1,50 @@
+	return ret;
+}
+
+static struct buffer_head * ext3_dx_find_entry(struct inode *dir,
+			struct qstr *entry, struct ext3_dir_entry_2 **res_dir,
+			int *err)
+{
+	struct super_block * sb;
+	struct dx_hash_info	hinfo;
+	u32 hash;
+	struct dx_frame frames[2], *frame;
+	struct ext3_dir_entry_2 *de, *top;
+	struct buffer_head *bh;
+	unsigned long block;
+	int retval;
+	int namelen = entry->len;
+	const u8 *name = entry->name;
+
+	sb = dir->i_sb;
+	
+	if (namelen > 2 || name[0] != '.'|| (namelen == 2 && name[1] != '.')) {
+		if (!(frame = dx_probe(entry, dir, &hinfo, frames, err)))
+			return NULL;
+	} else {
+		frame = frames;
+		frame->bh = NULL;			
+		frame->at = (struct dx_entry *)frames;	
+		dx_set_block(frame->at, 0);		
+	}
+	hash = hinfo.hash;
+	do {
+		block = dx_get_block(frame->at);
+		if (!(bh = ext3_bread (NULL,dir, block, 0, err)))
+			goto errout;
+		de = (struct ext3_dir_entry_2 *) bh->b_data;
+		top = (struct ext3_dir_entry_2 *) ((char *) de + sb->s_blocksize -
+				       EXT3_DIR_REC_LEN(0));
+		for (; de < top; de = ext3_next_entry(de)) {
+			int off = (block << EXT3_BLOCK_SIZE_BITS(sb))
+				  + ((char *) de - bh->b_data);
+
+			if (!ext3_check_dir_entry(__func__, dir, de, bh, off)) {
+				brelse(bh);
+				*err = ERR_BAD_DX_DIR;
+				goto errout;
+			}
+
+			if (ext3_match(namelen, name, de)) {
+				*res_dir = de;
+				dx_release(frames);

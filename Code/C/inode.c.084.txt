@@ -1,0 +1,36 @@
+	}
+	ret = 0;
+	if (PageMappedToDisk(page))
+		goto out_unlock;
+
+	if (page->index == size >> PAGE_CACHE_SHIFT)
+		len = size & ~PAGE_CACHE_MASK;
+	else
+		len = PAGE_CACHE_SIZE;
+
+	lock_page(page);
+	
+	if (page_has_buffers(page)) {
+		if (!walk_page_buffers(NULL, page_buffers(page), 0, len, NULL,
+					ext4_bh_unmapped)) {
+			unlock_page(page);
+			goto out_unlock;
+		}
+	}
+	unlock_page(page);
+	
+	ret = mapping->a_ops->write_begin(file, mapping, page_offset(page),
+			len, AOP_FLAG_UNINTERRUPTIBLE, &page, &fsdata);
+	if (ret < 0)
+		goto out_unlock;
+	ret = mapping->a_ops->write_end(file, mapping, page_offset(page),
+			len, len, page, fsdata);
+	if (ret < 0)
+		goto out_unlock;
+	ret = 0;
+out_unlock:
+	if (ret)
+		ret = VM_FAULT_SIGBUS;
+	up_read(&inode->i_alloc_sem);
+	return ret;
+}

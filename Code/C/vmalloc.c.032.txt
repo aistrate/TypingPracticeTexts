@@ -1,0 +1,49 @@
+	addr += pgoff << PAGE_SHIFT;
+	do {
+		struct page *page = vmalloc_to_page(addr);
+		int ret;
+
+		ret = vm_insert_page(vma, uaddr, page);
+		if (ret)
+			return ret;
+
+		uaddr += PAGE_SIZE;
+		addr += PAGE_SIZE;
+		usize -= PAGE_SIZE;
+	} while (usize > 0);
+
+	vma->vm_flags |= VM_RESERVED;
+
+	return 0;
+}
+EXPORT_SYMBOL(remap_vmalloc_range);
+
+void  __attribute__((weak)) vmalloc_sync_all(void)
+{
+}
+
+static int f(pte_t *pte, pgtable_t table, unsigned long addr, void *data)
+{
+	
+	return 0;
+}
+
+struct vm_struct *alloc_vm_area(size_t size)
+{
+	struct vm_struct *area;
+
+	area = get_vm_area_caller(size, VM_IOREMAP,
+				__builtin_return_address(0));
+	if (area == NULL)
+		return NULL;
+
+	if (apply_to_page_range(&init_mm, (unsigned long)area->addr,
+				area->size, f, NULL)) {
+		free_vm_area(area);
+		return NULL;
+	}
+
+	vmalloc_sync_all();
+
+	return area;
+}

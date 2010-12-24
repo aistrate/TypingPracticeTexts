@@ -1,0 +1,50 @@
+	return nr;
+}
+
+static int vmap_page_range(unsigned long start, unsigned long end,
+			   pgprot_t prot, struct page **pages)
+{
+	int ret;
+
+	ret = vmap_page_range_noflush(start, end, prot, pages);
+	flush_cache_vmap(start, end);
+	return ret;
+}
+
+int is_vmalloc_or_module_addr(const void *x)
+{
+	
+#if defined(CONFIG_MODULES) && defined(MODULES_VADDR)
+	unsigned long addr = (unsigned long)x;
+	if (addr >= MODULES_VADDR && addr < MODULES_END)
+		return 1;
+#endif
+	return is_vmalloc_addr(x);
+}
+
+struct page *vmalloc_to_page(const void *vmalloc_addr)
+{
+	unsigned long addr = (unsigned long) vmalloc_addr;
+	struct page *page = NULL;
+	pgd_t *pgd = pgd_offset_k(addr);
+
+	VIRTUAL_BUG_ON(!is_vmalloc_or_module_addr(vmalloc_addr));
+
+	if (!pgd_none(*pgd)) {
+		pud_t *pud = pud_offset(pgd, addr);
+		if (!pud_none(*pud)) {
+			pmd_t *pmd = pmd_offset(pud, addr);
+			if (!pmd_none(*pmd)) {
+				pte_t *ptep, pte;
+
+				ptep = pte_offset_map(pmd, addr);
+				pte = *ptep;
+				if (pte_present(pte))
+					page = pte_page(pte);
+				pte_unmap(ptep);
+			}
+		}
+	}
+	return page;
+}
+EXPORT_SYMBOL(vmalloc_to_page);

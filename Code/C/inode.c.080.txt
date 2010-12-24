@@ -1,0 +1,50 @@
+{
+	return ext4_meta_trans_blocks(inode, nrblocks, 1);
+}
+
+int ext4_mark_iloc_dirty(handle_t *handle,
+			 struct inode *inode, struct ext4_iloc *iloc)
+{
+	int err = 0;
+
+	if (test_opt(inode->i_sb, I_VERSION))
+		inode_inc_iversion(inode);
+
+	get_bh(iloc->bh);
+
+	err = ext4_do_update_inode(handle, inode, iloc);
+	put_bh(iloc->bh);
+	return err;
+}
+
+int
+ext4_reserve_inode_write(handle_t *handle, struct inode *inode,
+			 struct ext4_iloc *iloc)
+{
+	int err;
+
+	err = ext4_get_inode_loc(inode, iloc);
+	if (!err) {
+		BUFFER_TRACE(iloc->bh, "get_write_access");
+		err = ext4_journal_get_write_access(handle, iloc->bh);
+		if (err) {
+			brelse(iloc->bh);
+			iloc->bh = NULL;
+		}
+	}
+	ext4_std_error(inode->i_sb, err);
+	return err;
+}
+
+static int ext4_expand_extra_isize(struct inode *inode,
+				   unsigned int new_extra_isize,
+				   struct ext4_iloc iloc,
+				   handle_t *handle)
+{
+	struct ext4_inode *raw_inode;
+	struct ext4_xattr_ibody_header *header;
+
+	if (EXT4_I(inode)->i_extra_isize >= new_extra_isize)
+		return 0;
+
+	raw_inode = ext4_raw_inode(&iloc);

@@ -1,0 +1,50 @@
+	else
+		free_space = dir->i_sb->s_blocksize - i_size_read(dir);
+
+	de_buf = di->id2.i_data.id_data;
+	limit = de_buf + i_size_read(dir);
+	rec_len = OCFS2_DIR_REC_LEN(namelen);
+
+	while (de_buf < limit) {
+		de = (struct ocfs2_dir_entry *)de_buf;
+
+		if (!ocfs2_check_dir_entry(dir, de, di_bh, offset)) {
+			ret = -ENOENT;
+			goto out;
+		}
+		if (ocfs2_match(namelen, name, de)) {
+			ret = -EEXIST;
+			goto out;
+		}
+		
+		if (ocfs2_dirent_would_fit(de, rec_len)) {
+			
+			*ret_de_bh = di_bh;
+			get_bh(*ret_de_bh);
+			ret = 0;
+			goto out;
+		}
+
+		last_de = de;
+		de_buf += le16_to_cpu(de->rec_len);
+		offset += le16_to_cpu(de->rec_len);
+	}
+
+	*blocks_wanted = 1;
+	new_rec_len = le16_to_cpu(last_de->rec_len) + free_space;
+	if (new_rec_len < (rec_len + OCFS2_DIR_REC_LEN(last_de->name_len)))
+		*blocks_wanted = 2;
+
+	ret = -ENOSPC;
+out:
+	return ret;
+}
+
+static int ocfs2_find_dir_space_el(struct inode *dir, const char *name,
+				   int namelen, struct buffer_head **ret_de_bh)
+{
+	unsigned long offset;
+	struct buffer_head *bh = NULL;
+	unsigned short rec_len;
+	struct ocfs2_dir_entry *de;
+	struct super_block *sb = dir->i_sb;

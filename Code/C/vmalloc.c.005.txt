@@ -1,0 +1,49 @@
+unsigned long vmalloc_to_pfn(const void *vmalloc_addr)
+{
+	return page_to_pfn(vmalloc_to_page(vmalloc_addr));
+}
+EXPORT_SYMBOL(vmalloc_to_pfn);
+
+#define VM_LAZY_FREE	0x01
+#define VM_LAZY_FREEING	0x02
+#define VM_VM_AREA	0x04
+
+struct vmap_area {
+	unsigned long va_start;
+	unsigned long va_end;
+	unsigned long flags;
+	struct rb_node rb_node;		
+	struct list_head list;		
+	struct list_head purge_list;	
+	void *private;
+	struct rcu_head rcu_head;
+};
+
+static DEFINE_SPINLOCK(vmap_area_lock);
+static struct rb_root vmap_area_root = RB_ROOT;
+static LIST_HEAD(vmap_area_list);
+static unsigned long vmap_area_pcpu_hole;
+
+static struct vmap_area *__find_vmap_area(unsigned long addr)
+{
+	struct rb_node *n = vmap_area_root.rb_node;
+
+	while (n) {
+		struct vmap_area *va;
+
+		va = rb_entry(n, struct vmap_area, rb_node);
+		if (addr < va->va_start)
+			n = n->rb_left;
+		else if (addr > va->va_start)
+			n = n->rb_right;
+		else
+			return va;
+	}
+
+	return NULL;
+}
+
+static void __insert_vmap_area(struct vmap_area *va)
+{
+	struct rb_node **p = &vmap_area_root.rb_node;
+	struct rb_node *parent = NULL;

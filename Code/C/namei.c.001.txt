@@ -1,0 +1,50 @@
+#include <linux/fs.h>
+#include <linux/pagemap.h>
+#include <linux/jbd.h>
+#include <linux/time.h>
+#include <linux/ext3_fs.h>
+#include <linux/ext3_jbd.h>
+#include <linux/fcntl.h>
+#include <linux/stat.h>
+#include <linux/string.h>
+#include <linux/quotaops.h>
+#include <linux/buffer_head.h>
+#include <linux/bio.h>
+
+#include "namei.h"
+#include "xattr.h"
+#include "acl.h"
+
+#define NAMEI_RA_CHUNKS  2
+#define NAMEI_RA_BLOCKS  4
+#define NAMEI_RA_SIZE        (NAMEI_RA_CHUNKS * NAMEI_RA_BLOCKS)
+#define NAMEI_RA_INDEX(c,b)  (((c) * NAMEI_RA_BLOCKS) + (b))
+
+static struct buffer_head *ext3_append(handle_t *handle,
+					struct inode *inode,
+					u32 *block, int *err)
+{
+	struct buffer_head *bh;
+
+	*block = inode->i_size >> inode->i_sb->s_blocksize_bits;
+
+	bh = ext3_bread(handle, inode, *block, 1, err);
+	if (bh) {
+		inode->i_size += inode->i_sb->s_blocksize;
+		EXT3_I(inode)->i_disksize = inode->i_size;
+		*err = ext3_journal_get_write_access(handle, bh);
+		if (*err) {
+			brelse(bh);
+			bh = NULL;
+		}
+	}
+	return bh;
+}
+
+#ifndef assert
+#define assert(test) J_ASSERT(test)
+#endif
+
+#ifdef DX_DEBUG
+#define dxtrace(command) command
+#else

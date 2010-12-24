@@ -1,0 +1,50 @@
+			bh = page_bufs = page_buffers(page);
+			block_start = 0;
+			do {
+				if (!bh)
+					goto redirty_page;
+				if (map && (cur_logical >= map->m_lblk) &&
+				    (cur_logical <= (map->m_lblk +
+						     (map->m_len - 1)))) {
+					if (buffer_delay(bh)) {
+						clear_buffer_delay(bh);
+						bh->b_blocknr = pblock;
+					}
+					if (buffer_unwritten(bh) ||
+					    buffer_mapped(bh))
+						BUG_ON(bh->b_blocknr != pblock);
+					if (map->m_flags & EXT4_MAP_UNINIT)
+						set_buffer_uninit(bh);
+					clear_buffer_unwritten(bh);
+				}
+
+				if (buffer_delay(bh) || buffer_unwritten(bh))
+					redirty_page = 1;
+				bh = bh->b_this_page;
+				block_start += bh->b_size;
+				cur_logical++;
+				pblock++;
+			} while (bh != page_bufs);
+
+			if (redirty_page)
+				goto redirty_page;
+
+			if (commit_write)
+				
+				block_commit_write(page, 0, len);
+
+			if (unlikely(journal_data && PageChecked(page)))
+				err = __ext4_journalled_writepage(page, len);
+			else if (test_opt(inode->i_sb, MBLK_IO_SUBMIT))
+				err = ext4_bio_write_page(&io_submit, page,
+							  len, mpd->wbc);
+			else
+				err = block_write_full_page(page,
+					noalloc_get_block_write, mpd->wbc);
+
+			if (!err)
+				mpd->pages_written++;
+			
+			if (ret == 0)
+				ret = err;
+		}

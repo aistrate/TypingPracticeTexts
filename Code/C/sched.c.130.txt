@@ -1,0 +1,50 @@
+		rq->next_balance = jiffies;
+		rq->push_cpu = 0;
+		rq->cpu = i;
+		rq->online = 0;
+		rq->idle_stamp = 0;
+		rq->avg_idle = 2*sysctl_sched_migration_cost;
+		rq_attach_root(rq, &def_root_domain);
+#ifdef CONFIG_NO_HZ
+		rq->nohz_balance_kick = 0;
+		init_sched_softirq_csd(&per_cpu(remote_sched_softirq_cb, i));
+#endif
+#endif
+		init_rq_hrtick(rq);
+		atomic_set(&rq->nr_iowait, 0);
+	}
+
+	set_load_weight(&init_task);
+
+#ifdef CONFIG_PREEMPT_NOTIFIERS
+	INIT_HLIST_HEAD(&init_task.preempt_notifiers);
+#endif
+
+#ifdef CONFIG_SMP
+	open_softirq(SCHED_SOFTIRQ, run_rebalance_domains);
+#endif
+
+#ifdef CONFIG_RT_MUTEXES
+	plist_head_init_raw(&init_task.pi_waiters, &init_task.pi_lock);
+#endif
+
+	atomic_inc(&init_mm.mm_count);
+	enter_lazy_tlb(&init_mm, current);
+
+	init_idle(current, smp_processor_id());
+
+	calc_load_update = jiffies + LOAD_FREQ;
+
+	current->sched_class = &fair_sched_class;
+
+	zalloc_cpumask_var(&nohz_cpu_mask, GFP_NOWAIT);
+#ifdef CONFIG_SMP
+#ifdef CONFIG_NO_HZ
+	zalloc_cpumask_var(&nohz.idle_cpus_mask, GFP_NOWAIT);
+	alloc_cpumask_var(&nohz.grp_idle_mask, GFP_NOWAIT);
+	atomic_set(&nohz.load_balancer, nr_cpu_ids);
+	atomic_set(&nohz.first_pick_cpu, nr_cpu_ids);
+	atomic_set(&nohz.second_pick_cpu, nr_cpu_ids);
+#endif
+	
+	if (cpu_isolated_map == NULL)

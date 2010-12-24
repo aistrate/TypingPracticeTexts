@@ -1,0 +1,50 @@
+			sizeof(struct sched_domain_attr));
+}
+
+void partition_sched_domains(int ndoms_new, cpumask_var_t doms_new[],
+			     struct sched_domain_attr *dattr_new)
+{
+	int i, j, n;
+	int new_topology;
+
+	mutex_lock(&sched_domains_mutex);
+
+	unregister_sched_domain_sysctl();
+
+	new_topology = arch_update_cpu_topology();
+
+	n = doms_new ? ndoms_new : 0;
+
+	for (i = 0; i < ndoms_cur; i++) {
+		for (j = 0; j < n && !new_topology; j++) {
+			if (cpumask_equal(doms_cur[i], doms_new[j])
+			    && dattrs_equal(dattr_cur, i, dattr_new, j))
+				goto match1;
+		}
+		
+		detach_destroy_domains(doms_cur[i]);
+match1:
+		;
+	}
+
+	if (doms_new == NULL) {
+		ndoms_cur = 0;
+		doms_new = &fallback_doms;
+		cpumask_andnot(doms_new[0], cpu_active_mask, cpu_isolated_map);
+		WARN_ON_ONCE(dattr_new);
+	}
+
+	for (i = 0; i < ndoms_new; i++) {
+		for (j = 0; j < ndoms_cur && !new_topology; j++) {
+			if (cpumask_equal(doms_new[i], doms_cur[j])
+			    && dattrs_equal(dattr_new, i, dattr_cur, j))
+				goto match2;
+		}
+		
+		__build_sched_domains(doms_new[i],
+					dattr_new ? dattr_new + i : NULL);
+match2:
+		;
+	}
+
+	if (doms_cur != &fallback_doms)

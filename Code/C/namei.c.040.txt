@@ -1,0 +1,50 @@
+static int ext3_link (struct dentry * old_dentry,
+		struct inode * dir, struct dentry *dentry)
+{
+	handle_t *handle;
+	struct inode *inode = old_dentry->d_inode;
+	int err, retries = 0;
+
+	if (inode->i_nlink >= EXT3_LINK_MAX)
+		return -EMLINK;
+
+	dquot_initialize(dir);
+
+	if (inode->i_nlink == 0)
+		return -ENOENT;
+
+retry:
+	handle = ext3_journal_start(dir, EXT3_DATA_TRANS_BLOCKS(dir->i_sb) +
+					EXT3_INDEX_EXTRA_TRANS_BLOCKS);
+	if (IS_ERR(handle))
+		return PTR_ERR(handle);
+
+	if (IS_DIRSYNC(dir))
+		handle->h_sync = 1;
+
+	inode->i_ctime = CURRENT_TIME_SEC;
+	inc_nlink(inode);
+	ihold(inode);
+
+	err = ext3_add_entry(handle, dentry, inode);
+	if (!err) {
+		ext3_mark_inode_dirty(handle, inode);
+		d_instantiate(dentry, inode);
+	} else {
+		drop_nlink(inode);
+		iput(inode);
+	}
+	ext3_journal_stop(handle);
+	if (err == -ENOSPC && ext3_should_retry_alloc(dir->i_sb, &retries))
+		goto retry;
+	return err;
+}
+
+#define PARENT_INO(buffer) \
+	(ext3_next_entry((struct ext3_dir_entry_2 *)(buffer))->inode)
+
+static int ext3_rename (struct inode * old_dir, struct dentry *old_dentry,
+			   struct inode * new_dir,struct dentry *new_dentry)
+{
+	handle_t *handle;
+	struct inode * old_inode, * new_inode;

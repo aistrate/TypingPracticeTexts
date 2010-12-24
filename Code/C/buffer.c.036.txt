@@ -1,0 +1,50 @@
+	struct buffer_head *head, *bh;
+	struct page *page;
+	pgoff_t index;
+	unsigned from, to;
+	unsigned block_in_page;
+	unsigned block_start, block_end;
+	sector_t block_in_file;
+	int nr_reads = 0;
+	int ret = 0;
+	int is_mapped_to_disk = 1;
+
+	index = pos >> PAGE_CACHE_SHIFT;
+	from = pos & (PAGE_CACHE_SIZE - 1);
+	to = from + len;
+
+	page = grab_cache_page_write_begin(mapping, index, flags);
+	if (!page)
+		return -ENOMEM;
+	*pagep = page;
+	*fsdata = NULL;
+
+	if (page_has_buffers(page)) {
+		ret = __block_write_begin(page, pos, len, get_block);
+		if (unlikely(ret))
+			goto out_release;
+		return ret;
+	}
+
+	if (PageMappedToDisk(page))
+		return 0;
+
+	head = alloc_page_buffers(page, blocksize, 0);
+	if (!head) {
+		ret = -ENOMEM;
+		goto out_release;
+	}
+
+	block_in_file = (sector_t)page->index << (PAGE_CACHE_SHIFT - blkbits);
+
+	for (block_start = 0, block_in_page = 0, bh = head;
+		  block_start < PAGE_CACHE_SIZE;
+		  block_in_page++, block_start += blocksize, bh = bh->b_this_page) {
+		int create;
+
+		block_end = block_start + blocksize;
+		bh->b_state = 0;
+		create = 1;
+		if (block_start >= to)
+			create = 0;
+		ret = get_block(inode, block_in_file + block_in_page,

@@ -1,0 +1,49 @@
+				write_end_fn);
+	if (ret == 0)
+		ret = err;
+	err = ext4_journal_stop(handle);
+	if (!ret)
+		ret = err;
+
+	walk_page_buffers(handle, page_bufs, 0, len, NULL, bput_one);
+	ext4_set_inode_state(inode, EXT4_STATE_JDATA);
+out:
+	return ret;
+}
+
+static int ext4_set_bh_endio(struct buffer_head *bh, struct inode *inode);
+static void ext4_end_io_buffer_write(struct buffer_head *bh, int uptodate);
+
+static int ext4_writepage(struct page *page,
+			  struct writeback_control *wbc)
+{
+	int ret = 0, commit_write = 0;
+	loff_t size;
+	unsigned int len;
+	struct buffer_head *page_bufs = NULL;
+	struct inode *inode = page->mapping->host;
+
+	trace_ext4_writepage(inode, page);
+	size = i_size_read(inode);
+	if (page->index == size >> PAGE_CACHE_SHIFT)
+		len = size & ~PAGE_CACHE_MASK;
+	else
+		len = PAGE_CACHE_SIZE;
+
+	if (!page_has_buffers(page)) {
+		if (__block_write_begin(page, 0, len,
+					noalloc_get_block_write)) {
+		redirty_page:
+			redirty_page_for_writepage(wbc, page);
+			unlock_page(page);
+			return 0;
+		}
+		commit_write = 1;
+	}
+	page_bufs = page_buffers(page);
+	if (walk_page_buffers(NULL, page_bufs, 0, len, NULL,
+			      ext4_bh_delay_or_unwritten)) {
+		
+		goto redirty_page;
+	}
+	if (commit_write)

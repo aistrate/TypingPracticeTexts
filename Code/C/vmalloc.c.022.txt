@@ -1,0 +1,49 @@
+EXPORT_SYMBOL_GPL(__get_vm_area);
+
+struct vm_struct *__get_vm_area_caller(unsigned long size, unsigned long flags,
+				       unsigned long start, unsigned long end,
+				       void *caller)
+{
+	return __get_vm_area_node(size, 1, flags, start, end, -1, GFP_KERNEL,
+				  caller);
+}
+
+struct vm_struct *get_vm_area(unsigned long size, unsigned long flags)
+{
+	return __get_vm_area_node(size, 1, flags, VMALLOC_START, VMALLOC_END,
+				-1, GFP_KERNEL, __builtin_return_address(0));
+}
+
+struct vm_struct *get_vm_area_caller(unsigned long size, unsigned long flags,
+				void *caller)
+{
+	return __get_vm_area_node(size, 1, flags, VMALLOC_START, VMALLOC_END,
+						-1, GFP_KERNEL, caller);
+}
+
+struct vm_struct *get_vm_area_node(unsigned long size, unsigned long flags,
+				   int node, gfp_t gfp_mask)
+{
+	return __get_vm_area_node(size, 1, flags, VMALLOC_START, VMALLOC_END,
+				  node, gfp_mask, __builtin_return_address(0));
+}
+
+static struct vm_struct *find_vm_area(const void *addr)
+{
+	struct vmap_area *va;
+
+	va = find_vmap_area((unsigned long)addr);
+	if (va && va->flags & VM_VM_AREA)
+		return va->private;
+
+	return NULL;
+}
+
+struct vm_struct *remove_vm_area(const void *addr)
+{
+	struct vmap_area *va;
+
+	va = find_vmap_area((unsigned long)addr);
+	if (va && va->flags & VM_VM_AREA) {
+		struct vm_struct *vm = va->private;
+		struct vm_struct *tmp, **p;

@@ -1,0 +1,50 @@
+			BUG_ON(new_bh == NULL);
+			goto bail_bh;
+		}
+
+		brelse(new_bh);
+		new_bh = NULL;
+
+		down_write(&OCFS2_I(dir)->ip_alloc_sem);
+		drop_alloc_sem = 1;
+		dir_i_size = i_size_read(dir);
+		credits = OCFS2_SIMPLE_DIR_EXTEND_CREDITS;
+		goto do_extend;
+	}
+
+	down_write(&OCFS2_I(dir)->ip_alloc_sem);
+	drop_alloc_sem = 1;
+	dir_i_size = i_size_read(dir);
+	mlog(0, "extending dir %llu (i_size = %lld)\n",
+	     (unsigned long long)OCFS2_I(dir)->ip_blkno, dir_i_size);
+
+	spin_lock(&OCFS2_I(dir)->ip_lock);
+	if (dir_i_size == ocfs2_clusters_to_bytes(sb, OCFS2_I(dir)->ip_clusters)) {
+		spin_unlock(&OCFS2_I(dir)->ip_lock);
+		ocfs2_init_dinode_extent_tree(&et, INODE_CACHE(dir),
+					      parent_fe_bh);
+		num_free_extents = ocfs2_num_free_extents(osb, &et);
+		if (num_free_extents < 0) {
+			status = num_free_extents;
+			mlog_errno(status);
+			goto bail;
+		}
+
+		if (!num_free_extents) {
+			status = ocfs2_reserve_new_metadata(osb, el, &meta_ac);
+			if (status < 0) {
+				if (status != -ENOSPC)
+					mlog_errno(status);
+				goto bail;
+			}
+		}
+
+		status = ocfs2_reserve_clusters(osb, 1, &data_ac);
+		if (status < 0) {
+			if (status != -ENOSPC)
+				mlog_errno(status);
+			goto bail;
+		}
+
+		if (ocfs2_dir_resv_allowed(osb))
+			data_ac->ac_resv = &OCFS2_I(dir)->ip_la_data_resv;

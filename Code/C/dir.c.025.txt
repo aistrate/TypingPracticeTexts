@@ -1,0 +1,50 @@
+					struct ocfs2_dir_entry *de_del,
+					struct buffer_head *bh)
+{
+	return __ocfs2_delete_entry(handle, dir, de_del, bh, bh->b_data,
+				    bh->b_size);
+}
+
+int ocfs2_delete_entry(handle_t *handle,
+		       struct inode *dir,
+		       struct ocfs2_dir_lookup_result *res)
+{
+	if (ocfs2_dir_indexed(dir))
+		return ocfs2_delete_entry_dx(handle, dir, res);
+
+	if (OCFS2_I(dir)->ip_dyn_features & OCFS2_INLINE_DATA_FL)
+		return ocfs2_delete_entry_id(handle, dir, res->dl_entry,
+					     res->dl_leaf_bh);
+
+	return ocfs2_delete_entry_el(handle, dir, res->dl_entry,
+				     res->dl_leaf_bh);
+}
+
+static inline int ocfs2_dirent_would_fit(struct ocfs2_dir_entry *de,
+					 unsigned int new_rec_len)
+{
+	unsigned int de_really_used;
+
+	if (le64_to_cpu(de->inode) == 0 &&
+	    le16_to_cpu(de->rec_len) >= new_rec_len)
+		return 1;
+
+	de_really_used = OCFS2_DIR_REC_LEN(de->name_len);
+	if (le16_to_cpu(de->rec_len) >= (de_really_used + new_rec_len))
+	    return 1;
+
+	return 0;
+}
+
+static void ocfs2_dx_dir_leaf_insert_tail(struct ocfs2_dx_leaf *dx_leaf,
+					  struct ocfs2_dx_entry *dx_new_entry)
+{
+	int i;
+
+	i = le16_to_cpu(dx_leaf->dl_list.de_num_used);
+	dx_leaf->dl_list.de_entries[i] = *dx_new_entry;
+
+	le16_add_cpu(&dx_leaf->dl_list.de_num_used, 1);
+}
+
+static void ocfs2_dx_entry_list_insert(struct ocfs2_dx_entry_list *entry_list,

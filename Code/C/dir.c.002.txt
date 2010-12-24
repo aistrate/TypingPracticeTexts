@@ -1,0 +1,50 @@
+	if (OCFS2_I(dir)->ip_dyn_features & OCFS2_INLINE_DATA_FL)
+		return 0;
+
+	return ocfs2_meta_ecc(osb) || ocfs2_dir_indexed(dir);
+}
+
+static int ocfs2_new_dir_wants_trailer(struct inode *dir)
+{
+	struct ocfs2_super *osb = OCFS2_SB(dir->i_sb);
+
+	return ocfs2_meta_ecc(osb) ||
+		ocfs2_supports_indexed_dirs(osb);
+}
+
+static inline unsigned int ocfs2_dir_trailer_blk_off(struct super_block *sb)
+{
+	return sb->s_blocksize - sizeof(struct ocfs2_dir_block_trailer);
+}
+
+#define ocfs2_trailer_from_bh(_bh, _sb) ((struct ocfs2_dir_block_trailer *) ((_bh)->b_data + ocfs2_dir_trailer_blk_off((_sb))))
+
+struct ocfs2_dir_block_trailer *ocfs2_dir_trailer_from_size(int blocksize,
+							    void *data)
+{
+	char *p = data;
+
+	p += blocksize - sizeof(struct ocfs2_dir_block_trailer);
+	return (struct ocfs2_dir_block_trailer *)p;
+}
+
+static int ocfs2_skip_dir_trailer(struct inode *dir,
+				  struct ocfs2_dir_entry *de,
+				  unsigned long offset,
+				  unsigned long blklen)
+{
+	unsigned long toff = blklen - sizeof(struct ocfs2_dir_block_trailer);
+
+	if (!ocfs2_supports_dir_trailer(dir))
+		return 0;
+
+	if (offset != toff)
+		return 0;
+
+	return 1;
+}
+
+static void ocfs2_init_dir_trailer(struct inode *inode,
+				   struct buffer_head *bh, u16 rec_len)
+{
+	struct ocfs2_dir_block_trailer *trailer;

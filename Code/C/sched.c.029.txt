@@ -1,0 +1,50 @@
+	__releases(rq2->lock)
+{
+	raw_spin_unlock(&rq1->lock);
+	if (rq1 != rq2)
+		raw_spin_unlock(&rq2->lock);
+	else
+		__release(rq2->lock);
+}
+
+#endif
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+static void cfs_rq_set_shares(struct cfs_rq *cfs_rq, unsigned long shares)
+{
+#ifdef CONFIG_SMP
+	cfs_rq->shares = shares;
+#endif
+}
+#endif
+
+static void calc_load_account_idle(struct rq *this_rq);
+static void update_sysctl(void);
+static int get_update_sysctl_factor(void);
+static void update_cpu_load(struct rq *this_rq);
+
+static inline void __set_task_cpu(struct task_struct *p, unsigned int cpu)
+{
+	set_task_rq(p, cpu);
+#ifdef CONFIG_SMP
+	
+	smp_wmb();
+	task_thread_info(p)->cpu = cpu;
+#endif
+}
+
+static const struct sched_class rt_sched_class;
+
+#define sched_class_highest (&stop_sched_class)
+#define for_each_class(class) \
+   for (class = sched_class_highest; class; class = class->next)
+
+#include "sched_stats.h"
+
+static void inc_nr_running(struct rq *rq)
+{
+	rq->nr_running++;
+}
+
+static void dec_nr_running(struct rq *rq)
+{

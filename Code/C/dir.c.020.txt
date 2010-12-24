@@ -1,0 +1,50 @@
+		       struct ocfs2_dir_lookup_result *res,
+		       struct inode *new_entry_inode)
+{
+	int ret;
+	ocfs2_journal_access_func access = ocfs2_journal_access_db;
+	struct ocfs2_dir_entry *de = res->dl_entry;
+	struct buffer_head *de_bh = res->dl_leaf_bh;
+
+	if (OCFS2_I(dir)->ip_dyn_features & OCFS2_INLINE_DATA_FL)
+		access = ocfs2_journal_access_di;
+
+	ret = access(handle, INODE_CACHE(dir), de_bh,
+		     OCFS2_JOURNAL_ACCESS_WRITE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	de->inode = cpu_to_le64(OCFS2_I(new_entry_inode)->ip_blkno);
+	ocfs2_set_de_type(de, new_entry_inode->i_mode);
+
+	ocfs2_journal_dirty(handle, de_bh);
+
+out:
+	return ret;
+}
+
+static int __ocfs2_delete_entry(handle_t *handle, struct inode *dir,
+				struct ocfs2_dir_entry *de_del,
+				struct buffer_head *bh, char *first_de,
+				unsigned int bytes)
+{
+	struct ocfs2_dir_entry *de, *pde;
+	int i, status = -ENOENT;
+	ocfs2_journal_access_func access = ocfs2_journal_access_db;
+
+	mlog_entry("(0x%p, 0x%p, 0x%p, 0x%p)\n", handle, dir, de_del, bh);
+
+	if (OCFS2_I(dir)->ip_dyn_features & OCFS2_INLINE_DATA_FL)
+		access = ocfs2_journal_access_di;
+
+	i = 0;
+	pde = NULL;
+	de = (struct ocfs2_dir_entry *) first_de;
+	while (i < bytes) {
+		if (!ocfs2_check_dir_entry(dir, de, bh, i)) {
+			status = -EIO;
+			mlog_errno(status);
+			goto bail;
+		}

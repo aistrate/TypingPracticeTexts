@@ -1,0 +1,50 @@
+				   &dr_suballoc_bit, &num_bits, &dr_blkno);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	mlog(0, "Dir %llu, attach new index block: %llu\n",
+	     (unsigned long long)OCFS2_I(dir)->ip_blkno,
+	     (unsigned long long)dr_blkno);
+
+	dx_root_bh = sb_getblk(osb->sb, dr_blkno);
+	if (dx_root_bh == NULL) {
+		ret = -EIO;
+		goto out;
+	}
+	ocfs2_set_new_buffer_uptodate(INODE_CACHE(dir), dx_root_bh);
+
+	ret = ocfs2_journal_access_dr(handle, INODE_CACHE(dir), dx_root_bh,
+				      OCFS2_JOURNAL_ACCESS_CREATE);
+	if (ret < 0) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	dx_root = (struct ocfs2_dx_root_block *)dx_root_bh->b_data;
+	memset(dx_root, 0, osb->sb->s_blocksize);
+	strcpy(dx_root->dr_signature, OCFS2_DX_ROOT_SIGNATURE);
+	dx_root->dr_suballoc_slot = cpu_to_le16(meta_ac->ac_alloc_slot);
+	dx_root->dr_suballoc_loc = cpu_to_le64(suballoc_loc);
+	dx_root->dr_suballoc_bit = cpu_to_le16(dr_suballoc_bit);
+	dx_root->dr_fs_generation = cpu_to_le32(osb->fs_generation);
+	dx_root->dr_blkno = cpu_to_le64(dr_blkno);
+	dx_root->dr_dir_blkno = cpu_to_le64(OCFS2_I(dir)->ip_blkno);
+	dx_root->dr_num_entries = cpu_to_le32(num_entries);
+	if (le16_to_cpu(trailer->db_free_rec_len))
+		dx_root->dr_free_blk = cpu_to_le64(dirdata_bh->b_blocknr);
+	else
+		dx_root->dr_free_blk = cpu_to_le64(0);
+
+	if (dx_inline) {
+		dx_root->dr_flags |= OCFS2_DX_FLAG_INLINE;
+		dx_root->dr_entries.de_count =
+			cpu_to_le16(ocfs2_dx_entries_per_root(osb->sb));
+	} else {
+		dx_root->dr_list.l_count =
+			cpu_to_le16(ocfs2_extent_recs_per_dx_root(osb->sb));
+	}
+	ocfs2_journal_dirty(handle, dx_root_bh);
+
+	ret = ocfs2_journal_access_di(handle, INODE_CACHE(dir), di_bh,

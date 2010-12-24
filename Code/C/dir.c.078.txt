@@ -1,0 +1,43 @@
+	if (ocfs2_dx_root_inline(dx_root))
+		goto remove_index;
+
+	ocfs2_init_dx_root_extent_tree(&et, INODE_CACHE(dir), dx_root_bh);
+
+	while (le32_to_cpu(dx_root->dr_clusters)) {
+		ret = ocfs2_dx_dir_lookup_rec(dir, &dx_root->dr_list,
+					      major_hash, &cpos, &blkno, &clen);
+		if (ret) {
+			mlog_errno(ret);
+			goto out;
+		}
+
+		p_cpos = ocfs2_blocks_to_clusters(dir->i_sb, blkno);
+
+		ret = ocfs2_remove_btree_range(dir, &et, cpos, p_cpos, clen, 0,
+					       &dealloc, 0);
+		if (ret) {
+			mlog_errno(ret);
+			goto out;
+		}
+
+		if (cpos == 0)
+			break;
+
+		major_hash = cpos - 1;
+	}
+
+remove_index:
+	ret = ocfs2_dx_dir_remove_index(dir, di_bh, dx_root_bh);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	ocfs2_remove_from_cache(INODE_CACHE(dir), dx_root_bh);
+out:
+	ocfs2_schedule_truncate_log_flush(osb, 1);
+	ocfs2_run_deallocs(osb, &dealloc);
+
+	brelse(dx_root_bh);
+	return ret;
+}

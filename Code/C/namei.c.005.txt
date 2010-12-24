@@ -1,0 +1,50 @@
+	unsigned entry_space = dir->i_sb->s_blocksize - EXT3_DIR_REC_LEN(0);
+	return entry_space / sizeof(struct dx_entry);
+}
+
+#ifdef DX_DEBUG
+static void dx_show_index (char * label, struct dx_entry *entries)
+{
+        int i, n = dx_get_count (entries);
+        printk("%s index ", label);
+        for (i = 0; i < n; i++)
+        {
+                printk("%x->%u ", i? dx_get_hash(entries + i): 0, dx_get_block(entries + i));
+        }
+        printk("\n");
+}
+
+struct stats
+{
+	unsigned names;
+	unsigned space;
+	unsigned bcount;
+};
+
+static struct stats dx_show_leaf(struct dx_hash_info *hinfo, struct ext3_dir_entry_2 *de,
+				 int size, int show_names)
+{
+	unsigned names = 0, space = 0;
+	char *base = (char *) de;
+	struct dx_hash_info h = *hinfo;
+
+	printk("names: ");
+	while ((char *) de < base + size)
+	{
+		if (de->inode)
+		{
+			if (show_names)
+			{
+				int len = de->name_len;
+				char *name = de->name;
+				while (len--) printk("%c", *name++);
+				ext3fs_dirhash(de->name, de->name_len, &h);
+				printk(":%x.%u ", h.hash,
+				       ((char *) de - base));
+			}
+			space += EXT3_DIR_REC_LEN(de->name_len);
+			names++;
+		}
+		de = ext3_next_entry(de);
+	}
+	printk("(%i)\n", names);

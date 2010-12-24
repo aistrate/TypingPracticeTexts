@@ -1,0 +1,49 @@
+int buffer_heads_over_limit;
+
+struct bh_accounting {
+	int nr;			
+	int ratelimit;		
+};
+
+static DEFINE_PER_CPU(struct bh_accounting, bh_accounting) = {0, 0};
+
+static void recalc_bh_state(void)
+{
+	int i;
+	int tot = 0;
+
+	if (__get_cpu_var(bh_accounting).ratelimit++ < 4096)
+		return;
+	__get_cpu_var(bh_accounting).ratelimit = 0;
+	for_each_online_cpu(i)
+		tot += per_cpu(bh_accounting, i).nr;
+	buffer_heads_over_limit = (tot > max_buffer_heads);
+}
+	
+struct buffer_head *alloc_buffer_head(gfp_t gfp_flags)
+{
+	struct buffer_head *ret = kmem_cache_zalloc(bh_cachep, gfp_flags);
+	if (ret) {
+		INIT_LIST_HEAD(&ret->b_assoc_buffers);
+		get_cpu_var(bh_accounting).nr++;
+		recalc_bh_state();
+		put_cpu_var(bh_accounting);
+	}
+	return ret;
+}
+EXPORT_SYMBOL(alloc_buffer_head);
+
+void free_buffer_head(struct buffer_head *bh)
+{
+	BUG_ON(!list_empty(&bh->b_assoc_buffers));
+	kmem_cache_free(bh_cachep, bh);
+	get_cpu_var(bh_accounting).nr--;
+	recalc_bh_state();
+	put_cpu_var(bh_accounting);
+}
+EXPORT_SYMBOL(free_buffer_head);
+
+static void buffer_exit_cpu(int cpu)
+{
+	int i;
+	struct bh_lru *b = &per_cpu(bh_lrus, cpu);

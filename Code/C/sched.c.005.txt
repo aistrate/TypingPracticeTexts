@@ -1,0 +1,50 @@
+	struct sched_rt_entity **rt_se;
+	struct rt_rq **rt_rq;
+
+	struct rt_bandwidth rt_bandwidth;
+#endif
+
+	struct rcu_head rcu;
+	struct list_head list;
+
+	struct task_group *parent;
+	struct list_head siblings;
+	struct list_head children;
+};
+
+#define root_task_group init_task_group
+
+static DEFINE_SPINLOCK(task_group_lock);
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+
+#ifdef CONFIG_SMP
+static int root_task_group_empty(void)
+{
+	return list_empty(&root_task_group.children);
+}
+#endif
+
+# define INIT_TASK_GROUP_LOAD	NICE_0_LOAD
+
+#define MIN_SHARES	2
+#define MAX_SHARES	(1UL << 18)
+
+static int init_task_group_load = INIT_TASK_GROUP_LOAD;
+#endif
+
+struct task_group init_task_group;
+
+#endif	
+
+struct cfs_rq {
+	struct load_weight load;
+	unsigned long nr_running;
+
+	u64 exec_clock;
+	u64 min_vruntime;
+
+	struct rb_root tasks_timeline;
+	struct rb_node *rb_leftmost;
+
+	struct list_head tasks;

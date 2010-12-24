@@ -1,0 +1,50 @@
+	return pte;
+}
+
+static inline void cow_user_page(struct page *dst, struct page *src, unsigned long va, struct vm_area_struct *vma)
+{
+	
+	if (unlikely(!src)) {
+		void *kaddr = kmap_atomic(dst, KM_USER0);
+		void __user *uaddr = (void __user *)(va & PAGE_MASK);
+
+		if (__copy_from_user_inatomic(kaddr, uaddr, PAGE_SIZE))
+			clear_page(kaddr);
+		kunmap_atomic(kaddr, KM_USER0);
+		flush_dcache_page(dst);
+	} else
+		copy_user_highpage(dst, src, va, vma);
+}
+
+static int do_wp_page(struct mm_struct *mm, struct vm_area_struct *vma,
+		unsigned long address, pte_t *page_table, pmd_t *pmd,
+		spinlock_t *ptl, pte_t orig_pte)
+	__releases(ptl)
+{
+	struct page *old_page, *new_page;
+	pte_t entry;
+	int reuse = 0, ret = 0;
+	int page_mkwrite = 0;
+	struct page *dirty_page = NULL;
+
+	old_page = vm_normal_page(vma, address, orig_pte);
+	if (!old_page) {
+		
+		if ((vma->vm_flags & (VM_WRITE|VM_SHARED)) ==
+				     (VM_WRITE|VM_SHARED))
+			goto reuse;
+		goto gotten;
+	}
+
+	if (PageAnon(old_page) && !PageKsm(old_page)) {
+		if (!trylock_page(old_page)) {
+			page_cache_get(old_page);
+			pte_unmap_unlock(page_table, ptl);
+			lock_page(old_page);
+			page_table = pte_offset_map_lock(mm, pmd, address,
+							 &ptl);
+			if (!pte_same(*page_table, orig_pte)) {
+				unlock_page(old_page);
+				page_cache_release(old_page);
+				goto unlock;
+			}

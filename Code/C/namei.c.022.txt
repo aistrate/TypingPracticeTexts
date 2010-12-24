@@ -1,0 +1,50 @@
+	if (hinfo->hash >= hash2)
+	{
+		swap(*bh, bh2);
+		de = de2;
+	}
+	dx_insert_block (frame, hash2 + continued, newblock);
+	err = ext3_journal_dirty_metadata (handle, bh2);
+	if (err)
+		goto journal_error;
+	err = ext3_journal_dirty_metadata (handle, frame->bh);
+	if (err)
+		goto journal_error;
+	brelse (bh2);
+	dxtrace(dx_show_index ("frame", frame->entries));
+	return de;
+
+journal_error:
+	brelse(*bh);
+	brelse(bh2);
+	*bh = NULL;
+	ext3_std_error(dir->i_sb, err);
+errout:
+	*error = err;
+	return NULL;
+}
+
+static int add_dirent_to_buf(handle_t *handle, struct dentry *dentry,
+			     struct inode *inode, struct ext3_dir_entry_2 *de,
+			     struct buffer_head * bh)
+{
+	struct inode	*dir = dentry->d_parent->d_inode;
+	const char	*name = dentry->d_name.name;
+	int		namelen = dentry->d_name.len;
+	unsigned long	offset = 0;
+	unsigned short	reclen;
+	int		nlen, rlen, err;
+	char		*top;
+
+	reclen = EXT3_DIR_REC_LEN(namelen);
+	if (!de) {
+		de = (struct ext3_dir_entry_2 *)bh->b_data;
+		top = bh->b_data + dir->i_sb->s_blocksize - reclen;
+		while ((char *) de <= top) {
+			if (!ext3_check_dir_entry("ext3_add_entry", dir, de,
+						  bh, offset)) {
+				brelse (bh);
+				return -EIO;
+			}
+			if (ext3_match (namelen, name, de)) {
+				brelse (bh);

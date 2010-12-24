@@ -1,0 +1,49 @@
+	if (i_block < direct_blocks) {
+		offsets[n++] = i_block;
+		final = direct_blocks;
+	} else if ((i_block -= direct_blocks) < indirect_blocks) {
+		offsets[n++] = EXT4_IND_BLOCK;
+		offsets[n++] = i_block;
+		final = ptrs;
+	} else if ((i_block -= indirect_blocks) < double_blocks) {
+		offsets[n++] = EXT4_DIND_BLOCK;
+		offsets[n++] = i_block >> ptrs_bits;
+		offsets[n++] = i_block & (ptrs - 1);
+		final = ptrs;
+	} else if (((i_block -= double_blocks) >> (ptrs_bits * 2)) < ptrs) {
+		offsets[n++] = EXT4_TIND_BLOCK;
+		offsets[n++] = i_block >> (ptrs_bits * 2);
+		offsets[n++] = (i_block >> ptrs_bits) & (ptrs - 1);
+		offsets[n++] = i_block & (ptrs - 1);
+		final = ptrs;
+	} else {
+		ext4_warning(inode->i_sb, "block %lu > max in inode %lu",
+			     i_block + direct_blocks +
+			     indirect_blocks + double_blocks, inode->i_ino);
+	}
+	if (boundary)
+		*boundary = final - 1 - (i_block & (ptrs - 1));
+	return n;
+}
+
+static int __ext4_check_blockref(const char *function, unsigned int line,
+				 struct inode *inode,
+				 __le32 *p, unsigned int max)
+{
+	struct ext4_super_block *es = EXT4_SB(inode->i_sb)->s_es;
+	__le32 *bref = p;
+	unsigned int blk;
+
+	while (bref < p+max) {
+		blk = le32_to_cpu(*bref++);
+		if (blk &&
+		    unlikely(!ext4_data_block_valid(EXT4_SB(inode->i_sb),
+						    blk, 1))) {
+			es->s_last_error_block = cpu_to_le64(blk);
+			ext4_error_inode(inode, function, line, blk,
+					 "invalid block");
+			return -EIO;
+		}
+	}
+	return 0;
+}

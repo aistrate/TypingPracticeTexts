@@ -1,0 +1,50 @@
+static int ocfs2_dx_dir_rebalance_credits(struct ocfs2_super *osb,
+					  struct ocfs2_dx_root_block *dx_root)
+{
+	int credits = ocfs2_clusters_to_blocks(osb->sb, 2);
+
+	credits += ocfs2_calc_extend_credits(osb->sb, &dx_root->dr_list, 1);
+	credits += ocfs2_quota_trans_credits(osb->sb);
+	return credits;
+}
+
+static int ocfs2_dx_dir_rebalance(struct ocfs2_super *osb, struct inode *dir,
+				  struct buffer_head *dx_root_bh,
+				  struct buffer_head *dx_leaf_bh,
+				  struct ocfs2_dx_hinfo *hinfo, u32 leaf_cpos,
+				  u64 leaf_blkno)
+{
+	struct ocfs2_dx_leaf *dx_leaf = (struct ocfs2_dx_leaf *)dx_leaf_bh->b_data;
+	int credits, ret, i, num_used, did_quota = 0;
+	u32 cpos, split_hash, insert_hash = hinfo->major_hash;
+	u64 orig_leaves_start;
+	int num_dx_leaves;
+	struct buffer_head **orig_dx_leaves = NULL;
+	struct buffer_head **new_dx_leaves = NULL;
+	struct ocfs2_alloc_context *data_ac = NULL, *meta_ac = NULL;
+	struct ocfs2_extent_tree et;
+	handle_t *handle = NULL;
+	struct ocfs2_dx_root_block *dx_root;
+	struct ocfs2_dx_leaf *tmp_dx_leaf = NULL;
+
+	mlog(0, "DX Dir: %llu, rebalance leaf leaf_blkno: %llu insert: %u\n",
+	     (unsigned long long)OCFS2_I(dir)->ip_blkno,
+	     (unsigned long long)leaf_blkno, insert_hash);
+
+	ocfs2_init_dx_root_extent_tree(&et, INODE_CACHE(dir), dx_root_bh);
+
+	dx_root = (struct ocfs2_dx_root_block *)dx_root_bh->b_data;
+	
+	if (le32_to_cpu(dx_root->dr_clusters) == UINT_MAX)
+		return -ENOSPC;
+
+	num_used = le16_to_cpu(dx_leaf->dl_list.de_num_used);
+	if (num_used < le16_to_cpu(dx_leaf->dl_list.de_count)) {
+		mlog(ML_ERROR, "DX Dir: %llu, Asked to rebalance empty leaf: "
+		     "%llu, %d\n", (unsigned long long)OCFS2_I(dir)->ip_blkno,
+		     (unsigned long long)leaf_blkno, num_used);
+		ret = -EIO;
+		goto out;
+	}
+
+	orig_dx_leaves = ocfs2_dx_dir_kmalloc_leaves(osb->sb, &num_dx_leaves);

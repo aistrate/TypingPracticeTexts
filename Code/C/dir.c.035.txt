@@ -1,0 +1,49 @@
+					filldir_err);
+}
+
+int ocfs2_dir_foreach(struct inode *inode, loff_t *f_pos, void *priv,
+		      filldir_t filldir)
+{
+	int ret = 0, filldir_err = 0;
+	u64 version = inode->i_version;
+
+	while (*f_pos < i_size_read(inode)) {
+		ret = ocfs2_dir_foreach_blk(inode, &version, f_pos, priv,
+					    filldir, &filldir_err);
+		if (ret || filldir_err)
+			break;
+	}
+
+	if (ret > 0)
+		ret = -EIO;
+
+	return 0;
+}
+
+int ocfs2_readdir(struct file * filp, void * dirent, filldir_t filldir)
+{
+	int error = 0;
+	struct inode *inode = filp->f_path.dentry->d_inode;
+	int lock_level = 0;
+
+	mlog_entry("dirino=%llu\n",
+		   (unsigned long long)OCFS2_I(inode)->ip_blkno);
+
+	error = ocfs2_inode_lock_atime(inode, filp->f_vfsmnt, &lock_level);
+	if (lock_level && error >= 0) {
+		
+		ocfs2_inode_unlock(inode, 1);
+		lock_level = 0;
+		error = ocfs2_inode_lock(inode, NULL, 0);
+	}
+	if (error < 0) {
+		if (error != -ENOENT)
+			mlog_errno(error);
+		
+		goto bail_nolock;
+	}
+
+	error = ocfs2_dir_foreach_blk(inode, &filp->f_version, &filp->f_pos,
+				      dirent, filldir, NULL);
+
+	ocfs2_inode_unlock(inode, lock_level);

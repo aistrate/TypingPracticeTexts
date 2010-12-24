@@ -1,0 +1,50 @@
+		if (de == de_del)  {
+			status = access(handle, INODE_CACHE(dir), bh,
+					OCFS2_JOURNAL_ACCESS_WRITE);
+			if (status < 0) {
+				status = -EIO;
+				mlog_errno(status);
+				goto bail;
+			}
+			if (pde)
+				le16_add_cpu(&pde->rec_len,
+						le16_to_cpu(de->rec_len));
+			else
+				de->inode = 0;
+			dir->i_version++;
+			ocfs2_journal_dirty(handle, bh);
+			goto bail;
+		}
+		i += le16_to_cpu(de->rec_len);
+		pde = de;
+		de = (struct ocfs2_dir_entry *)((char *)de + le16_to_cpu(de->rec_len));
+	}
+bail:
+	mlog_exit(status);
+	return status;
+}
+
+static unsigned int ocfs2_figure_dirent_hole(struct ocfs2_dir_entry *de)
+{
+	unsigned int hole;
+
+	if (le64_to_cpu(de->inode) == 0)
+		hole = le16_to_cpu(de->rec_len);
+	else
+		hole = le16_to_cpu(de->rec_len) -
+			OCFS2_DIR_REC_LEN(de->name_len);
+
+	return hole;
+}
+
+static int ocfs2_find_max_rec_len(struct super_block *sb,
+				  struct buffer_head *dirblock_bh)
+{
+	int size, this_hole, largest_hole = 0;
+	char *trailer, *de_buf, *limit, *start = dirblock_bh->b_data;
+	struct ocfs2_dir_entry *de;
+
+	trailer = (char *)ocfs2_trailer_from_bh(dirblock_bh, sb);
+	size = ocfs2_dir_trailer_blk_off(sb);
+	limit = start + size;
+	de_buf = start;

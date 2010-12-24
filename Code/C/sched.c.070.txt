@@ -1,0 +1,50 @@
+		p->sched_class = &rt_sched_class;
+	else
+		p->sched_class = &fair_sched_class;
+
+	p->prio = prio;
+
+	if (running)
+		p->sched_class->set_curr_task(rq);
+	if (on_rq) {
+		enqueue_task(rq, p, oldprio < prio ? ENQUEUE_HEAD : 0);
+
+		check_class_changed(rq, p, prev_class, oldprio, running);
+	}
+	task_rq_unlock(rq, &flags);
+}
+
+#endif
+
+void set_user_nice(struct task_struct *p, long nice)
+{
+	int old_prio, delta, on_rq;
+	unsigned long flags;
+	struct rq *rq;
+
+	if (TASK_NICE(p) == nice || nice < -20 || nice > 19)
+		return;
+	
+	rq = task_rq_lock(p, &flags);
+	
+	if (task_has_rt_policy(p)) {
+		p->static_prio = NICE_TO_PRIO(nice);
+		goto out_unlock;
+	}
+	on_rq = p->se.on_rq;
+	if (on_rq)
+		dequeue_task(rq, p, 0);
+
+	p->static_prio = NICE_TO_PRIO(nice);
+	set_load_weight(p);
+	old_prio = p->prio;
+	p->prio = effective_prio(p);
+	delta = p->prio - old_prio;
+
+	if (on_rq) {
+		enqueue_task(rq, p, 0);
+		
+		if (delta < 0 || (delta > 0 && task_running(rq, p)))
+			resched_task(rq->curr);
+	}
+out_unlock:

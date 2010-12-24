@@ -1,0 +1,50 @@
+		dx_entry = &entry_list->de_entries[i];
+
+		j = __ocfs2_dx_dir_hash_idx(osb,
+					    le32_to_cpu(dx_entry->dx_minor_hash));
+		target_leaf = (struct ocfs2_dx_leaf *)dx_leaves[j]->b_data;
+
+		ocfs2_dx_dir_leaf_insert_tail(target_leaf, dx_entry);
+
+	}
+
+	dx_root->dr_flags &= ~OCFS2_DX_FLAG_INLINE;
+	memset(&dx_root->dr_list, 0, osb->sb->s_blocksize -
+	       offsetof(struct ocfs2_dx_root_block, dr_list));
+	dx_root->dr_list.l_count =
+		cpu_to_le16(ocfs2_extent_recs_per_dx_root(osb->sb));
+
+	ocfs2_init_dx_root_extent_tree(&et, INODE_CACHE(dir), dx_root_bh);
+	ret = ocfs2_insert_extent(handle, &et, 0, insert_blkno, 1, 0, NULL);
+	if (ret)
+		mlog_errno(ret);
+	did_quota = 0;
+
+	ocfs2_journal_dirty(handle, dx_root_bh);
+
+out_commit:
+	if (ret < 0 && did_quota)
+		dquot_free_space_nodirty(dir,
+					  ocfs2_clusters_to_bytes(dir->i_sb, 1));
+
+	ocfs2_commit_trans(osb, handle);
+
+out:
+	if (data_ac)
+		ocfs2_free_alloc_context(data_ac);
+
+	if (dx_leaves) {
+		for (i = 0; i < num_dx_leaves; i++)
+			brelse(dx_leaves[i]);
+		kfree(dx_leaves);
+	}
+	return ret;
+}
+
+static int ocfs2_inline_dx_has_space(struct buffer_head *dx_root_bh)
+{
+	struct ocfs2_dx_root_block *dx_root;
+	struct ocfs2_dx_entry_list *entry_list;
+
+	dx_root = (struct ocfs2_dx_root_block *) dx_root_bh->b_data;
+	entry_list = &dx_root->dr_entries;

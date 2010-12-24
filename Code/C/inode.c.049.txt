@@ -1,0 +1,50 @@
+{
+	journal_t *journal = EXT4_JOURNAL(page->mapping->host);
+
+	if (ext4_should_dioread_nolock(page->mapping->host))
+		ext4_invalidatepage_free_endio(page, offset);
+	
+	if (offset == 0)
+		ClearPageChecked(page);
+
+	if (journal)
+		jbd2_journal_invalidatepage(journal, page, offset);
+	else
+		block_invalidatepage(page, offset);
+}
+
+static int ext4_releasepage(struct page *page, gfp_t wait)
+{
+	journal_t *journal = EXT4_JOURNAL(page->mapping->host);
+
+	WARN_ON(PageChecked(page));
+	if (!page_has_buffers(page))
+		return 0;
+	if (journal)
+		return jbd2_journal_try_to_free_buffers(journal, page, wait);
+	else
+		return try_to_free_buffers(page);
+}
+
+static ssize_t ext4_ind_direct_IO(int rw, struct kiocb *iocb,
+			      const struct iovec *iov, loff_t offset,
+			      unsigned long nr_segs)
+{
+	struct file *file = iocb->ki_filp;
+	struct inode *inode = file->f_mapping->host;
+	struct ext4_inode_info *ei = EXT4_I(inode);
+	handle_t *handle;
+	ssize_t ret;
+	int orphan = 0;
+	size_t count = iov_length(iov, nr_segs);
+	int retries = 0;
+
+	if (rw == WRITE) {
+		loff_t final_size = offset + count;
+
+		if (final_size > inode->i_size) {
+			
+			handle = ext4_journal_start(inode, 2);
+			if (IS_ERR(handle)) {
+				ret = PTR_ERR(handle);
+				goto out;

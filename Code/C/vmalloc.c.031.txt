@@ -1,0 +1,49 @@
+	read_lock(&vmlist_lock);
+	for (tmp = vmlist; count && tmp; tmp = tmp->next) {
+		vaddr = (char *) tmp->addr;
+		if (addr >= vaddr + tmp->size - PAGE_SIZE)
+			continue;
+		while (addr < vaddr) {
+			if (count == 0)
+				goto finished;
+			buf++;
+			addr++;
+			count--;
+		}
+		n = vaddr + tmp->size - PAGE_SIZE - addr;
+		if (n > count)
+			n = count;
+		if (!(tmp->flags & VM_IOREMAP)) {
+			aligned_vwrite(buf, addr, n);
+			copied++;
+		}
+		buf += n;
+		addr += n;
+		count -= n;
+	}
+finished:
+	read_unlock(&vmlist_lock);
+	if (!copied)
+		return 0;
+	return buflen;
+}
+
+int remap_vmalloc_range(struct vm_area_struct *vma, void *addr,
+						unsigned long pgoff)
+{
+	struct vm_struct *area;
+	unsigned long uaddr = vma->vm_start;
+	unsigned long usize = vma->vm_end - vma->vm_start;
+
+	if ((PAGE_SIZE-1) & (unsigned long)addr)
+		return -EINVAL;
+
+	area = find_vm_area(addr);
+	if (!area)
+		return -EINVAL;
+
+	if (!(area->flags & VM_USERMAP))
+		return -EINVAL;
+
+	if (usize + (pgoff << PAGE_SHIFT) > area->size - PAGE_SIZE)
+		return -EINVAL;

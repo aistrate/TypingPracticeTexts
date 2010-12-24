@@ -1,0 +1,49 @@
+		if (err > 0)
+			err = ext4_journal_restart(handle, 3);
+		if (err != 0) {
+			ext4_warning(inode->i_sb,
+				     "couldn't extend journal (err %d)", err);
+		stop_handle:
+			ext4_journal_stop(handle);
+			ext4_orphan_del(NULL, inode);
+			goto no_delete;
+		}
+	}
+
+	ext4_orphan_del(handle, inode);
+	EXT4_I(inode)->i_dtime	= get_seconds();
+
+	if (ext4_mark_inode_dirty(handle, inode))
+		
+		ext4_clear_inode(inode);
+	else
+		ext4_free_inode(handle, inode);
+	ext4_journal_stop(handle);
+	return;
+no_delete:
+	ext4_clear_inode(inode);	
+}
+
+typedef struct {
+	__le32	*p;
+	__le32	key;
+	struct buffer_head *bh;
+} Indirect;
+
+static inline void add_chain(Indirect *p, struct buffer_head *bh, __le32 *v)
+{
+	p->key = *(p->p = v);
+	p->bh = bh;
+}
+
+static int ext4_block_to_path(struct inode *inode,
+			      ext4_lblk_t i_block,
+			      ext4_lblk_t offsets[4], int *boundary)
+{
+	int ptrs = EXT4_ADDR_PER_BLOCK(inode->i_sb);
+	int ptrs_bits = EXT4_ADDR_PER_BLOCK_BITS(inode->i_sb);
+	const long direct_blocks = EXT4_NDIR_BLOCKS,
+		indirect_blocks = ptrs,
+		double_blocks = (1 << (ptrs_bits * 2));
+	int n = 0;
+	int final = 0;

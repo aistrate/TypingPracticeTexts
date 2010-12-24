@@ -1,0 +1,50 @@
+			copied = 0;
+
+		page_zero_new_buffers(page, start+copied, start+len);
+	}
+	flush_dcache_page(page);
+
+	__block_commit_write(inode, page, start, start+copied);
+
+	return copied;
+}
+EXPORT_SYMBOL(block_write_end);
+
+int generic_write_end(struct file *file, struct address_space *mapping,
+			loff_t pos, unsigned len, unsigned copied,
+			struct page *page, void *fsdata)
+{
+	struct inode *inode = mapping->host;
+	int i_size_changed = 0;
+
+	copied = block_write_end(file, mapping, pos, len, copied, page, fsdata);
+
+	if (pos+copied > inode->i_size) {
+		i_size_write(inode, pos+copied);
+		i_size_changed = 1;
+	}
+
+	unlock_page(page);
+	page_cache_release(page);
+
+	if (i_size_changed)
+		mark_inode_dirty(inode);
+
+	return copied;
+}
+EXPORT_SYMBOL(generic_write_end);
+
+int block_is_partially_uptodate(struct page *page, read_descriptor_t *desc,
+					unsigned long from)
+{
+	struct inode *inode = page->mapping->host;
+	unsigned block_start, block_end, blocksize;
+	unsigned to;
+	struct buffer_head *bh, *head;
+	int ret = 1;
+
+	if (!page_has_buffers(page))
+		return 0;
+
+	blocksize = 1 << inode->i_blkbits;
+	to = min_t(unsigned, PAGE_CACHE_SIZE - from, desc->count);

@@ -1,0 +1,50 @@
+			list_add(&bh->b_assoc_buffers, &tmp);
+			bh->b_assoc_map = mapping;
+			if (buffer_dirty(bh)) {
+				get_bh(bh);
+				spin_unlock(lock);
+				
+				write_dirty_buffer(bh, WRITE_SYNC_PLUG);
+
+				if (prev_mapping && prev_mapping != mapping)
+					blk_run_address_space(prev_mapping);
+				prev_mapping = mapping;
+
+				brelse(bh);
+				spin_lock(lock);
+			}
+		}
+	}
+
+	while (!list_empty(&tmp)) {
+		bh = BH_ENTRY(tmp.prev);
+		get_bh(bh);
+		mapping = bh->b_assoc_map;
+		__remove_assoc_queue(bh);
+		
+		smp_mb();
+		if (buffer_dirty(bh)) {
+			list_add(&bh->b_assoc_buffers,
+				 &mapping->private_list);
+			bh->b_assoc_map = mapping;
+		}
+		spin_unlock(lock);
+		wait_on_buffer(bh);
+		if (!buffer_uptodate(bh))
+			err = -EIO;
+		brelse(bh);
+		spin_lock(lock);
+	}
+	
+	spin_unlock(lock);
+	err2 = osync_buffers_list(lock, list);
+	if (err)
+		return err;
+	else
+		return err2;
+}
+
+void invalidate_inode_buffers(struct inode *inode)
+{
+	if (inode_has_buffers(inode)) {
+		struct address_space *mapping = &inode->i_data;

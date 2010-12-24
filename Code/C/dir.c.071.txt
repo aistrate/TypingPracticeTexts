@@ -1,0 +1,50 @@
+	handle_t *handle = NULL;
+	struct ocfs2_dx_root_block *dx_root;
+	struct ocfs2_dx_entry_list *entry_list;
+	struct ocfs2_dx_entry *dx_entry;
+	struct ocfs2_dx_leaf *target_leaf;
+
+	ret = ocfs2_reserve_clusters(osb, 1, &data_ac);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	dx_leaves = ocfs2_dx_dir_kmalloc_leaves(osb->sb, &num_dx_leaves);
+	if (!dx_leaves) {
+		ret = -ENOMEM;
+		mlog_errno(ret);
+		goto out;
+	}
+
+	handle = ocfs2_start_trans(osb, ocfs2_calc_dxi_expand_credits(osb->sb));
+	if (IS_ERR(handle)) {
+		ret = PTR_ERR(handle);
+		mlog_errno(ret);
+		goto out;
+	}
+
+	ret = dquot_alloc_space_nodirty(dir,
+				       ocfs2_clusters_to_bytes(osb->sb, 1));
+	if (ret)
+		goto out_commit;
+	did_quota = 1;
+
+	ret = ocfs2_journal_access_dr(handle, INODE_CACHE(dir), dx_root_bh,
+				      OCFS2_JOURNAL_ACCESS_WRITE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	ret = __ocfs2_dx_dir_new_cluster(dir, 0, handle, data_ac, dx_leaves,
+					 num_dx_leaves, &insert_blkno);
+	if (ret) {
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	dx_root = (struct ocfs2_dx_root_block *) dx_root_bh->b_data;
+	entry_list = &dx_root->dr_entries;
+
+	for (i = 0; i < le16_to_cpu(entry_list->de_num_used); i++) {

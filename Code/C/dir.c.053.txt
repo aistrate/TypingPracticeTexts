@@ -1,0 +1,50 @@
+	di->i_dyn_features = cpu_to_le16(oi->ip_dyn_features);
+	spin_unlock(&oi->ip_lock);
+
+	ocfs2_dinode_new_extent_list(dir, di);
+
+	i_size_write(dir, sb->s_blocksize);
+	dir->i_mtime = dir->i_ctime = CURRENT_TIME;
+
+	di->i_size = cpu_to_le64(sb->s_blocksize);
+	di->i_ctime = di->i_mtime = cpu_to_le64(dir->i_ctime.tv_sec);
+	di->i_ctime_nsec = di->i_mtime_nsec = cpu_to_le32(dir->i_ctime.tv_nsec);
+
+	ret = ocfs2_insert_extent(handle, &et, 0, blkno, len,
+				  0, NULL);
+	if (ret) {
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	dir->i_blocks = ocfs2_inode_sector_count(dir);
+
+	ocfs2_journal_dirty(handle, di_bh);
+
+	if (ocfs2_supports_indexed_dirs(osb)) {
+		ret = ocfs2_dx_dir_attach_index(osb, handle, dir, di_bh,
+						dirdata_bh, meta_ac, dx_inline,
+						num_dx_entries, &dx_root_bh);
+		if (ret) {
+			mlog_errno(ret);
+			goto out_commit;
+		}
+
+		if (dx_inline) {
+			ocfs2_dx_dir_index_root_block(dir, dx_root_bh,
+						      dirdata_bh);
+		} else {
+			ocfs2_init_dx_root_extent_tree(&dx_et,
+						       INODE_CACHE(dir),
+						       dx_root_bh);
+			ret = ocfs2_insert_extent(handle, &dx_et, 0,
+						  dx_insert_blkno, 1, 0, NULL);
+			if (ret)
+				mlog_errno(ret);
+		}
+	}
+
+	if (alloc > len) {
+		ret = ocfs2_claim_clusters(handle, data_ac, 1, &bit_off,
+					   &len);
+		if (ret) {

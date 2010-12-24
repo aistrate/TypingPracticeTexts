@@ -1,0 +1,50 @@
+		mlog_errno(ret);
+		goto out;
+	}
+
+search_el:
+	
+	ret = ocfs2_search_dx_free_list(dir, dx_root_bh, namelen, lookup);
+	if (ret && ret != -ENOSPC) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	lookup->dl_dx_root_bh = dx_root_bh;
+	free_dx_root = 0;
+
+	if (ret == -ENOSPC) {
+		ret = ocfs2_extend_dir(osb, dir, di_bh, 1, lookup, &leaf_bh);
+
+		if (ret) {
+			mlog_errno(ret);
+			goto out;
+		}
+
+		lookup->dl_prev_leaf_bh = NULL;
+		lookup->dl_leaf_bh = leaf_bh;
+	}
+
+out:
+	if (free_dx_root)
+		brelse(dx_root_bh);
+	return ret;
+}
+
+int ocfs2_prepare_dir_for_insert(struct ocfs2_super *osb,
+				 struct inode *dir,
+				 struct buffer_head *parent_fe_bh,
+				 const char *name,
+				 int namelen,
+				 struct ocfs2_dir_lookup_result *lookup)
+{
+	int ret;
+	unsigned int blocks_wanted = 1;
+	struct buffer_head *bh = NULL;
+
+	mlog(0, "getting ready to insert namelen %d into dir %llu\n",
+	     namelen, (unsigned long long)OCFS2_I(dir)->ip_blkno);
+
+	if (!namelen) {
+		ret = -EINVAL;
+		mlog_errno(ret);

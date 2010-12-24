@@ -1,0 +1,50 @@
+		free_sched_domains(doms_cur, ndoms_cur);
+	kfree(dattr_cur);	
+	doms_cur = doms_new;
+	dattr_cur = dattr_new;
+	ndoms_cur = ndoms_new;
+
+	register_sched_domain_sysctl();
+
+	mutex_unlock(&sched_domains_mutex);
+}
+
+#if defined(CONFIG_SCHED_MC) || defined(CONFIG_SCHED_SMT)
+static void arch_reinit_sched_domains(void)
+{
+	get_online_cpus();
+
+	partition_sched_domains(0, NULL, NULL);
+
+	rebuild_sched_domains();
+	put_online_cpus();
+}
+
+static ssize_t sched_power_savings_store(const char *buf, size_t count, int smt)
+{
+	unsigned int level = 0;
+
+	if (sscanf(buf, "%u", &level) != 1)
+		return -EINVAL;
+
+	if (level >= MAX_POWERSAVINGS_BALANCE_LEVELS)
+		return -EINVAL;
+
+	if (smt)
+		sched_smt_power_savings = level;
+	else
+		sched_mc_power_savings = level;
+
+	arch_reinit_sched_domains();
+
+	return count;
+}
+
+#ifdef CONFIG_SCHED_MC
+static ssize_t sched_mc_power_savings_show(struct sysdev_class *class,
+					   struct sysdev_class_attribute *attr,
+					   char *page)
+{
+	return sprintf(page, "%u\n", sched_mc_power_savings);
+}
+static ssize_t sched_mc_power_savings_store(struct sysdev_class *class,

@@ -1,0 +1,50 @@
+	struct list_head *p;
+	int err = 0;
+
+	spin_lock(lock);
+repeat:
+	list_for_each_prev(p, list) {
+		bh = BH_ENTRY(p);
+		if (buffer_locked(bh)) {
+			get_bh(bh);
+			spin_unlock(lock);
+			wait_on_buffer(bh);
+			if (!buffer_uptodate(bh))
+				err = -EIO;
+			brelse(bh);
+			spin_lock(lock);
+			goto repeat;
+		}
+	}
+	spin_unlock(lock);
+	return err;
+}
+
+static void do_thaw_one(struct super_block *sb, void *unused)
+{
+	char b[BDEVNAME_SIZE];
+	while (sb->s_bdev && !thaw_bdev(sb->s_bdev, sb))
+		printk(KERN_WARNING "Emergency Thaw on %s\n",
+		       bdevname(sb->s_bdev, b));
+}
+
+static void do_thaw_all(struct work_struct *work)
+{
+	iterate_supers(do_thaw_one, NULL);
+	kfree(work);
+	printk(KERN_WARNING "Emergency Thaw complete\n");
+}
+
+void emergency_thaw_all(void)
+{
+	struct work_struct *work;
+
+	work = kmalloc(sizeof(*work), GFP_ATOMIC);
+	if (work) {
+		INIT_WORK(work, do_thaw_all);
+		schedule_work(work);
+	}
+}
+
+int sync_mapping_buffers(struct address_space *mapping)
+{

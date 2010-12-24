@@ -1,0 +1,50 @@
+{
+	pgoff_t pgoff = (((address & PAGE_MASK)
+			- vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
+
+	pte_unmap(page_table);
+	return __do_fault(mm, vma, address, pmd, pgoff, flags, orig_pte);
+}
+
+static int do_nonlinear_fault(struct mm_struct *mm, struct vm_area_struct *vma,
+		unsigned long address, pte_t *page_table, pmd_t *pmd,
+		unsigned int flags, pte_t orig_pte)
+{
+	pgoff_t pgoff;
+
+	flags |= FAULT_FLAG_NONLINEAR;
+
+	if (!pte_unmap_same(mm, pmd, page_table, orig_pte))
+		return 0;
+
+	if (unlikely(!(vma->vm_flags & VM_NONLINEAR))) {
+		
+		print_bad_pte(vma, address, orig_pte, NULL);
+		return VM_FAULT_SIGBUS;
+	}
+
+	pgoff = pte_to_pgoff(orig_pte);
+	return __do_fault(mm, vma, address, pmd, pgoff, flags, orig_pte);
+}
+
+static inline int handle_pte_fault(struct mm_struct *mm,
+		struct vm_area_struct *vma, unsigned long address,
+		pte_t *pte, pmd_t *pmd, unsigned int flags)
+{
+	pte_t entry;
+	spinlock_t *ptl;
+
+	entry = *pte;
+	if (!pte_present(entry)) {
+		if (pte_none(entry)) {
+			if (vma->vm_ops) {
+				if (likely(vma->vm_ops->fault))
+					return do_linear_fault(mm, vma, address,
+						pte, pmd, flags, entry);
+			}
+			return do_anonymous_page(mm, vma, address,
+						 pte, pmd, flags);
+		}
+		if (pte_file(entry))
+			return do_nonlinear_fault(mm, vma, address,
+					pte, pmd, flags, entry);

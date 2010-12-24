@@ -1,0 +1,50 @@
+	blk_bits = order_base_2(lblock);
+	return (blk_bits / EXT4_ADDR_PER_BLOCK_BITS(inode->i_sb)) + 1;
+}
+
+static int ext4_calc_metadata_amount(struct inode *inode, sector_t lblock)
+{
+	if (ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS))
+		return ext4_ext_calc_metadata_amount(inode, lblock);
+
+	return ext4_indirect_calc_metadata_amount(inode, lblock);
+}
+
+void ext4_da_update_reserve_space(struct inode *inode,
+					int used, int quota_claim)
+{
+	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
+	struct ext4_inode_info *ei = EXT4_I(inode);
+
+	spin_lock(&ei->i_block_reservation_lock);
+	trace_ext4_da_update_reserve_space(inode, used);
+	if (unlikely(used > ei->i_reserved_data_blocks)) {
+		ext4_msg(inode->i_sb, KERN_NOTICE, "%s: ino %lu, used %d "
+			 "with only %d reserved data blocks\n",
+			 __func__, inode->i_ino, used,
+			 ei->i_reserved_data_blocks);
+		WARN_ON(1);
+		used = ei->i_reserved_data_blocks;
+	}
+
+	ei->i_reserved_data_blocks -= used;
+	ei->i_reserved_meta_blocks -= ei->i_allocated_meta_blocks;
+	percpu_counter_sub(&sbi->s_dirtyblocks_counter,
+			   used + ei->i_allocated_meta_blocks);
+	ei->i_allocated_meta_blocks = 0;
+
+	if (ei->i_reserved_data_blocks == 0) {
+		
+		percpu_counter_sub(&sbi->s_dirtyblocks_counter,
+				   ei->i_reserved_meta_blocks);
+		ei->i_reserved_meta_blocks = 0;
+		ei->i_da_metadata_calc_len = 0;
+	}
+	spin_unlock(&EXT4_I(inode)->i_block_reservation_lock);
+
+	if (quota_claim)
+		dquot_claim_block(inode, used);
+	else {
+		
+		dquot_release_reservation_block(inode, used);
+	}

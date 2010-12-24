@@ -1,0 +1,50 @@
+		return do_swap_page(mm, vma, address,
+					pte, pmd, flags, entry);
+	}
+
+	ptl = pte_lockptr(mm, pmd);
+	spin_lock(ptl);
+	if (unlikely(!pte_same(*pte, entry)))
+		goto unlock;
+	if (flags & FAULT_FLAG_WRITE) {
+		if (!pte_write(entry))
+			return do_wp_page(mm, vma, address,
+					pte, pmd, ptl, entry);
+		entry = pte_mkdirty(entry);
+	}
+	entry = pte_mkyoung(entry);
+	if (ptep_set_access_flags(vma, address, pte, entry, flags & FAULT_FLAG_WRITE)) {
+		update_mmu_cache(vma, address, pte);
+	} else {
+		
+		if (flags & FAULT_FLAG_WRITE)
+			flush_tlb_fix_spurious_fault(vma, address);
+	}
+unlock:
+	pte_unmap_unlock(pte, ptl);
+	return 0;
+}
+
+int handle_mm_fault(struct mm_struct *mm, struct vm_area_struct *vma,
+		unsigned long address, unsigned int flags)
+{
+	pgd_t *pgd;
+	pud_t *pud;
+	pmd_t *pmd;
+	pte_t *pte;
+
+	__set_current_state(TASK_RUNNING);
+
+	count_vm_event(PGFAULT);
+
+	check_sync_rss_stat(current);
+
+	if (unlikely(is_vm_hugetlb_page(vma)))
+		return hugetlb_fault(mm, vma, address, flags);
+
+	pgd = pgd_offset(mm, address);
+	pud = pud_alloc(mm, pgd, address);
+	if (!pud)
+		return VM_FAULT_OOM;
+	pmd = pmd_alloc(mm, pud, address);
+	if (!pmd)

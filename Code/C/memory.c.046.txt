@@ -1,0 +1,50 @@
+			if (flags & FAULT_FLAG_WRITE) {
+				dirty_page = page;
+				get_page(dirty_page);
+			}
+		}
+		set_pte_at(mm, address, page_table, entry);
+
+		update_mmu_cache(vma, address, page_table);
+	} else {
+		if (charged)
+			mem_cgroup_uncharge_page(page);
+		if (anon)
+			page_cache_release(page);
+		else
+			anon = 1; 
+	}
+
+	pte_unmap_unlock(page_table, ptl);
+
+out:
+	if (dirty_page) {
+		struct address_space *mapping = page->mapping;
+
+		if (set_page_dirty(dirty_page))
+			page_mkwrite = 1;
+		unlock_page(dirty_page);
+		put_page(dirty_page);
+		if (page_mkwrite && mapping) {
+			
+			balance_dirty_pages_ratelimited(mapping);
+		}
+
+		if (vma->vm_file)
+			file_update_time(vma->vm_file);
+	} else {
+		unlock_page(vmf.page);
+		if (anon)
+			page_cache_release(vmf.page);
+	}
+
+	return ret;
+
+unwritable_page:
+	page_cache_release(page);
+	return ret;
+}
+
+static int do_linear_fault(struct mm_struct *mm, struct vm_area_struct *vma,
+		unsigned long address, pte_t *page_table, pmd_t *pmd,
+		unsigned int flags, pte_t orig_pte)

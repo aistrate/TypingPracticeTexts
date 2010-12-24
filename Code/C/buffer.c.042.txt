@@ -1,0 +1,50 @@
+	}
+
+	if (PageUptodate(page))
+		set_buffer_uptodate(bh);
+
+	if (!buffer_uptodate(bh) && !buffer_delay(bh) && !buffer_unwritten(bh)) {
+		err = -EIO;
+		ll_rw_block(READ, 1, &bh);
+		wait_on_buffer(bh);
+		
+		if (!buffer_uptodate(bh))
+			goto unlock;
+	}
+
+	zero_user(page, offset, length);
+	mark_buffer_dirty(bh);
+	err = 0;
+
+unlock:
+	unlock_page(page);
+	page_cache_release(page);
+out:
+	return err;
+}
+EXPORT_SYMBOL(block_truncate_page);
+
+int block_write_full_page_endio(struct page *page, get_block_t *get_block,
+			struct writeback_control *wbc, bh_end_io_t *handler)
+{
+	struct inode * const inode = page->mapping->host;
+	loff_t i_size = i_size_read(inode);
+	const pgoff_t end_index = i_size >> PAGE_CACHE_SHIFT;
+	unsigned offset;
+
+	if (page->index < end_index)
+		return __block_write_full_page(inode, page, get_block, wbc,
+					       handler);
+
+	offset = i_size & (PAGE_CACHE_SIZE-1);
+	if (page->index >= end_index+1 || !offset) {
+		
+		do_invalidatepage(page, 0);
+		unlock_page(page);
+		return 0; 
+	}
+
+	zero_user_segment(page, offset, PAGE_CACHE_SIZE);
+	return __block_write_full_page(inode, page, get_block, wbc, handler);
+}
+EXPORT_SYMBOL(block_write_full_page_endio);

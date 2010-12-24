@@ -1,0 +1,49 @@
+	spin_lock(&bd_mapping->private_lock);
+	if (!page_has_buffers(page))
+		goto out_unlock;
+	head = page_buffers(page);
+	bh = head;
+	do {
+		if (!buffer_mapped(bh))
+			all_mapped = 0;
+		else if (bh->b_blocknr == block) {
+			ret = bh;
+			get_bh(bh);
+			goto out_unlock;
+		}
+		bh = bh->b_this_page;
+	} while (bh != head);
+
+	if (all_mapped) {
+		printk("__find_get_block_slow() failed. "
+			"block=%llu, b_blocknr=%llu\n",
+			(unsigned long long)block,
+			(unsigned long long)bh->b_blocknr);
+		printk("b_state=0x%08lx, b_size=%zu\n",
+			bh->b_state, bh->b_size);
+		printk("device blocksize: %d\n", 1 << bd_inode->i_blkbits);
+	}
+out_unlock:
+	spin_unlock(&bd_mapping->private_lock);
+	page_cache_release(page);
+out:
+	return ret;
+}
+
+void invalidate_bdev(struct block_device *bdev)
+{
+	struct address_space *mapping = bdev->bd_inode->i_mapping;
+
+	if (mapping->nrpages == 0)
+		return;
+
+	invalidate_bh_lrus();
+	lru_add_drain_all();	
+	invalidate_mapping_pages(mapping, 0, -1);
+}
+EXPORT_SYMBOL(invalidate_bdev);
+
+static void free_more_memory(void)
+{
+	struct zone *zone;
+	int nid;

@@ -1,0 +1,50 @@
+		bh->b_blocknr = -1;
+		head = bh;
+
+		bh->b_state = 0;
+		atomic_set(&bh->b_count, 0);
+		bh->b_size = size;
+
+		set_bh_page(bh, page, offset);
+
+		init_buffer(bh, NULL, NULL);
+	}
+	return head;
+
+no_grow:
+	if (head) {
+		do {
+			bh = head;
+			head = head->b_this_page;
+			free_buffer_head(bh);
+		} while (head);
+	}
+
+	if (!retry)
+		return NULL;
+
+	free_more_memory();
+	goto try_again;
+}
+EXPORT_SYMBOL_GPL(alloc_page_buffers);
+
+static inline void
+link_dev_buffers(struct page *page, struct buffer_head *head)
+{
+	struct buffer_head *bh, *tail;
+
+	bh = head;
+	do {
+		tail = bh;
+		bh = bh->b_this_page;
+	} while (bh);
+	tail->b_this_page = head;
+	attach_page_buffers(page, head);
+}
+
+static void
+init_page_buffers(struct page *page, struct block_device *bdev,
+			sector_t block, int size)
+{
+	struct buffer_head *head = page_buffers(page);
+	struct buffer_head *bh = head;

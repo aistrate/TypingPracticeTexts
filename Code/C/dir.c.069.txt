@@ -1,0 +1,50 @@
+		mlog_errno(ret);
+		goto out;
+	}
+
+	ret = ocfs2_read_dx_leaf(dir, blkno, &dx_leaf_bh);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	dx_leaf = (struct ocfs2_dx_leaf *)dx_leaf_bh->b_data;
+
+	if (le16_to_cpu(dx_leaf->dl_list.de_num_used) >=
+	    le16_to_cpu(dx_leaf->dl_list.de_count)) {
+		if (rebalanced) {
+			
+			ret = -ENOSPC;
+			goto out;
+		}
+
+		ret = ocfs2_dx_dir_rebalance(osb, dir, dx_root_bh, dx_leaf_bh,
+					     &lookup->dl_hinfo, leaf_cpos,
+					     blkno);
+		if (ret) {
+			if (ret != -ENOSPC)
+				mlog_errno(ret);
+			goto out;
+		}
+
+		brelse(dx_leaf_bh);
+		dx_leaf_bh = NULL;
+		rebalanced = 1;
+		goto restart_search;
+	}
+
+	lookup->dl_dx_leaf_bh = dx_leaf_bh;
+	dx_leaf_bh = NULL;
+
+out:
+	brelse(dx_leaf_bh);
+	return ret;
+}
+
+static int ocfs2_search_dx_free_list(struct inode *dir,
+				     struct buffer_head *dx_root_bh,
+				     int namelen,
+				     struct ocfs2_dir_lookup_result *lookup)
+{
+	int ret = -ENOSPC;
+	struct buffer_head *leaf_bh = NULL, *prev_leaf_bh = NULL;

@@ -1,0 +1,50 @@
+	}
+	ei->i_reserved_data_blocks -= to_free;
+
+	if (ei->i_reserved_data_blocks == 0) {
+		
+		percpu_counter_sub(&sbi->s_dirtyblocks_counter,
+				   ei->i_reserved_meta_blocks);
+		ei->i_reserved_meta_blocks = 0;
+		ei->i_da_metadata_calc_len = 0;
+	}
+
+	percpu_counter_sub(&sbi->s_dirtyblocks_counter, to_free);
+
+	spin_unlock(&EXT4_I(inode)->i_block_reservation_lock);
+
+	dquot_release_reservation_block(inode, to_free);
+}
+
+static void ext4_da_page_release_reservation(struct page *page,
+					     unsigned long offset)
+{
+	int to_release = 0;
+	struct buffer_head *head, *bh;
+	unsigned int curr_off = 0;
+
+	head = page_buffers(page);
+	bh = head;
+	do {
+		unsigned int next_off = curr_off + bh->b_size;
+
+		if ((offset <= curr_off) && (buffer_delay(bh))) {
+			to_release++;
+			clear_buffer_delay(bh);
+		}
+		curr_off = next_off;
+	} while ((bh = bh->b_this_page) != head);
+	ext4_da_release_space(page->mapping->host, to_release);
+}
+
+static int mpage_da_submit_io(struct mpage_da_data *mpd,
+			      struct ext4_map_blocks *map)
+{
+	struct pagevec pvec;
+	unsigned long index, end;
+	int ret = 0, err, nr_pages, i;
+	struct inode *inode = mpd->inode;
+	struct address_space *mapping = inode->i_mapping;
+	loff_t size = i_size_read(inode);
+	unsigned int len, block_start;
+	struct buffer_head *bh, *page_bufs = NULL;

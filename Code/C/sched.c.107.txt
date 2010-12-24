@@ -1,0 +1,50 @@
+#endif 
+
+static DEFINE_PER_CPU(struct static_sched_domain, phys_domains);
+static DEFINE_PER_CPU(struct static_sched_group, sched_group_phys);
+
+static int
+cpu_to_phys_group(int cpu, const struct cpumask *cpu_map,
+		  struct sched_group **sg, struct cpumask *mask)
+{
+	int group;
+#ifdef CONFIG_SCHED_BOOK
+	cpumask_and(mask, cpu_book_mask(cpu), cpu_map);
+	group = cpumask_first(mask);
+#elif defined(CONFIG_SCHED_MC)
+	cpumask_and(mask, cpu_coregroup_mask(cpu), cpu_map);
+	group = cpumask_first(mask);
+#elif defined(CONFIG_SCHED_SMT)
+	cpumask_and(mask, topology_thread_cpumask(cpu), cpu_map);
+	group = cpumask_first(mask);
+#else
+	group = cpu;
+#endif
+	if (sg)
+		*sg = &per_cpu(sched_group_phys, group).sg;
+	return group;
+}
+
+#ifdef CONFIG_NUMA
+
+static DEFINE_PER_CPU(struct static_sched_domain, node_domains);
+static struct sched_group ***sched_group_nodes_bycpu;
+
+static DEFINE_PER_CPU(struct static_sched_domain, allnodes_domains);
+static DEFINE_PER_CPU(struct static_sched_group, sched_group_allnodes);
+
+static int cpu_to_allnodes_group(int cpu, const struct cpumask *cpu_map,
+				 struct sched_group **sg,
+				 struct cpumask *nodemask)
+{
+	int group;
+
+	cpumask_and(nodemask, cpumask_of_node(cpu_to_node(cpu)), cpu_map);
+	group = cpumask_first(nodemask);
+
+	if (sg)
+		*sg = &per_cpu(sched_group_allnodes, group).sg;
+	return group;
+}
+
+static void init_numa_sched_groups_power(struct sched_group *group_head)

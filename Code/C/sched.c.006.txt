@@ -1,0 +1,50 @@
+	struct list_head *balance_iterator;
+
+	struct sched_entity *curr, *next, *last;
+
+	unsigned int nr_spread_over;
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+	struct rq *rq;	
+
+	struct list_head leaf_cfs_rq_list;
+	struct task_group *tg;	
+
+#ifdef CONFIG_SMP
+	
+	unsigned long task_weight;
+
+	unsigned long h_load;
+
+	unsigned long shares;
+
+	unsigned long rq_weight;
+#endif
+#endif
+};
+
+struct rt_rq {
+	struct rt_prio_array active;
+	unsigned long rt_nr_running;
+#if defined CONFIG_SMP || defined CONFIG_RT_GROUP_SCHED
+	struct {
+		int curr; 
+#ifdef CONFIG_SMP
+		int next; 
+#endif
+	} highest_prio;
+#endif
+#ifdef CONFIG_SMP
+	unsigned long rt_nr_migratory;
+	unsigned long rt_nr_total;
+	int overloaded;
+	struct plist_head pushable_tasks;
+#endif
+	int rt_throttled;
+	u64 rt_time;
+	u64 rt_runtime;
+	
+	raw_spinlock_t rt_runtime_lock;
+
+#ifdef CONFIG_RT_GROUP_SCHED
+	unsigned long rt_nr_boosted;

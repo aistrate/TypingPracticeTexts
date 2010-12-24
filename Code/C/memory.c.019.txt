@@ -1,0 +1,50 @@
+			}
+
+			*tlbp = tlb_gather_mmu(vma->vm_mm, fullmm);
+			tlb_start_valid = 0;
+			zap_work = ZAP_BLOCK_SIZE;
+		}
+	}
+out:
+	mmu_notifier_invalidate_range_end(mm, start_addr, end_addr);
+	return start;	
+}
+
+unsigned long zap_page_range(struct vm_area_struct *vma, unsigned long address,
+		unsigned long size, struct zap_details *details)
+{
+	struct mm_struct *mm = vma->vm_mm;
+	struct mmu_gather *tlb;
+	unsigned long end = address + size;
+	unsigned long nr_accounted = 0;
+
+	lru_add_drain();
+	tlb = tlb_gather_mmu(mm, 0);
+	update_hiwater_rss(mm);
+	end = unmap_vmas(&tlb, vma, address, end, &nr_accounted, details);
+	if (tlb)
+		tlb_finish_mmu(tlb, address, end);
+	return end;
+}
+
+int zap_vma_ptes(struct vm_area_struct *vma, unsigned long address,
+		unsigned long size)
+{
+	if (address < vma->vm_start || address + size > vma->vm_end ||
+	    		!(vma->vm_flags & VM_PFNMAP))
+		return -1;
+	zap_page_range(vma, address, size, NULL);
+	return 0;
+}
+EXPORT_SYMBOL_GPL(zap_vma_ptes);
+
+struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+			unsigned int flags)
+{
+	pgd_t *pgd;
+	pud_t *pud;
+	pmd_t *pmd;
+	pte_t *ptep, pte;
+	spinlock_t *ptl;
+	struct page *page;
+	struct mm_struct *mm = vma->vm_mm;

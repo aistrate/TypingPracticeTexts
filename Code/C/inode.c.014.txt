@@ -1,0 +1,50 @@
+		goto cleanup;
+
+	map->m_flags |= EXT4_MAP_NEW;
+
+	ext4_update_inode_fsync_trans(handle, inode, 1);
+got_it:
+	map->m_flags |= EXT4_MAP_MAPPED;
+	map->m_pblk = le32_to_cpu(chain[depth-1].key);
+	map->m_len = count;
+	if (count > blocks_to_boundary)
+		map->m_flags |= EXT4_MAP_BOUNDARY;
+	err = count;
+	
+	partial = chain + depth - 1;	
+cleanup:
+	while (partial > chain) {
+		BUFFER_TRACE(partial->bh, "call brelse");
+		brelse(partial->bh);
+		partial--;
+	}
+out:
+	return err;
+}
+
+#ifdef CONFIG_QUOTA
+qsize_t *ext4_get_reserved_space(struct inode *inode)
+{
+	return &EXT4_I(inode)->i_reserved_quota;
+}
+#endif
+
+static int ext4_indirect_calc_metadata_amount(struct inode *inode,
+					      sector_t lblock)
+{
+	struct ext4_inode_info *ei = EXT4_I(inode);
+	sector_t dind_mask = ~((sector_t)EXT4_ADDR_PER_BLOCK(inode->i_sb) - 1);
+	int blk_bits;
+
+	if (lblock < EXT4_NDIR_BLOCKS)
+		return 0;
+
+	lblock -= EXT4_NDIR_BLOCKS;
+
+	if (ei->i_da_metadata_calc_len &&
+	    (lblock & dind_mask) == ei->i_da_metadata_calc_last_lblock) {
+		ei->i_da_metadata_calc_len++;
+		return 0;
+	}
+	ei->i_da_metadata_calc_last_lblock = lblock & dind_mask;
+	ei->i_da_metadata_calc_len = 1;

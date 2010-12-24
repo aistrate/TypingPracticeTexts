@@ -1,0 +1,49 @@
+	struct rq *rq;
+	struct list_head leaf_rt_rq_list;
+	struct task_group *tg;
+#endif
+};
+
+#ifdef CONFIG_SMP
+
+struct root_domain {
+	atomic_t refcount;
+	cpumask_var_t span;
+	cpumask_var_t online;
+
+	cpumask_var_t rto_mask;
+	atomic_t rto_count;
+	struct cpupri cpupri;
+};
+
+static struct root_domain def_root_domain;
+
+#endif 
+
+struct rq {
+	
+	raw_spinlock_t lock;
+
+	unsigned long nr_running;
+	#define CPU_LOAD_IDX_MAX 5
+	unsigned long cpu_load[CPU_LOAD_IDX_MAX];
+	unsigned long last_load_update_tick;
+#ifdef CONFIG_NO_HZ
+	u64 nohz_stamp;
+	unsigned char nohz_balance_kick;
+#endif
+	unsigned int skip_clock_update;
+
+	struct load_weight load;
+	unsigned long nr_load_updates;
+	u64 nr_switches;
+
+	struct cfs_rq cfs;
+	struct rt_rq rt;
+
+#ifdef CONFIG_FAIR_GROUP_SCHED
+	
+	struct list_head leaf_cfs_rq_list;
+#endif
+#ifdef CONFIG_RT_GROUP_SCHED
+	struct list_head leaf_rt_rq_list;

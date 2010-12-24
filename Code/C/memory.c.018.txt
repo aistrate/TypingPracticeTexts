@@ -1,0 +1,50 @@
+	mmu_notifier_invalidate_range_start(mm, start_addr, end_addr);
+	for ( ; vma && vma->vm_start < end_addr; vma = vma->vm_next) {
+		unsigned long end;
+
+		start = max(vma->vm_start, start_addr);
+		if (start >= vma->vm_end)
+			continue;
+		end = min(vma->vm_end, end_addr);
+		if (end <= vma->vm_start)
+			continue;
+
+		if (vma->vm_flags & VM_ACCOUNT)
+			*nr_accounted += (end - start) >> PAGE_SHIFT;
+
+		if (unlikely(is_pfn_mapping(vma)))
+			untrack_pfn_vma(vma, 0, 0);
+
+		while (start != end) {
+			if (!tlb_start_valid) {
+				tlb_start = start;
+				tlb_start_valid = 1;
+			}
+
+			if (unlikely(is_vm_hugetlb_page(vma))) {
+				
+				if (vma->vm_file) {
+					unmap_hugepage_range(vma, start, end, NULL);
+					zap_work -= (end - start) /
+					pages_per_huge_page(hstate_vma(vma));
+				}
+
+				start = end;
+			} else
+				start = unmap_page_range(*tlbp, vma,
+						start, end, &zap_work, details);
+
+			if (zap_work > 0) {
+				BUG_ON(start != end);
+				break;
+			}
+
+			tlb_finish_mmu(*tlbp, tlb_start, start);
+
+			if (need_resched() ||
+				(i_mmap_lock && spin_needbreak(i_mmap_lock))) {
+				if (i_mmap_lock) {
+					*tlbp = NULL;
+					goto out;
+				}
+				cond_resched();

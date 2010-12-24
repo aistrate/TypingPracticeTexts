@@ -1,0 +1,50 @@
+		return VM_FAULT_OOM;
+	pte = pte_alloc_map(mm, pmd, address);
+	if (!pte)
+		return VM_FAULT_OOM;
+
+	return handle_pte_fault(mm, vma, address, pte, pmd, flags);
+}
+
+#ifndef __PAGETABLE_PUD_FOLDED
+
+int __pud_alloc(struct mm_struct *mm, pgd_t *pgd, unsigned long address)
+{
+	pud_t *new = pud_alloc_one(mm, address);
+	if (!new)
+		return -ENOMEM;
+
+	smp_wmb(); 
+
+	spin_lock(&mm->page_table_lock);
+	if (pgd_present(*pgd))		
+		pud_free(mm, new);
+	else
+		pgd_populate(mm, pgd, new);
+	spin_unlock(&mm->page_table_lock);
+	return 0;
+}
+#endif 
+
+#ifndef __PAGETABLE_PMD_FOLDED
+
+int __pmd_alloc(struct mm_struct *mm, pud_t *pud, unsigned long address)
+{
+	pmd_t *new = pmd_alloc_one(mm, address);
+	if (!new)
+		return -ENOMEM;
+
+	smp_wmb(); 
+
+	spin_lock(&mm->page_table_lock);
+#ifndef __ARCH_HAS_4LEVEL_HACK
+	if (pud_present(*pud))		
+		pmd_free(mm, new);
+	else
+		pud_populate(mm, pud, new);
+#else
+	if (pgd_present(*pud))		
+		pmd_free(mm, new);
+	else
+		pgd_populate(mm, pud, new);
+#endif 

@@ -1,0 +1,50 @@
+			de = (struct ocfs2_dir_entry *) (bh->b_data + offset);
+			if (!ocfs2_check_dir_entry(inode, de, bh, offset)) {
+				
+				*f_pos = ((*f_pos) | (sb->s_blocksize - 1)) + 1;
+				brelse(bh);
+				goto out;
+			}
+			offset += le16_to_cpu(de->rec_len);
+			if (le64_to_cpu(de->inode)) {
+				
+				unsigned long version = *f_version;
+				unsigned char d_type = DT_UNKNOWN;
+
+				if (de->file_type < OCFS2_FT_MAX)
+					d_type = ocfs2_filetype_table[de->file_type];
+				error = filldir(priv, de->name,
+						de->name_len,
+						*f_pos,
+						le64_to_cpu(de->inode),
+						d_type);
+				if (error) {
+					if (filldir_err)
+						*filldir_err = error;
+					break;
+				}
+				if (version != *f_version)
+					goto revalidate;
+				stored ++;
+			}
+			*f_pos += le16_to_cpu(de->rec_len);
+		}
+		offset = 0;
+		brelse(bh);
+		bh = NULL;
+	}
+
+	stored = 0;
+out:
+	return stored;
+}
+
+static int ocfs2_dir_foreach_blk(struct inode *inode, u64 *f_version,
+				 loff_t *f_pos, void *priv, filldir_t filldir,
+				 int *filldir_err)
+{
+	if (OCFS2_I(inode)->ip_dyn_features & OCFS2_INLINE_DATA_FL)
+		return ocfs2_dir_foreach_blk_id(inode, f_version, f_pos, priv,
+						filldir, filldir_err);
+
+	return ocfs2_dir_foreach_blk_el(inode, f_version, f_pos, priv, filldir,

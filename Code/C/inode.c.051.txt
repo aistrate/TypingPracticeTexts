@@ -1,0 +1,50 @@
+			loff_t end = offset + ret;
+			if (end > inode->i_size) {
+				ei->i_disksize = end;
+				i_size_write(inode, end);
+				
+				ext4_mark_inode_dirty(handle, inode);
+			}
+		}
+		err = ext4_journal_stop(handle);
+		if (ret == 0)
+			ret = err;
+	}
+out:
+	return ret;
+}
+
+static int ext4_get_block_write(struct inode *inode, sector_t iblock,
+		   struct buffer_head *bh_result, int create)
+{
+	ext4_debug("ext4_get_block_write: inode %lu, create flag %d\n",
+		   inode->i_ino, create);
+	return _ext4_get_block(inode, iblock, bh_result,
+			       EXT4_GET_BLOCKS_IO_CREATE_EXT);
+}
+
+static void ext4_end_io_dio(struct kiocb *iocb, loff_t offset,
+			    ssize_t size, void *private, int ret,
+			    bool is_async)
+{
+        ext4_io_end_t *io_end = iocb->private;
+	struct workqueue_struct *wq;
+	unsigned long flags;
+	struct ext4_inode_info *ei;
+
+	if (!io_end || !size)
+		goto out;
+
+	ext_debug("ext4_end_io_dio(): io_end 0x%p"
+		  "for inode %lu, iocb 0x%p, offset %llu, size %llu\n",
+ 		  iocb->private, io_end->inode->i_ino, iocb, offset,
+		  size);
+
+	if (!(io_end->flag & EXT4_IO_END_UNWRITTEN)) {
+		ext4_free_io_end(io_end);
+		iocb->private = NULL;
+out:
+		if (is_async)
+			aio_complete(iocb, ret, 0);
+		return;
+	}

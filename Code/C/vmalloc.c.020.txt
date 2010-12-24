@@ -1,0 +1,50 @@
+void unmap_kernel_range_noflush(unsigned long addr, unsigned long size)
+{
+	vunmap_page_range(addr, addr + size);
+}
+
+void unmap_kernel_range(unsigned long addr, unsigned long size)
+{
+	unsigned long end = addr + size;
+
+	flush_cache_vunmap(addr, end);
+	vunmap_page_range(addr, end);
+	flush_tlb_kernel_range(addr, end);
+}
+
+int map_vm_area(struct vm_struct *area, pgprot_t prot, struct page ***pages)
+{
+	unsigned long addr = (unsigned long)area->addr;
+	unsigned long end = addr + area->size - PAGE_SIZE;
+	int err;
+
+	err = vmap_page_range(addr, end, prot, *pages);
+	if (err > 0) {
+		*pages += err;
+		err = 0;
+	}
+
+	return err;
+}
+EXPORT_SYMBOL_GPL(map_vm_area);
+
+DEFINE_RWLOCK(vmlist_lock);
+struct vm_struct *vmlist;
+
+static void insert_vmalloc_vm(struct vm_struct *vm, struct vmap_area *va,
+			      unsigned long flags, void *caller)
+{
+	struct vm_struct *tmp, **p;
+
+	vm->flags = flags;
+	vm->addr = (void *)va->va_start;
+	vm->size = va->va_end - va->va_start;
+	vm->caller = caller;
+	va->private = vm;
+	va->flags |= VM_VM_AREA;
+
+	write_lock(&vmlist_lock);
+	for (p = &vmlist; (tmp = *p) != NULL; p = &tmp->next) {
+		if (tmp->addr >= vm->addr)
+			break;
+	}

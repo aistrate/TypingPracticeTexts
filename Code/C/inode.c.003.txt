@@ -1,0 +1,50 @@
+	ret = ext4_journal_restart(handle, blocks_for_truncate(inode));
+	down_write(&EXT4_I(inode)->i_data_sem);
+	ext4_discard_preallocations(inode);
+
+	return ret;
+}
+
+void ext4_evict_inode(struct inode *inode)
+{
+	handle_t *handle;
+	int err;
+
+	trace_ext4_evict_inode(inode);
+	if (inode->i_nlink) {
+		truncate_inode_pages(&inode->i_data, 0);
+		goto no_delete;
+	}
+
+	if (!is_bad_inode(inode))
+		dquot_initialize(inode);
+
+	if (ext4_should_order_data(inode))
+		ext4_begin_ordered_truncate(inode, 0);
+	truncate_inode_pages(&inode->i_data, 0);
+
+	if (is_bad_inode(inode))
+		goto no_delete;
+
+	handle = ext4_journal_start(inode, blocks_for_truncate(inode)+3);
+	if (IS_ERR(handle)) {
+		ext4_std_error(inode->i_sb, PTR_ERR(handle));
+		
+		ext4_orphan_del(NULL, inode);
+		goto no_delete;
+	}
+
+	if (IS_SYNC(inode))
+		ext4_handle_sync(handle);
+	inode->i_size = 0;
+	err = ext4_mark_inode_dirty(handle, inode);
+	if (err) {
+		ext4_warning(inode->i_sb,
+			     "couldn't mark inode dirty (err %d)", err);
+		goto stop_handle;
+	}
+	if (inode->i_blocks)
+		ext4_truncate(inode);
+
+	if (!ext4_handle_has_enough_credits(handle, 3)) {
+		err = ext4_journal_extend(handle, 3);

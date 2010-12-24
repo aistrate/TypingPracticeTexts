@@ -1,0 +1,50 @@
+EXPORT_SYMBOL(wait_for_completion_killable_timeout);
+
+bool try_wait_for_completion(struct completion *x)
+{
+	unsigned long flags;
+	int ret = 1;
+
+	spin_lock_irqsave(&x->wait.lock, flags);
+	if (!x->done)
+		ret = 0;
+	else
+		x->done--;
+	spin_unlock_irqrestore(&x->wait.lock, flags);
+	return ret;
+}
+EXPORT_SYMBOL(try_wait_for_completion);
+
+bool completion_done(struct completion *x)
+{
+	unsigned long flags;
+	int ret = 1;
+
+	spin_lock_irqsave(&x->wait.lock, flags);
+	if (!x->done)
+		ret = 0;
+	spin_unlock_irqrestore(&x->wait.lock, flags);
+	return ret;
+}
+EXPORT_SYMBOL(completion_done);
+
+static long __sched
+sleep_on_common(wait_queue_head_t *q, int state, long timeout)
+{
+	unsigned long flags;
+	wait_queue_t wait;
+
+	init_waitqueue_entry(&wait, current);
+
+	__set_current_state(state);
+
+	spin_lock_irqsave(&q->lock, flags);
+	__add_wait_queue(q, &wait);
+	spin_unlock(&q->lock);
+	timeout = schedule_timeout(timeout);
+	spin_lock_irq(&q->lock);
+	__remove_wait_queue(q, &wait);
+	spin_unlock_irqrestore(&q->lock, flags);
+
+	return timeout;
+}

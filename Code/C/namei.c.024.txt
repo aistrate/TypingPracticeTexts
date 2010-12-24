@@ -1,0 +1,50 @@
+			    struct inode *inode, struct buffer_head *bh)
+{
+	struct inode	*dir = dentry->d_parent->d_inode;
+	const char	*name = dentry->d_name.name;
+	int		namelen = dentry->d_name.len;
+	struct buffer_head *bh2;
+	struct dx_root	*root;
+	struct dx_frame	frames[2], *frame;
+	struct dx_entry *entries;
+	struct ext3_dir_entry_2	*de, *de2;
+	char		*data1, *top;
+	unsigned	len;
+	int		retval;
+	unsigned	blocksize;
+	struct dx_hash_info hinfo;
+	u32		block;
+	struct fake_dirent *fde;
+
+	blocksize =  dir->i_sb->s_blocksize;
+	dxtrace(printk(KERN_DEBUG "Creating index: inode %lu\n", dir->i_ino));
+	retval = ext3_journal_get_write_access(handle, bh);
+	if (retval) {
+		ext3_std_error(dir->i_sb, retval);
+		brelse(bh);
+		return retval;
+	}
+	root = (struct dx_root *) bh->b_data;
+
+	fde = &root->dotdot;
+	de = (struct ext3_dir_entry_2 *)((char *)fde +
+			ext3_rec_len_from_disk(fde->rec_len));
+	if ((char *) de >= (((char *) root) + blocksize)) {
+		ext3_error(dir->i_sb, __func__,
+			   "invalid rec_len for '..' in inode %lu",
+			   dir->i_ino);
+		brelse(bh);
+		return -EIO;
+	}
+	len = ((char *) root) + blocksize - (char *) de;
+
+	bh2 = ext3_append (handle, dir, &block, &retval);
+	if (!(bh2)) {
+		brelse(bh);
+		return retval;
+	}
+	EXT3_I(dir)->i_flags |= EXT3_INDEX_FL;
+	data1 = bh2->b_data;
+
+	memcpy (data1, de, len);
+	de = (struct ext3_dir_entry_2 *) data1;

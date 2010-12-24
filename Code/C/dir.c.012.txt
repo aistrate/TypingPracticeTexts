@@ -1,0 +1,50 @@
+	struct buffer_head *tmp = *dx_leaf_bh;
+
+	ret = ocfs2_read_block(INODE_CACHE(dir), blkno, &tmp,
+			       ocfs2_validate_dx_leaf);
+
+	if (!ret && !*dx_leaf_bh)
+		*dx_leaf_bh = tmp;
+
+	return ret;
+}
+
+static int ocfs2_read_dx_leaves(struct inode *dir, u64 start, int num,
+				struct buffer_head **dx_leaf_bhs)
+{
+	int ret;
+
+	ret = ocfs2_read_blocks(INODE_CACHE(dir), start, num, dx_leaf_bhs, 0,
+				ocfs2_validate_dx_leaf);
+	if (ret)
+		mlog_errno(ret);
+
+	return ret;
+}
+
+static struct buffer_head *ocfs2_find_entry_el(const char *name, int namelen,
+					       struct inode *dir,
+					       struct ocfs2_dir_entry **res_dir)
+{
+	struct super_block *sb;
+	struct buffer_head *bh_use[NAMEI_RA_SIZE];
+	struct buffer_head *bh, *ret = NULL;
+	unsigned long start, block, b;
+	int ra_max = 0;		
+
+	int ra_ptr = 0;		
+
+	int num = 0;
+	int nblocks, i, err;
+
+	mlog_entry_void();
+
+	sb = dir->i_sb;
+
+	nblocks = i_size_read(dir) >> sb->s_blocksize_bits;
+	start = OCFS2_I(dir)->ip_dir_start_lookup;
+	if (start >= nblocks)
+		start = 0;
+	block = start;
+
+restart:

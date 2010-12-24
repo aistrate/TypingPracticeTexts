@@ -1,0 +1,49 @@
+		(1 << BH_Delay) | (1 << BH_Unwritten))
+
+static void mpage_add_bh_to_extent(struct mpage_da_data *mpd,
+				   sector_t logical, size_t b_size,
+				   unsigned long b_state)
+{
+	sector_t next;
+	int nrblocks = mpd->b_size >> mpd->inode->i_blkbits;
+
+	if (nrblocks >= 8*1024*1024/mpd->inode->i_sb->s_blocksize)
+		goto flush_it;
+
+	if (!(ext4_test_inode_flag(mpd->inode, EXT4_INODE_EXTENTS))) {
+		if (nrblocks >= EXT4_MAX_TRANS_DATA) {
+			
+			goto flush_it;
+		} else if ((nrblocks + (b_size >> mpd->inode->i_blkbits)) >
+				EXT4_MAX_TRANS_DATA) {
+			
+			b_size = (EXT4_MAX_TRANS_DATA - nrblocks) <<
+						mpd->inode->i_blkbits;
+			
+		}
+	}
+	
+	if (mpd->b_size == 0) {
+		mpd->b_blocknr = logical;
+		mpd->b_size = b_size;
+		mpd->b_state = b_state & BH_FLAGS;
+		return;
+	}
+
+	next = mpd->b_blocknr + nrblocks;
+	
+	if (logical == next && (b_state & BH_FLAGS) == mpd->b_state) {
+		mpd->b_size += b_size;
+		return;
+	}
+
+flush_it:
+	
+	mpage_da_map_and_submit(mpd);
+	return;
+}
+
+static int ext4_bh_delay_or_unwritten(handle_t *handle, struct buffer_head *bh)
+{
+	return (buffer_delay(bh) || buffer_unwritten(bh)) && buffer_dirty(bh);
+}

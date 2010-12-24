@@ -1,0 +1,50 @@
+	return TASK_NICE(p);
+}
+EXPORT_SYMBOL(task_nice);
+
+int idle_cpu(int cpu)
+{
+	return cpu_curr(cpu) == cpu_rq(cpu)->idle;
+}
+
+struct task_struct *idle_task(int cpu)
+{
+	return cpu_rq(cpu)->idle;
+}
+
+static struct task_struct *find_process_by_pid(pid_t pid)
+{
+	return pid ? find_task_by_vpid(pid) : current;
+}
+
+static void
+__setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
+{
+	BUG_ON(p->se.on_rq);
+
+	p->policy = policy;
+	p->rt_priority = prio;
+	p->normal_prio = normal_prio(p);
+	
+	p->prio = rt_mutex_getprio(p);
+	if (rt_prio(p->prio))
+		p->sched_class = &rt_sched_class;
+	else
+		p->sched_class = &fair_sched_class;
+	set_load_weight(p);
+}
+
+static bool check_same_owner(struct task_struct *p)
+{
+	const struct cred *cred = current_cred(), *pcred;
+	bool match;
+
+	rcu_read_lock();
+	pcred = __task_cred(p);
+	match = (cred->euid == pcred->euid ||
+		 cred->euid == pcred->uid);
+	rcu_read_unlock();
+	return match;
+}
+
+static int __sched_setscheduler(struct task_struct *p, int policy,

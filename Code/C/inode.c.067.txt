@@ -1,0 +1,50 @@
+			table = ext4_inode_table(sb, gdp);
+			
+			b = block & ~(EXT4_SB(sb)->s_inode_readahead_blks-1);
+			if (table > b)
+				b = table;
+			end = b + EXT4_SB(sb)->s_inode_readahead_blks;
+			num = EXT4_INODES_PER_GROUP(sb);
+			if (EXT4_HAS_RO_COMPAT_FEATURE(sb,
+				       EXT4_FEATURE_RO_COMPAT_GDT_CSUM))
+				num -= ext4_itable_unused_count(sb, gdp);
+			table += num / inodes_per_block;
+			if (end > table)
+				end = table;
+			while (b <= end)
+				sb_breadahead(sb, b++);
+		}
+
+		get_bh(bh);
+		bh->b_end_io = end_buffer_read_sync;
+		submit_bh(READ_META, bh);
+		wait_on_buffer(bh);
+		if (!buffer_uptodate(bh)) {
+			EXT4_ERROR_INODE_BLOCK(inode, block,
+					       "unable to read itable block");
+			brelse(bh);
+			return -EIO;
+		}
+	}
+has_buffer:
+	iloc->bh = bh;
+	return 0;
+}
+
+int ext4_get_inode_loc(struct inode *inode, struct ext4_iloc *iloc)
+{
+	
+	return __ext4_get_inode_loc(inode, iloc,
+		!ext4_test_inode_state(inode, EXT4_STATE_XATTR));
+}
+
+void ext4_set_inode_flags(struct inode *inode)
+{
+	unsigned int flags = EXT4_I(inode)->i_flags;
+
+	inode->i_flags &= ~(S_SYNC|S_APPEND|S_IMMUTABLE|S_NOATIME|S_DIRSYNC);
+	if (flags & EXT4_SYNC_FL)
+		inode->i_flags |= S_SYNC;
+	if (flags & EXT4_APPEND_FL)
+		inode->i_flags |= S_APPEND;
+	if (flags & EXT4_IMMUTABLE_FL)

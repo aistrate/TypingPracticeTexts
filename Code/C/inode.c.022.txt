@@ -1,0 +1,50 @@
+		clear_buffer_dirty(bh);
+	ret = ext4_journal_get_write_access(handle, bh);
+	if (!ret && dirty)
+		ret = ext4_handle_dirty_metadata(handle, NULL, bh);
+	return ret;
+}
+
+static void ext4_truncate_failed_write(struct inode *inode)
+{
+	truncate_inode_pages(inode->i_mapping, inode->i_size);
+	ext4_truncate(inode);
+}
+
+static int ext4_get_block_write(struct inode *inode, sector_t iblock,
+		   struct buffer_head *bh_result, int create);
+static int ext4_write_begin(struct file *file, struct address_space *mapping,
+			    loff_t pos, unsigned len, unsigned flags,
+			    struct page **pagep, void **fsdata)
+{
+	struct inode *inode = mapping->host;
+	int ret, needed_blocks;
+	handle_t *handle;
+	int retries = 0;
+	struct page *page;
+	pgoff_t index;
+	unsigned from, to;
+
+	trace_ext4_write_begin(inode, pos, len, flags);
+	
+	needed_blocks = ext4_writepage_trans_blocks(inode) + 1;
+	index = pos >> PAGE_CACHE_SHIFT;
+	from = pos & (PAGE_CACHE_SIZE - 1);
+	to = from + len;
+
+retry:
+	handle = ext4_journal_start(inode, needed_blocks);
+	if (IS_ERR(handle)) {
+		ret = PTR_ERR(handle);
+		goto out;
+	}
+
+	flags |= AOP_FLAG_NOFS;
+
+	page = grab_cache_page_write_begin(mapping, index, flags);
+	if (!page) {
+		ext4_journal_stop(handle);
+		ret = -ENOMEM;
+		goto out;
+	}
+	*pagep = page;

@@ -1,0 +1,50 @@
+		goto out;
+	}
+
+	if (ocfs2_supports_indexed_dirs(osb))
+		ocfs2_dx_dir_name_hash(dir, name, namelen, &lookup->dl_hinfo);
+
+	if (ocfs2_dir_indexed(dir)) {
+		ret = ocfs2_prepare_dx_dir_for_insert(dir, parent_fe_bh,
+						      name, namelen, lookup);
+		if (ret)
+			mlog_errno(ret);
+		goto out;
+	}
+
+	if (OCFS2_I(dir)->ip_dyn_features & OCFS2_INLINE_DATA_FL) {
+		ret = ocfs2_find_dir_space_id(dir, parent_fe_bh, name,
+					      namelen, &bh, &blocks_wanted);
+	} else
+		ret = ocfs2_find_dir_space_el(dir, name, namelen, &bh);
+
+	if (ret && ret != -ENOSPC) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	if (ret == -ENOSPC) {
+		
+		BUG_ON(bh);
+
+		ret = ocfs2_extend_dir(osb, dir, parent_fe_bh, blocks_wanted,
+				       lookup, &bh);
+		if (ret) {
+			if (ret != -ENOSPC)
+				mlog_errno(ret);
+			goto out;
+		}
+
+		BUG_ON(!bh);
+	}
+
+	lookup->dl_leaf_bh = bh;
+	bh = NULL;
+out:
+	brelse(bh);
+	return ret;
+}
+
+static int ocfs2_dx_dir_remove_index(struct inode *dir,
+				     struct buffer_head *di_bh,
+				     struct buffer_head *dx_root_bh)

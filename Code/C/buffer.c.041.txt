@@ -1,0 +1,50 @@
+}
+EXPORT_SYMBOL(nobh_truncate_page);
+
+int block_truncate_page(struct address_space *mapping,
+			loff_t from, get_block_t *get_block)
+{
+	pgoff_t index = from >> PAGE_CACHE_SHIFT;
+	unsigned offset = from & (PAGE_CACHE_SIZE-1);
+	unsigned blocksize;
+	sector_t iblock;
+	unsigned length, pos;
+	struct inode *inode = mapping->host;
+	struct page *page;
+	struct buffer_head *bh;
+	int err;
+
+	blocksize = 1 << inode->i_blkbits;
+	length = offset & (blocksize - 1);
+
+	if (!length)
+		return 0;
+
+	length = blocksize - length;
+	iblock = (sector_t)index << (PAGE_CACHE_SHIFT - inode->i_blkbits);
+	
+	page = grab_cache_page(mapping, index);
+	err = -ENOMEM;
+	if (!page)
+		goto out;
+
+	if (!page_has_buffers(page))
+		create_empty_buffers(page, blocksize, 0);
+
+	bh = page_buffers(page);
+	pos = blocksize;
+	while (offset >= pos) {
+		bh = bh->b_this_page;
+		iblock++;
+		pos += blocksize;
+	}
+
+	err = 0;
+	if (!buffer_mapped(bh)) {
+		WARN_ON(bh->b_size != blocksize);
+		err = get_block(inode, iblock, bh, 0);
+		if (err)
+			goto unlock;
+		
+		if (!buffer_mapped(bh))
+			goto unlock;

@@ -1,0 +1,50 @@
+	do {
+		
+		if (ra_ptr >= ra_max) {
+			
+			ra_ptr = 0;
+			b = block;
+			for (ra_max = 0; ra_max < NAMEI_RA_SIZE; ra_max++) {
+				
+				if (b >= nblocks || (num && block == start)) {
+					bh_use[ra_max] = NULL;
+					break;
+				}
+				num++;
+
+				bh = NULL;
+				err = ocfs2_read_dir_block(dir, b++, &bh,
+							   OCFS2_BH_READAHEAD);
+				bh_use[ra_max] = bh;
+			}
+		}
+		if ((bh = bh_use[ra_ptr++]) == NULL)
+			goto next;
+		if (ocfs2_read_dir_block(dir, block, &bh, 0)) {
+			
+			ocfs2_error(dir->i_sb, "reading directory %llu, "
+				    "offset %lu\n",
+				    (unsigned long long)OCFS2_I(dir)->ip_blkno,
+				    block);
+			goto next;
+		}
+		i = ocfs2_search_dirblock(bh, dir, name, namelen,
+					  block << sb->s_blocksize_bits,
+					  bh->b_data, sb->s_blocksize,
+					  res_dir);
+		if (i == 1) {
+			OCFS2_I(dir)->ip_dir_start_lookup = block;
+			ret = bh;
+			goto cleanup_and_exit;
+		} else {
+			brelse(bh);
+			if (i < 0)
+				goto cleanup_and_exit;
+		}
+	next:
+		if (++block >= nblocks)
+			block = 0;
+	} while (block != start);
+
+	block = nblocks;
+	nblocks = i_size_read(dir) >> sb->s_blocksize_bits;

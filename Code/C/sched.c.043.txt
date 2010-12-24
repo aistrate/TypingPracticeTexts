@@ -1,0 +1,50 @@
+#ifdef CONFIG_PREEMPT
+	
+	task_thread_info(p)->preempt_count = 1;
+#endif
+	plist_node_init(&p->pushable_tasks, MAX_PRIO);
+
+	put_cpu();
+}
+
+void wake_up_new_task(struct task_struct *p, unsigned long clone_flags)
+{
+	unsigned long flags;
+	struct rq *rq;
+	int cpu __maybe_unused = get_cpu();
+
+#ifdef CONFIG_SMP
+	rq = task_rq_lock(p, &flags);
+	p->state = TASK_WAKING;
+
+	cpu = select_task_rq(rq, p, SD_BALANCE_FORK, 0);
+	set_task_cpu(p, cpu);
+
+	p->state = TASK_RUNNING;
+	task_rq_unlock(rq, &flags);
+#endif
+
+	rq = task_rq_lock(p, &flags);
+	activate_task(rq, p, 0);
+	trace_sched_wakeup_new(p, 1);
+	check_preempt_curr(rq, p, WF_FORK);
+#ifdef CONFIG_SMP
+	if (p->sched_class->task_woken)
+		p->sched_class->task_woken(rq, p);
+#endif
+	task_rq_unlock(rq, &flags);
+	put_cpu();
+}
+
+#ifdef CONFIG_PREEMPT_NOTIFIERS
+
+void preempt_notifier_register(struct preempt_notifier *notifier)
+{
+	hlist_add_head(&notifier->link, &current->preempt_notifiers);
+}
+EXPORT_SYMBOL_GPL(preempt_notifier_register);
+
+void preempt_notifier_unregister(struct preempt_notifier *notifier)
+{
+	hlist_del(&notifier->link);
+}

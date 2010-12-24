@@ -1,0 +1,50 @@
+	ret = __block_write_begin(page, 0, end, get_block);
+	if (!ret)
+		ret = block_commit_write(page, 0, end);
+
+	if (unlikely(ret)) {
+		unlock_page(page);
+		if (ret == -ENOMEM)
+			ret = VM_FAULT_OOM;
+		else 
+			ret = VM_FAULT_SIGBUS;
+	} else
+		ret = VM_FAULT_LOCKED;
+
+out:
+	return ret;
+}
+EXPORT_SYMBOL(block_page_mkwrite);
+
+static void end_buffer_read_nobh(struct buffer_head *bh, int uptodate)
+{
+	__end_buffer_read_notouch(bh, uptodate);
+}
+
+static void attach_nobh_buffers(struct page *page, struct buffer_head *head)
+{
+	struct buffer_head *bh;
+
+	BUG_ON(!PageLocked(page));
+
+	spin_lock(&page->mapping->private_lock);
+	bh = head;
+	do {
+		if (PageDirty(page))
+			set_buffer_dirty(bh);
+		if (!bh->b_this_page)
+			bh->b_this_page = head;
+		bh = bh->b_this_page;
+	} while (bh != head);
+	attach_page_buffers(page, head);
+	spin_unlock(&page->mapping->private_lock);
+}
+
+int nobh_write_begin(struct address_space *mapping,
+			loff_t pos, unsigned len, unsigned flags,
+			struct page **pagep, void **fsdata,
+			get_block_t *get_block)
+{
+	struct inode *inode = mapping->host;
+	const unsigned blkbits = inode->i_blkbits;
+	const unsigned blocksize = 1 << blkbits;

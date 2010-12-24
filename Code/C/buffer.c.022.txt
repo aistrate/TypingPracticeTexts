@@ -1,0 +1,50 @@
+void create_empty_buffers(struct page *page,
+			unsigned long blocksize, unsigned long b_state)
+{
+	struct buffer_head *bh, *head, *tail;
+
+	head = alloc_page_buffers(page, blocksize, 1);
+	bh = head;
+	do {
+		bh->b_state |= b_state;
+		tail = bh;
+		bh = bh->b_this_page;
+	} while (bh);
+	tail->b_this_page = head;
+
+	spin_lock(&page->mapping->private_lock);
+	if (PageUptodate(page) || PageDirty(page)) {
+		bh = head;
+		do {
+			if (PageDirty(page))
+				set_buffer_dirty(bh);
+			if (PageUptodate(page))
+				set_buffer_uptodate(bh);
+			bh = bh->b_this_page;
+		} while (bh != head);
+	}
+	attach_page_buffers(page, head);
+	spin_unlock(&page->mapping->private_lock);
+}
+EXPORT_SYMBOL(create_empty_buffers);
+
+void unmap_underlying_metadata(struct block_device *bdev, sector_t block)
+{
+	struct buffer_head *old_bh;
+
+	might_sleep();
+
+	old_bh = __find_get_block_slow(bdev, block);
+	if (old_bh) {
+		clear_buffer_dirty(old_bh);
+		wait_on_buffer(old_bh);
+		clear_buffer_req(old_bh);
+		__brelse(old_bh);
+	}
+}
+EXPORT_SYMBOL(unmap_underlying_metadata);
+
+static int __block_write_full_page(struct inode *inode, struct page *page,
+			get_block_t *get_block, struct writeback_control *wbc,
+			bh_end_io_t *handler)
+{

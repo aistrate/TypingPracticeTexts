@@ -1,0 +1,50 @@
+						AOP_FLAG_UNINTERRUPTIBLE,
+						&page, &fsdata);
+		if (err)
+			goto out;
+		zero_user(page, zerofrom, len);
+		err = pagecache_write_end(file, mapping, curpos, len, len,
+						page, fsdata);
+		if (err < 0)
+			goto out;
+		BUG_ON(err != len);
+		err = 0;
+
+		balance_dirty_pages_ratelimited(mapping);
+	}
+
+	if (index == curidx) {
+		zerofrom = curpos & ~PAGE_CACHE_MASK;
+		
+		if (offset <= zerofrom) {
+			goto out;
+		}
+		if (zerofrom & (blocksize-1)) {
+			*bytes |= (blocksize-1);
+			(*bytes)++;
+		}
+		len = offset - zerofrom;
+
+		err = pagecache_write_begin(file, mapping, curpos, len,
+						AOP_FLAG_UNINTERRUPTIBLE,
+						&page, &fsdata);
+		if (err)
+			goto out;
+		zero_user(page, zerofrom, len);
+		err = pagecache_write_end(file, mapping, curpos, len, len,
+						page, fsdata);
+		if (err < 0)
+			goto out;
+		BUG_ON(err != len);
+		err = 0;
+	}
+out:
+	return err;
+}
+
+int cont_write_begin(struct file *file, struct address_space *mapping,
+			loff_t pos, unsigned len, unsigned flags,
+			struct page **pagep, void **fsdata,
+			get_block_t *get_block, loff_t *bytes)
+{
+	struct inode *inode = mapping->host;

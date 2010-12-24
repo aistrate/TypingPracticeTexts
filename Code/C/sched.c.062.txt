@@ -1,0 +1,50 @@
+				struct task_struct *to_wakeup;
+
+				to_wakeup = wq_worker_sleeping(prev, cpu);
+				if (to_wakeup)
+					try_to_wake_up_local(to_wakeup);
+			}
+			deactivate_task(rq, prev, DEQUEUE_SLEEP);
+		}
+		switch_count = &prev->nvcsw;
+	}
+
+	pre_schedule(rq, prev);
+
+	if (unlikely(!rq->nr_running))
+		idle_balance(cpu, rq);
+
+	put_prev_task(rq, prev);
+	next = pick_next_task(rq);
+	clear_tsk_need_resched(prev);
+	rq->skip_clock_update = 0;
+
+	if (likely(prev != next)) {
+		sched_info_switch(prev, next);
+		perf_event_task_sched_out(prev, next);
+
+		rq->nr_switches++;
+		rq->curr = next;
+		++*switch_count;
+
+		context_switch(rq, prev, next); 
+		
+		cpu = smp_processor_id();
+		rq = cpu_rq(cpu);
+	} else
+		raw_spin_unlock_irq(&rq->lock);
+
+	post_schedule(rq);
+
+	if (unlikely(reacquire_kernel_lock(prev)))
+		goto need_resched_nonpreemptible;
+
+	preempt_enable_no_resched();
+	if (need_resched())
+		goto need_resched;
+}
+EXPORT_SYMBOL(schedule);
+
+#ifdef CONFIG_MUTEX_SPIN_ON_OWNER
+
+int mutex_spin_on_owner(struct mutex *lock, struct thread_info *owner)

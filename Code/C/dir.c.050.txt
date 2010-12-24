@@ -1,0 +1,49 @@
+	return 0;
+}
+
+static int ocfs2_expand_inline_dir(struct inode *dir, struct buffer_head *di_bh,
+				   unsigned int blocks_wanted,
+				   struct ocfs2_dir_lookup_result *lookup,
+				   struct buffer_head **first_block_bh)
+{
+	u32 alloc, dx_alloc, bit_off, len, num_dx_entries = 0;
+	struct super_block *sb = dir->i_sb;
+	int ret, i, num_dx_leaves = 0, dx_inline = 0,
+		credits = ocfs2_inline_to_extents_credits(sb);
+	u64 dx_insert_blkno, blkno,
+		bytes = blocks_wanted << sb->s_blocksize_bits;
+	struct ocfs2_super *osb = OCFS2_SB(dir->i_sb);
+	struct ocfs2_inode_info *oi = OCFS2_I(dir);
+	struct ocfs2_alloc_context *data_ac;
+	struct ocfs2_alloc_context *meta_ac = NULL;
+	struct buffer_head *dirdata_bh = NULL;
+	struct buffer_head *dx_root_bh = NULL;
+	struct buffer_head **dx_leaves = NULL;
+	struct ocfs2_dinode *di = (struct ocfs2_dinode *)di_bh->b_data;
+	handle_t *handle;
+	struct ocfs2_extent_tree et;
+	struct ocfs2_extent_tree dx_et;
+	int did_quota = 0, bytes_allocated = 0;
+
+	ocfs2_init_dinode_extent_tree(&et, INODE_CACHE(dir), di_bh);
+
+	alloc = ocfs2_clusters_for_bytes(sb, bytes);
+	dx_alloc = 0;
+
+	down_write(&oi->ip_alloc_sem);
+
+	if (ocfs2_supports_indexed_dirs(osb)) {
+		credits += ocfs2_add_dir_index_credits(sb);
+
+		dx_inline = ocfs2_new_dx_should_be_inline(dir, di_bh);
+		if (!dx_inline) {
+			
+			dx_alloc++;
+			dx_leaves = ocfs2_dx_dir_kmalloc_leaves(sb,
+								&num_dx_leaves);
+			if (!dx_leaves) {
+				ret = -ENOMEM;
+				mlog_errno(ret);
+				goto out;
+			}
+		}

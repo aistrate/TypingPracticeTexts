@@ -1,0 +1,50 @@
+	page = grab_cache_page(mapping, index);
+	err = -ENOMEM;
+	if (!page)
+		goto out;
+
+	if (page_has_buffers(page)) {
+has_buffers:
+		unlock_page(page);
+		page_cache_release(page);
+		return block_truncate_page(mapping, from, get_block);
+	}
+
+	pos = blocksize;
+	while (offset >= pos) {
+		iblock++;
+		pos += blocksize;
+	}
+
+	map_bh.b_size = blocksize;
+	map_bh.b_state = 0;
+	err = get_block(inode, iblock, &map_bh, 0);
+	if (err)
+		goto unlock;
+	
+	if (!buffer_mapped(&map_bh))
+		goto unlock;
+
+	if (!PageUptodate(page)) {
+		err = mapping->a_ops->readpage(NULL, page);
+		if (err) {
+			page_cache_release(page);
+			goto out;
+		}
+		lock_page(page);
+		if (!PageUptodate(page)) {
+			err = -EIO;
+			goto unlock;
+		}
+		if (page_has_buffers(page))
+			goto has_buffers;
+	}
+	zero_user(page, offset, length);
+	set_page_dirty(page);
+	err = 0;
+
+unlock:
+	unlock_page(page);
+	page_cache_release(page);
+out:
+	return err;

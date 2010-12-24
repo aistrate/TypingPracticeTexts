@@ -1,0 +1,49 @@
+	if ((unsigned long) addr + count < count)
+		count = -(unsigned long) addr;
+
+	read_lock(&vmlist_lock);
+	for (tmp = vmlist; count && tmp; tmp = tmp->next) {
+		vaddr = (char *) tmp->addr;
+		if (addr >= vaddr + tmp->size - PAGE_SIZE)
+			continue;
+		while (addr < vaddr) {
+			if (count == 0)
+				goto finished;
+			*buf = '\0';
+			buf++;
+			addr++;
+			count--;
+		}
+		n = vaddr + tmp->size - PAGE_SIZE - addr;
+		if (n > count)
+			n = count;
+		if (!(tmp->flags & VM_IOREMAP))
+			aligned_vread(buf, addr, n);
+		else 
+			memset(buf, 0, n);
+		buf += n;
+		addr += n;
+		count -= n;
+	}
+finished:
+	read_unlock(&vmlist_lock);
+
+	if (buf == buf_start)
+		return 0;
+	
+	if (buf != buf_start + buflen)
+		memset(buf, 0, buflen - (buf - buf_start));
+
+	return buflen;
+}
+
+long vwrite(char *buf, char *addr, unsigned long count)
+{
+	struct vm_struct *tmp;
+	char *vaddr;
+	unsigned long n, buflen;
+	int copied = 0;
+
+	if ((unsigned long) addr + count < count)
+		count = -(unsigned long) addr;
+	buflen = count;

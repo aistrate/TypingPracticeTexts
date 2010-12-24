@@ -1,0 +1,49 @@
+		BUG_ON(vb->free);
+		spin_unlock(&vb->lock);
+		free_vmap_block(vb);
+	} else
+		spin_unlock(&vb->lock);
+}
+
+void vm_unmap_aliases(void)
+{
+	unsigned long start = ULONG_MAX, end = 0;
+	int cpu;
+	int flush = 0;
+
+	if (unlikely(!vmap_initialized))
+		return;
+
+	for_each_possible_cpu(cpu) {
+		struct vmap_block_queue *vbq = &per_cpu(vmap_block_queue, cpu);
+		struct vmap_block *vb;
+
+		rcu_read_lock();
+		list_for_each_entry_rcu(vb, &vbq->free, free_list) {
+			int i;
+
+			spin_lock(&vb->lock);
+			i = find_first_bit(vb->dirty_map, VMAP_BBMAP_BITS);
+			while (i < VMAP_BBMAP_BITS) {
+				unsigned long s, e;
+				int j;
+				j = find_next_zero_bit(vb->dirty_map,
+					VMAP_BBMAP_BITS, i);
+
+				s = vb->va->va_start + (i << PAGE_SHIFT);
+				e = vb->va->va_start + (j << PAGE_SHIFT);
+				flush = 1;
+
+				if (s < start)
+					start = s;
+				if (e > end)
+					end = e;
+
+				i = j;
+				i = find_next_bit(vb->dirty_map,
+							VMAP_BBMAP_BITS, i);
+			}
+			spin_unlock(&vb->lock);
+		}
+		rcu_read_unlock();
+	}

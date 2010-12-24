@@ -1,0 +1,50 @@
+		pagevec_release(&pvec);
+	}
+	ext4_io_submit(&io_submit);
+	return ret;
+}
+
+static void ext4_da_block_invalidatepages(struct mpage_da_data *mpd,
+					sector_t logical, long blk_cnt)
+{
+	int nr_pages, i;
+	pgoff_t index, end;
+	struct pagevec pvec;
+	struct inode *inode = mpd->inode;
+	struct address_space *mapping = inode->i_mapping;
+
+	index = logical >> (PAGE_CACHE_SHIFT - inode->i_blkbits);
+	end   = (logical + blk_cnt - 1) >>
+				(PAGE_CACHE_SHIFT - inode->i_blkbits);
+	while (index <= end) {
+		nr_pages = pagevec_lookup(&pvec, mapping, index, PAGEVEC_SIZE);
+		if (nr_pages == 0)
+			break;
+		for (i = 0; i < nr_pages; i++) {
+			struct page *page = pvec.pages[i];
+			if (page->index > end)
+				break;
+			BUG_ON(!PageLocked(page));
+			BUG_ON(PageWriteback(page));
+			block_invalidatepage(page, 0);
+			ClearPageUptodate(page);
+			unlock_page(page);
+		}
+		index = pvec.pages[nr_pages - 1]->index + 1;
+		pagevec_release(&pvec);
+	}
+	return;
+}
+
+static void ext4_print_free_blocks(struct inode *inode)
+{
+	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
+	printk(KERN_CRIT "Total free blocks count %lld\n",
+	       ext4_count_free_blocks(inode->i_sb));
+	printk(KERN_CRIT "Free/Dirty block details\n");
+	printk(KERN_CRIT "free_blocks=%lld\n",
+	       (long long) percpu_counter_sum(&sbi->s_freeblocks_counter));
+	printk(KERN_CRIT "dirty_blocks=%lld\n",
+	       (long long) percpu_counter_sum(&sbi->s_dirtyblocks_counter));
+	printk(KERN_CRIT "Block reservation details\n");
+	printk(KERN_CRIT "i_reserved_data_blocks=%u\n",

@@ -1,0 +1,49 @@
+		BUFFER_TRACE(sbi->s_sbh, "get_write_access");
+		err = ext3_journal_get_write_access(handle, sbi->s_sbh);
+		if (err)
+			goto out_brelse;
+		sbi->s_es->s_last_orphan = cpu_to_le32(ino_next);
+		err = ext3_journal_dirty_metadata(handle, sbi->s_sbh);
+	} else {
+		struct ext3_iloc iloc2;
+		struct inode *i_prev =
+			&list_entry(prev, struct ext3_inode_info, i_orphan)->vfs_inode;
+
+		jbd_debug(4, "orphan inode %lu will point to %lu\n",
+			  i_prev->i_ino, ino_next);
+		err = ext3_reserve_inode_write(handle, i_prev, &iloc2);
+		if (err)
+			goto out_brelse;
+		NEXT_ORPHAN(i_prev) = ino_next;
+		err = ext3_mark_iloc_dirty(handle, i_prev, &iloc2);
+	}
+	if (err)
+		goto out_brelse;
+	NEXT_ORPHAN(inode) = 0;
+	err = ext3_mark_iloc_dirty(handle, inode, &iloc);
+
+out_err:
+	ext3_std_error(inode->i_sb, err);
+out:
+	mutex_unlock(&EXT3_SB(inode->i_sb)->s_orphan_lock);
+	return err;
+
+out_brelse:
+	brelse(iloc.bh);
+	goto out_err;
+}
+
+static int ext3_rmdir (struct inode * dir, struct dentry *dentry)
+{
+	int retval;
+	struct inode * inode;
+	struct buffer_head * bh;
+	struct ext3_dir_entry_2 * de;
+	handle_t *handle;
+
+	dquot_initialize(dir);
+	dquot_initialize(dentry->d_inode);
+
+	handle = ext3_journal_start(dir, EXT3_DELETE_TRANS_BLOCKS(dir->i_sb));
+	if (IS_ERR(handle))
+		return PTR_ERR(handle);

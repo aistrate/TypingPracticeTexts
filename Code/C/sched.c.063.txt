@@ -1,0 +1,50 @@
+{
+	unsigned int cpu;
+	struct rq *rq;
+
+	if (!sched_feat(OWNER_SPIN))
+		return 0;
+
+#ifdef CONFIG_DEBUG_PAGEALLOC
+	
+	if (probe_kernel_address(&owner->cpu, cpu))
+		return 0;
+#else
+	cpu = owner->cpu;
+#endif
+
+	if (cpu >= nr_cpumask_bits)
+		return 0;
+
+	if (!cpu_online(cpu))
+		return 0;
+
+	rq = cpu_rq(cpu);
+
+	for (;;) {
+		
+		if (lock->owner != owner) {
+			
+			if (lock->owner)
+				return 0;
+			break;
+		}
+
+		if (task_thread_info(rq->curr) != owner || need_resched())
+			return 0;
+
+		cpu_relax();
+	}
+
+	return 1;
+}
+#endif
+
+#ifdef CONFIG_PREEMPT
+
+asmlinkage void __sched notrace preempt_schedule(void)
+{
+	struct thread_info *ti = current_thread_info();
+
+	if (likely(ti->preempt_count || irqs_disabled()))
+		return;

@@ -1,0 +1,49 @@
+}
+
+static int ext4_set_bh_endio(struct buffer_head *bh, struct inode *inode)
+{
+	ext4_io_end_t *io_end;
+	struct page *page = bh->b_page;
+	loff_t offset = (sector_t)page->index << PAGE_CACHE_SHIFT;
+	size_t size = bh->b_size;
+
+retry:
+	io_end = ext4_init_io_end(inode, GFP_ATOMIC);
+	if (!io_end) {
+		if (printk_ratelimit())
+			printk(KERN_WARNING "%s: allocation fail\n", __func__);
+		schedule();
+		goto retry;
+	}
+	io_end->offset = offset;
+	io_end->size = size;
+	
+	io_end->page = page;
+	get_page(io_end->page);
+
+	bh->b_private = io_end;
+	bh->b_end_io = ext4_end_io_buffer_write;
+	return 0;
+}
+
+static ssize_t ext4_ext_direct_IO(int rw, struct kiocb *iocb,
+			      const struct iovec *iov, loff_t offset,
+			      unsigned long nr_segs)
+{
+	struct file *file = iocb->ki_filp;
+	struct inode *inode = file->f_mapping->host;
+	ssize_t ret;
+	size_t count = iov_length(iov, nr_segs);
+
+	loff_t final_size = offset + count;
+	if (rw == WRITE && final_size <= inode->i_size) {
+		
+		iocb->private = NULL;
+		EXT4_I(inode)->cur_aio_dio = NULL;
+		if (!is_sync_kiocb(iocb)) {
+			iocb->private = ext4_init_io_end(inode, GFP_NOFS);
+			if (!iocb->private)
+				return -ENOMEM;
+			
+			EXT4_I(inode)->cur_aio_dio = iocb->private;
+		}

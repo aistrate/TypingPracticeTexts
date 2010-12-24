@@ -1,0 +1,50 @@
+	ext3_std_error(dir->i_sb, err);
+cleanup:
+	if (bh)
+		brelse(bh);
+	dx_release(frames);
+	return err;
+}
+
+static int ext3_delete_entry (handle_t *handle,
+			      struct inode * dir,
+			      struct ext3_dir_entry_2 * de_del,
+			      struct buffer_head * bh)
+{
+	struct ext3_dir_entry_2 * de, * pde;
+	int i;
+
+	i = 0;
+	pde = NULL;
+	de = (struct ext3_dir_entry_2 *) bh->b_data;
+	while (i < bh->b_size) {
+		if (!ext3_check_dir_entry("ext3_delete_entry", dir, de, bh, i))
+			return -EIO;
+		if (de == de_del)  {
+			BUFFER_TRACE(bh, "get_write_access");
+			ext3_journal_get_write_access(handle, bh);
+			if (pde)
+				pde->rec_len = ext3_rec_len_to_disk(
+					ext3_rec_len_from_disk(pde->rec_len) +
+					ext3_rec_len_from_disk(de->rec_len));
+			else
+				de->inode = 0;
+			dir->i_version++;
+			BUFFER_TRACE(bh, "call ext3_journal_dirty_metadata");
+			ext3_journal_dirty_metadata(handle, bh);
+			return 0;
+		}
+		i += ext3_rec_len_from_disk(de->rec_len);
+		pde = de;
+		de = ext3_next_entry(de);
+	}
+	return -ENOENT;
+}
+
+static int ext3_add_nondir(handle_t *handle,
+		struct dentry *dentry, struct inode *inode)
+{
+	int err = ext3_add_entry(handle, dentry, inode);
+	if (!err) {
+		ext3_mark_inode_dirty(handle, inode);
+		d_instantiate(dentry, inode);

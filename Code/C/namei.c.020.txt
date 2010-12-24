@@ -1,0 +1,50 @@
+	unsigned rec_len = 0;
+
+	while (count--) {
+		struct ext3_dir_entry_2 *de = (struct ext3_dir_entry_2 *) (from + map->offs);
+		rec_len = EXT3_DIR_REC_LEN(de->name_len);
+		memcpy (to, de, rec_len);
+		((struct ext3_dir_entry_2 *) to)->rec_len =
+				ext3_rec_len_to_disk(rec_len);
+		de->inode = 0;
+		map++;
+		to += rec_len;
+	}
+	return (struct ext3_dir_entry_2 *) (to - rec_len);
+}
+
+static struct ext3_dir_entry_2 *dx_pack_dirents(char *base, unsigned blocksize)
+{
+	struct ext3_dir_entry_2 *next, *to, *prev;
+	struct ext3_dir_entry_2 *de = (struct ext3_dir_entry_2 *)base;
+	unsigned rec_len = 0;
+
+	prev = to = de;
+	while ((char *)de < base + blocksize) {
+		next = ext3_next_entry(de);
+		if (de->inode && de->name_len) {
+			rec_len = EXT3_DIR_REC_LEN(de->name_len);
+			if (de > to)
+				memmove(to, de, rec_len);
+			to->rec_len = ext3_rec_len_to_disk(rec_len);
+			prev = to;
+			to = (struct ext3_dir_entry_2 *) (((char *) to) + rec_len);
+		}
+		de = next;
+	}
+	return prev;
+}
+
+static struct ext3_dir_entry_2 *do_split(handle_t *handle, struct inode *dir,
+			struct buffer_head **bh,struct dx_frame *frame,
+			struct dx_hash_info *hinfo, int *error)
+{
+	unsigned blocksize = dir->i_sb->s_blocksize;
+	unsigned count, continued;
+	struct buffer_head *bh2;
+	u32 newblock;
+	u32 hash2;
+	struct dx_map_entry *map;
+	char *data1 = (*bh)->b_data, *data2;
+	unsigned split, move, size;
+	struct ext3_dir_entry_2 *de = NULL, *de2;

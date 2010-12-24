@@ -1,0 +1,50 @@
+{
+	const struct sched_class *class;
+	struct task_struct *p;
+
+	if (likely(rq->nr_running == rq->cfs.nr_running)) {
+		p = fair_sched_class.pick_next_task(rq);
+		if (likely(p))
+			return p;
+	}
+
+	for_each_class(class) {
+		p = class->pick_next_task(rq);
+		if (p)
+			return p;
+	}
+
+	BUG(); 
+}
+
+asmlinkage void __sched schedule(void)
+{
+	struct task_struct *prev, *next;
+	unsigned long *switch_count;
+	struct rq *rq;
+	int cpu;
+
+need_resched:
+	preempt_disable();
+	cpu = smp_processor_id();
+	rq = cpu_rq(cpu);
+	rcu_note_context_switch(cpu);
+	prev = rq->curr;
+
+	release_kernel_lock(prev);
+need_resched_nonpreemptible:
+
+	schedule_debug(prev);
+
+	if (sched_feat(HRTICK))
+		hrtick_clear(rq);
+
+	raw_spin_lock_irq(&rq->lock);
+
+	switch_count = &prev->nivcsw;
+	if (prev->state && !(preempt_count() & PREEMPT_ACTIVE)) {
+		if (unlikely(signal_pending_state(prev->state, prev))) {
+			prev->state = TASK_RUNNING;
+		} else {
+			
+			if (prev->flags & PF_WQ_WORKER) {

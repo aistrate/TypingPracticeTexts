@@ -1,0 +1,49 @@
+	printk(KERN_DEBUG "CPU%d attaching sched-domain:\n", cpu);
+
+	if (!alloc_cpumask_var(&groupmask, GFP_KERNEL)) {
+		printk(KERN_DEBUG "Cannot load-balance (out of memory)\n");
+		return;
+	}
+
+	for (;;) {
+		if (sched_domain_debug_one(sd, cpu, level, groupmask))
+			break;
+		level++;
+		sd = sd->parent;
+		if (!sd)
+			break;
+	}
+	free_cpumask_var(groupmask);
+}
+#else 
+# define sched_domain_debug(sd, cpu) do { } while (0)
+#endif 
+
+static int sd_degenerate(struct sched_domain *sd)
+{
+	if (cpumask_weight(sched_domain_span(sd)) == 1)
+		return 1;
+
+	if (sd->flags & (SD_LOAD_BALANCE |
+			 SD_BALANCE_NEWIDLE |
+			 SD_BALANCE_FORK |
+			 SD_BALANCE_EXEC |
+			 SD_SHARE_CPUPOWER |
+			 SD_SHARE_PKG_RESOURCES)) {
+		if (sd->groups != sd->groups->next)
+			return 0;
+	}
+
+	if (sd->flags & (SD_WAKE_AFFINE))
+		return 0;
+
+	return 1;
+}
+
+static int
+sd_parent_degenerate(struct sched_domain *sd, struct sched_domain *parent)
+{
+	unsigned long cflags = sd->flags, pflags = parent->flags;
+
+	if (sd_degenerate(parent))
+		return 1;

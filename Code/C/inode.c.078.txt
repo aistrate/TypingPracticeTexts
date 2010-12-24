@@ -1,0 +1,49 @@
+		rc = vmtruncate(inode, attr->ia_size);
+
+	if (!rc) {
+		setattr_copy(inode, attr);
+		mark_inode_dirty(inode);
+	}
+
+	if (orphan && inode->i_nlink)
+		ext4_orphan_del(NULL, inode);
+
+	if (!rc && (ia_valid & ATTR_MODE))
+		rc = ext4_acl_chmod(inode);
+
+err_out:
+	ext4_std_error(inode->i_sb, error);
+	if (!error)
+		error = rc;
+	return error;
+}
+
+int ext4_getattr(struct vfsmount *mnt, struct dentry *dentry,
+		 struct kstat *stat)
+{
+	struct inode *inode;
+	unsigned long delalloc_blocks;
+
+	inode = dentry->d_inode;
+	generic_fillattr(inode, stat);
+
+	delalloc_blocks = EXT4_I(inode)->i_reserved_data_blocks;
+
+	stat->blocks += (delalloc_blocks << inode->i_sb->s_blocksize_bits)>>9;
+	return 0;
+}
+
+static int ext4_indirect_trans_blocks(struct inode *inode, int nrblocks,
+				      int chunk)
+{
+	int indirects;
+
+	if (chunk) {
+		
+		indirects = nrblocks / EXT4_ADDR_PER_BLOCK(inode->i_sb);
+		return indirects + 3;
+	}
+	
+	indirects = nrblocks * 2 + 1;
+	return indirects;
+}

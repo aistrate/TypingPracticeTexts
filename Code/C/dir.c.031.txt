@@ -1,0 +1,50 @@
+			ocfs2_journal_dirty(handle, insert_bh);
+			retval = 0;
+			goto bail;
+		}
+
+		offset += le16_to_cpu(de->rec_len);
+		de = (struct ocfs2_dir_entry *) ((char *) de + le16_to_cpu(de->rec_len));
+	}
+
+	retval = -ENOSPC;
+bail:
+
+	mlog_exit(retval);
+	return retval;
+}
+
+static int ocfs2_dir_foreach_blk_id(struct inode *inode,
+				    u64 *f_version,
+				    loff_t *f_pos, void *priv,
+				    filldir_t filldir, int *filldir_err)
+{
+	int ret, i, filldir_ret;
+	unsigned long offset = *f_pos;
+	struct buffer_head *di_bh = NULL;
+	struct ocfs2_dinode *di;
+	struct ocfs2_inline_data *data;
+	struct ocfs2_dir_entry *de;
+
+	ret = ocfs2_read_inode_block(inode, &di_bh);
+	if (ret) {
+		mlog(ML_ERROR, "Unable to read inode block for dir %llu\n",
+		     (unsigned long long)OCFS2_I(inode)->ip_blkno);
+		goto out;
+	}
+
+	di = (struct ocfs2_dinode *)di_bh->b_data;
+	data = &di->id2.i_data;
+
+	while (*f_pos < i_size_read(inode)) {
+revalidate:
+		
+		if (*f_version != inode->i_version) {
+			for (i = 0; i < i_size_read(inode) && i < offset; ) {
+				de = (struct ocfs2_dir_entry *)
+					(data->id_data + i);
+				
+				if (le16_to_cpu(de->rec_len) <
+				    OCFS2_DIR_REC_LEN(1))
+					break;
+				i += le16_to_cpu(de->rec_len);

@@ -1,0 +1,49 @@
+}
+
+static inline void post_schedule(struct rq *rq)
+{
+}
+
+#endif
+
+asmlinkage void schedule_tail(struct task_struct *prev)
+	__releases(rq->lock)
+{
+	struct rq *rq = this_rq();
+
+	finish_task_switch(rq, prev);
+
+	post_schedule(rq);
+
+#ifdef __ARCH_WANT_UNLOCKED_CTXSW
+	
+	preempt_enable();
+#endif
+	if (current->set_child_tid)
+		put_user(task_pid_vnr(current), current->set_child_tid);
+}
+
+static inline void
+context_switch(struct rq *rq, struct task_struct *prev,
+	       struct task_struct *next)
+{
+	struct mm_struct *mm, *oldmm;
+
+	prepare_task_switch(rq, prev, next);
+	trace_sched_switch(prev, next);
+	mm = next->mm;
+	oldmm = prev->active_mm;
+	
+	arch_start_context_switch(prev);
+
+	if (!mm) {
+		next->active_mm = oldmm;
+		atomic_inc(&oldmm->mm_count);
+		enter_lazy_tlb(oldmm, next);
+	} else
+		switch_mm(oldmm, mm, next);
+
+	if (!prev->mm) {
+		prev->active_mm = NULL;
+		rq->prev_mm = oldmm;
+	}

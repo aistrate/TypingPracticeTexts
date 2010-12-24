@@ -1,0 +1,50 @@
+	int err;
+	sector_t block;
+	sector_t last_block;
+	struct buffer_head *bh, *head;
+	const unsigned blocksize = 1 << inode->i_blkbits;
+	int nr_underway = 0;
+	int write_op = (wbc->sync_mode == WB_SYNC_ALL ?
+			WRITE_SYNC_PLUG : WRITE);
+
+	BUG_ON(!PageLocked(page));
+
+	last_block = (i_size_read(inode) - 1) >> inode->i_blkbits;
+
+	if (!page_has_buffers(page)) {
+		create_empty_buffers(page, blocksize,
+					(1 << BH_Dirty)|(1 << BH_Uptodate));
+	}
+
+	block = (sector_t)page->index << (PAGE_CACHE_SHIFT - inode->i_blkbits);
+	head = page_buffers(page);
+	bh = head;
+
+	do {
+		if (block > last_block) {
+			
+			clear_buffer_dirty(bh);
+			set_buffer_uptodate(bh);
+		} else if ((!buffer_mapped(bh) || buffer_delay(bh)) &&
+			   buffer_dirty(bh)) {
+			WARN_ON(bh->b_size != blocksize);
+			err = get_block(inode, block, bh, 1);
+			if (err)
+				goto recover;
+			clear_buffer_delay(bh);
+			if (buffer_new(bh)) {
+				
+				clear_buffer_new(bh);
+				unmap_underlying_metadata(bh->b_bdev,
+							bh->b_blocknr);
+			}
+		}
+		bh = bh->b_this_page;
+		block++;
+	} while (bh != head);
+
+	do {
+		if (!buffer_mapped(bh))
+			continue;
+		
+		if (wbc->sync_mode != WB_SYNC_NONE) {

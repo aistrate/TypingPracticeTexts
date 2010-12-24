@@ -1,0 +1,50 @@
+					bdev_logical_block_size(bdev));
+
+		dump_stack();
+		return NULL;
+	}
+
+	for (;;) {
+		struct buffer_head * bh;
+		int ret;
+
+		bh = __find_get_block(bdev, block, size);
+		if (bh)
+			return bh;
+
+		ret = grow_buffers(bdev, block, size);
+		if (ret < 0)
+			return NULL;
+		if (ret == 0)
+			free_more_memory();
+	}
+}
+
+void mark_buffer_dirty(struct buffer_head *bh)
+{
+	WARN_ON_ONCE(!buffer_uptodate(bh));
+
+	if (buffer_dirty(bh)) {
+		smp_mb();
+		if (buffer_dirty(bh))
+			return;
+	}
+
+	if (!test_set_buffer_dirty(bh)) {
+		struct page *page = bh->b_page;
+		if (!TestSetPageDirty(page)) {
+			struct address_space *mapping = page_mapping(page);
+			if (mapping)
+				__set_page_dirty(page, mapping, 0);
+		}
+	}
+}
+EXPORT_SYMBOL(mark_buffer_dirty);
+
+void __brelse(struct buffer_head * buf)
+{
+	if (atomic_read(&buf->b_count)) {
+		put_bh(buf);
+		return;
+	}
+	WARN(1, KERN_ERR "VFS: brelse: Trying to free free buffer\n");

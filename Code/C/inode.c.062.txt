@@ -1,0 +1,50 @@
+					(__le32 *) bh->b_data + addr_per_block,
+					depth);
+
+			if (ext4_handle_is_aborted(handle))
+				return;
+			if (try_to_extend_transaction(handle, inode)) {
+				ext4_mark_inode_dirty(handle, inode);
+				ext4_truncate_restart_trans(handle, inode,
+					    blocks_for_truncate(inode));
+			}
+
+			ext4_free_blocks(handle, inode, 0, nr, 1,
+					 EXT4_FREE_BLOCKS_METADATA|
+					 EXT4_FREE_BLOCKS_FORGET);
+
+			if (parent_bh) {
+				
+				BUFFER_TRACE(parent_bh, "get_write_access");
+				if (!ext4_journal_get_write_access(handle,
+								   parent_bh)){
+					*p = 0;
+					BUFFER_TRACE(parent_bh,
+					"call ext4_handle_dirty_metadata");
+					ext4_handle_dirty_metadata(handle,
+								   inode,
+								   parent_bh);
+				}
+			}
+		}
+	} else {
+		
+		BUFFER_TRACE(parent_bh, "free data blocks");
+		ext4_free_data(handle, inode, parent_bh, first, last);
+	}
+}
+
+int ext4_can_truncate(struct inode *inode)
+{
+	if (IS_APPEND(inode) || IS_IMMUTABLE(inode))
+		return 0;
+	if (S_ISREG(inode->i_mode))
+		return 1;
+	if (S_ISDIR(inode->i_mode))
+		return 1;
+	if (S_ISLNK(inode->i_mode))
+		return !ext4_inode_is_fast_symlink(inode);
+	return 0;
+}
+
+void ext4_truncate(struct inode *inode)

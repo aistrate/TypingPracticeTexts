@@ -1,0 +1,50 @@
+	}
+	if (--num >= 0)
+		*buf++ = val;
+	while (--num >= 0)
+		*buf++ = pad;
+}
+
+static void ocfs2_dx_dir_name_hash(struct inode *dir, const char *name, int len,
+				   struct ocfs2_dx_hinfo *hinfo)
+{
+	struct ocfs2_super *osb = OCFS2_SB(dir->i_sb);
+	const char	*p;
+	__u32		in[8], buf[4];
+
+	if ((len == 1 && !strncmp(".", name, 1)) ||
+	    (len == 2 && !strncmp("..", name, 2))) {
+		buf[0] = buf[1] = 0;
+		goto out;
+	}
+
+#ifdef OCFS2_DEBUG_DX_DIRS
+	
+	buf[0] = buf[1] = len;
+	goto out;
+#endif
+
+	memcpy(buf, osb->osb_dx_seed, sizeof(buf));
+
+	p = name;
+	while (len > 0) {
+		str2hashbuf(p, len, in, 4);
+		TEA_transform(buf, in);
+		len -= 16;
+		p += 16;
+	}
+
+out:
+	hinfo->major_hash = buf[0];
+	hinfo->minor_hash = buf[1];
+}
+
+static int ocfs2_check_dir_entry(struct inode * dir,
+				 struct ocfs2_dir_entry * de,
+				 struct buffer_head * bh,
+				 unsigned long offset)
+{
+	const char *error_msg = NULL;
+	const int rlen = le16_to_cpu(de->rec_len);
+
+	if (rlen < OCFS2_DIR_REC_LEN(1))

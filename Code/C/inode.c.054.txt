@@ -1,0 +1,50 @@
+		ret = blockdev_direct_IO(rw, iocb, inode,
+					 inode->i_sb->s_bdev, iov,
+					 offset, nr_segs,
+					 ext4_get_block_write,
+					 ext4_end_io_dio);
+		if (iocb->private)
+			EXT4_I(inode)->cur_aio_dio = NULL;
+		
+		if (ret != -EIOCBQUEUED && ret <= 0 && iocb->private) {
+			ext4_free_io_end(iocb->private);
+			iocb->private = NULL;
+		} else if (ret > 0 && ext4_test_inode_state(inode,
+						EXT4_STATE_DIO_UNWRITTEN)) {
+			int err;
+			
+			err = ext4_convert_unwritten_extents(inode,
+							     offset, ret);
+			if (err < 0)
+				ret = err;
+			ext4_clear_inode_state(inode, EXT4_STATE_DIO_UNWRITTEN);
+		}
+		return ret;
+	}
+
+	return ext4_ind_direct_IO(rw, iocb, iov, offset, nr_segs);
+}
+
+static ssize_t ext4_direct_IO(int rw, struct kiocb *iocb,
+			      const struct iovec *iov, loff_t offset,
+			      unsigned long nr_segs)
+{
+	struct file *file = iocb->ki_filp;
+	struct inode *inode = file->f_mapping->host;
+
+	if (ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS))
+		return ext4_ext_direct_IO(rw, iocb, iov, offset, nr_segs);
+
+	return ext4_ind_direct_IO(rw, iocb, iov, offset, nr_segs);
+}
+
+static int ext4_journalled_set_page_dirty(struct page *page)
+{
+	SetPageChecked(page);
+	return __set_page_dirty_nobuffers(page);
+}
+
+static const struct address_space_operations ext4_ordered_aops = {
+	.readpage		= ext4_readpage,
+	.readpages		= ext4_readpages,
+	.writepage		= ext4_writepage,

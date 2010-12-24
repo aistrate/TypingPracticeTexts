@@ -1,0 +1,49 @@
+	NEXT_ORPHAN(inode) = le32_to_cpu(EXT3_SB(sb)->s_es->s_last_orphan);
+	EXT3_SB(sb)->s_es->s_last_orphan = cpu_to_le32(inode->i_ino);
+	err = ext3_journal_dirty_metadata(handle, EXT3_SB(sb)->s_sbh);
+	rc = ext3_mark_iloc_dirty(handle, inode, &iloc);
+	if (!err)
+		err = rc;
+
+	if (!err)
+		list_add(&EXT3_I(inode)->i_orphan, &EXT3_SB(sb)->s_orphan);
+
+	jbd_debug(4, "superblock will point to %lu\n", inode->i_ino);
+	jbd_debug(4, "orphan inode %lu will point to %d\n",
+			inode->i_ino, NEXT_ORPHAN(inode));
+out_unlock:
+	mutex_unlock(&EXT3_SB(sb)->s_orphan_lock);
+	ext3_std_error(inode->i_sb, err);
+	return err;
+}
+
+int ext3_orphan_del(handle_t *handle, struct inode *inode)
+{
+	struct list_head *prev;
+	struct ext3_inode_info *ei = EXT3_I(inode);
+	struct ext3_sb_info *sbi;
+	unsigned long ino_next;
+	struct ext3_iloc iloc;
+	int err = 0;
+
+	mutex_lock(&EXT3_SB(inode->i_sb)->s_orphan_lock);
+	if (list_empty(&ei->i_orphan))
+		goto out;
+
+	ino_next = NEXT_ORPHAN(inode);
+	prev = ei->i_orphan.prev;
+	sbi = EXT3_SB(inode->i_sb);
+
+	jbd_debug(4, "remove inode %lu from orphan list\n", inode->i_ino);
+
+	list_del_init(&ei->i_orphan);
+
+	if (!handle)
+		goto out;
+
+	err = ext3_reserve_inode_write(handle, inode, &iloc);
+	if (err)
+		goto out_err;
+
+	if (prev == &sbi->s_orphan) {
+		jbd_debug(4, "superblock will point to %lu\n", ino_next);

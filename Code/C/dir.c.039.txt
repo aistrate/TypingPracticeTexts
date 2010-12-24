@@ -1,0 +1,50 @@
+		return 1;
+	}
+
+	return !priv.seen_other;
+}
+
+static struct ocfs2_dir_entry *ocfs2_fill_initial_dirents(struct inode *inode,
+							  struct inode *parent,
+							  char *start,
+							  unsigned int size)
+{
+	struct ocfs2_dir_entry *de = (struct ocfs2_dir_entry *)start;
+
+	de->inode = cpu_to_le64(OCFS2_I(inode)->ip_blkno);
+	de->name_len = 1;
+	de->rec_len =
+		cpu_to_le16(OCFS2_DIR_REC_LEN(de->name_len));
+	strcpy(de->name, ".");
+	ocfs2_set_de_type(de, S_IFDIR);
+
+	de = (struct ocfs2_dir_entry *) ((char *)de + le16_to_cpu(de->rec_len));
+	de->inode = cpu_to_le64(OCFS2_I(parent)->ip_blkno);
+	de->rec_len = cpu_to_le16(size - OCFS2_DIR_REC_LEN(1));
+	de->name_len = 2;
+	strcpy(de->name, "..");
+	ocfs2_set_de_type(de, S_IFDIR);
+
+	return de;
+}
+
+static int ocfs2_fill_new_dir_id(struct ocfs2_super *osb,
+				 handle_t *handle,
+				 struct inode *parent,
+				 struct inode *inode,
+				 struct buffer_head *di_bh)
+{
+	int ret;
+	struct ocfs2_dinode *di = (struct ocfs2_dinode *)di_bh->b_data;
+	struct ocfs2_inline_data *data = &di->id2.i_data;
+	unsigned int size = le16_to_cpu(data->id_count);
+
+	ret = ocfs2_journal_access_di(handle, INODE_CACHE(inode), di_bh,
+				      OCFS2_JOURNAL_ACCESS_WRITE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	ocfs2_fill_initial_dirents(inode, parent, data->id_data, size);
+	ocfs2_journal_dirty(handle, di_bh);

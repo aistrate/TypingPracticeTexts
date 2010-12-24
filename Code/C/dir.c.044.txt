@@ -1,0 +1,49 @@
+		strcpy(dx_leaf->dl_signature, OCFS2_DX_LEAF_SIGNATURE);
+		dx_leaf->dl_fs_generation = cpu_to_le32(osb->fs_generation);
+		dx_leaf->dl_blkno = cpu_to_le64(bh->b_blocknr);
+		dx_leaf->dl_list.de_count =
+			cpu_to_le16(ocfs2_dx_entries_per_leaf(osb->sb));
+
+		mlog(0,
+		     "Dir %llu, format dx_leaf: %llu, entry count: %u\n",
+		     (unsigned long long)OCFS2_I(dir)->ip_blkno,
+		     (unsigned long long)bh->b_blocknr,
+		     le16_to_cpu(dx_leaf->dl_list.de_count));
+
+		ocfs2_journal_dirty(handle, bh);
+	}
+
+	ret = 0;
+out:
+	return ret;
+}
+
+static int __ocfs2_dx_dir_new_cluster(struct inode *dir,
+				      u32 cpos, handle_t *handle,
+				      struct ocfs2_alloc_context *data_ac,
+				      struct buffer_head **dx_leaves,
+				      int num_dx_leaves, u64 *ret_phys_blkno)
+{
+	int ret;
+	u32 phys, num;
+	u64 phys_blkno;
+	struct ocfs2_super *osb = OCFS2_SB(dir->i_sb);
+
+	ret = __ocfs2_claim_clusters(handle, data_ac, 1, 1, &phys, &num);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	phys_blkno = ocfs2_clusters_to_blocks(osb->sb, phys);
+	ret = ocfs2_dx_dir_format_cluster(osb, handle, dir, dx_leaves,
+					  num_dx_leaves, phys_blkno);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	*ret_phys_blkno = phys_blkno;
+out:
+	return ret;
+}

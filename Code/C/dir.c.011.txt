@@ -1,0 +1,50 @@
+	}
+
+	return 0;
+}
+
+static int ocfs2_read_dx_root(struct inode *dir, struct ocfs2_dinode *di,
+			      struct buffer_head **dx_root_bh)
+{
+	int ret;
+	u64 blkno = le64_to_cpu(di->i_dx_root);
+	struct buffer_head *tmp = *dx_root_bh;
+
+	ret = ocfs2_read_block(INODE_CACHE(dir), blkno, &tmp,
+			       ocfs2_validate_dx_root);
+
+	if (!ret && !*dx_root_bh)
+		*dx_root_bh = tmp;
+
+	return ret;
+}
+
+static int ocfs2_validate_dx_leaf(struct super_block *sb,
+				  struct buffer_head *bh)
+{
+	int ret;
+	struct ocfs2_dx_leaf *dx_leaf = (struct ocfs2_dx_leaf *)bh->b_data;
+
+	BUG_ON(!buffer_uptodate(bh));
+
+	ret = ocfs2_validate_meta_ecc(sb, bh->b_data, &dx_leaf->dl_check);
+	if (ret) {
+		mlog(ML_ERROR,
+		     "Checksum failed for dir index leaf block %llu\n",
+		     (unsigned long long)bh->b_blocknr);
+		return ret;
+	}
+
+	if (!OCFS2_IS_VALID_DX_LEAF(dx_leaf)) {
+		ocfs2_error(sb, "Dir Index Leaf has bad signature %.*s",
+			    7, dx_leaf->dl_signature);
+		return -EROFS;
+	}
+
+	return 0;
+}
+
+static int ocfs2_read_dx_leaf(struct inode *dir, u64 blkno,
+			      struct buffer_head **dx_leaf_bh)
+{
+	int ret;

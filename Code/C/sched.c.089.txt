@@ -1,0 +1,50 @@
+static void migrate_nr_uninterruptible(struct rq *rq_src)
+{
+	struct rq *rq_dest = cpu_rq(cpumask_any(cpu_active_mask));
+	unsigned long flags;
+
+	local_irq_save(flags);
+	double_rq_lock(rq_src, rq_dest);
+	rq_dest->nr_uninterruptible += rq_src->nr_uninterruptible;
+	rq_src->nr_uninterruptible = 0;
+	double_rq_unlock(rq_src, rq_dest);
+	local_irq_restore(flags);
+}
+
+static void migrate_live_tasks(int src_cpu)
+{
+	struct task_struct *p, *t;
+
+	read_lock(&tasklist_lock);
+
+	do_each_thread(t, p) {
+		if (p == current)
+			continue;
+
+		if (task_cpu(p) == src_cpu)
+			move_task_off_dead_cpu(src_cpu, p);
+	} while_each_thread(t, p);
+
+	read_unlock(&tasklist_lock);
+}
+
+void sched_idle_next(void)
+{
+	int this_cpu = smp_processor_id();
+	struct rq *rq = cpu_rq(this_cpu);
+	struct task_struct *p = rq->idle;
+	unsigned long flags;
+
+	BUG_ON(cpu_online(this_cpu));
+
+	raw_spin_lock_irqsave(&rq->lock, flags);
+
+	__setscheduler(rq, p, SCHED_FIFO, MAX_RT_PRIO-1);
+
+	activate_task(rq, p, 0);
+
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+}
+
+void idle_task_exit(void)
+{

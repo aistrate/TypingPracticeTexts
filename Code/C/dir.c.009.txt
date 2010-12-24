@@ -1,0 +1,50 @@
+	if (le64_to_cpu(trailer->db_parent_dinode) !=
+	    OCFS2_I(dir)->ip_blkno) {
+		rc = -EINVAL;
+		ocfs2_error(dir->i_sb,
+			    "Directory block #%llu on dinode "
+			    "#%llu has an invalid parent_dinode "
+			    "of %llu",
+			    (unsigned long long)bh->b_blocknr,
+			    (unsigned long long)OCFS2_I(dir)->ip_blkno,
+			    (unsigned long long)le64_to_cpu(trailer->db_blkno));
+		goto out;
+	}
+out:
+	return rc;
+}
+
+static int ocfs2_read_dir_block(struct inode *inode, u64 v_block,
+				struct buffer_head **bh, int flags)
+{
+	int rc = 0;
+	struct buffer_head *tmp = *bh;
+
+	rc = ocfs2_read_virt_blocks(inode, v_block, 1, &tmp, flags,
+				    ocfs2_validate_dir_block);
+	if (rc) {
+		mlog_errno(rc);
+		goto out;
+	}
+
+	if (!(flags & OCFS2_BH_READAHEAD) &&
+	    ocfs2_supports_dir_trailer(inode)) {
+		rc = ocfs2_check_dir_trailer(inode, tmp);
+		if (rc) {
+			if (!*bh)
+				brelse(tmp);
+			mlog_errno(rc);
+			goto out;
+		}
+	}
+
+	if (!*bh)
+		*bh = tmp;
+
+out:
+	return rc ? -EIO : 0;
+}
+
+static int ocfs2_read_dir_block_direct(struct inode *dir, u64 phys,
+				       struct buffer_head **bh)
+{

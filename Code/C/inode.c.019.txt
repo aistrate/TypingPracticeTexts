@@ -1,0 +1,50 @@
+	int ret = 0, started = 0;
+	int dio_credits;
+
+	map.m_lblk = iblock;
+	map.m_len = bh->b_size >> inode->i_blkbits;
+
+	if (flags && !handle) {
+		
+		if (map.m_len > DIO_MAX_BLOCKS)
+			map.m_len = DIO_MAX_BLOCKS;
+		dio_credits = ext4_chunk_trans_blocks(inode, map.m_len);
+		handle = ext4_journal_start(inode, dio_credits);
+		if (IS_ERR(handle)) {
+			ret = PTR_ERR(handle);
+			return ret;
+		}
+		started = 1;
+	}
+
+	ret = ext4_map_blocks(handle, inode, &map, flags);
+	if (ret > 0) {
+		map_bh(bh, inode->i_sb, map.m_pblk);
+		bh->b_state = (bh->b_state & ~EXT4_MAP_FLAGS) | map.m_flags;
+		bh->b_size = inode->i_sb->s_blocksize * map.m_len;
+		ret = 0;
+	}
+	if (started)
+		ext4_journal_stop(handle);
+	return ret;
+}
+
+int ext4_get_block(struct inode *inode, sector_t iblock,
+		   struct buffer_head *bh, int create)
+{
+	return _ext4_get_block(inode, iblock, bh,
+			       create ? EXT4_GET_BLOCKS_CREATE : 0);
+}
+
+struct buffer_head *ext4_getblk(handle_t *handle, struct inode *inode,
+				ext4_lblk_t block, int create, int *errp)
+{
+	struct ext4_map_blocks map;
+	struct buffer_head *bh;
+	int fatal = 0, err;
+
+	J_ASSERT(handle != NULL || create == 0);
+
+	map.m_lblk = block;
+	map.m_len = 1;
+	err = ext4_map_blocks(handle, inode, &map,

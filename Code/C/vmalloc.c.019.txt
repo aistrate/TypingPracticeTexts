@@ -1,0 +1,49 @@
+}
+EXPORT_SYMBOL(vm_map_ram);
+
+void __init vm_area_register_early(struct vm_struct *vm, size_t align)
+{
+	static size_t vm_init_off __initdata;
+	unsigned long addr;
+
+	addr = ALIGN(VMALLOC_START + vm_init_off, align);
+	vm_init_off = PFN_ALIGN(addr + vm->size) - VMALLOC_START;
+
+	vm->addr = (void *)addr;
+
+	vm->next = vmlist;
+	vmlist = vm;
+}
+
+void __init vmalloc_init(void)
+{
+	struct vmap_area *va;
+	struct vm_struct *tmp;
+	int i;
+
+	for_each_possible_cpu(i) {
+		struct vmap_block_queue *vbq;
+
+		vbq = &per_cpu(vmap_block_queue, i);
+		spin_lock_init(&vbq->lock);
+		INIT_LIST_HEAD(&vbq->free);
+	}
+
+	for (tmp = vmlist; tmp; tmp = tmp->next) {
+		va = kzalloc(sizeof(struct vmap_area), GFP_NOWAIT);
+		va->flags = tmp->flags | VM_VM_AREA;
+		va->va_start = (unsigned long)tmp->addr;
+		va->va_end = va->va_start + tmp->size;
+		__insert_vmap_area(va);
+	}
+
+	vmap_area_pcpu_hole = VMALLOC_END;
+
+	vmap_initialized = true;
+}
+
+int map_kernel_range_noflush(unsigned long addr, unsigned long size,
+			     pgprot_t prot, struct page **pages)
+{
+	return vmap_page_range_noflush(addr, addr + size, prot, pages);
+}

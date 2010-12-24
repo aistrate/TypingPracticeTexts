@@ -1,0 +1,50 @@
+static int default_relax_domain_level = -1;
+
+static int __init setup_relax_domain_level(char *str)
+{
+	unsigned long val;
+
+	val = simple_strtoul(str, NULL, 0);
+	if (val < SD_LV_MAX)
+		default_relax_domain_level = val;
+
+	return 1;
+}
+__setup("relax_domain_level=", setup_relax_domain_level);
+
+static void set_domain_attribute(struct sched_domain *sd,
+				 struct sched_domain_attr *attr)
+{
+	int request;
+
+	if (!attr || attr->relax_domain_level < 0) {
+		if (default_relax_domain_level < 0)
+			return;
+		else
+			request = default_relax_domain_level;
+	} else
+		request = attr->relax_domain_level;
+	if (request < sd->level) {
+		
+		sd->flags &= ~(SD_BALANCE_WAKE|SD_BALANCE_NEWIDLE);
+	} else {
+		
+		sd->flags |= (SD_BALANCE_WAKE|SD_BALANCE_NEWIDLE);
+	}
+}
+
+static void __free_domain_allocs(struct s_data *d, enum s_alloc what,
+				 const struct cpumask *cpu_map)
+{
+	switch (what) {
+	case sa_sched_groups:
+		free_sched_groups(cpu_map, d->tmpmask); 
+		d->sched_group_nodes = NULL;
+	case sa_rootdomain:
+		free_rootdomain(d->rd); 
+	case sa_tmpmask:
+		free_cpumask_var(d->tmpmask); 
+	case sa_send_covered:
+		free_cpumask_var(d->send_covered); 
+	case sa_this_book_map:
+		free_cpumask_var(d->this_book_map); 

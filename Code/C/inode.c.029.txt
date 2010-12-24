@@ -1,0 +1,49 @@
+	int journal_data = ext4_should_journal_data(inode);
+	sector_t pblock = 0, cur_logical = 0;
+	struct ext4_io_submit io_submit;
+
+	BUG_ON(mpd->next_page <= mpd->first_page);
+	memset(&io_submit, 0, sizeof(io_submit));
+	
+	index = mpd->first_page;
+	end = mpd->next_page - 1;
+
+	pagevec_init(&pvec, 0);
+	while (index <= end) {
+		nr_pages = pagevec_lookup(&pvec, mapping, index, PAGEVEC_SIZE);
+		if (nr_pages == 0)
+			break;
+		for (i = 0; i < nr_pages; i++) {
+			int commit_write = 0, redirty_page = 0;
+			struct page *page = pvec.pages[i];
+
+			index = page->index;
+			if (index > end)
+				break;
+
+			if (index == size >> PAGE_CACHE_SHIFT)
+				len = size & ~PAGE_CACHE_MASK;
+			else
+				len = PAGE_CACHE_SIZE;
+			if (map) {
+				cur_logical = index << (PAGE_CACHE_SHIFT -
+							inode->i_blkbits);
+				pblock = map->m_pblk + (cur_logical -
+							map->m_lblk);
+			}
+			index++;
+
+			BUG_ON(!PageLocked(page));
+			BUG_ON(PageWriteback(page));
+
+			if (!page_has_buffers(page)) {
+				if (__block_write_begin(page, 0, len,
+						noalloc_get_block_write)) {
+				redirty_page:
+					redirty_page_for_writepage(mpd->wbc,
+								   page);
+					unlock_page(page);
+					continue;
+				}
+				commit_write = 1;
+			}

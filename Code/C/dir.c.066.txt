@@ -1,0 +1,50 @@
+	if (!orig_dx_leaves) {
+		ret = -ENOMEM;
+		mlog_errno(ret);
+		goto out;
+	}
+
+	new_dx_leaves = ocfs2_dx_dir_kmalloc_leaves(osb->sb, NULL);
+	if (!new_dx_leaves) {
+		ret = -ENOMEM;
+		mlog_errno(ret);
+		goto out;
+	}
+
+	ret = ocfs2_lock_allocators(dir, &et, 1, 0, &data_ac, &meta_ac);
+	if (ret) {
+		if (ret != -ENOSPC)
+			mlog_errno(ret);
+		goto out;
+	}
+
+	credits = ocfs2_dx_dir_rebalance_credits(osb, dx_root);
+	handle = ocfs2_start_trans(osb, credits);
+	if (IS_ERR(handle)) {
+		ret = PTR_ERR(handle);
+		handle = NULL;
+		mlog_errno(ret);
+		goto out;
+	}
+
+	ret = dquot_alloc_space_nodirty(dir,
+				       ocfs2_clusters_to_bytes(dir->i_sb, 1));
+	if (ret)
+		goto out_commit;
+	did_quota = 1;
+
+	ret = ocfs2_journal_access_dl(handle, INODE_CACHE(dir), dx_leaf_bh,
+				      OCFS2_JOURNAL_ACCESS_WRITE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	sort(dx_leaf->dl_list.de_entries, num_used,
+	     sizeof(struct ocfs2_dx_entry), dx_leaf_sort_cmp,
+	     dx_leaf_sort_swap);
+
+	ocfs2_journal_dirty(handle, dx_leaf_bh);
+
+	ret = ocfs2_dx_dir_find_leaf_split(dx_leaf, leaf_cpos, insert_hash,
+					   &split_hash);

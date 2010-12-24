@@ -1,0 +1,50 @@
+	__purge_vmap_area_lazy(&start, &end, 1, flush);
+}
+EXPORT_SYMBOL_GPL(vm_unmap_aliases);
+
+void vm_unmap_ram(const void *mem, unsigned int count)
+{
+	unsigned long size = count << PAGE_SHIFT;
+	unsigned long addr = (unsigned long)mem;
+
+	BUG_ON(!addr);
+	BUG_ON(addr < VMALLOC_START);
+	BUG_ON(addr > VMALLOC_END);
+	BUG_ON(addr & (PAGE_SIZE-1));
+
+	debug_check_no_locks_freed(mem, size);
+	vmap_debug_free_range(addr, addr+size);
+
+	if (likely(count <= VMAP_MAX_ALLOC))
+		vb_free(mem, size);
+	else
+		free_unmap_vmap_area_addr(addr);
+}
+EXPORT_SYMBOL(vm_unmap_ram);
+
+void *vm_map_ram(struct page **pages, unsigned int count, int node, pgprot_t prot)
+{
+	unsigned long size = count << PAGE_SHIFT;
+	unsigned long addr;
+	void *mem;
+
+	if (likely(count <= VMAP_MAX_ALLOC)) {
+		mem = vb_alloc(size, GFP_KERNEL);
+		if (IS_ERR(mem))
+			return NULL;
+		addr = (unsigned long)mem;
+	} else {
+		struct vmap_area *va;
+		va = alloc_vmap_area(size, PAGE_SIZE,
+				VMALLOC_START, VMALLOC_END, node, GFP_KERNEL);
+		if (IS_ERR(va))
+			return NULL;
+
+		addr = va->va_start;
+		mem = (void *)addr;
+	}
+	if (vmap_page_range(addr, addr + size, prot, pages) < 0) {
+		vm_unmap_ram(mem, count);
+		return NULL;
+	}
+	return mem;

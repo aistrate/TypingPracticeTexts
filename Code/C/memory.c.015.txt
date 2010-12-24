@@ -1,0 +1,49 @@
+				if (details->nonlinear_vma &&
+				    (page->index < details->first_index ||
+				     page->index > details->last_index))
+					continue;
+			}
+			ptent = ptep_get_and_clear_full(mm, addr, pte,
+							tlb->fullmm);
+			tlb_remove_tlb_entry(tlb, pte, addr);
+			if (unlikely(!page))
+				continue;
+			if (unlikely(details) && details->nonlinear_vma
+			    && linear_page_index(details->nonlinear_vma,
+						addr) != page->index)
+				set_pte_at(mm, addr, pte,
+					   pgoff_to_pte(page->index));
+			if (PageAnon(page))
+				rss[MM_ANONPAGES]--;
+			else {
+				if (pte_dirty(ptent))
+					set_page_dirty(page);
+				if (pte_young(ptent) &&
+				    likely(!VM_SequentialReadHint(vma)))
+					mark_page_accessed(page);
+				rss[MM_FILEPAGES]--;
+			}
+			page_remove_rmap(page);
+			if (unlikely(page_mapcount(page) < 0))
+				print_bad_pte(vma, addr, ptent, page);
+			tlb_remove_page(tlb, page);
+			continue;
+		}
+		
+		if (unlikely(details))
+			continue;
+		if (pte_file(ptent)) {
+			if (unlikely(!(vma->vm_flags & VM_NONLINEAR)))
+				print_bad_pte(vma, addr, ptent, NULL);
+		} else {
+			swp_entry_t entry = pte_to_swp_entry(ptent);
+
+			if (!non_swap_entry(entry))
+				rss[MM_SWAPENTS]--;
+			if (unlikely(!free_swap_and_cache(entry)))
+				print_bad_pte(vma, addr, ptent, NULL);
+		}
+		pte_clear_not_present_full(mm, addr, pte, tlb->fullmm);
+	} while (pte++, addr += PAGE_SIZE, (addr != end && *zap_work > 0));
+
+	add_mm_rss_vec(mm, rss);

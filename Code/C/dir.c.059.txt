@@ -1,0 +1,50 @@
+		}
+	} else {
+		de->rec_len = cpu_to_le16(sb->s_blocksize);
+	}
+	ocfs2_journal_dirty(handle, new_bh);
+
+	dir_i_size += dir->i_sb->s_blocksize;
+	i_size_write(dir, dir_i_size);
+	dir->i_blocks = ocfs2_inode_sector_count(dir);
+	status = ocfs2_mark_inode_dirty(handle, dir, parent_fe_bh);
+	if (status < 0) {
+		mlog_errno(status);
+		goto bail;
+	}
+
+bail_bh:
+	*new_de_bh = new_bh;
+	get_bh(*new_de_bh);
+bail:
+	if (handle)
+		ocfs2_commit_trans(osb, handle);
+	if (drop_alloc_sem)
+		up_write(&OCFS2_I(dir)->ip_alloc_sem);
+
+	if (data_ac)
+		ocfs2_free_alloc_context(data_ac);
+	if (meta_ac)
+		ocfs2_free_alloc_context(meta_ac);
+
+	brelse(new_bh);
+
+	mlog_exit(status);
+	return status;
+}
+
+static int ocfs2_find_dir_space_id(struct inode *dir, struct buffer_head *di_bh,
+				   const char *name, int namelen,
+				   struct buffer_head **ret_de_bh,
+				   unsigned int *blocks_wanted)
+{
+	int ret;
+	struct super_block *sb = dir->i_sb;
+	struct ocfs2_dinode *di = (struct ocfs2_dinode *)di_bh->b_data;
+	struct ocfs2_dir_entry *de, *last_de = NULL;
+	char *de_buf, *limit;
+	unsigned long offset = 0;
+	unsigned int rec_len, new_rec_len, free_space = dir->i_sb->s_blocksize;
+
+	if (ocfs2_new_dir_wants_trailer(dir))
+		free_space = ocfs2_dir_trailer_blk_off(sb) - i_size_read(dir);

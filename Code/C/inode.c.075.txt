@@ -1,0 +1,50 @@
+		for (block = 0; block < EXT4_N_BLOCKS; block++)
+			raw_inode->i_block[block] = ei->i_data[block];
+
+	raw_inode->i_disk_version = cpu_to_le32(inode->i_version);
+	if (ei->i_extra_isize) {
+		if (EXT4_FITS_IN_INODE(raw_inode, ei, i_version_hi))
+			raw_inode->i_version_hi =
+			cpu_to_le32(inode->i_version >> 32);
+		raw_inode->i_extra_isize = cpu_to_le16(ei->i_extra_isize);
+	}
+
+	BUFFER_TRACE(bh, "call ext4_handle_dirty_metadata");
+	rc = ext4_handle_dirty_metadata(handle, NULL, bh);
+	if (!err)
+		err = rc;
+	ext4_clear_inode_state(inode, EXT4_STATE_NEW);
+
+	ext4_update_inode_fsync_trans(handle, inode, 0);
+out_brelse:
+	brelse(bh);
+	ext4_std_error(inode->i_sb, err);
+	return err;
+}
+
+int ext4_write_inode(struct inode *inode, struct writeback_control *wbc)
+{
+	int err;
+
+	if (current->flags & PF_MEMALLOC)
+		return 0;
+
+	if (EXT4_SB(inode->i_sb)->s_journal) {
+		if (ext4_journal_current_handle()) {
+			jbd_debug(1, "called recursively, non-PF_MEMALLOC!\n");
+			dump_stack();
+			return -EIO;
+		}
+
+		if (wbc->sync_mode != WB_SYNC_ALL)
+			return 0;
+
+		err = ext4_force_commit(inode->i_sb);
+	} else {
+		struct ext4_iloc iloc;
+
+		err = __ext4_get_inode_loc(inode, &iloc, 0);
+		if (err)
+			return err;
+		if (wbc->sync_mode == WB_SYNC_ALL)
+			sync_dirty_buffer(iloc.bh);

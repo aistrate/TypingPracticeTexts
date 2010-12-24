@@ -1,0 +1,49 @@
+	struct rb_node *tmp;
+
+	while (*p) {
+		struct vmap_area *tmp_va;
+
+		parent = *p;
+		tmp_va = rb_entry(parent, struct vmap_area, rb_node);
+		if (va->va_start < tmp_va->va_end)
+			p = &(*p)->rb_left;
+		else if (va->va_end > tmp_va->va_start)
+			p = &(*p)->rb_right;
+		else
+			BUG();
+	}
+
+	rb_link_node(&va->rb_node, parent, p);
+	rb_insert_color(&va->rb_node, &vmap_area_root);
+
+	tmp = rb_prev(&va->rb_node);
+	if (tmp) {
+		struct vmap_area *prev;
+		prev = rb_entry(tmp, struct vmap_area, rb_node);
+		list_add_rcu(&va->list, &prev->list);
+	} else
+		list_add_rcu(&va->list, &vmap_area_list);
+}
+
+static void purge_vmap_area_lazy(void);
+
+static struct vmap_area *alloc_vmap_area(unsigned long size,
+				unsigned long align,
+				unsigned long vstart, unsigned long vend,
+				int node, gfp_t gfp_mask)
+{
+	struct vmap_area *va;
+	struct rb_node *n;
+	unsigned long addr;
+	int purged = 0;
+
+	BUG_ON(!size);
+	BUG_ON(size & ~PAGE_MASK);
+
+	va = kmalloc_node(sizeof(struct vmap_area),
+			gfp_mask & GFP_RECLAIM_MASK, node);
+	if (unlikely(!va))
+		return ERR_PTR(-ENOMEM);
+
+retry:
+	addr = ALIGN(vstart, align);

@@ -1,0 +1,50 @@
+			for (ra_max = 0; ra_max < NAMEI_RA_SIZE; ra_max++) {
+				
+				if (b >= nblocks || (num && block == start)) {
+					bh_use[ra_max] = NULL;
+					break;
+				}
+				num++;
+				bh = ext3_getblk(NULL, dir, b++, 0, &err);
+				bh_use[ra_max] = bh;
+				if (bh)
+					ll_rw_block(READ_META, 1, &bh);
+			}
+		}
+		if ((bh = bh_use[ra_ptr++]) == NULL)
+			goto next;
+		wait_on_buffer(bh);
+		if (!buffer_uptodate(bh)) {
+			
+			ext3_error(sb, __func__, "reading directory #%lu "
+				   "offset %lu", dir->i_ino, block);
+			brelse(bh);
+			goto next;
+		}
+		i = search_dirblock(bh, dir, entry,
+			    block << EXT3_BLOCK_SIZE_BITS(sb), res_dir);
+		if (i == 1) {
+			EXT3_I(dir)->i_dir_start_lookup = block;
+			ret = bh;
+			goto cleanup_and_exit;
+		} else {
+			brelse(bh);
+			if (i < 0)
+				goto cleanup_and_exit;
+		}
+	next:
+		if (++block >= nblocks)
+			block = 0;
+	} while (block != start);
+
+	block = nblocks;
+	nblocks = dir->i_size >> EXT3_BLOCK_SIZE_BITS(sb);
+	if (block < nblocks) {
+		start = 0;
+		goto restart;
+	}
+
+cleanup_and_exit:
+	
+	for (; ra_ptr < ra_max; ra_ptr++)
+		brelse (bh_use[ra_ptr]);

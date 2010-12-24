@@ -1,0 +1,49 @@
+		return -EIO;
+	}
+	if (!buffer_uptodate(bh)) {
+		lock_buffer(bh);
+
+		if (buffer_write_io_error(bh) && !buffer_uptodate(bh))
+			set_buffer_uptodate(bh);
+
+		if (buffer_uptodate(bh)) {
+			
+			unlock_buffer(bh);
+			goto has_buffer;
+		}
+
+		if (in_mem) {
+			struct buffer_head *bitmap_bh;
+			int i, start;
+
+			start = inode_offset & ~(inodes_per_block - 1);
+
+			bitmap_bh = sb_getblk(sb, ext4_inode_bitmap(sb, gdp));
+			if (!bitmap_bh)
+				goto make_io;
+
+			if (!buffer_uptodate(bitmap_bh)) {
+				brelse(bitmap_bh);
+				goto make_io;
+			}
+			for (i = start; i < start + inodes_per_block; i++) {
+				if (i == inode_offset)
+					continue;
+				if (ext4_test_bit(i, bitmap_bh->b_data))
+					break;
+			}
+			brelse(bitmap_bh);
+			if (i == start + inodes_per_block) {
+				
+				memset(bh->b_data, 0, bh->b_size);
+				set_buffer_uptodate(bh);
+				unlock_buffer(bh);
+				goto has_buffer;
+			}
+		}
+
+make_io:
+		
+		if (EXT4_SB(sb)->s_inode_readahead_blks) {
+			ext4_fsblk_t b, end, table;
+			unsigned num;

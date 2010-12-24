@@ -1,0 +1,49 @@
+	if (page_uptodate && !PageError(page))
+		SetPageUptodate(page);
+	unlock_page(page);
+	return;
+
+still_busy:
+	bit_spin_unlock(BH_Uptodate_Lock, &first->b_state);
+	local_irq_restore(flags);
+	return;
+}
+
+void end_buffer_async_write(struct buffer_head *bh, int uptodate)
+{
+	char b[BDEVNAME_SIZE];
+	unsigned long flags;
+	struct buffer_head *first;
+	struct buffer_head *tmp;
+	struct page *page;
+
+	BUG_ON(!buffer_async_write(bh));
+
+	page = bh->b_page;
+	if (uptodate) {
+		set_buffer_uptodate(bh);
+	} else {
+		if (!quiet_error(bh)) {
+			buffer_io_error(bh);
+			printk(KERN_WARNING "lost page write due to "
+					"I/O error on %s\n",
+			       bdevname(bh->b_bdev, b));
+		}
+		set_bit(AS_EIO, &page->mapping->flags);
+		set_buffer_write_io_error(bh);
+		clear_buffer_uptodate(bh);
+		SetPageError(page);
+	}
+
+	first = page_buffers(page);
+	local_irq_save(flags);
+	bit_spin_lock(BH_Uptodate_Lock, &first->b_state);
+
+	clear_buffer_async_write(bh);
+	unlock_buffer(bh);
+	tmp = bh->b_this_page;
+	while (tmp != bh) {
+		if (buffer_async_write(tmp)) {
+			BUG_ON(!buffer_locked(tmp));
+			goto still_busy;
+		}

@@ -1,0 +1,49 @@
+{
+	struct buffer_head *ret = NULL;
+	struct bh_lru *lru;
+	unsigned int i;
+
+	check_irqs_on();
+	bh_lru_lock();
+	lru = &__get_cpu_var(bh_lrus);
+	for (i = 0; i < BH_LRU_SIZE; i++) {
+		struct buffer_head *bh = lru->bhs[i];
+
+		if (bh && bh->b_bdev == bdev &&
+				bh->b_blocknr == block && bh->b_size == size) {
+			if (i) {
+				while (i) {
+					lru->bhs[i] = lru->bhs[i - 1];
+					i--;
+				}
+				lru->bhs[0] = bh;
+			}
+			get_bh(bh);
+			ret = bh;
+			break;
+		}
+	}
+	bh_lru_unlock();
+	return ret;
+}
+
+struct buffer_head *
+__find_get_block(struct block_device *bdev, sector_t block, unsigned size)
+{
+	struct buffer_head *bh = lookup_bh_lru(bdev, block, size);
+
+	if (bh == NULL) {
+		bh = __find_get_block_slow(bdev, block);
+		if (bh)
+			bh_lru_install(bh);
+	}
+	if (bh)
+		touch_buffer(bh);
+	return bh;
+}
+EXPORT_SYMBOL(__find_get_block);
+
+struct buffer_head *
+__getblk(struct block_device *bdev, sector_t block, unsigned size)
+{
+	struct buffer_head *bh = __find_get_block(bdev, block, size);

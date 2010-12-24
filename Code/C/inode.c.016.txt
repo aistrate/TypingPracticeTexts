@@ -1,0 +1,49 @@
+	if ((ei->i_reserved_data_blocks == 0) &&
+	    (atomic_read(&inode->i_writecount) == 0))
+		ext4_discard_preallocations(inode);
+}
+
+static int __check_block_validity(struct inode *inode, const char *func,
+				unsigned int line,
+				struct ext4_map_blocks *map)
+{
+	if (!ext4_data_block_valid(EXT4_SB(inode->i_sb), map->m_pblk,
+				   map->m_len)) {
+		ext4_error_inode(inode, func, line, map->m_pblk,
+				 "lblock %lu mapped to illegal pblock "
+				 "(length %d)", (unsigned long) map->m_lblk,
+				 map->m_len);
+		return -EIO;
+	}
+	return 0;
+}
+
+#define check_block_validity(inode, map)	\
+	__check_block_validity((inode), __func__, __LINE__, (map))
+
+static pgoff_t ext4_num_dirty_pages(struct inode *inode, pgoff_t idx,
+				    unsigned int max_pages)
+{
+	struct address_space *mapping = inode->i_mapping;
+	pgoff_t	index;
+	struct pagevec pvec;
+	pgoff_t num = 0;
+	int i, nr_pages, done = 0;
+
+	if (max_pages == 0)
+		return 0;
+	pagevec_init(&pvec, 0);
+	while (!done) {
+		index = idx;
+		nr_pages = pagevec_lookup_tag(&pvec, mapping, &index,
+					      PAGECACHE_TAG_DIRTY,
+					      (pgoff_t)PAGEVEC_SIZE);
+		if (nr_pages == 0)
+			break;
+		for (i = 0; i < nr_pages; i++) {
+			struct page *page = pvec.pages[i];
+			struct buffer_head *bh, *head;
+
+			lock_page(page);
+			if (unlikely(page->mapping != mapping) ||
+			    !PageDirty(page) ||

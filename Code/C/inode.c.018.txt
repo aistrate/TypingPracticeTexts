@@ -1,0 +1,50 @@
+		if (ret != 0)
+			return ret;
+	}
+
+	if ((flags & EXT4_GET_BLOCKS_CREATE) == 0)
+		return retval;
+
+	if (retval > 0 && map->m_flags & EXT4_MAP_MAPPED)
+		return retval;
+
+	map->m_flags &= ~EXT4_MAP_UNWRITTEN;
+
+	down_write((&EXT4_I(inode)->i_data_sem));
+
+	if (flags & EXT4_GET_BLOCKS_DELALLOC_RESERVE)
+		EXT4_I(inode)->i_delalloc_reserved_flag = 1;
+	
+	if (ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS)) {
+		retval = ext4_ext_map_blocks(handle, inode, map, flags);
+	} else {
+		retval = ext4_ind_map_blocks(handle, inode, map, flags);
+
+		if (retval > 0 && map->m_flags & EXT4_MAP_NEW) {
+			
+			ext4_clear_inode_state(inode, EXT4_STATE_EXT_MIGRATE);
+		}
+
+		if ((retval > 0) &&
+			(flags & EXT4_GET_BLOCKS_DELALLOC_RESERVE))
+			ext4_da_update_reserve_space(inode, retval, 1);
+	}
+	if (flags & EXT4_GET_BLOCKS_DELALLOC_RESERVE)
+		EXT4_I(inode)->i_delalloc_reserved_flag = 0;
+
+	up_write((&EXT4_I(inode)->i_data_sem));
+	if (retval > 0 && map->m_flags & EXT4_MAP_MAPPED) {
+		int ret = check_block_validity(inode, map);
+		if (ret != 0)
+			return ret;
+	}
+	return retval;
+}
+
+#define DIO_MAX_BLOCKS 4096
+
+static int _ext4_get_block(struct inode *inode, sector_t iblock,
+			   struct buffer_head *bh, int flags)
+{
+	handle_t *handle = ext4_journal_current_handle();
+	struct ext4_map_blocks map;

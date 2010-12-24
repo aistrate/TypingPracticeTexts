@@ -1,0 +1,50 @@
+		int size = le16_to_cpu(de->rec_len);
+
+		size -= OCFS2_DIR_REC_LEN(2);
+		size -= sizeof(struct ocfs2_dir_block_trailer);
+
+		ocfs2_init_dir_trailer(inode, new_bh, size);
+	}
+
+	ocfs2_journal_dirty(handle, new_bh);
+
+	i_size_write(inode, inode->i_sb->s_blocksize);
+	inode->i_nlink = 2;
+	inode->i_blocks = ocfs2_inode_sector_count(inode);
+	status = ocfs2_mark_inode_dirty(handle, inode, fe_bh);
+	if (status < 0) {
+		mlog_errno(status);
+		goto bail;
+	}
+
+	status = 0;
+	if (ret_new_bh) {
+		*ret_new_bh = new_bh;
+		new_bh = NULL;
+	}
+bail:
+	brelse(new_bh);
+
+	mlog_exit(status);
+	return status;
+}
+
+static int ocfs2_dx_dir_attach_index(struct ocfs2_super *osb,
+				     handle_t *handle, struct inode *dir,
+				     struct buffer_head *di_bh,
+				     struct buffer_head *dirdata_bh,
+				     struct ocfs2_alloc_context *meta_ac,
+				     int dx_inline, u32 num_entries,
+				     struct buffer_head **ret_dx_root_bh)
+{
+	int ret;
+	struct ocfs2_dinode *di = (struct ocfs2_dinode *) di_bh->b_data;
+	u16 dr_suballoc_bit;
+	u64 suballoc_loc, dr_blkno;
+	unsigned int num_bits;
+	struct buffer_head *dx_root_bh = NULL;
+	struct ocfs2_dx_root_block *dx_root;
+	struct ocfs2_dir_block_trailer *trailer =
+		ocfs2_trailer_from_bh(dirdata_bh, dir->i_sb);
+
+	ret = ocfs2_claim_metadata(handle, meta_ac, 1, &suballoc_loc,

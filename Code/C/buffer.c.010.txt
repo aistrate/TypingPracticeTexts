@@ -1,0 +1,50 @@
+				page_index(page), PAGECACHE_TAG_DIRTY);
+	}
+	spin_unlock_irq(&mapping->tree_lock);
+	__mark_inode_dirty(mapping->host, I_DIRTY_PAGES);
+}
+
+int __set_page_dirty_buffers(struct page *page)
+{
+	int newly_dirty;
+	struct address_space *mapping = page_mapping(page);
+
+	if (unlikely(!mapping))
+		return !TestSetPageDirty(page);
+
+	spin_lock(&mapping->private_lock);
+	if (page_has_buffers(page)) {
+		struct buffer_head *head = page_buffers(page);
+		struct buffer_head *bh = head;
+
+		do {
+			set_buffer_dirty(bh);
+			bh = bh->b_this_page;
+		} while (bh != head);
+	}
+	newly_dirty = !TestSetPageDirty(page);
+	spin_unlock(&mapping->private_lock);
+
+	if (newly_dirty)
+		__set_page_dirty(page, mapping, 1);
+	return newly_dirty;
+}
+EXPORT_SYMBOL(__set_page_dirty_buffers);
+
+static int fsync_buffers_list(spinlock_t *lock, struct list_head *list)
+{
+	struct buffer_head *bh;
+	struct list_head tmp;
+	struct address_space *mapping, *prev_mapping = NULL;
+	int err = 0, err2;
+
+	INIT_LIST_HEAD(&tmp);
+
+	spin_lock(lock);
+	while (!list_empty(list)) {
+		bh = BH_ENTRY(list->next);
+		mapping = bh->b_assoc_map;
+		__remove_assoc_queue(bh);
+		
+		smp_mb();
+		if (buffer_dirty(bh) || buffer_locked(bh)) {

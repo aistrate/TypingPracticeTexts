@@ -1,0 +1,50 @@
+	task_rq_unlock(rq, &flags);
+}
+EXPORT_SYMBOL(set_user_nice);
+
+int can_nice(const struct task_struct *p, const int nice)
+{
+	
+	int nice_rlim = 20 - nice;
+
+	return (nice_rlim <= task_rlimit(p, RLIMIT_NICE) ||
+		capable(CAP_SYS_NICE));
+}
+
+#ifdef __ARCH_WANT_SYS_NICE
+
+SYSCALL_DEFINE1(nice, int, increment)
+{
+	long nice, retval;
+
+	if (increment < -40)
+		increment = -40;
+	if (increment > 40)
+		increment = 40;
+
+	nice = TASK_NICE(current) + increment;
+	if (nice < -20)
+		nice = -20;
+	if (nice > 19)
+		nice = 19;
+
+	if (increment < 0 && !can_nice(current, nice))
+		return -EPERM;
+
+	retval = security_task_setnice(current, nice);
+	if (retval)
+		return retval;
+
+	set_user_nice(current, nice);
+	return 0;
+}
+
+#endif
+
+int task_prio(const struct task_struct *p)
+{
+	return p->prio - MAX_RT_PRIO;
+}
+
+int task_nice(const struct task_struct *p)
+{

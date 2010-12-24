@@ -1,0 +1,50 @@
+			goto errout;
+		count++;
+	}
+	if (start_hash < 2 || (start_hash ==2 && start_minor_hash==0)) {
+		de = (struct ext3_dir_entry_2 *) frames[0].bh->b_data;
+		de = ext3_next_entry(de);
+		if ((err = ext3_htree_store_dirent(dir_file, 2, 0, de)) != 0)
+			goto errout;
+		count++;
+	}
+
+	while (1) {
+		block = dx_get_block(frame->at);
+		ret = htree_dirblock_to_tree(dir_file, dir, block, &hinfo,
+					     start_hash, start_minor_hash);
+		if (ret < 0) {
+			err = ret;
+			goto errout;
+		}
+		count += ret;
+		hashval = ~0;
+		ret = ext3_htree_next_block(dir, HASH_NB_ALWAYS,
+					    frame, frames, &hashval);
+		*next_hash = hashval;
+		if (ret < 0) {
+			err = ret;
+			goto errout;
+		}
+		
+		if ((ret == 0) ||
+		    (count && ((hashval & 1) == 0)))
+			break;
+	}
+	dx_release(frames);
+	dxtrace(printk("Fill tree: returned %d entries, next hash: %x\n",
+		       count, *next_hash));
+	return count;
+errout:
+	dx_release(frames);
+	return (err);
+}
+
+static int dx_make_map(struct ext3_dir_entry_2 *de, unsigned blocksize,
+		struct dx_hash_info *hinfo, struct dx_map_entry *map_tail)
+{
+	int count = 0;
+	char *base = (char *) de;
+	struct dx_hash_info h = *hinfo;
+
+	while ((char *) de < base + blocksize)

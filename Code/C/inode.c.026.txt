@@ -1,0 +1,50 @@
+	unsigned from, to;
+	loff_t new_i_size;
+
+	trace_ext4_journalled_write_end(inode, pos, len, copied);
+	from = pos & (PAGE_CACHE_SIZE - 1);
+	to = from + len;
+
+	if (copied < len) {
+		if (!PageUptodate(page))
+			copied = 0;
+		page_zero_new_buffers(page, from+copied, to);
+	}
+
+	ret = walk_page_buffers(handle, page_buffers(page), from,
+				to, &partial, write_end_fn);
+	if (!partial)
+		SetPageUptodate(page);
+	new_i_size = pos + copied;
+	if (new_i_size > inode->i_size)
+		i_size_write(inode, pos+copied);
+	ext4_set_inode_state(inode, EXT4_STATE_JDATA);
+	if (new_i_size > EXT4_I(inode)->i_disksize) {
+		ext4_update_i_disksize(inode, new_i_size);
+		ret2 = ext4_mark_inode_dirty(handle, inode);
+		if (!ret)
+			ret = ret2;
+	}
+
+	unlock_page(page);
+	page_cache_release(page);
+	if (pos + len > inode->i_size && ext4_can_truncate(inode))
+		
+		ext4_orphan_add(handle, inode);
+
+	ret2 = ext4_journal_stop(handle);
+	if (!ret)
+		ret = ret2;
+	if (pos + len > inode->i_size) {
+		ext4_truncate_failed_write(inode);
+		
+		if (inode->i_nlink)
+			ext4_orphan_del(NULL, inode);
+	}
+
+	return ret ? ret : copied;
+}
+
+static int ext4_da_reserve_space(struct inode *inode, sector_t lblock)
+{
+	int retries = 0;

@@ -1,0 +1,50 @@
+				    unsigned long sd_shares,
+				    unsigned long sd_rq_weight,
+				    unsigned long *usd_rq_weight)
+{
+	unsigned long shares, rq_weight;
+	int boost = 0;
+
+	rq_weight = usd_rq_weight[cpu];
+	if (!rq_weight) {
+		boost = 1;
+		rq_weight = NICE_0_LOAD;
+	}
+
+	shares = (sd_shares * rq_weight) / sd_rq_weight;
+	shares = clamp_t(unsigned long, shares, MIN_SHARES, MAX_SHARES);
+
+	if (abs(shares - tg->se[cpu]->load.weight) >
+			sysctl_sched_shares_thresh) {
+		struct rq *rq = cpu_rq(cpu);
+		unsigned long flags;
+
+		raw_spin_lock_irqsave(&rq->lock, flags);
+		tg->cfs_rq[cpu]->rq_weight = boost ? 0 : rq_weight;
+		tg->cfs_rq[cpu]->shares = boost ? 0 : shares;
+		__set_se_shares(tg->se[cpu], shares);
+		raw_spin_unlock_irqrestore(&rq->lock, flags);
+	}
+}
+
+static int tg_shares_up(struct task_group *tg, void *data)
+{
+	unsigned long weight, rq_weight = 0, sum_weight = 0, shares = 0;
+	unsigned long *usd_rq_weight;
+	struct sched_domain *sd = data;
+	unsigned long flags;
+	int i;
+
+	if (!tg->se[0])
+		return 0;
+
+	local_irq_save(flags);
+	usd_rq_weight = per_cpu_ptr(update_shares_data, smp_processor_id());
+
+	for_each_cpu(i, sched_domain_span(sd)) {
+		weight = tg->cfs_rq[i]->load.weight;
+		usd_rq_weight[i] = weight;
+
+		rq_weight += weight;
+		
+		if (!weight)

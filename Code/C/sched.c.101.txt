@@ -1,0 +1,48 @@
+	atomic_inc(&rd->refcount);
+	rq->rd = rd;
+
+	cpumask_set_cpu(rq->cpu, rd->span);
+	if (cpumask_test_cpu(rq->cpu, cpu_active_mask))
+		set_rq_online(rq);
+
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+
+	if (old_rd)
+		free_rootdomain(old_rd);
+}
+
+static int init_rootdomain(struct root_domain *rd)
+{
+	memset(rd, 0, sizeof(*rd));
+
+	if (!alloc_cpumask_var(&rd->span, GFP_KERNEL))
+		goto out;
+	if (!alloc_cpumask_var(&rd->online, GFP_KERNEL))
+		goto free_span;
+	if (!alloc_cpumask_var(&rd->rto_mask, GFP_KERNEL))
+		goto free_online;
+
+	if (cpupri_init(&rd->cpupri) != 0)
+		goto free_rto_mask;
+	return 0;
+
+free_rto_mask:
+	free_cpumask_var(rd->rto_mask);
+free_online:
+	free_cpumask_var(rd->online);
+free_span:
+	free_cpumask_var(rd->span);
+out:
+	return -ENOMEM;
+}
+
+static void init_defrootdomain(void)
+{
+	init_rootdomain(&def_root_domain);
+
+	atomic_set(&def_root_domain.refcount, 1);
+}
+
+static struct root_domain *alloc_rootdomain(void)
+{
+	struct root_domain *rd;

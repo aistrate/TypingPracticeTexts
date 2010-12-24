@@ -1,0 +1,50 @@
+	inode->i_blocks = ext4_inode_blocks(raw_inode, ei);
+	ei->i_file_acl = le32_to_cpu(raw_inode->i_file_acl_lo);
+	if (EXT4_HAS_INCOMPAT_FEATURE(sb, EXT4_FEATURE_INCOMPAT_64BIT))
+		ei->i_file_acl |=
+			((__u64)le16_to_cpu(raw_inode->i_file_acl_high)) << 32;
+	inode->i_size = ext4_isize(raw_inode);
+	ei->i_disksize = inode->i_size;
+#ifdef CONFIG_QUOTA
+	ei->i_reserved_quota = 0;
+#endif
+	inode->i_generation = le32_to_cpu(raw_inode->i_generation);
+	ei->i_block_group = iloc.block_group;
+	ei->i_last_alloc_group = ~0;
+	
+	for (block = 0; block < EXT4_N_BLOCKS; block++)
+		ei->i_data[block] = raw_inode->i_block[block];
+	INIT_LIST_HEAD(&ei->i_orphan);
+
+	if (journal) {
+		transaction_t *transaction;
+		tid_t tid;
+
+		read_lock(&journal->j_state_lock);
+		if (journal->j_running_transaction)
+			transaction = journal->j_running_transaction;
+		else
+			transaction = journal->j_committing_transaction;
+		if (transaction)
+			tid = transaction->t_tid;
+		else
+			tid = journal->j_commit_sequence;
+		read_unlock(&journal->j_state_lock);
+		ei->i_sync_tid = tid;
+		ei->i_datasync_tid = tid;
+	}
+
+	if (EXT4_INODE_SIZE(inode->i_sb) > EXT4_GOOD_OLD_INODE_SIZE) {
+		ei->i_extra_isize = le16_to_cpu(raw_inode->i_extra_isize);
+		if (EXT4_GOOD_OLD_INODE_SIZE + ei->i_extra_isize >
+		    EXT4_INODE_SIZE(inode->i_sb)) {
+			ret = -EIO;
+			goto bad_inode;
+		}
+		if (ei->i_extra_isize == 0) {
+			
+			ei->i_extra_isize = sizeof(struct ext4_inode) -
+					    EXT4_GOOD_OLD_INODE_SIZE;
+		} else {
+			__le32 *magic = (void *)raw_inode +
+					EXT4_GOOD_OLD_INODE_SIZE +

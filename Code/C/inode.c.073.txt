@@ -1,0 +1,50 @@
+	if (i_blocks <= 0xffffffffffffULL) {
+		
+		raw_inode->i_blocks_lo   = cpu_to_le32(i_blocks);
+		raw_inode->i_blocks_high = cpu_to_le16(i_blocks >> 32);
+		ext4_clear_inode_flag(inode, EXT4_INODE_HUGE_FILE);
+	} else {
+		ext4_set_inode_flag(inode, EXT4_INODE_HUGE_FILE);
+		
+		i_blocks = i_blocks >> (inode->i_blkbits - 9);
+		raw_inode->i_blocks_lo   = cpu_to_le32(i_blocks);
+		raw_inode->i_blocks_high = cpu_to_le16(i_blocks >> 32);
+	}
+	return 0;
+}
+
+static int ext4_do_update_inode(handle_t *handle,
+				struct inode *inode,
+				struct ext4_iloc *iloc)
+{
+	struct ext4_inode *raw_inode = ext4_raw_inode(iloc);
+	struct ext4_inode_info *ei = EXT4_I(inode);
+	struct buffer_head *bh = iloc->bh;
+	int err = 0, rc, block;
+
+	if (ext4_test_inode_state(inode, EXT4_STATE_NEW))
+		memset(raw_inode, 0, EXT4_SB(inode->i_sb)->s_inode_size);
+
+	ext4_get_inode_flags(ei);
+	raw_inode->i_mode = cpu_to_le16(inode->i_mode);
+	if (!(test_opt(inode->i_sb, NO_UID32))) {
+		raw_inode->i_uid_low = cpu_to_le16(low_16_bits(inode->i_uid));
+		raw_inode->i_gid_low = cpu_to_le16(low_16_bits(inode->i_gid));
+
+		if (!ei->i_dtime) {
+			raw_inode->i_uid_high =
+				cpu_to_le16(high_16_bits(inode->i_uid));
+			raw_inode->i_gid_high =
+				cpu_to_le16(high_16_bits(inode->i_gid));
+		} else {
+			raw_inode->i_uid_high = 0;
+			raw_inode->i_gid_high = 0;
+		}
+	} else {
+		raw_inode->i_uid_low =
+			cpu_to_le16(fs_high2lowuid(inode->i_uid));
+		raw_inode->i_gid_low =
+			cpu_to_le16(fs_high2lowgid(inode->i_gid));
+		raw_inode->i_uid_high = 0;
+		raw_inode->i_gid_high = 0;
+	}

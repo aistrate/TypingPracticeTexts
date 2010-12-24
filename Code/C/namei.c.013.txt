@@ -1,0 +1,49 @@
+	{
+		if (de->name_len && de->inode) {
+			ext3fs_dirhash(de->name, de->name_len, &h);
+			map_tail--;
+			map_tail->hash = h.hash;
+			map_tail->offs = (u16) ((char *) de - base);
+			map_tail->size = le16_to_cpu(de->rec_len);
+			count++;
+			cond_resched();
+		}
+		
+		de = ext3_next_entry(de);
+	}
+	return count;
+}
+
+static void dx_sort_map (struct dx_map_entry *map, unsigned count)
+{
+        struct dx_map_entry *p, *q, *top = map + count - 1;
+        int more;
+        
+        while (count > 2)
+	{
+                count = count*10/13;
+                if (count - 9 < 2) 
+                        count = 11;
+                for (p = top, q = p - count; q >= map; p--, q--)
+                        if (p->hash < q->hash)
+                                swap(*p, *q);
+        }
+        
+        do {
+                more = 0;
+                q = top;
+                while (q-- > map)
+		{
+                        if (q[1].hash >= q[0].hash)
+				continue;
+                        swap(*(q+1), *q);
+                        more = 1;
+		}
+	} while(more);
+}
+
+static void dx_insert_block(struct dx_frame *frame, u32 hash, u32 block)
+{
+	struct dx_entry *entries = frame->entries;
+	struct dx_entry *old = frame->at, *new = old + 1;
+	int count = dx_get_count(entries);

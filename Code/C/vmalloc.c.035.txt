@@ -1,0 +1,50 @@
+			BUG_ON(end2 <= end && end2 > start);
+		}
+	}
+	last_end = offsets[last_area] + sizes[last_area];
+
+	if (vmalloc_end - vmalloc_start < last_end) {
+		WARN_ON(true);
+		return NULL;
+	}
+
+	vms = kzalloc(sizeof(vms[0]) * nr_vms, gfp_mask);
+	vas = kzalloc(sizeof(vas[0]) * nr_vms, gfp_mask);
+	if (!vas || !vms)
+		goto err_free;
+
+	for (area = 0; area < nr_vms; area++) {
+		vas[area] = kzalloc(sizeof(struct vmap_area), gfp_mask);
+		vms[area] = kzalloc(sizeof(struct vm_struct), gfp_mask);
+		if (!vas[area] || !vms[area])
+			goto err_free;
+	}
+retry:
+	spin_lock(&vmap_area_lock);
+
+	area = term_area = last_area;
+	start = offsets[area];
+	end = start + sizes[area];
+
+	if (!pvm_find_next_prev(vmap_area_pcpu_hole, &next, &prev)) {
+		base = vmalloc_end - last_end;
+		goto found;
+	}
+	base = pvm_determine_end(&next, &prev, align) - end;
+
+	while (true) {
+		BUG_ON(next && next->va_end <= base + end);
+		BUG_ON(prev && prev->va_end > base + end);
+
+		if (base + last_end < vmalloc_start + last_end) {
+			spin_unlock(&vmap_area_lock);
+			if (!purged) {
+				purge_vmap_area_lazy();
+				purged = true;
+				goto retry;
+			}
+			goto err_free;
+		}
+
+		if (next && next->va_start < base + end) {
+			base = pvm_determine_end(&next, &prev, align) - end;

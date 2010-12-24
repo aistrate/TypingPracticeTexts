@@ -1,0 +1,50 @@
+	}
+	*fsdata = (void *)0;
+	trace_ext4_da_write_begin(inode, pos, len, flags);
+retry:
+	
+	handle = ext4_journal_start(inode, 1);
+	if (IS_ERR(handle)) {
+		ret = PTR_ERR(handle);
+		goto out;
+	}
+	
+	flags |= AOP_FLAG_NOFS;
+
+	page = grab_cache_page_write_begin(mapping, index, flags);
+	if (!page) {
+		ext4_journal_stop(handle);
+		ret = -ENOMEM;
+		goto out;
+	}
+	*pagep = page;
+
+	ret = __block_write_begin(page, pos, len, ext4_da_get_block_prep);
+	if (ret < 0) {
+		unlock_page(page);
+		ext4_journal_stop(handle);
+		page_cache_release(page);
+		
+		if (pos + len > inode->i_size)
+			ext4_truncate_failed_write(inode);
+	}
+
+	if (ret == -ENOSPC && ext4_should_retry_alloc(inode->i_sb, &retries))
+		goto retry;
+out:
+	return ret;
+}
+
+static int ext4_da_should_update_i_disksize(struct page *page,
+					    unsigned long offset)
+{
+	struct buffer_head *bh;
+	struct inode *inode = page->mapping->host;
+	unsigned int idx;
+	int i;
+
+	bh = page_buffers(page);
+	idx = offset >> inode->i_blkbits;
+
+	for (i = 0; i < idx; i++)
+		bh = bh->b_this_page;

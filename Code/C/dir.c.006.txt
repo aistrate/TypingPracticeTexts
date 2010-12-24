@@ -1,0 +1,49 @@
+		error_msg = "rec_len is smaller than minimal";
+	else if (rlen % 4 != 0)
+		error_msg = "rec_len % 4 != 0";
+	else if (rlen < OCFS2_DIR_REC_LEN(de->name_len))
+		error_msg = "rec_len is too small for name_len";
+	else if (((char *) de - bh->b_data) + rlen > dir->i_sb->s_blocksize)
+		error_msg = "directory entry across blocks";
+
+	if (error_msg != NULL)
+		mlog(ML_ERROR, "bad entry in directory #%llu: %s - "
+		     "offset=%lu, inode=%llu, rec_len=%d, name_len=%d\n",
+		     (unsigned long long)OCFS2_I(dir)->ip_blkno, error_msg,
+		     offset, (unsigned long long)le64_to_cpu(de->inode), rlen,
+		     de->name_len);
+	return error_msg == NULL ? 1 : 0;
+}
+
+static inline int ocfs2_match(int len,
+			      const char * const name,
+			      struct ocfs2_dir_entry *de)
+{
+	if (len != de->name_len)
+		return 0;
+	if (!de->inode)
+		return 0;
+	return !memcmp(name, de->name, len);
+}
+
+static int inline ocfs2_search_dirblock(struct buffer_head *bh,
+					struct inode *dir,
+					const char *name, int namelen,
+					unsigned long offset,
+					char *first_de,
+					unsigned int bytes,
+					struct ocfs2_dir_entry **res_dir)
+{
+	struct ocfs2_dir_entry *de;
+	char *dlimit, *de_buf;
+	int de_len;
+	int ret = 0;
+
+	mlog_entry_void();
+
+	de_buf = first_de;
+	dlimit = de_buf + bytes;
+
+	while (de_buf < dlimit) {
+		
+		de = (struct ocfs2_dir_entry *) de_buf;

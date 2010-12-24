@@ -1,0 +1,50 @@
+					mpd->b_state = bh->b_state & BH_FLAGS;
+			}
+			logical++;
+		} while ((bh = bh->b_this_page) != head);
+	}
+
+	return 0;
+}
+
+static int ext4_da_get_block_prep(struct inode *inode, sector_t iblock,
+				  struct buffer_head *bh, int create)
+{
+	struct ext4_map_blocks map;
+	int ret = 0;
+	sector_t invalid_block = ~((sector_t) 0xffff);
+
+	if (invalid_block < ext4_blocks_count(EXT4_SB(inode->i_sb)->s_es))
+		invalid_block = ~0;
+
+	BUG_ON(create == 0);
+	BUG_ON(bh->b_size != inode->i_sb->s_blocksize);
+
+	map.m_lblk = iblock;
+	map.m_len = 1;
+
+	ret = ext4_map_blocks(NULL, inode, &map, 0);
+	if (ret < 0)
+		return ret;
+	if (ret == 0) {
+		if (buffer_delay(bh))
+			return 0; 
+		
+		ret = ext4_da_reserve_space(inode, iblock);
+		if (ret)
+			
+			return ret;
+
+		map_bh(bh, inode->i_sb, invalid_block);
+		set_buffer_new(bh);
+		set_buffer_delay(bh);
+		return 0;
+	}
+
+	map_bh(bh, inode->i_sb, map.m_pblk);
+	bh->b_state = (bh->b_state & ~EXT4_MAP_FLAGS) | map.m_flags;
+
+	if (buffer_unwritten(bh)) {
+		
+		set_buffer_new(bh);
+		set_buffer_mapped(bh);

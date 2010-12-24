@@ -1,0 +1,49 @@
+					bh, create);
+		if (ret)
+			goto failed;
+		if (!buffer_mapped(bh))
+			is_mapped_to_disk = 0;
+		if (buffer_new(bh))
+			unmap_underlying_metadata(bh->b_bdev, bh->b_blocknr);
+		if (PageUptodate(page)) {
+			set_buffer_uptodate(bh);
+			continue;
+		}
+		if (buffer_new(bh) || !buffer_mapped(bh)) {
+			zero_user_segments(page, block_start, from,
+							to, block_end);
+			continue;
+		}
+		if (buffer_uptodate(bh))
+			continue;	
+		if (block_start < from || block_end > to) {
+			lock_buffer(bh);
+			bh->b_end_io = end_buffer_read_nobh;
+			submit_bh(READ, bh);
+			nr_reads++;
+		}
+	}
+
+	if (nr_reads) {
+		
+		for (bh = head; bh; bh = bh->b_this_page) {
+			wait_on_buffer(bh);
+			if (!buffer_uptodate(bh))
+				ret = -EIO;
+		}
+		if (ret)
+			goto failed;
+	}
+
+	if (is_mapped_to_disk)
+		SetPageMappedToDisk(page);
+
+	*fsdata = head; 
+
+	return 0;
+
+failed:
+	BUG_ON(!ret);
+	
+	attach_nobh_buffers(page, head);
+	page_zero_new_buffers(page, from, to);

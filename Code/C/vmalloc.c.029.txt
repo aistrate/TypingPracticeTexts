@@ -1,0 +1,50 @@
+		if (p) {
+			
+			void *map = kmap_atomic(p, KM_USER0);
+			memcpy(buf, map + offset, length);
+			kunmap_atomic(map, KM_USER0);
+		} else
+			memset(buf, 0, length);
+
+		addr += length;
+		buf += length;
+		copied += length;
+		count -= length;
+	}
+	return copied;
+}
+
+static int aligned_vwrite(char *buf, char *addr, unsigned long count)
+{
+	struct page *p;
+	int copied = 0;
+
+	while (count) {
+		unsigned long offset, length;
+
+		offset = (unsigned long)addr & ~PAGE_MASK;
+		length = PAGE_SIZE - offset;
+		if (length > count)
+			length = count;
+		p = vmalloc_to_page(addr);
+		
+		if (p) {
+			
+			void *map = kmap_atomic(p, KM_USER0);
+			memcpy(map + offset, buf, length);
+			kunmap_atomic(map, KM_USER0);
+		}
+		addr += length;
+		buf += length;
+		copied += length;
+		count -= length;
+	}
+	return copied;
+}
+
+long vread(char *buf, char *addr, unsigned long count)
+{
+	struct vm_struct *tmp;
+	char *vaddr, *buf_start = buf;
+	unsigned long buflen = count;
+	unsigned long n;

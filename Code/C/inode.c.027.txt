@@ -1,0 +1,50 @@
+	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
+	struct ext4_inode_info *ei = EXT4_I(inode);
+	unsigned long md_needed;
+	int ret;
+
+repeat:
+	spin_lock(&ei->i_block_reservation_lock);
+	md_needed = ext4_calc_metadata_amount(inode, lblock);
+	trace_ext4_da_reserve_space(inode, md_needed);
+	spin_unlock(&ei->i_block_reservation_lock);
+
+	ret = dquot_reserve_block(inode, 1);
+	if (ret)
+		return ret;
+	
+	if (ext4_claim_free_blocks(sbi, md_needed + 1)) {
+		dquot_release_reservation_block(inode, 1);
+		if (ext4_should_retry_alloc(inode->i_sb, &retries)) {
+			yield();
+			goto repeat;
+		}
+		return -ENOSPC;
+	}
+	spin_lock(&ei->i_block_reservation_lock);
+	ei->i_reserved_data_blocks++;
+	ei->i_reserved_meta_blocks += md_needed;
+	spin_unlock(&ei->i_block_reservation_lock);
+
+	return 0;       
+}
+
+static void ext4_da_release_space(struct inode *inode, int to_free)
+{
+	struct ext4_sb_info *sbi = EXT4_SB(inode->i_sb);
+	struct ext4_inode_info *ei = EXT4_I(inode);
+
+	if (!to_free)
+		return;		
+
+	spin_lock(&EXT4_I(inode)->i_block_reservation_lock);
+
+	trace_ext4_da_release_space(inode, to_free);
+	if (unlikely(to_free > ei->i_reserved_data_blocks)) {
+		
+		ext4_msg(inode->i_sb, KERN_NOTICE, "ext4_da_release_space: "
+			 "ino %lu, to_free %d with only %d reserved "
+			 "data blocks\n", inode->i_ino, to_free,
+			 ei->i_reserved_data_blocks);
+		WARN_ON(1);
+		to_free = ei->i_reserved_data_blocks;

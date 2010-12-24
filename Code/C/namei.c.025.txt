@@ -1,0 +1,50 @@
+	top = data1 + len;
+	while ((char *)(de2 = ext3_next_entry(de)) < top)
+		de = de2;
+	de->rec_len = ext3_rec_len_to_disk(data1 + blocksize - (char *) de);
+	
+	de = (struct ext3_dir_entry_2 *) (&root->dotdot);
+	de->rec_len = ext3_rec_len_to_disk(blocksize - EXT3_DIR_REC_LEN(2));
+	memset (&root->info, 0, sizeof(root->info));
+	root->info.info_length = sizeof(root->info);
+	root->info.hash_version = EXT3_SB(dir->i_sb)->s_def_hash_version;
+	entries = root->entries;
+	dx_set_block (entries, 1);
+	dx_set_count (entries, 1);
+	dx_set_limit (entries, dx_root_limit(dir, sizeof(root->info)));
+
+	hinfo.hash_version = root->info.hash_version;
+	if (hinfo.hash_version <= DX_HASH_TEA)
+		hinfo.hash_version += EXT3_SB(dir->i_sb)->s_hash_unsigned;
+	hinfo.seed = EXT3_SB(dir->i_sb)->s_hash_seed;
+	ext3fs_dirhash(name, namelen, &hinfo);
+	frame = frames;
+	frame->entries = entries;
+	frame->at = entries;
+	frame->bh = bh;
+	bh = bh2;
+	de = do_split(handle,dir, &bh, frame, &hinfo, &retval);
+	dx_release (frames);
+	if (!(de))
+		return retval;
+
+	return add_dirent_to_buf(handle, dentry, inode, de, bh);
+}
+
+static int ext3_add_entry (handle_t *handle, struct dentry *dentry,
+	struct inode *inode)
+{
+	struct inode *dir = dentry->d_parent->d_inode;
+	struct buffer_head * bh;
+	struct ext3_dir_entry_2 *de;
+	struct super_block * sb;
+	int	retval;
+	int	dx_fallback=0;
+	unsigned blocksize;
+	u32 block, blocks;
+
+	sb = dir->i_sb;
+	blocksize = sb->s_blocksize;
+	if (!dentry->d_name.len)
+		return -EINVAL;
+	if (is_dx(dir)) {

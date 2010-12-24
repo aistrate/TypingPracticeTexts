@@ -1,0 +1,50 @@
+	preempt_count() -= val;
+}
+EXPORT_SYMBOL(sub_preempt_count);
+
+#endif
+
+static noinline void __schedule_bug(struct task_struct *prev)
+{
+	struct pt_regs *regs = get_irq_regs();
+
+	printk(KERN_ERR "BUG: scheduling while atomic: %s/%d/0x%08x\n",
+		prev->comm, prev->pid, preempt_count());
+
+	debug_show_held_locks(prev);
+	print_modules();
+	if (irqs_disabled())
+		print_irqtrace_events(prev);
+
+	if (regs)
+		show_regs(regs);
+	else
+		dump_stack();
+}
+
+static inline void schedule_debug(struct task_struct *prev)
+{
+	
+	if (unlikely(in_atomic_preempt_off() && !prev->exit_state))
+		__schedule_bug(prev);
+
+	profile_hit(SCHED_PROFILING, __builtin_return_address(0));
+
+	schedstat_inc(this_rq(), sched_count);
+#ifdef CONFIG_SCHEDSTATS
+	if (unlikely(prev->lock_depth >= 0)) {
+		schedstat_inc(this_rq(), bkl_count);
+		schedstat_inc(prev, sched_info.bkl_count);
+	}
+#endif
+}
+
+static void put_prev_task(struct rq *rq, struct task_struct *prev)
+{
+	if (prev->se.on_rq)
+		update_rq_clock(rq);
+	prev->sched_class->put_prev_task(rq, prev);
+}
+
+static inline struct task_struct *
+pick_next_task(struct rq *rq)

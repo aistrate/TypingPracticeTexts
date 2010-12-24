@@ -1,0 +1,50 @@
+{
+	const unsigned long vmalloc_end = VMALLOC_END & ~(align - 1);
+	unsigned long addr;
+
+	if (*pnext)
+		addr = min((*pnext)->va_start & ~(align - 1), vmalloc_end);
+	else
+		addr = vmalloc_end;
+
+	while (*pprev && (*pprev)->va_end > addr) {
+		*pnext = *pprev;
+		*pprev = node_to_va(rb_prev(&(*pnext)->rb_node));
+	}
+
+	return addr;
+}
+
+struct vm_struct **pcpu_get_vm_areas(const unsigned long *offsets,
+				     const size_t *sizes, int nr_vms,
+				     size_t align, gfp_t gfp_mask)
+{
+	const unsigned long vmalloc_start = ALIGN(VMALLOC_START, align);
+	const unsigned long vmalloc_end = VMALLOC_END & ~(align - 1);
+	struct vmap_area **vas, *prev, *next;
+	struct vm_struct **vms;
+	int area, area2, last_area, term_area;
+	unsigned long base, start, end, last_end;
+	bool purged = false;
+
+	gfp_mask &= GFP_RECLAIM_MASK;
+
+	BUG_ON(align & ~PAGE_MASK || !is_power_of_2(align));
+	for (last_area = 0, area = 0; area < nr_vms; area++) {
+		start = offsets[area];
+		end = start + sizes[area];
+
+		BUG_ON(!IS_ALIGNED(offsets[area], align));
+		BUG_ON(!IS_ALIGNED(sizes[area], align));
+
+		if (start > offsets[last_area])
+			last_area = area;
+
+		for (area2 = 0; area2 < nr_vms; area2++) {
+			unsigned long start2 = offsets[area2];
+			unsigned long end2 = start2 + sizes[area2];
+
+			if (area2 == area)
+				continue;
+
+			BUG_ON(start2 >= start && start2 < end);

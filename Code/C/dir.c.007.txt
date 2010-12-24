@@ -1,0 +1,50 @@
+		if (de_buf + namelen <= dlimit &&
+		    ocfs2_match(namelen, name, de)) {
+			
+			if (!ocfs2_check_dir_entry(dir, de, bh, offset)) {
+				ret = -1;
+				goto bail;
+			}
+			*res_dir = de;
+			ret = 1;
+			goto bail;
+		}
+
+		de_len = le16_to_cpu(de->rec_len);
+		if (de_len <= 0) {
+			ret = -1;
+			goto bail;
+		}
+
+		de_buf += de_len;
+		offset += de_len;
+	}
+
+bail:
+	mlog_exit(ret);
+	return ret;
+}
+
+static struct buffer_head *ocfs2_find_entry_id(const char *name,
+					       int namelen,
+					       struct inode *dir,
+					       struct ocfs2_dir_entry **res_dir)
+{
+	int ret, found;
+	struct buffer_head *di_bh = NULL;
+	struct ocfs2_dinode *di;
+	struct ocfs2_inline_data *data;
+
+	ret = ocfs2_read_inode_block(dir, &di_bh);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	di = (struct ocfs2_dinode *)di_bh->b_data;
+	data = &di->id2.i_data;
+
+	found = ocfs2_search_dirblock(di_bh, dir, name, namelen, 0,
+				      data->id_data, i_size_read(dir), res_dir);
+	if (found == 1)
+		return di_bh;

@@ -1,0 +1,49 @@
+			*err = ERR_BAD_DX_DIR;
+			goto fail2;
+		}
+		frame++;
+		frame->bh = NULL;
+	}
+fail2:
+	while (frame >= frame_in) {
+		brelse(frame->bh);
+		frame--;
+	}
+fail:
+	if (*err == ERR_BAD_DX_DIR)
+		ext3_warning(dir->i_sb, __func__,
+			     "Corrupt dir inode %ld, running e2fsck is "
+			     "recommended.", dir->i_ino);
+	return NULL;
+}
+
+static void dx_release (struct dx_frame *frames)
+{
+	if (frames[0].bh == NULL)
+		return;
+
+	if (((struct dx_root *) frames[0].bh->b_data)->info.indirect_levels)
+		brelse(frames[1].bh);
+	brelse(frames[0].bh);
+}
+
+static int ext3_htree_next_block(struct inode *dir, __u32 hash,
+				 struct dx_frame *frame,
+				 struct dx_frame *frames,
+				 __u32 *start_hash)
+{
+	struct dx_frame *p;
+	struct buffer_head *bh;
+	int err, num_frames = 0;
+	__u32 bhash;
+
+	p = frame;
+	
+	while (1) {
+		if (++(p->at) < p->entries + dx_get_count(p->entries))
+			break;
+		if (p == frames)
+			return 0;
+		num_frames++;
+		p--;
+	}

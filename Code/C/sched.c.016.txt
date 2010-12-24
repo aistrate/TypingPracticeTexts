@@ -1,0 +1,49 @@
+{
+	raw_spin_unlock(&rq->lock);
+}
+
+static inline void task_rq_unlock(struct rq *rq, unsigned long *flags)
+	__releases(rq->lock)
+{
+	raw_spin_unlock_irqrestore(&rq->lock, *flags);
+}
+
+static struct rq *this_rq_lock(void)
+	__acquires(rq->lock)
+{
+	struct rq *rq;
+
+	local_irq_disable();
+	rq = this_rq();
+	raw_spin_lock(&rq->lock);
+
+	return rq;
+}
+
+#ifdef CONFIG_SCHED_HRTICK
+
+static inline int hrtick_enabled(struct rq *rq)
+{
+	if (!sched_feat(HRTICK))
+		return 0;
+	if (!cpu_active(cpu_of(rq)))
+		return 0;
+	return hrtimer_is_hres_active(&rq->hrtick_timer);
+}
+
+static void hrtick_clear(struct rq *rq)
+{
+	if (hrtimer_active(&rq->hrtick_timer))
+		hrtimer_cancel(&rq->hrtick_timer);
+}
+
+static enum hrtimer_restart hrtick(struct hrtimer *timer)
+{
+	struct rq *rq = container_of(timer, struct rq, hrtick_timer);
+
+	WARN_ON_ONCE(cpu_of(rq) != smp_processor_id());
+
+	raw_spin_lock(&rq->lock);
+	update_rq_clock(rq);
+	rq->curr->sched_class->task_tick(rq, rq->curr, 1);
+	raw_spin_unlock(&rq->lock);

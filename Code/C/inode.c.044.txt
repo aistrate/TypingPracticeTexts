@@ -1,0 +1,50 @@
+			 __func__, wbc->nr_to_write, ret);
+
+	wbc->range_cyclic = range_cyclic;
+	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
+		
+		mapping->writeback_index = done_index;
+
+out_writepages:
+	wbc->nr_to_write -= nr_to_writebump;
+	wbc->range_start = range_start;
+	trace_ext4_da_writepages_result(inode, wbc, ret, pages_written);
+	return ret;
+}
+
+#define FALL_BACK_TO_NONDELALLOC 1
+static int ext4_nonda_switch(struct super_block *sb)
+{
+	s64 free_blocks, dirty_blocks;
+	struct ext4_sb_info *sbi = EXT4_SB(sb);
+
+	free_blocks  = percpu_counter_read_positive(&sbi->s_freeblocks_counter);
+	dirty_blocks = percpu_counter_read_positive(&sbi->s_dirtyblocks_counter);
+	if (2 * free_blocks < 3 * dirty_blocks ||
+		free_blocks < (dirty_blocks + EXT4_FREEBLOCKS_WATERMARK)) {
+		
+		return 1;
+	}
+	
+	if (free_blocks < 2 * dirty_blocks)
+		writeback_inodes_sb_if_idle(sb);
+
+	return 0;
+}
+
+static int ext4_da_write_begin(struct file *file, struct address_space *mapping,
+			       loff_t pos, unsigned len, unsigned flags,
+			       struct page **pagep, void **fsdata)
+{
+	int ret, retries = 0;
+	struct page *page;
+	pgoff_t index;
+	struct inode *inode = mapping->host;
+	handle_t *handle;
+
+	index = pos >> PAGE_CACHE_SHIFT;
+
+	if (ext4_nonda_switch(inode->i_sb)) {
+		*fsdata = (void *)FALL_BACK_TO_NONDELALLOC;
+		return ext4_write_begin(file, mapping, pos,
+					len, flags, pagep, fsdata);

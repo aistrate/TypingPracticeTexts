@@ -1,0 +1,49 @@
+failed:
+	BUG();
+	unlock_page(page);
+	page_cache_release(page);
+	return NULL;
+}
+
+static int
+grow_buffers(struct block_device *bdev, sector_t block, int size)
+{
+	struct page *page;
+	pgoff_t index;
+	int sizebits;
+
+	sizebits = -1;
+	do {
+		sizebits++;
+	} while ((size << sizebits) < PAGE_SIZE);
+
+	index = block >> sizebits;
+
+	if (unlikely(index != block >> sizebits)) {
+		char b[BDEVNAME_SIZE];
+
+		printk(KERN_ERR "%s: requested out-of-range block %llu for "
+			"device %s\n",
+			__func__, (unsigned long long)block,
+			bdevname(bdev, b));
+		return -EIO;
+	}
+	block = index << sizebits;
+	
+	page = grow_dev_page(bdev, block, index, size);
+	if (!page)
+		return 0;
+	unlock_page(page);
+	page_cache_release(page);
+	return 1;
+}
+
+static struct buffer_head *
+__getblk_slow(struct block_device *bdev, sector_t block, int size)
+{
+	
+	if (unlikely(size & (bdev_logical_block_size(bdev)-1) ||
+			(size < 512 || size > PAGE_SIZE))) {
+		printk(KERN_ERR "getblk(): invalid block size %d requested\n",
+					size);
+		printk(KERN_ERR "logical block size: %d\n",

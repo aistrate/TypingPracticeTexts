@@ -1,0 +1,49 @@
+	BUFFER_TRACE(bh, "get_write_access");
+	err = ext3_journal_get_write_access(handle, bh);
+	if (err)
+		goto journal_error;
+
+	err = add_dirent_to_buf(handle, dentry, inode, NULL, bh);
+	if (err != -ENOSPC) {
+		bh = NULL;
+		goto cleanup;
+	}
+
+	dxtrace(printk("using %u of %u node entries\n",
+		       dx_get_count(entries), dx_get_limit(entries)));
+	
+	if (dx_get_count(entries) == dx_get_limit(entries)) {
+		u32 newblock;
+		unsigned icount = dx_get_count(entries);
+		int levels = frame - frames;
+		struct dx_entry *entries2;
+		struct dx_node *node2;
+		struct buffer_head *bh2;
+
+		if (levels && (dx_get_count(frames->entries) ==
+			       dx_get_limit(frames->entries))) {
+			ext3_warning(sb, __func__,
+				     "Directory index full!");
+			err = -ENOSPC;
+			goto cleanup;
+		}
+		bh2 = ext3_append (handle, dir, &newblock, &err);
+		if (!(bh2))
+			goto cleanup;
+		node2 = (struct dx_node *)(bh2->b_data);
+		entries2 = node2->entries;
+		node2->fake.rec_len = ext3_rec_len_to_disk(sb->s_blocksize);
+		node2->fake.inode = 0;
+		BUFFER_TRACE(frame->bh, "get_write_access");
+		err = ext3_journal_get_write_access(handle, frame->bh);
+		if (err)
+			goto journal_error;
+		if (levels) {
+			unsigned icount1 = icount/2, icount2 = icount - icount1;
+			unsigned hash2 = dx_get_hash(entries + icount1);
+			dxtrace(printk("Split index %i/%i\n", icount1, icount2));
+
+			BUFFER_TRACE(frame->bh, "get_write_access"); 
+			err = ext3_journal_get_write_access(handle,
+							     frames[0].bh);
+			if (err)

@@ -1,0 +1,50 @@
+	if (unlikely(dest_cpu >= nr_cpu_ids)) {
+		dest_cpu = cpuset_cpus_allowed_fallback(p);
+		
+		if (p->mm && printk_ratelimit()) {
+			printk(KERN_INFO "process %d (%s) no "
+			       "longer affine to cpu%d\n",
+			       task_pid_nr(p), p->comm, cpu);
+		}
+	}
+
+	return dest_cpu;
+}
+
+static inline
+int select_task_rq(struct rq *rq, struct task_struct *p, int sd_flags, int wake_flags)
+{
+	int cpu = p->sched_class->select_task_rq(rq, p, sd_flags, wake_flags);
+
+	if (unlikely(!cpumask_test_cpu(cpu, &p->cpus_allowed) ||
+		     !cpu_online(cpu)))
+		cpu = select_fallback_rq(task_cpu(p), p);
+
+	return cpu;
+}
+
+static void update_avg(u64 *avg, u64 sample)
+{
+	s64 diff = sample - *avg;
+	*avg += diff >> 3;
+}
+#endif
+
+static inline void ttwu_activate(struct task_struct *p, struct rq *rq,
+				 bool is_sync, bool is_migrate, bool is_local,
+				 unsigned long en_flags)
+{
+	schedstat_inc(p, se.statistics.nr_wakeups);
+	if (is_sync)
+		schedstat_inc(p, se.statistics.nr_wakeups_sync);
+	if (is_migrate)
+		schedstat_inc(p, se.statistics.nr_wakeups_migrate);
+	if (is_local)
+		schedstat_inc(p, se.statistics.nr_wakeups_local);
+	else
+		schedstat_inc(p, se.statistics.nr_wakeups_remote);
+
+	activate_task(rq, p, en_flags);
+}
+
+static inline void ttwu_post_activation(struct task_struct *p, struct rq *rq,

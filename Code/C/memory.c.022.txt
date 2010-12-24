@@ -1,0 +1,50 @@
+		struct vm_area_struct *vma;
+
+		vma = find_extend_vma(mm, start);
+		if (!vma && in_gate_area(tsk, start)) {
+			unsigned long pg = start & PAGE_MASK;
+			struct vm_area_struct *gate_vma = get_gate_vma(tsk);
+			pgd_t *pgd;
+			pud_t *pud;
+			pmd_t *pmd;
+			pte_t *pte;
+
+			if (gup_flags & FOLL_WRITE)
+				return i ? : -EFAULT;
+			if (pg > TASK_SIZE)
+				pgd = pgd_offset_k(pg);
+			else
+				pgd = pgd_offset_gate(mm, pg);
+			BUG_ON(pgd_none(*pgd));
+			pud = pud_offset(pgd, pg);
+			BUG_ON(pud_none(*pud));
+			pmd = pmd_offset(pud, pg);
+			if (pmd_none(*pmd))
+				return i ? : -EFAULT;
+			pte = pte_offset_map(pmd, pg);
+			if (pte_none(*pte)) {
+				pte_unmap(pte);
+				return i ? : -EFAULT;
+			}
+			if (pages) {
+				struct page *page;
+
+				page = vm_normal_page(gate_vma, start, *pte);
+				if (!page) {
+					if (!(gup_flags & FOLL_DUMP) &&
+					     is_zero_pfn(pte_pfn(*pte)))
+						page = pte_page(*pte);
+					else {
+						pte_unmap(pte);
+						return i ? : -EFAULT;
+					}
+				}
+				pages[i] = page;
+				get_page(page);
+			}
+			pte_unmap(pte);
+			if (vmas)
+				vmas[i] = gate_vma;
+			i++;
+			start += PAGE_SIZE;
+			nr_pages--;

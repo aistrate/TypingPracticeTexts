@@ -1,0 +1,49 @@
+	if (task_contributes_to_load(p)) {
+		if (likely(cpu_online(orig_cpu)))
+			rq->nr_uninterruptible--;
+		else
+			this_rq()->nr_uninterruptible--;
+	}
+	p->state = TASK_WAKING;
+
+	if (p->sched_class->task_waking) {
+		p->sched_class->task_waking(rq, p);
+		en_flags |= ENQUEUE_WAKING;
+	}
+
+	cpu = select_task_rq(rq, p, SD_BALANCE_WAKE, wake_flags);
+	if (cpu != orig_cpu)
+		set_task_cpu(p, cpu);
+	__task_rq_unlock(rq);
+
+	rq = cpu_rq(cpu);
+	raw_spin_lock(&rq->lock);
+
+	WARN_ON(task_cpu(p) != cpu);
+	WARN_ON(p->state != TASK_WAKING);
+
+#ifdef CONFIG_SCHEDSTATS
+	schedstat_inc(rq, ttwu_count);
+	if (cpu == this_cpu)
+		schedstat_inc(rq, ttwu_local);
+	else {
+		struct sched_domain *sd;
+		for_each_domain(this_cpu, sd) {
+			if (cpumask_test_cpu(cpu, sched_domain_span(sd))) {
+				schedstat_inc(sd, ttwu_wake_remote);
+				break;
+			}
+		}
+	}
+#endif 
+
+out_activate:
+#endif 
+	ttwu_activate(p, rq, wake_flags & WF_SYNC, orig_cpu != cpu,
+		      cpu == this_cpu, en_flags);
+	success = 1;
+out_running:
+	ttwu_post_activation(p, rq, wake_flags, success);
+out:
+	task_rq_unlock(rq, &flags);
+	put_cpu();

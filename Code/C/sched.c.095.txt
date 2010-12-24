@@ -1,0 +1,49 @@
+		break;
+
+	case CPU_ONLINE:
+	case CPU_ONLINE_FROZEN:
+		
+		raw_spin_lock_irqsave(&rq->lock, flags);
+		if (rq->rd) {
+			BUG_ON(!cpumask_test_cpu(cpu, rq->rd->span));
+
+			set_rq_online(rq);
+		}
+		raw_spin_unlock_irqrestore(&rq->lock, flags);
+		break;
+
+#ifdef CONFIG_HOTPLUG_CPU
+	case CPU_DEAD:
+	case CPU_DEAD_FROZEN:
+		migrate_live_tasks(cpu);
+		
+		raw_spin_lock_irq(&rq->lock);
+		deactivate_task(rq, rq->idle, 0);
+		__setscheduler(rq, rq->idle, SCHED_NORMAL, 0);
+		rq->idle->sched_class = &idle_sched_class;
+		migrate_dead_tasks(cpu);
+		raw_spin_unlock_irq(&rq->lock);
+		migrate_nr_uninterruptible(rq);
+		BUG_ON(rq->nr_running != 0);
+		calc_global_load_remove(rq);
+		break;
+
+	case CPU_DYING:
+	case CPU_DYING_FROZEN:
+		
+		raw_spin_lock_irqsave(&rq->lock, flags);
+		if (rq->rd) {
+			BUG_ON(!cpumask_test_cpu(cpu, rq->rd->span));
+			set_rq_offline(rq);
+		}
+		raw_spin_unlock_irqrestore(&rq->lock, flags);
+		break;
+#endif
+	}
+	return NOTIFY_OK;
+}
+
+static struct notifier_block __cpuinitdata migration_notifier = {
+	.notifier_call = migration_call,
+	.priority = CPU_PRI_MIGRATION,
+};

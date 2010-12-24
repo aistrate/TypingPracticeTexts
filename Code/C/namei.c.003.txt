@@ -1,0 +1,50 @@
+	struct dx_entry *entries;
+	struct dx_entry *at;
+};
+
+struct dx_map_entry
+{
+	u32 hash;
+	u16 offs;
+	u16 size;
+};
+
+static inline unsigned dx_get_block (struct dx_entry *entry);
+static void dx_set_block (struct dx_entry *entry, unsigned value);
+static inline unsigned dx_get_hash (struct dx_entry *entry);
+static void dx_set_hash (struct dx_entry *entry, unsigned value);
+static unsigned dx_get_count (struct dx_entry *entries);
+static unsigned dx_get_limit (struct dx_entry *entries);
+static void dx_set_count (struct dx_entry *entries, unsigned value);
+static void dx_set_limit (struct dx_entry *entries, unsigned value);
+static unsigned dx_root_limit (struct inode *dir, unsigned infosize);
+static unsigned dx_node_limit (struct inode *dir);
+static struct dx_frame *dx_probe(struct qstr *entry,
+				 struct inode *dir,
+				 struct dx_hash_info *hinfo,
+				 struct dx_frame *frame,
+				 int *err);
+static void dx_release (struct dx_frame *frames);
+static int dx_make_map(struct ext3_dir_entry_2 *de, unsigned blocksize,
+			struct dx_hash_info *hinfo, struct dx_map_entry map[]);
+static void dx_sort_map(struct dx_map_entry *map, unsigned count);
+static struct ext3_dir_entry_2 *dx_move_dirents (char *from, char *to,
+		struct dx_map_entry *offsets, int count);
+static struct ext3_dir_entry_2 *dx_pack_dirents(char *base, unsigned blocksize);
+static void dx_insert_block (struct dx_frame *frame, u32 hash, u32 block);
+static int ext3_htree_next_block(struct inode *dir, __u32 hash,
+				 struct dx_frame *frame,
+				 struct dx_frame *frames,
+				 __u32 *start_hash);
+static struct buffer_head * ext3_dx_find_entry(struct inode *dir,
+			struct qstr *entry, struct ext3_dir_entry_2 **res_dir,
+			int *err);
+static int ext3_dx_add_entry(handle_t *handle, struct dentry *dentry,
+			     struct inode *inode);
+
+static inline struct ext3_dir_entry_2 *
+ext3_next_entry(struct ext3_dir_entry_2 *p)
+{
+	return (struct ext3_dir_entry_2 *)((char *)p +
+		ext3_rec_len_from_disk(p->rec_len));
+}

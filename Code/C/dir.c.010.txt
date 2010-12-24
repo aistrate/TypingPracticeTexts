@@ -1,0 +1,50 @@
+	int ret;
+	struct buffer_head *tmp = *bh;
+
+	ret = ocfs2_read_block(INODE_CACHE(dir), phys, &tmp,
+			       ocfs2_validate_dir_block);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	if (ocfs2_supports_dir_trailer(dir)) {
+		ret = ocfs2_check_dir_trailer(dir, tmp);
+		if (ret) {
+			if (!*bh)
+				brelse(tmp);
+			mlog_errno(ret);
+			goto out;
+		}
+	}
+
+	if (!ret && !*bh)
+		*bh = tmp;
+out:
+	return ret;
+}
+
+static int ocfs2_validate_dx_root(struct super_block *sb,
+				  struct buffer_head *bh)
+{
+	int ret;
+	struct ocfs2_dx_root_block *dx_root;
+
+	BUG_ON(!buffer_uptodate(bh));
+
+	dx_root = (struct ocfs2_dx_root_block *) bh->b_data;
+
+	ret = ocfs2_validate_meta_ecc(sb, bh->b_data, &dx_root->dr_check);
+	if (ret) {
+		mlog(ML_ERROR,
+		     "Checksum failed for dir index root block %llu\n",
+		     (unsigned long long)bh->b_blocknr);
+		return ret;
+	}
+
+	if (!OCFS2_IS_VALID_DX_ROOT(dx_root)) {
+		ocfs2_error(sb,
+			    "Dir Index Root # %llu has bad signature %.*s",
+			    (unsigned long long)le64_to_cpu(dx_root->dr_blkno),
+			    7, dx_root->dr_signature);
+		return -EINVAL;

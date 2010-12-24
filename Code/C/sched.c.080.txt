@@ -1,0 +1,48 @@
+		if (copy_to_user(user_mask_ptr, mask, retlen))
+			ret = -EFAULT;
+		else
+			ret = retlen;
+	}
+	free_cpumask_var(mask);
+
+	return ret;
+}
+
+SYSCALL_DEFINE0(sched_yield)
+{
+	struct rq *rq = this_rq_lock();
+
+	schedstat_inc(rq, yld_count);
+	current->sched_class->yield_task(rq);
+
+	__release(rq->lock);
+	spin_release(&rq->lock.dep_map, 1, _THIS_IP_);
+	do_raw_spin_unlock(&rq->lock);
+	preempt_enable_no_resched();
+
+	schedule();
+
+	return 0;
+}
+
+static inline int should_resched(void)
+{
+	return need_resched() && !(preempt_count() & PREEMPT_ACTIVE);
+}
+
+static void __cond_resched(void)
+{
+	add_preempt_count(PREEMPT_ACTIVE);
+	schedule();
+	sub_preempt_count(PREEMPT_ACTIVE);
+}
+
+int __sched _cond_resched(void)
+{
+	if (should_resched()) {
+		__cond_resched();
+		return 1;
+	}
+	return 0;
+}
+EXPORT_SYMBOL(_cond_resched);

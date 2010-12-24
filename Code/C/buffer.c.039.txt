@@ -1,0 +1,49 @@
+	unsigned offset;
+	int ret;
+
+	if (page->index < end_index)
+		goto out;
+
+	offset = i_size & (PAGE_CACHE_SIZE-1);
+	if (page->index >= end_index+1 || !offset) {
+		
+#if 0
+		
+		if (page->mapping->a_ops->invalidatepage)
+			page->mapping->a_ops->invalidatepage(page, offset);
+#endif
+		unlock_page(page);
+		return 0; 
+	}
+
+	zero_user_segment(page, offset, PAGE_CACHE_SIZE);
+out:
+	ret = mpage_writepage(page, get_block, wbc);
+	if (ret == -EAGAIN)
+		ret = __block_write_full_page(inode, page, get_block, wbc,
+					      end_buffer_async_write);
+	return ret;
+}
+EXPORT_SYMBOL(nobh_writepage);
+
+int nobh_truncate_page(struct address_space *mapping,
+			loff_t from, get_block_t *get_block)
+{
+	pgoff_t index = from >> PAGE_CACHE_SHIFT;
+	unsigned offset = from & (PAGE_CACHE_SIZE-1);
+	unsigned blocksize;
+	sector_t iblock;
+	unsigned length, pos;
+	struct inode *inode = mapping->host;
+	struct page *page;
+	struct buffer_head map_bh;
+	int err;
+
+	blocksize = 1 << inode->i_blkbits;
+	length = offset & (blocksize - 1);
+
+	if (!length)
+		return 0;
+
+	length = blocksize - length;
+	iblock = (sector_t)index << (PAGE_CACHE_SHIFT - inode->i_blkbits);

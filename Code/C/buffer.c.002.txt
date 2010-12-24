@@ -1,0 +1,49 @@
+void __lock_buffer(struct buffer_head *bh)
+{
+	wait_on_bit_lock(&bh->b_state, BH_Lock, sync_buffer,
+							TASK_UNINTERRUPTIBLE);
+}
+EXPORT_SYMBOL(__lock_buffer);
+
+void unlock_buffer(struct buffer_head *bh)
+{
+	clear_bit_unlock(BH_Lock, &bh->b_state);
+	smp_mb__after_clear_bit();
+	wake_up_bit(&bh->b_state, BH_Lock);
+}
+EXPORT_SYMBOL(unlock_buffer);
+
+void __wait_on_buffer(struct buffer_head * bh)
+{
+	wait_on_bit(&bh->b_state, BH_Lock, sync_buffer, TASK_UNINTERRUPTIBLE);
+}
+EXPORT_SYMBOL(__wait_on_buffer);
+
+static void
+__clear_page_buffers(struct page *page)
+{
+	ClearPagePrivate(page);
+	set_page_private(page, 0);
+	page_cache_release(page);
+}
+
+static int quiet_error(struct buffer_head *bh)
+{
+	if (!test_bit(BH_Quiet, &bh->b_state) && printk_ratelimit())
+		return 0;
+	return 1;
+}
+
+static void buffer_io_error(struct buffer_head *bh)
+{
+	char b[BDEVNAME_SIZE];
+	printk(KERN_ERR "Buffer I/O error on device %s, logical block %Lu\n",
+			bdevname(bh->b_bdev, b),
+			(unsigned long long)bh->b_blocknr);
+}
+
+static void __end_buffer_read_notouch(struct buffer_head *bh, int uptodate)
+{
+	if (uptodate) {
+		set_buffer_uptodate(bh);
+	} else {

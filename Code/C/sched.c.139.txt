@@ -1,0 +1,48 @@
+	on_rq = se->on_rq;
+	if (on_rq)
+		dequeue_entity(cfs_rq, se, 0);
+
+	se->load.weight = shares;
+	se->load.inv_weight = 0;
+
+	if (on_rq)
+		enqueue_entity(cfs_rq, se, 0);
+}
+
+static void set_se_shares(struct sched_entity *se, unsigned long shares)
+{
+	struct cfs_rq *cfs_rq = se->cfs_rq;
+	struct rq *rq = cfs_rq->rq;
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&rq->lock, flags);
+	__set_se_shares(se, shares);
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+}
+
+static DEFINE_MUTEX(shares_mutex);
+
+int sched_group_set_shares(struct task_group *tg, unsigned long shares)
+{
+	int i;
+	unsigned long flags;
+
+	if (!tg->se[0])
+		return -EINVAL;
+
+	if (shares < MIN_SHARES)
+		shares = MIN_SHARES;
+	else if (shares > MAX_SHARES)
+		shares = MAX_SHARES;
+
+	mutex_lock(&shares_mutex);
+	if (tg->shares == shares)
+		goto done;
+
+	spin_lock_irqsave(&task_group_lock, flags);
+	for_each_possible_cpu(i)
+		unregister_fair_sched_group(tg, i);
+	list_del_rcu(&tg->siblings);
+	spin_unlock_irqrestore(&task_group_lock, flags);
+
+	synchronize_sched();

@@ -1,0 +1,50 @@
+				return -EEXIST;
+			}
+			nlen = EXT3_DIR_REC_LEN(de->name_len);
+			rlen = ext3_rec_len_from_disk(de->rec_len);
+			if ((de->inode? rlen - nlen: rlen) >= reclen)
+				break;
+			de = (struct ext3_dir_entry_2 *)((char *)de + rlen);
+			offset += rlen;
+		}
+		if ((char *) de > top)
+			return -ENOSPC;
+	}
+	BUFFER_TRACE(bh, "get_write_access");
+	err = ext3_journal_get_write_access(handle, bh);
+	if (err) {
+		ext3_std_error(dir->i_sb, err);
+		brelse(bh);
+		return err;
+	}
+
+	nlen = EXT3_DIR_REC_LEN(de->name_len);
+	rlen = ext3_rec_len_from_disk(de->rec_len);
+	if (de->inode) {
+		struct ext3_dir_entry_2 *de1 = (struct ext3_dir_entry_2 *)((char *)de + nlen);
+		de1->rec_len = ext3_rec_len_to_disk(rlen - nlen);
+		de->rec_len = ext3_rec_len_to_disk(nlen);
+		de = de1;
+	}
+	de->file_type = EXT3_FT_UNKNOWN;
+	if (inode) {
+		de->inode = cpu_to_le32(inode->i_ino);
+		ext3_set_de_type(dir->i_sb, de, inode->i_mode);
+	} else
+		de->inode = 0;
+	de->name_len = namelen;
+	memcpy (de->name, name, namelen);
+	
+	dir->i_mtime = dir->i_ctime = CURRENT_TIME_SEC;
+	ext3_update_dx_flag(dir);
+	dir->i_version++;
+	ext3_mark_inode_dirty(handle, dir);
+	BUFFER_TRACE(bh, "call ext3_journal_dirty_metadata");
+	err = ext3_journal_dirty_metadata(handle, bh);
+	if (err)
+		ext3_std_error(dir->i_sb, err);
+	brelse(bh);
+	return 0;
+}
+
+static int make_indexed_dir(handle_t *handle, struct dentry *dentry,

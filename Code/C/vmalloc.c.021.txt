@@ -1,0 +1,50 @@
+	vm->next = *p;
+	*p = vm;
+	write_unlock(&vmlist_lock);
+}
+
+static struct vm_struct *__get_vm_area_node(unsigned long size,
+		unsigned long align, unsigned long flags, unsigned long start,
+		unsigned long end, int node, gfp_t gfp_mask, void *caller)
+{
+	static struct vmap_area *va;
+	struct vm_struct *area;
+
+	BUG_ON(in_interrupt());
+	if (flags & VM_IOREMAP) {
+		int bit = fls(size);
+
+		if (bit > IOREMAP_MAX_ORDER)
+			bit = IOREMAP_MAX_ORDER;
+		else if (bit < PAGE_SHIFT)
+			bit = PAGE_SHIFT;
+
+		align = 1ul << bit;
+	}
+
+	size = PAGE_ALIGN(size);
+	if (unlikely(!size))
+		return NULL;
+
+	area = kzalloc_node(sizeof(*area), gfp_mask & GFP_RECLAIM_MASK, node);
+	if (unlikely(!area))
+		return NULL;
+
+	size += PAGE_SIZE;
+
+	va = alloc_vmap_area(size, align, start, end, node, gfp_mask);
+	if (IS_ERR(va)) {
+		kfree(area);
+		return NULL;
+	}
+
+	insert_vmalloc_vm(area, va, flags, caller);
+	return area;
+}
+
+struct vm_struct *__get_vm_area(unsigned long size, unsigned long flags,
+				unsigned long start, unsigned long end)
+{
+	return __get_vm_area_node(size, 1, flags, start, end, -1, GFP_KERNEL,
+						__builtin_return_address(0));
+}

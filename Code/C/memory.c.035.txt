@@ -1,0 +1,50 @@
+		} else
+			inc_mm_counter_fast(mm, MM_ANONPAGES);
+		flush_cache_page(vma, address, pte_pfn(orig_pte));
+		entry = mk_pte(new_page, vma->vm_page_prot);
+		entry = maybe_mkwrite(pte_mkdirty(entry), vma);
+		
+		ptep_clear_flush(vma, address, page_table);
+		page_add_new_anon_rmap(new_page, vma, address);
+		
+		set_pte_at_notify(mm, address, page_table, entry);
+		update_mmu_cache(vma, address, page_table);
+		if (old_page) {
+			
+			page_remove_rmap(old_page);
+		}
+
+		new_page = old_page;
+		ret |= VM_FAULT_WRITE;
+	} else
+		mem_cgroup_uncharge_page(new_page);
+
+	if (new_page)
+		page_cache_release(new_page);
+	if (old_page)
+		page_cache_release(old_page);
+unlock:
+	pte_unmap_unlock(page_table, ptl);
+	if (dirty_page) {
+		
+		if (!page_mkwrite) {
+			wait_on_page_locked(dirty_page);
+			set_page_dirty_balance(dirty_page, page_mkwrite);
+		}
+		put_page(dirty_page);
+		if (page_mkwrite) {
+			struct address_space *mapping = dirty_page->mapping;
+
+			set_page_dirty(dirty_page);
+			unlock_page(dirty_page);
+			page_cache_release(dirty_page);
+			if (mapping)	{
+				
+				balance_dirty_pages_ratelimited(mapping);
+			}
+		}
+
+		if (vma->vm_file)
+			file_update_time(vma->vm_file);
+	}
+	return ret;

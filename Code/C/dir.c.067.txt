@@ -1,0 +1,49 @@
+	if (ret) {
+		mlog_errno(ret);
+		goto  out_commit;
+	}
+
+	mlog(0, "Split leaf (%u) at %u, insert major hash is %u\n",
+	     leaf_cpos, split_hash, insert_hash);
+
+	tmp_dx_leaf = kmalloc(osb->sb->s_blocksize, GFP_NOFS);
+	if (!tmp_dx_leaf) {
+		ret = -ENOMEM;
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	orig_leaves_start = ocfs2_block_to_cluster_start(dir->i_sb, leaf_blkno);
+	ret = ocfs2_read_dx_leaves(dir, orig_leaves_start, num_dx_leaves,
+				   orig_dx_leaves);
+	if (ret) {
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	cpos = split_hash;
+	ret = ocfs2_dx_dir_new_cluster(dir, &et, cpos, handle,
+				       data_ac, meta_ac, new_dx_leaves,
+				       num_dx_leaves);
+	if (ret) {
+		mlog_errno(ret);
+		goto out_commit;
+	}
+
+	for (i = 0; i < num_dx_leaves; i++) {
+		ret = ocfs2_journal_access_dl(handle, INODE_CACHE(dir),
+					      orig_dx_leaves[i],
+					      OCFS2_JOURNAL_ACCESS_WRITE);
+		if (ret) {
+			mlog_errno(ret);
+			goto out_commit;
+		}
+
+		ret = ocfs2_journal_access_dl(handle, INODE_CACHE(dir),
+					      new_dx_leaves[i],
+					      OCFS2_JOURNAL_ACCESS_WRITE);
+		if (ret) {
+			mlog_errno(ret);
+			goto out_commit;
+		}
+	}

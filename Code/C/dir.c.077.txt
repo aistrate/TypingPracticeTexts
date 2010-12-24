@@ -1,0 +1,49 @@
+	blk = le64_to_cpu(dx_root->dr_blkno);
+	bit = le16_to_cpu(dx_root->dr_suballoc_bit);
+	if (dx_root->dr_suballoc_loc)
+		bg_blkno = le64_to_cpu(dx_root->dr_suballoc_loc);
+	else
+		bg_blkno = ocfs2_which_suballoc_group(blk, bit);
+	ret = ocfs2_free_suballoc_bits(handle, dx_alloc_inode, dx_alloc_bh,
+				       bit, bg_blkno, 1);
+	if (ret)
+		mlog_errno(ret);
+
+out_commit:
+	ocfs2_commit_trans(osb, handle);
+
+out_unlock:
+	ocfs2_inode_unlock(dx_alloc_inode, 1);
+
+out_mutex:
+	mutex_unlock(&dx_alloc_inode->i_mutex);
+	brelse(dx_alloc_bh);
+out:
+	iput(dx_alloc_inode);
+	return ret;
+}
+
+int ocfs2_dx_dir_truncate(struct inode *dir, struct buffer_head *di_bh)
+{
+	int ret;
+	unsigned int uninitialized_var(clen);
+	u32 major_hash = UINT_MAX, p_cpos, uninitialized_var(cpos);
+	u64 uninitialized_var(blkno);
+	struct ocfs2_super *osb = OCFS2_SB(dir->i_sb);
+	struct buffer_head *dx_root_bh = NULL;
+	struct ocfs2_dx_root_block *dx_root;
+	struct ocfs2_dinode *di = (struct ocfs2_dinode *)di_bh->b_data;
+	struct ocfs2_cached_dealloc_ctxt dealloc;
+	struct ocfs2_extent_tree et;
+
+	ocfs2_init_dealloc_ctxt(&dealloc);
+
+	if (!ocfs2_dir_indexed(dir))
+		return 0;
+
+	ret = ocfs2_read_dx_root(dir, di, &dx_root_bh);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+	dx_root = (struct ocfs2_dx_root_block *)dx_root_bh->b_data;

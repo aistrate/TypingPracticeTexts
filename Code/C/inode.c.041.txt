@@ -1,0 +1,50 @@
+					done = 1;
+					break;
+				}
+			}
+
+			if (nr_to_write > 0) {
+				nr_to_write--;
+				if (nr_to_write == 0 &&
+				    wbc->sync_mode == WB_SYNC_NONE) {
+					
+					done = 1;
+					break;
+				}
+			}
+		}
+		pagevec_release(&pvec);
+		cond_resched();
+	}
+	return ret;
+}
+
+static int ext4_da_writepages(struct address_space *mapping,
+			      struct writeback_control *wbc)
+{
+	pgoff_t	index;
+	int range_whole = 0;
+	handle_t *handle = NULL;
+	struct mpage_da_data mpd;
+	struct inode *inode = mapping->host;
+	int pages_written = 0;
+	long pages_skipped;
+	unsigned int max_pages;
+	int range_cyclic, cycled = 1, io_done = 0;
+	int needed_blocks, ret = 0;
+	long desired_nr_to_write, nr_to_writebump = 0;
+	loff_t range_start = wbc->range_start;
+	struct ext4_sb_info *sbi = EXT4_SB(mapping->host->i_sb);
+	pgoff_t done_index = 0;
+	pgoff_t end;
+
+	trace_ext4_da_writepages(inode, wbc);
+
+	if (!mapping->nrpages || !mapping_tagged(mapping, PAGECACHE_TAG_DIRTY))
+		return 0;
+
+	if (unlikely(sbi->s_mount_flags & EXT4_MF_FS_ABORTED))
+		return -EROFS;
+
+	if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX)
+		range_whole = 1;

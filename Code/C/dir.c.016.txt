@@ -1,0 +1,49 @@
+	u32 name_hash = hinfo->major_hash;
+
+	ret = ocfs2_dx_dir_lookup_rec(inode, el, name_hash, &cpos, &blkno,
+				      &clen);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	cend = cpos + clen;
+	if (name_hash >= cend) {
+		
+		blkno += ocfs2_clusters_to_blocks(inode->i_sb, clen - 1);
+		cpos += clen - 1;
+	} else {
+		blkno += ocfs2_clusters_to_blocks(inode->i_sb,
+						  name_hash - cpos);
+		cpos = name_hash;
+	}
+
+	blkno += ocfs2_dx_dir_hash_idx(OCFS2_SB(inode->i_sb), hinfo);
+
+	if (ret_phys_blkno)
+		*ret_phys_blkno = blkno;
+	if (ret_cpos)
+		*ret_cpos = cpos;
+
+out:
+
+	return ret;
+}
+
+static int ocfs2_dx_dir_search(const char *name, int namelen,
+			       struct inode *dir,
+			       struct ocfs2_dx_root_block *dx_root,
+			       struct ocfs2_dir_lookup_result *res)
+{
+	int ret, i, found;
+	u64 uninitialized_var(phys);
+	struct buffer_head *dx_leaf_bh = NULL;
+	struct ocfs2_dx_leaf *dx_leaf;
+	struct ocfs2_dx_entry *dx_entry = NULL;
+	struct buffer_head *dir_ent_bh = NULL;
+	struct ocfs2_dir_entry *dir_ent = NULL;
+	struct ocfs2_dx_hinfo *hinfo = &res->dl_hinfo;
+	struct ocfs2_extent_list *dr_el;
+	struct ocfs2_dx_entry_list *entry_list;
+
+	ocfs2_dx_dir_name_hash(dir, name, namelen, &res->dl_hinfo);

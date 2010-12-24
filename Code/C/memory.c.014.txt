@@ -1,0 +1,50 @@
+	src_pgd = pgd_offset(src_mm, addr);
+	do {
+		next = pgd_addr_end(addr, end);
+		if (pgd_none_or_clear_bad(src_pgd))
+			continue;
+		if (unlikely(copy_pud_range(dst_mm, src_mm, dst_pgd, src_pgd,
+					    vma, addr, next))) {
+			ret = -ENOMEM;
+			break;
+		}
+	} while (dst_pgd++, src_pgd++, addr = next, addr != end);
+
+	if (is_cow_mapping(vma->vm_flags))
+		mmu_notifier_invalidate_range_end(src_mm,
+						  vma->vm_start, end);
+	return ret;
+}
+
+static unsigned long zap_pte_range(struct mmu_gather *tlb,
+				struct vm_area_struct *vma, pmd_t *pmd,
+				unsigned long addr, unsigned long end,
+				long *zap_work, struct zap_details *details)
+{
+	struct mm_struct *mm = tlb->mm;
+	pte_t *pte;
+	spinlock_t *ptl;
+	int rss[NR_MM_COUNTERS];
+
+	init_rss_vec(rss);
+
+	pte = pte_offset_map_lock(mm, pmd, addr, &ptl);
+	arch_enter_lazy_mmu_mode();
+	do {
+		pte_t ptent = *pte;
+		if (pte_none(ptent)) {
+			(*zap_work)--;
+			continue;
+		}
+
+		(*zap_work) -= PAGE_SIZE;
+
+		if (pte_present(ptent)) {
+			struct page *page;
+
+			page = vm_normal_page(vma, addr, ptent);
+			if (unlikely(details) && page) {
+				
+				if (details->check_mapping &&
+				    details->check_mapping != page->mapping)
+					continue;

@@ -1,0 +1,50 @@
+{
+	hotcpu_notifier(hotplug_hrtick, 0);
+}
+#else
+
+static void hrtick_start(struct rq *rq, u64 delay)
+{
+	__hrtimer_start_range_ns(&rq->hrtick_timer, ns_to_ktime(delay), 0,
+			HRTIMER_MODE_REL_PINNED, 0);
+}
+
+static inline void init_hrtick(void)
+{
+}
+#endif 
+
+static void init_rq_hrtick(struct rq *rq)
+{
+#ifdef CONFIG_SMP
+	rq->hrtick_csd_pending = 0;
+
+	rq->hrtick_csd.flags = 0;
+	rq->hrtick_csd.func = __hrtick_start;
+	rq->hrtick_csd.info = rq;
+#endif
+
+	hrtimer_init(&rq->hrtick_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+	rq->hrtick_timer.function = hrtick;
+}
+#else	
+static inline void hrtick_clear(struct rq *rq)
+{
+}
+
+static inline void init_rq_hrtick(struct rq *rq)
+{
+}
+
+static inline void init_hrtick(void)
+{
+}
+#endif	
+
+#ifdef CONFIG_SMP
+
+#ifndef tsk_is_polling
+#define tsk_is_polling(t) test_tsk_thread_flag(t, TIF_POLLING_NRFLAG)
+#endif
+
+static void resched_task(struct task_struct *p)

@@ -1,0 +1,50 @@
+		debug_show_all_locks();
+}
+
+void __cpuinit init_idle_bootup_task(struct task_struct *idle)
+{
+	idle->sched_class = &idle_sched_class;
+}
+
+void __cpuinit init_idle(struct task_struct *idle, int cpu)
+{
+	struct rq *rq = cpu_rq(cpu);
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&rq->lock, flags);
+
+	__sched_fork(idle);
+	idle->state = TASK_RUNNING;
+	idle->se.exec_start = sched_clock();
+
+	cpumask_copy(&idle->cpus_allowed, cpumask_of(cpu));
+	
+	rcu_read_lock();
+	__set_task_cpu(idle, cpu);
+	rcu_read_unlock();
+
+	rq->curr = rq->idle = idle;
+#if defined(CONFIG_SMP) && defined(__ARCH_WANT_UNLOCKED_CTXSW)
+	idle->oncpu = 1;
+#endif
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+
+#if defined(CONFIG_PREEMPT)
+	task_thread_info(idle)->preempt_count = (idle->lock_depth >= 0);
+#else
+	task_thread_info(idle)->preempt_count = 0;
+#endif
+	
+	idle->sched_class = &idle_sched_class;
+	ftrace_graph_init_task(idle);
+}
+
+cpumask_var_t nohz_cpu_mask;
+
+static int get_update_sysctl_factor(void)
+{
+	unsigned int cpus = min_t(int, num_online_cpus(), 8);
+	unsigned int factor;
+
+	switch (sysctl_sched_tunable_scaling) {
+	case SCHED_TUNABLESCALING_NONE:

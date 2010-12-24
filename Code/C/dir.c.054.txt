@@ -1,0 +1,50 @@
+			mlog_errno(ret);
+			goto out_commit;
+		}
+		blkno = ocfs2_clusters_to_blocks(dir->i_sb, bit_off);
+
+		ret = ocfs2_insert_extent(handle, &et, 1,
+					  blkno, len, 0, NULL);
+		if (ret) {
+			mlog_errno(ret);
+			goto out_commit;
+		}
+		bytes_allocated += ocfs2_clusters_to_bytes(dir->i_sb, 1);
+	}
+
+	*first_block_bh = dirdata_bh;
+	dirdata_bh = NULL;
+	if (ocfs2_supports_indexed_dirs(osb)) {
+		unsigned int off;
+
+		if (!dx_inline) {
+			
+			off = ocfs2_dx_dir_hash_idx(OCFS2_SB(dir->i_sb),
+						    &lookup->dl_hinfo);
+			get_bh(dx_leaves[off]);
+			lookup->dl_dx_leaf_bh = dx_leaves[off];
+		}
+		lookup->dl_dx_root_bh = dx_root_bh;
+		dx_root_bh = NULL;
+	}
+
+out_commit:
+	if (ret < 0 && did_quota)
+		dquot_free_space_nodirty(dir, bytes_allocated);
+
+	ocfs2_commit_trans(osb, handle);
+
+out:
+	up_write(&oi->ip_alloc_sem);
+	if (data_ac)
+		ocfs2_free_alloc_context(data_ac);
+	if (meta_ac)
+		ocfs2_free_alloc_context(meta_ac);
+
+	if (dx_leaves) {
+		for (i = 0; i < num_dx_leaves; i++)
+			brelse(dx_leaves[i]);
+		kfree(dx_leaves);
+	}
+
+	brelse(dirdata_bh);

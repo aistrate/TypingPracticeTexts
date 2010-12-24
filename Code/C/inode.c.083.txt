@@ -1,0 +1,50 @@
+	if (!journal)
+		return 0;
+	if (is_journal_aborted(journal))
+		return -EROFS;
+
+	jbd2_journal_lock_updates(journal);
+	jbd2_journal_flush(journal);
+
+	if (val)
+		ext4_set_inode_flag(inode, EXT4_INODE_JOURNAL_DATA);
+	else
+		ext4_clear_inode_flag(inode, EXT4_INODE_JOURNAL_DATA);
+	ext4_set_aops(inode);
+
+	jbd2_journal_unlock_updates(journal);
+
+	handle = ext4_journal_start(inode, 1);
+	if (IS_ERR(handle))
+		return PTR_ERR(handle);
+
+	err = ext4_mark_inode_dirty(handle, inode);
+	ext4_handle_sync(handle);
+	ext4_journal_stop(handle);
+	ext4_std_error(inode->i_sb, err);
+
+	return err;
+}
+
+static int ext4_bh_unmapped(handle_t *handle, struct buffer_head *bh)
+{
+	return !buffer_mapped(bh);
+}
+
+int ext4_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+{
+	struct page *page = vmf->page;
+	loff_t size;
+	unsigned long len;
+	int ret = -EINVAL;
+	void *fsdata;
+	struct file *file = vma->vm_file;
+	struct inode *inode = file->f_path.dentry->d_inode;
+	struct address_space *mapping = inode->i_mapping;
+
+	down_read(&inode->i_alloc_sem);
+	size = i_size_read(inode);
+	if (page->mapping != mapping || size <= page_offset(page)
+	    || !PageUptodate(page)) {
+		
+		goto out_unlock;

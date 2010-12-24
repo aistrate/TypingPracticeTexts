@@ -1,0 +1,49 @@
+		if (le32_to_cpu(rec->e_cpos) <= major_hash) {
+			found = 1;
+			break;
+		}
+	}
+
+	if (!found) {
+		ocfs2_error(inode->i_sb, "Inode %lu has bad extent "
+			    "record (%u, %u, 0) in btree", inode->i_ino,
+			    le32_to_cpu(rec->e_cpos),
+			    ocfs2_rec_clusters(el, rec));
+		ret = -EROFS;
+		goto out;
+	}
+
+	if (ret_phys_blkno)
+		*ret_phys_blkno = le64_to_cpu(rec->e_blkno);
+	if (ret_cpos)
+		*ret_cpos = le32_to_cpu(rec->e_cpos);
+	if (ret_clen)
+		*ret_clen = le16_to_cpu(rec->e_leaf_clusters);
+
+out:
+	brelse(eb_bh);
+	return ret;
+}
+
+static inline unsigned int __ocfs2_dx_dir_hash_idx(struct ocfs2_super *osb,
+						   u32 minor_hash)
+{
+	return minor_hash & osb->osb_dx_mask;
+}
+
+static inline unsigned int ocfs2_dx_dir_hash_idx(struct ocfs2_super *osb,
+					  struct ocfs2_dx_hinfo *hinfo)
+{
+	return __ocfs2_dx_dir_hash_idx(osb, hinfo->minor_hash);
+}
+
+static int ocfs2_dx_dir_lookup(struct inode *inode,
+			       struct ocfs2_extent_list *el,
+			       struct ocfs2_dx_hinfo *hinfo,
+			       u32 *ret_cpos,
+			       u64 *ret_phys_blkno)
+{
+	int ret = 0;
+	unsigned int cend, uninitialized_var(clen);
+	u32 uninitialized_var(cpos);
+	u64 uninitialized_var(blkno);

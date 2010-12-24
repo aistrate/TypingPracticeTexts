@@ -1,0 +1,49 @@
+		clear_buffer_uptodate(bh);
+	}
+	unlock_buffer(bh);
+}
+
+void end_buffer_read_sync(struct buffer_head *bh, int uptodate)
+{
+	__end_buffer_read_notouch(bh, uptodate);
+	put_bh(bh);
+}
+EXPORT_SYMBOL(end_buffer_read_sync);
+
+void end_buffer_write_sync(struct buffer_head *bh, int uptodate)
+{
+	char b[BDEVNAME_SIZE];
+
+	if (uptodate) {
+		set_buffer_uptodate(bh);
+	} else {
+		if (!quiet_error(bh)) {
+			buffer_io_error(bh);
+			printk(KERN_WARNING "lost page write due to "
+					"I/O error on %s\n",
+				       bdevname(bh->b_bdev, b));
+		}
+		set_buffer_write_io_error(bh);
+		clear_buffer_uptodate(bh);
+	}
+	unlock_buffer(bh);
+	put_bh(bh);
+}
+EXPORT_SYMBOL(end_buffer_write_sync);
+
+static struct buffer_head *
+__find_get_block_slow(struct block_device *bdev, sector_t block)
+{
+	struct inode *bd_inode = bdev->bd_inode;
+	struct address_space *bd_mapping = bd_inode->i_mapping;
+	struct buffer_head *ret = NULL;
+	pgoff_t index;
+	struct buffer_head *bh;
+	struct buffer_head *head;
+	struct page *page;
+	int all_mapped = 1;
+
+	index = block >> (PAGE_CACHE_SHIFT - bd_inode->i_blkbits);
+	page = find_get_page(bd_mapping, index);
+	if (!page)
+		goto out;

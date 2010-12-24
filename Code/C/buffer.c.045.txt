@@ -1,0 +1,50 @@
+		}
+		unlock_buffer(bh);
+	}
+}
+EXPORT_SYMBOL(ll_rw_block);
+
+void write_dirty_buffer(struct buffer_head *bh, int rw)
+{
+	lock_buffer(bh);
+	if (!test_clear_buffer_dirty(bh)) {
+		unlock_buffer(bh);
+		return;
+	}
+	bh->b_end_io = end_buffer_write_sync;
+	get_bh(bh);
+	submit_bh(rw, bh);
+}
+EXPORT_SYMBOL(write_dirty_buffer);
+
+int __sync_dirty_buffer(struct buffer_head *bh, int rw)
+{
+	int ret = 0;
+
+	WARN_ON(atomic_read(&bh->b_count) < 1);
+	lock_buffer(bh);
+	if (test_clear_buffer_dirty(bh)) {
+		get_bh(bh);
+		bh->b_end_io = end_buffer_write_sync;
+		ret = submit_bh(rw, bh);
+		wait_on_buffer(bh);
+		if (!ret && !buffer_uptodate(bh))
+			ret = -EIO;
+	} else {
+		unlock_buffer(bh);
+	}
+	return ret;
+}
+EXPORT_SYMBOL(__sync_dirty_buffer);
+
+int sync_dirty_buffer(struct buffer_head *bh)
+{
+	return __sync_dirty_buffer(bh, WRITE_SYNC);
+}
+EXPORT_SYMBOL(sync_dirty_buffer);
+
+static inline int buffer_busy(struct buffer_head *bh)
+{
+	return atomic_read(&bh->b_count) |
+		(bh->b_state & ((1 << BH_Dirty) | (1 << BH_Lock)));
+}

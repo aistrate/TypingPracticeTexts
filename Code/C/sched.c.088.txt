@@ -1,0 +1,49 @@
+	if (task_cpu(p) != src_cpu)
+		goto done;
+	
+	if (!cpumask_test_cpu(dest_cpu, &p->cpus_allowed))
+		goto fail;
+
+	if (p->se.on_rq) {
+		deactivate_task(rq_src, p, 0);
+		set_task_cpu(p, dest_cpu);
+		activate_task(rq_dest, p, 0);
+		check_preempt_curr(rq_dest, p, 0);
+	}
+done:
+	ret = 1;
+fail:
+	double_rq_unlock(rq_src, rq_dest);
+	return ret;
+}
+
+static int migration_cpu_stop(void *data)
+{
+	struct migration_arg *arg = data;
+
+	local_irq_disable();
+	__migrate_task(arg->task, raw_smp_processor_id(), arg->dest_cpu);
+	local_irq_enable();
+	return 0;
+}
+
+#ifdef CONFIG_HOTPLUG_CPU
+
+void move_task_off_dead_cpu(int dead_cpu, struct task_struct *p)
+{
+	struct rq *rq = cpu_rq(dead_cpu);
+	int needs_cpu, uninitialized_var(dest_cpu);
+	unsigned long flags;
+
+	local_irq_save(flags);
+
+	raw_spin_lock(&rq->lock);
+	needs_cpu = (task_cpu(p) == dead_cpu) && (p->state != TASK_WAKING);
+	if (needs_cpu)
+		dest_cpu = select_fallback_rq(dead_cpu, p);
+	raw_spin_unlock(&rq->lock);
+	
+	if (needs_cpu)
+		__migrate_task(p, dead_cpu, dest_cpu);
+	local_irq_restore(flags);
+}

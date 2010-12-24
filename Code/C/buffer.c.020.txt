@@ -1,0 +1,50 @@
+	might_sleep();
+	if (bh == NULL)
+		bh = __getblk_slow(bdev, block, size);
+	return bh;
+}
+EXPORT_SYMBOL(__getblk);
+
+void __breadahead(struct block_device *bdev, sector_t block, unsigned size)
+{
+	struct buffer_head *bh = __getblk(bdev, block, size);
+	if (likely(bh)) {
+		ll_rw_block(READA, 1, &bh);
+		brelse(bh);
+	}
+}
+EXPORT_SYMBOL(__breadahead);
+
+struct buffer_head *
+__bread(struct block_device *bdev, sector_t block, unsigned size)
+{
+	struct buffer_head *bh = __getblk(bdev, block, size);
+
+	if (likely(bh) && !buffer_uptodate(bh))
+		bh = __bread_slow(bh);
+	return bh;
+}
+EXPORT_SYMBOL(__bread);
+
+static void invalidate_bh_lru(void *arg)
+{
+	struct bh_lru *b = &get_cpu_var(bh_lrus);
+	int i;
+
+	for (i = 0; i < BH_LRU_SIZE; i++) {
+		brelse(b->bhs[i]);
+		b->bhs[i] = NULL;
+	}
+	put_cpu_var(bh_lrus);
+}
+	
+void invalidate_bh_lrus(void)
+{
+	on_each_cpu(invalidate_bh_lru, NULL, 1);
+}
+EXPORT_SYMBOL_GPL(invalidate_bh_lrus);
+
+void set_bh_page(struct buffer_head *bh,
+		struct page *page, unsigned long offset)
+{
+	bh->b_page = page;

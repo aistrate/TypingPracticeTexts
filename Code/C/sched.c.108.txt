@@ -1,0 +1,50 @@
+{
+	struct sched_group *sg = group_head;
+	int j;
+
+	if (!sg)
+		return;
+	do {
+		for_each_cpu(j, sched_group_cpus(sg)) {
+			struct sched_domain *sd;
+
+			sd = &per_cpu(phys_domains, j).sd;
+			if (j != group_first_cpu(sd->groups)) {
+				
+				continue;
+			}
+
+			sg->cpu_power += sd->groups->cpu_power;
+		}
+		sg = sg->next;
+	} while (sg != group_head);
+}
+
+static int build_numa_sched_groups(struct s_data *d,
+				   const struct cpumask *cpu_map, int num)
+{
+	struct sched_domain *sd;
+	struct sched_group *sg, *prev;
+	int n, j;
+
+	cpumask_clear(d->covered);
+	cpumask_and(d->nodemask, cpumask_of_node(num), cpu_map);
+	if (cpumask_empty(d->nodemask)) {
+		d->sched_group_nodes[num] = NULL;
+		goto out;
+	}
+
+	sched_domain_node_span(num, d->domainspan);
+	cpumask_and(d->domainspan, d->domainspan, cpu_map);
+
+	sg = kmalloc_node(sizeof(struct sched_group) + cpumask_size(),
+			  GFP_KERNEL, num);
+	if (!sg) {
+		printk(KERN_WARNING "Can not alloc domain group for node %d\n",
+		       num);
+		return -ENOMEM;
+	}
+	d->sched_group_nodes[num] = sg;
+
+	for_each_cpu(j, d->nodemask) {
+		sd = &per_cpu(node_domains, j).sd;

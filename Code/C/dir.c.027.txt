@@ -1,0 +1,50 @@
+{
+	int ret = 0;
+	struct ocfs2_dx_root_block *dx_root;
+	struct buffer_head *dx_root_bh = lookup->dl_dx_root_bh;
+
+	ret = ocfs2_journal_access_dr(handle, INODE_CACHE(dir), dx_root_bh,
+				      OCFS2_JOURNAL_ACCESS_WRITE);
+	if (ret) {
+		mlog_errno(ret);
+		goto out;
+	}
+
+	dx_root = (struct ocfs2_dx_root_block *)lookup->dl_dx_root_bh->b_data;
+	if (ocfs2_dx_root_inline(dx_root)) {
+		ocfs2_dx_inline_root_insert(dir, handle,
+					    &lookup->dl_hinfo,
+					    lookup->dl_leaf_bh->b_blocknr,
+					    dx_root);
+	} else {
+		ret = __ocfs2_dx_dir_leaf_insert(dir, handle, &lookup->dl_hinfo,
+						 lookup->dl_leaf_bh->b_blocknr,
+						 lookup->dl_dx_leaf_bh);
+		if (ret)
+			goto out;
+	}
+
+	le32_add_cpu(&dx_root->dr_num_entries, 1);
+	ocfs2_journal_dirty(handle, dx_root_bh);
+
+out:
+	return ret;
+}
+
+static void ocfs2_remove_block_from_free_list(struct inode *dir,
+				       handle_t *handle,
+				       struct ocfs2_dir_lookup_result *lookup)
+{
+	struct ocfs2_dir_block_trailer *trailer, *prev;
+	struct ocfs2_dx_root_block *dx_root;
+	struct buffer_head *bh;
+
+	trailer = ocfs2_trailer_from_bh(lookup->dl_leaf_bh, dir->i_sb);
+
+	if (ocfs2_free_list_at_root(lookup)) {
+		bh = lookup->dl_dx_root_bh;
+		dx_root = (struct ocfs2_dx_root_block *)bh->b_data;
+		dx_root->dr_free_blk = trailer->db_free_next;
+	} else {
+		bh = lookup->dl_prev_leaf_bh;
+		prev = ocfs2_trailer_from_bh(bh, dir->i_sb);

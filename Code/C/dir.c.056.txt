@@ -1,0 +1,49 @@
+		mlog_errno(status);
+		goto bail;
+	}
+	status = 0;
+bail:
+	if (did_quota && status < 0)
+		dquot_free_space_nodirty(dir, ocfs2_clusters_to_bytes(sb, 1));
+	mlog_exit(status);
+	return status;
+}
+
+static int ocfs2_extend_dir(struct ocfs2_super *osb,
+			    struct inode *dir,
+			    struct buffer_head *parent_fe_bh,
+			    unsigned int blocks_wanted,
+			    struct ocfs2_dir_lookup_result *lookup,
+			    struct buffer_head **new_de_bh)
+{
+	int status = 0;
+	int credits, num_free_extents, drop_alloc_sem = 0;
+	loff_t dir_i_size;
+	struct ocfs2_dinode *fe = (struct ocfs2_dinode *) parent_fe_bh->b_data;
+	struct ocfs2_extent_list *el = &fe->id2.i_list;
+	struct ocfs2_alloc_context *data_ac = NULL;
+	struct ocfs2_alloc_context *meta_ac = NULL;
+	handle_t *handle = NULL;
+	struct buffer_head *new_bh = NULL;
+	struct ocfs2_dir_entry * de;
+	struct super_block *sb = osb->sb;
+	struct ocfs2_extent_tree et;
+	struct buffer_head *dx_root_bh = lookup->dl_dx_root_bh;
+
+	mlog_entry_void();
+
+	if (OCFS2_I(dir)->ip_dyn_features & OCFS2_INLINE_DATA_FL) {
+		
+		BUG_ON(dx_root_bh);
+
+		status = ocfs2_expand_inline_dir(dir, parent_fe_bh,
+						 blocks_wanted, lookup,
+						 &new_bh);
+		if (status) {
+			mlog_errno(status);
+			goto bail;
+		}
+
+		dx_root_bh = lookup->dl_dx_root_bh;
+
+		if (blocks_wanted == 1) {

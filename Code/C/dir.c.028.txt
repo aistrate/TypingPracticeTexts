@@ -1,0 +1,50 @@
+		prev->db_free_next = trailer->db_free_next;
+	}
+
+	trailer->db_free_rec_len = cpu_to_le16(0);
+	trailer->db_free_next = cpu_to_le64(0);
+
+	ocfs2_journal_dirty(handle, bh);
+	ocfs2_journal_dirty(handle, lookup->dl_leaf_bh);
+}
+
+static void ocfs2_recalc_free_list(struct inode *dir, handle_t *handle,
+				   struct ocfs2_dir_lookup_result *lookup)
+{
+	int max_rec_len;
+	struct ocfs2_dir_block_trailer *trailer;
+
+	max_rec_len = ocfs2_find_max_rec_len(dir->i_sb, lookup->dl_leaf_bh);
+	if (max_rec_len) {
+		
+		trailer = ocfs2_trailer_from_bh(lookup->dl_leaf_bh, dir->i_sb);
+		trailer->db_free_rec_len = cpu_to_le16(max_rec_len);
+		ocfs2_journal_dirty(handle, lookup->dl_leaf_bh);
+	} else {
+		ocfs2_remove_block_from_free_list(dir, handle, lookup);
+	}
+}
+
+int __ocfs2_add_entry(handle_t *handle,
+		      struct inode *dir,
+		      const char *name, int namelen,
+		      struct inode *inode, u64 blkno,
+		      struct buffer_head *parent_fe_bh,
+		      struct ocfs2_dir_lookup_result *lookup)
+{
+	unsigned long offset;
+	unsigned short rec_len;
+	struct ocfs2_dir_entry *de, *de1;
+	struct ocfs2_dinode *di = (struct ocfs2_dinode *)parent_fe_bh->b_data;
+	struct super_block *sb = dir->i_sb;
+	int retval, status;
+	unsigned int size = sb->s_blocksize;
+	struct buffer_head *insert_bh = lookup->dl_leaf_bh;
+	char *data_start = insert_bh->b_data;
+
+	mlog_entry_void();
+
+	if (!namelen)
+		return -EINVAL;
+
+	if (ocfs2_dir_indexed(dir)) {

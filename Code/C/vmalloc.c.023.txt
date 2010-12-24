@@ -1,0 +1,50 @@
+		write_lock(&vmlist_lock);
+		for (p = &vmlist; (tmp = *p) != vm; p = &tmp->next)
+			;
+		*p = tmp->next;
+		write_unlock(&vmlist_lock);
+
+		vmap_debug_free_range(va->va_start, va->va_end);
+		free_unmap_vmap_area(va);
+		vm->size -= PAGE_SIZE;
+
+		return vm;
+	}
+	return NULL;
+}
+
+static void __vunmap(const void *addr, int deallocate_pages)
+{
+	struct vm_struct *area;
+
+	if (!addr)
+		return;
+
+	if ((PAGE_SIZE-1) & (unsigned long)addr) {
+		WARN(1, KERN_ERR "Trying to vfree() bad address (%p)\n", addr);
+		return;
+	}
+
+	area = remove_vm_area(addr);
+	if (unlikely(!area)) {
+		WARN(1, KERN_ERR "Trying to vfree() nonexistent vm area (%p)\n",
+				addr);
+		return;
+	}
+
+	debug_check_no_locks_freed(addr, area->size);
+	debug_check_no_obj_freed(addr, area->size);
+
+	if (deallocate_pages) {
+		int i;
+
+		for (i = 0; i < area->nr_pages; i++) {
+			struct page *page = area->pages[i];
+
+			BUG_ON(!page);
+			__free_page(page);
+		}
+
+		if (area->flags & VM_VPAGES)
+			vfree(area->pages);
+		else

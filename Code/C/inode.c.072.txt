@@ -1,0 +1,49 @@
+			inode->i_op = &ext4_fast_symlink_inode_operations;
+			nd_terminate_link(ei->i_data, inode->i_size,
+				sizeof(ei->i_data) - 1);
+		} else {
+			inode->i_op = &ext4_symlink_inode_operations;
+			ext4_set_aops(inode);
+		}
+	} else if (S_ISCHR(inode->i_mode) || S_ISBLK(inode->i_mode) ||
+	      S_ISFIFO(inode->i_mode) || S_ISSOCK(inode->i_mode)) {
+		inode->i_op = &ext4_special_inode_operations;
+		if (raw_inode->i_block[0])
+			init_special_inode(inode, inode->i_mode,
+			   old_decode_dev(le32_to_cpu(raw_inode->i_block[0])));
+		else
+			init_special_inode(inode, inode->i_mode,
+			   new_decode_dev(le32_to_cpu(raw_inode->i_block[1])));
+	} else {
+		ret = -EIO;
+		EXT4_ERROR_INODE(inode, "bogus i_mode (%o)", inode->i_mode);
+		goto bad_inode;
+	}
+	brelse(iloc.bh);
+	ext4_set_inode_flags(inode);
+	unlock_new_inode(inode);
+	return inode;
+
+bad_inode:
+	brelse(iloc.bh);
+	iget_failed(inode);
+	return ERR_PTR(ret);
+}
+
+static int ext4_inode_blocks_set(handle_t *handle,
+				struct ext4_inode *raw_inode,
+				struct ext4_inode_info *ei)
+{
+	struct inode *inode = &(ei->vfs_inode);
+	u64 i_blocks = inode->i_blocks;
+	struct super_block *sb = inode->i_sb;
+
+	if (i_blocks <= ~0U) {
+		
+		raw_inode->i_blocks_lo   = cpu_to_le32(i_blocks);
+		raw_inode->i_blocks_high = 0;
+		ext4_clear_inode_flag(inode, EXT4_INODE_HUGE_FILE);
+		return 0;
+	}
+	if (!EXT4_HAS_RO_COMPAT_FEATURE(sb, EXT4_FEATURE_RO_COMPAT_HUGE_FILE))
+		return -EFBIG;

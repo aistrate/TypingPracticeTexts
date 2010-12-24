@@ -1,0 +1,50 @@
+	assert(count < dx_get_limit(entries));
+	assert(old < entries + count);
+	memmove(new + 1, new, (char *)(entries + count) - (char *)(new));
+	dx_set_hash(new, hash);
+	dx_set_block(new, block);
+	dx_set_count(entries, count + 1);
+}
+
+static void ext3_update_dx_flag(struct inode *inode)
+{
+	if (!EXT3_HAS_COMPAT_FEATURE(inode->i_sb,
+				     EXT3_FEATURE_COMPAT_DIR_INDEX))
+		EXT3_I(inode)->i_flags &= ~EXT3_INDEX_FL;
+}
+
+static inline int ext3_match (int len, const char * const name,
+			      struct ext3_dir_entry_2 * de)
+{
+	if (len != de->name_len)
+		return 0;
+	if (!de->inode)
+		return 0;
+	return !memcmp(name, de->name, len);
+}
+
+static inline int search_dirblock(struct buffer_head * bh,
+				  struct inode *dir,
+				  struct qstr *child,
+				  unsigned long offset,
+				  struct ext3_dir_entry_2 ** res_dir)
+{
+	struct ext3_dir_entry_2 * de;
+	char * dlimit;
+	int de_len;
+	const char *name = child->name;
+	int namelen = child->len;
+
+	de = (struct ext3_dir_entry_2 *) bh->b_data;
+	dlimit = bh->b_data + dir->i_sb->s_blocksize;
+	while ((char *) de < dlimit) {
+		
+		if ((char *) de + namelen <= dlimit &&
+		    ext3_match (namelen, name, de)) {
+			
+			if (!ext3_check_dir_entry("ext3_find_entry",
+						  dir, de, bh, offset))
+				return -1;
+			*res_dir = de;
+			return 1;
+		}

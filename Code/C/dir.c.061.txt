@@ -1,0 +1,50 @@
+	int status;
+	int blocksize = dir->i_sb->s_blocksize;
+
+	status = ocfs2_read_dir_block(dir, 0, &bh, 0);
+	if (status) {
+		mlog_errno(status);
+		goto bail;
+	}
+
+	rec_len = OCFS2_DIR_REC_LEN(namelen);
+	offset = 0;
+	de = (struct ocfs2_dir_entry *) bh->b_data;
+	while (1) {
+		if ((char *)de >= sb->s_blocksize + bh->b_data) {
+			brelse(bh);
+			bh = NULL;
+
+			if (i_size_read(dir) <= offset) {
+				
+				status = -ENOSPC;
+				goto bail;
+			}
+			status = ocfs2_read_dir_block(dir,
+					     offset >> sb->s_blocksize_bits,
+					     &bh, 0);
+			if (status) {
+				mlog_errno(status);
+				goto bail;
+			}
+			
+			de = (struct ocfs2_dir_entry *) bh->b_data;
+		}
+		if (!ocfs2_check_dir_entry(dir, de, bh, offset)) {
+			status = -ENOENT;
+			goto bail;
+		}
+		if (ocfs2_match(namelen, name, de)) {
+			status = -EEXIST;
+			goto bail;
+		}
+
+		if (ocfs2_skip_dir_trailer(dir, de, offset % blocksize,
+					   blocksize))
+			goto next;
+
+		if (ocfs2_dirent_would_fit(de, rec_len)) {
+			
+			*ret_de_bh = bh;
+			get_bh(*ret_de_bh);
+			status = 0;

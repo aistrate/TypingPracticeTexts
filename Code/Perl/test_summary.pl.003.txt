@@ -1,0 +1,50 @@
+        elsif (/^ok +(\d+) - (.*)$/) {
+            $pass++; $testnumber = $1; $test_comment = $2;
+        }
+    }
+    my $test = $pass + $fail + $todo + $skip;
+    if ($plan > $test) {
+        $abort = $plan - $test;
+        $fail += $abort;
+        push @fail, "$tname aborted $abort test(s)";
+    }
+    elsif ($plan < $test) {
+        $bonus = $test - $plan;
+        push @fail, "$tname passed $bonus unplanned test(s)";
+    }
+    if ($no_plan) {
+        push @plan_hint, "'plan *;' could become 'plan $plan;' in $tname";
+    }
+    printf "%4d %4d %4d %4d %4d\n",
+        $pass, $fail, $todo, $skip, $plan;
+    $sum{'pass'} += $pass;  $sum{"$syn-pass"} += $pass;
+    $sum{'fail'} += $fail;  $sum{"$syn-fail"} += $fail;
+    $sum{'todo'} += $todo;  $sum{"$syn-todo"} += $todo;
+    $sum{'skip'} += $skip;  $sum{"$syn-skip"} += $skip;
+    $sum{'plan'} += $plan;  $sum{"$syn-plan"} += $plan;
+    {
+        my $f = $tfile;
+        $f =~ s/\.rakudo$/.t/;
+        $plan_per_file{$f} = $plan;
+    }
+    for (keys %skip) {
+        printf "   %3d skipped: %s\n", $skip{$_}, $_;
+    }
+    for (keys %todofail) {
+        printf "   %3d todo   : %s\n", $todofail{$_}, $_;
+    }
+    for (keys %todopass) {
+        printf "   %3d todo PASSED: %s\n", $todopass{$_}, $_;
+    }
+    if ($abort) {
+        printf "   %3d tests aborted (missing ok/not ok)\n", $abort;
+    }
+    if ($bonus) {
+        printf "   %3d tests more than planned were run\n", $bonus;
+    }
+    defined $benchmark && $benchmark->log_script_times($tfile,\@times,\@comments);
+}
+defined $benchmark && $benchmark->end();
+
+for my $syn (sort keys %syn) {
+    my $ackcmd = "ack ^plan t/spec/$syn* -wH";

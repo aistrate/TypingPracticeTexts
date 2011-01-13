@@ -1,0 +1,50 @@
+            : $section;
+    print "Only of section `$section'\n";
+    @files = grep { m{ spec [/\\] \Q$section\E  }x } @files;
+}
+
+our $diff_lock :shared = 0;
+open our $diff_fh, '>', $out_filename
+    or die "Can't open '$out_filename' for writing: $!";
+{
+    select $diff_fh;
+    $| = 1;
+    select STDOUT;
+}
+
+our $tmp_dir = tempdir('RAKUDOXXXXXX', CLEANUP => 1);
+
+if ($threads_num > 1) {
+    my $queue = Thread::Queue->new;
+    for (1..$threads_num) {
+        threads->create(sub {
+                while(my $file_name = $queue->dequeue) {
+                    auto_unfudge_file($file_name);
+                }
+            });
+    }
+
+    $queue->enqueue($_) for @files;
+    $queue->enqueue(undef) for 1..$threads_num;
+    $_->join for threads->list;
+}
+else {
+    for (@files) {
+        auto_unfudge_file($_);
+    }
+}
+
+sub auto_unfudge_file {
+    my $file_name = shift;
+
+    return unless defined $file_name;
+    open my $f, '<:encoding(UTF-8)', $file_name
+        or die "Can't open '$file_name' for reading: $!";
+    print "Processing file '$file_name'\n";
+    my @fudge_lines;
+    while (<$f>) {
+        push @fudge_lines, [$. , $_] if m/^\s*#\?$impl/ &&
+            !m/unspecced|unicode|utf-?8|noauto/i;
+    }
+    close $f;
+    if (@fudge_lines){

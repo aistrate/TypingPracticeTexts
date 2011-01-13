@@ -1,0 +1,50 @@
+else {
+    print "No failures!\n";
+}
+
+package Simple::Relative::Benchmarking;
+
+sub begin {
+    my $timings = shift || 5;
+    my $self = {};
+    my @test_history;
+    $self->{'Timings'} = $timings;
+    $self->{'Last_test_loaded'} = '';
+
+    if ( open( $self->{'file_in'}, '<', 'docs/test_summary.times') ) {
+        my $file_in = $self->{'file_in'};
+        my $line = <$file_in>; chomp $line;
+        if ( $line =~ m/{"test_.+":\[/i ) {
+            $line = <$file_in>; chomp $line;
+            while ( $line =~ m/\s\s(.+\d\d\d\d-\d\d-\d\d.\d\d:\d\d:\d\d.+)/ ) {
+                my $history_line = $1;
+                $history_line =~ s/,$//;
+                push @test_history, $history_line;
+                $line = <$file_in>; chomp $line;
+            }
+            $line = <$file_in>; chomp $line;
+        }
+    }
+    open( $self->{'file_out'}, '>', 'docs/test_summary.times.tmp') or die "cannot create docs/test_summary.times.tmp: $!";
+    my $parrot_version = qx{./perl6 -e'print \$*VM<config><revision>'};
+    my $rakudo_version = qx{git log --oneline --max-count=1 .}; chomp $rakudo_version;
+    $rakudo_version =~ s/\\/\\\\/g;
+    $rakudo_version =~ s/\"/\\\"/g;
+    my $file_out = $self->{'file_out'};
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
+        gmtime(time());
+    push @test_history, sprintf("[\"%4d-%02d-%02d %02d:%02d:%02d\",%d,\"%s\"]",
+        $year+1900, $mon+1, $mday, $hour, $min, $sec,
+        $parrot_version, $rakudo_version );
+    while ( @test_history > $self->{'Timings'} ) { shift @test_history; }
+    print $file_out qq!{"test_history":[\n!;
+    print $file_out "  " . join(",\n  ",@test_history) . "\n ],\n";
+    print $file_out qq! "test_microseconds":{!;
+    $ENV{'PERL6_TEST_TIMES'} = 'true';
+    return bless $self;
+}
+
+sub log_script_times {
+    my $self      = shift;
+    my $test_name = shift;
+    my $ref_times = shift;

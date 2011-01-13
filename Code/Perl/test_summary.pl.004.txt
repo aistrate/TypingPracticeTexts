@@ -1,0 +1,50 @@
+    my @results = `$ackcmd`;
+    my $spec = 0;
+    for (@results) {
+        my ($fn, undef, $rest) = split /:/, $_;
+        if (exists $plan_per_file{$fn}) {
+            $spec += $plan_per_file{$fn}
+        } else {
+            $spec += $1 if $rest =~ /^\s*plan\s+(\d+)/;
+        }
+    }
+    $sum{"$syn-spec"} = $spec;
+    $sum{'spec'} += $spec;
+}
+
+if (@plan_hint) {
+    print "----------------\n";
+    foreach (@plan_hint) {
+        print "    $_\n";
+    }
+}
+
+print "----------------\n";
+my $sumfmt = qq(%-11.11s %6s,%6s,%6s,%6s,%6s,%6s\n);
+printf $sumfmt, qq{"Synopsis",}, map { qq{"$_"} } @col;
+for my $syn (sort keys %syn) {
+    printf $sumfmt, qq{"$syn",}, map { $sum{"$syn-$_"} } @col;
+}
+my $total = scalar(@tfiles).' regression files';
+printf $sumfmt, qq{"total",}, map { $sum{$_} } @col;
+print "----------------\n";
+
+if ($ENV{'REV'}) {
+    my @gmt = gmtime;
+    my $testdate = sprintf '"%4d-%02d-%02d %02d:%02d"', $gmt[5]+1900,
+        $gmt[4]+1, $gmt[3], $gmt[2], $gmt[1];
+    my $filecount = scalar(@tfiles);
+    my $passpercent = 100 * $sum{'pass'} / $sum{'spec'};
+    print join(',', $ENV{'REV'}, (map { $sum{$_} } @col),
+        $filecount), "\n";
+    printf "spectest-progress.csv update: " .
+        "%d files, %d (%.1f%% of %d) pass, %d fail\n",
+        $filecount, $sum{'pass'}, $passpercent, $sum{'spec'}, $sum{'fail'};
+}
+
+if (@fail) {
+    print "Failure summary:\n";
+    foreach (@fail) {
+        print "$_\n";
+    }
+}

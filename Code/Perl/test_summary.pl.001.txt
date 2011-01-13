@@ -1,0 +1,50 @@
+use strict;
+use warnings;
+use Time::Local;
+use Time::HiRes;
+
+my $benchmark;
+$benchmark = Simple::Relative::Benchmarking::begin();
+
+my $testlist = $ARGV[0] || 't/spectest.data';
+my $fh;
+open($fh, '<', $testlist) || die "Can't read $testlist: $!";
+my (@tfiles, %tname);
+while (<$fh>) {
+    /^ *#/ && next;
+    my ($specfile) = split ' ', $_;
+    next unless $specfile;
+    push @tfiles, "t/spec/$specfile";
+}
+close $fh or die $!;
+
+{
+    my $cmd = join ' ', $^X, 't/spec/fudgeall', 'rakudo', @tfiles;
+    print "$cmd\n";
+    @tfiles = split ' ', `$cmd`;
+}
+
+@tfiles = sort @tfiles;
+my $max = 0;
+for my $tfile (@tfiles) {
+    my $tname = $tfile;
+    $tname =~ s{^t/spec/}{};
+    $tname = substr($tname, 0, 49);
+    if (length($tname) > $max) {
+        $max = length($tname);
+    }
+    $tname{$tfile} = $tname;
+}
+
+my @col = qw(pass fail todo skip plan spec);
+my @syn = qw(S02 S03 S04 S05 S06 S07 S09 S10 S11 S12 S13 S14 S16 S17 S19 S28 S29 S32 int);
+my %syn;
+my %sum;
+my $syn;
+for $syn (@syn) {
+    $syn{$syn} = 0;
+    for my $col (@col) {
+        $sum{"$syn-$col"} = 0;
+    }
+}
+$syn = '';

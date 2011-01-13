@@ -1,0 +1,50 @@
+        print "Found " . (scalar @fudge_lines) . " fudges...\n" if $debug;
+    }
+    else {
+        print "No fudges found. Nothing to do\n" if $debug;
+        return;
+    }
+    my $fudged = fudge($file_name);
+    print "Fudged: $fudged\n" if $debug;
+    if (!tests_ok($fudged)){
+        print "File '$file_name' doesn't even pass in its current state\n";
+        return;
+    }
+    my @to_unfudge;
+    for my $to_unfudge (@fudge_lines){
+        print "trying line $to_unfudge->[0]...\n" if $debug;
+        next if $to_unfudge->[1] =~ m/\btodo\b/ && !$untodo;
+        $fudged = fudge(unfudge_some($file_name, [$to_unfudge->[0], '']));
+        if (tests_ok($fudged)){
+            print "WOOOOOT: Can remove fudge instruction on line $to_unfudge->[0]\n"
+                if $debug;
+            push @to_unfudge, [$to_unfudge->[0], ''],
+        } 
+        elsif ($unskip && $to_unfudge->[1] =~ s/\bskip\b/todo/) {
+            $fudged = fudge(unfudge_some($file_name, $to_unfudge));
+            if (tests_ok($fudged)){
+                print "s/skip/todo/ successful\n" if $debug;
+                push @to_unfudge, $to_unfudge;
+            }
+        }
+        else {
+            print "not successful\n"if $debug;
+        }
+    }
+
+    if (@to_unfudge){
+        my $u = unfudge_some($file_name, @to_unfudge);
+        lock($diff_lock);
+        print $diff_fh diff($file_name, $u);
+        unlink $u;
+    }
+
+}
+
+sub fudge {
+    my $fn = shift;
+
+    open my $p, '-|', 't/spec/fudge', '--keep-exit-code',  $impl, $fn
+        or die "Can't launch fudge: $!";
+    my $ret_fn = <$p>;
+    chomp $ret_fn;

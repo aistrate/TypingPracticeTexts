@@ -1,0 +1,50 @@
+    1 while <$p>;
+    close $p;
+    return $ret_fn;
+}
+
+sub usage {
+    die <<"USAGE"
+Usage:
+    $0 [options] file+
+Valid options:
+    --debug             Enable debug output
+    --impl impl         Specify a different implementation
+    --specfile file     Specification file to read filenames from
+    --auto              use t/spectest.data for --specfile
+    --keep-env          Keep PERL6LIB environment variable.
+    --exclude regex     Don't run the tests that match regex
+    --section number    Run only on tests belonging to section <number>
+    --unskip            Try to change 'skip' to 'todo' markers
+    --untodo            Try to remove 'todo' markers
+USAGE
+}
+
+sub unfudge_some {
+    my ($file, @lines) = @_;
+
+    my ($fh, $tmp_filename) = tempfile(
+            'tempXXXXX',
+            SUFFIX => '.t',
+            DIR => $tmp_dir
+    );
+    open my $in, '<', $file
+        or die "Can't open file '$file' for reading: $!";
+    while (<$in>){
+        if ($. == $lines[0][0]){
+            print $fh $lines[0][1];
+            shift @lines if @lines > 1;
+        }
+        else {
+            print $fh $_;
+        }
+    }
+    close $fh;
+    close $in;
+    return $tmp_filename;
+}
+
+sub tests_ok {
+    my $fn = shift;
+
+    $fn =~ s/\s+\z//;

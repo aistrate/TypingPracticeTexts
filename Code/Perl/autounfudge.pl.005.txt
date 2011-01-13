@@ -1,0 +1,34 @@
+    my $harness = get_harness();
+    my $agg = TAP::Parser::Aggregator->new();
+    $agg->start();
+    $harness->aggregate_tests($agg, $fn);
+    $agg->stop();
+    return !$agg->has_errors;
+}
+
+sub get_harness {
+    return TAP::Harness->new({
+            verbosity   => -2,
+            exec        => [$^X, 'tools/perl6-limited.pl'],
+            merge       => 1,
+    });
+}
+
+sub read_specfile {
+    my $fn = shift;
+
+    my @res;
+    open (my $f, '<', $fn) or die "Can't open file '$fn' for reading: $!";
+    while (<$f>){
+        next if m/#/;
+        next unless m/\S/;
+        next if m/$exclude/;
+        m/(\S+)/ && push @res, "t/spec/$1";
+    }
+    return @res;
+}
+
+END {
+    close $diff_fh if $diff_fh;
+    File::Path::rmtree($tmp_dir);
+}

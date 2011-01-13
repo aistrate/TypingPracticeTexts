@@ -1,0 +1,70 @@
+    my $ref_comments = shift;
+    my (@times) = @$ref_times;
+    my (@comments) = @$ref_comments;
+    shift @times;
+    shift @comments;
+    for ( my $i=0; $i<=@times; $i++ ) {
+        if ( not defined $comments[$i] ) { $comments[$i] = ''; }
+        $comments[$i] =~ s/\\/\\\\/g;
+        $comments[$i] =~ s/\"/\\\"/g;
+    }
+    my ( $line );
+    my $file_in  = $self->{'file_in'};
+    my $file_out = $self->{'file_out'};
+    $test_name =~ s{^t/spec/}{};
+    my $test_separator;
+    if ( $self->{'Last_test_loaded'} eq '' ) {
+        $test_separator = "\n";
+    }
+    else {
+        $test_separator = ",\n";
+    }
+    while ( not eof($file_in) and $self->{'Last_test_loaded'} lt $test_name ) {
+        $line = <$file_in>; chomp $line;
+        if ( $line =~ m/^\s\s"(.+)":.$/ ) {
+            $self->{'Last_test_loaded'} = $1;
+        }
+    }
+    my @logged_results;
+    if ( not eof($file_in) and $self->{'Last_test_loaded'} eq $test_name ) {
+        my $line = <$file_in>; chomp $line;
+        while ( not eof($file_in) and $line =~ m/^\s\s\s\[(\d+),\[(.+?)\],?/ ) {
+            my $test_number = $1;
+            my @timings = split /,/ , $2;
+            $logged_results[$test_number-1] = [ @timings ];
+            $line = <$file_in>; chomp $line;
+        }
+    }
+    my $microseconds = [];
+    my $testcount = @times;
+    for ( my $test_number=0; $test_number<$testcount; $test_number++) {
+        unless ( defined($times[$test_number]) ) { $times[$test_number] = 0; }
+        my ( @times_in_file );
+        if ( defined @{$logged_results[$test_number]} ) {
+            @times_in_file = ( @{$logged_results[$test_number]} );
+        }
+        push @times_in_file, $times[$test_number];
+        if ( not defined( $times_in_file[0] ) ) { shift @times_in_file; }
+        while ( @times_in_file > $self->{'Timings'} ) { shift @times_in_file; }
+        $$microseconds[$test_number] = [ @times_in_file ];
+    }
+    my $test_number = 1;
+    print $file_out
+        $test_separator .
+        qq'  "$test_name":[\n' .
+        join(",\n", map {'   ['.$test_number++.',['.join(',',@$_).'],"'.$comments[$test_number-2].'"]'} @$microseconds) .
+        qq'\n  ]';
+}
+
+sub end {
+    my $self = shift;
+    my $file_in  = $self->{'file_in'};
+    my $file_out = $self->{'file_out'};
+    print $file_out "\n }\n}\n";
+    close $file_out or warn $!;
+    close $file_in or warn $!;
+    unlink 'docs/test_summary.times';
+    rename 'docs/test_summary.times.tmp', 'docs/test_summary.times';
+}
+
+package main;

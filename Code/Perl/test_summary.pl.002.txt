@@ -1,0 +1,49 @@
+$| = 1;
+my ( @fail, @plan_hint );
+my %plan_per_file;
+for my $tfile (@tfiles) {
+    my $th;
+    open($th, '<', $tfile) || die "Can't read $tfile: $!\n";
+    my ($pass,$fail,$todo,$skip,$plan,$abort,$bonus) = (0,0,0,0,0,0,0);
+    my $no_plan = 0;
+    while (<$th>) {
+        if (/^\s*plan\D*(\d+)/) { $plan = $1; last; }
+        elsif (/^\s*plan\s+\*;/) { $no_plan = 1; last; }
+    }
+    close $th or die $!;
+    my $tname = $tname{$tfile};
+    if ( $syn ne substr($tname, 0, 3) ) {
+        $syn  =  substr($tname, 0, 3);
+        printf( "%s  pass fail todo skip plan\n", ' ' x $max );
+        unless ( exists $syn{$syn} ) {
+            push @fail, "note: test_summary.pl \@syn does not have $syn";
+        }
+    }
+    $syn{$syn}++;
+    printf "%s%s..", $tname, '.' x ($max - length($tname));
+    my $cmd = "./perl6 $tfile";
+    my @results = split "\n", qx{$cmd};
+    my (%skip, %todopass, %todofail);
+    my ($time1, $time2, $testnumber, $test_comment ) = ( 0, 0, 0, '' );
+    my @times = (); my @comments = ();
+    for (@results) {
+        if    (/^1\.\.(\d+)/)      { $plan = $1 if $1 > 0; next; }
+        if    (/^# t=(\d+\.\d+)/)  {
+            $time2 = $time1;
+            $time1 = $1;
+            my $microseconds = int( ($time1 - $time2) * 1_000_000 );
+            if ( $testnumber > 0 ) {
+                $times[$testnumber] = $microseconds;
+                $comments[$testnumber] = $test_comment;
+                $testnumber = 0;
+            }
+            next;
+        }
+        next unless /^(not )?ok +(\d+)/;
+        if    (/#\s*SKIP\s*(.*)/i) { $skip++; $skip{$1}++; }
+        elsif (/#\s*TODO\s*(.*)/i) { $todo++;
+            my $reason = $1;
+            if (/^ok /) { $todopass{$reason}++ }
+            else        { $todofail{$reason}++ }
+        }
+        elsif (/^not ok +(.*)/)    { $fail++; push @fail, "$tname $1"; }

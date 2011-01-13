@@ -1,0 +1,50 @@
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Fatal qw(close);
+use File::Temp qw(tempfile tempdir);
+use TAP::Harness;
+use TAP::Parser::Aggregator;
+use Cwd qw(getcwd);
+use File::Spec;
+use File::Path;
+use Text::Diff;
+use threads;
+use threads::shared;
+use Thread::Queue;
+
+my $impl = 'rakudo';
+our $debug = 0;
+our $out_filename = 'autounfudge.patch';
+my $exclude = '(?:(?:radix|modifiers/(?:while|until)|rx|assign)\.t)$';
+our $threads_num = 1;
+
+GetOptions  'impl=s'        => \$impl,
+            'debug'         => \$debug,
+            'specfile=s'    => \my $specfile,
+            'auto'          => \my $auto,
+            'keep-env'      => \my $keep_env,
+            'unskip'        => \my $unskip,
+            'untodo'        => \my $untodo,
+            'section=s'     => \my $section,
+            'exclude'       => \$exclude,
+            'jobs=i'        => \$threads_num,
+            or usage();
+
+delete $ENV{PERL6LIB} unless $keep_env;
+
+my @files;
+
+$specfile = 't/spectest.data' if $auto;
+
+if ($specfile){
+    @files = read_specfile($specfile);
+}
+else {
+    @files = @ARGV or usage();
+}
+
+if ($section) {
+    my $s = ($section =~ m/^\d{1,2}$/)
+            ? sprintf('S%02d', $section)

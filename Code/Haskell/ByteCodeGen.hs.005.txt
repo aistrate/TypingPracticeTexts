@@ -1,0 +1,57 @@
+getVarOffSets d p = catMaybes . map (getOffSet d p) . tickInfo_locals 
+
+getOffSet :: Word16 -> BCEnv -> Id -> Maybe (Id, Word16)
+getOffSet d env id 
+   = case lookupBCEnv_maybe id env of
+        Nothing     -> Nothing 
+        Just offset -> Just (id, d - offset)
+
+fvsToEnv :: BCEnv -> VarSet -> [Id]
+fvsToEnv p fvs = [v | v <- varSetElems fvs, 
+                      isId v,
+                      v `Map.member` p]
+
+data TickInfo 
+   = TickInfo   
+     { tickInfo_number :: Int
+     , tickInfo_module :: Module
+     , tickInfo_locals :: [Id]
+     } 
+
+instance Outputable TickInfo where
+   ppr info = text "TickInfo" <+> 
+              parens (int (tickInfo_number info) <+> ppr (tickInfo_module info) <+>
+                      ppr (tickInfo_locals info))
+
+schemeE :: Word16 -> Sequel -> BCEnv -> AnnExpr' Id VarSet -> BcM BCInstrList
+
+schemeE d s p e
+   | Just e' <- bcView e
+   = schemeE d s p e'
+
+schemeE d s p e@(AnnApp _ _) 
+   = schemeT d s p e
+
+schemeE d s p e@(AnnVar v)
+   | not (isUnLiftedType v_type)
+   =
+     schemeT d s p e
+
+   | otherwise
+   = do
+        (push, szw) <- pushAtom d p (AnnVar v)
+        return (push
+                  `appOL`  mkSLIDE szw (d-s)
+                  `snocOL` RETURN_UBX v_rep)
+   where
+      v_type = idType v
+      v_rep = typeCgRep v_type
+
+schemeE d s p (AnnLit literal)
+   = do (push, szw) <- pushAtom d p (AnnLit literal)
+        let l_rep = typeCgRep (literalType literal)
+        return (push
+               `appOL`  mkSLIDE szw (d-s)
+               `snocOL` RETURN_UBX l_rep)
+
+schemeE d s p (AnnLet (AnnNonRec x (_,rhs)) (_,body))

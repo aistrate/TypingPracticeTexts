@@ -1,0 +1,48 @@
+                _ -> Nothing
+
+mkConAppCode :: Word16 -> Sequel -> BCEnv
+             -> DataCon
+             -> [AnnExpr' Id VarSet]
+             -> BcM BCInstrList
+
+mkConAppCode _ _ _ con []
+  = ASSERT( isNullaryRepDataCon con )
+    return (unitOL (PUSH_G (getName (dataConWorkId con))))
+
+mkConAppCode orig_d _ p con args_r_to_l 
+  = ASSERT( dataConRepArity con == length args_r_to_l )
+    do_pushery orig_d (non_ptr_args ++ ptr_args)
+ where
+      (ptr_args, non_ptr_args) = partition isPtrAtom args_r_to_l
+
+      do_pushery d (arg:args)
+         = do (push, arg_words) <- pushAtom d p arg
+              more_push_code <- do_pushery (d+arg_words) args
+              return (push `appOL` more_push_code)
+      do_pushery d []
+         = return (unitOL (PACK con n_arg_words))
+         where
+           n_arg_words = d - orig_d
+
+unboxedTupleReturn
+        :: Word16 -> Sequel -> BCEnv
+        -> AnnExpr' Id VarSet -> BcM BCInstrList
+unboxedTupleReturn d s p arg = do
+  (push, sz) <- pushAtom d p arg
+  return (push `appOL`
+            mkSLIDE sz (d-s) `snocOL`
+            RETURN_UBX (atomRep arg))
+
+doTailCall
+        :: Word16 -> Sequel -> BCEnv
+        -> Id -> [AnnExpr' Id VarSet]
+        -> BcM BCInstrList
+doTailCall init_d s p fn args
+  = do_pushes init_d args (map atomRep args)
+  where
+  do_pushes d [] reps = do
+        ASSERT( null reps ) return ()
+        (push_fn, sz) <- pushAtom d p (AnnVar fn)
+        ASSERT( sz == 1 ) return ()
+        return (push_fn `appOL` (
+                  mkSLIDE ((d-init_d) + 1) (init_d - s) `appOL`

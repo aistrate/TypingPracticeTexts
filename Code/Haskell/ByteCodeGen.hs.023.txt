@@ -1,0 +1,54 @@
+        nextlabel :: Word16,
+        malloced  :: [BcPtr],
+        breakArray :: BreakArray
+        }
+
+newtype BcM r = BcM (BcM_State -> IO (BcM_State, r))
+
+ioToBc :: IO a -> BcM a
+ioToBc io = BcM $ \st -> do 
+  x <- io 
+  return (st, x)
+
+runBc :: UniqSupply -> ModBreaks -> BcM r -> IO (BcM_State, r)
+runBc us modBreaks (BcM m) 
+   = m (BcM_State us 0 [] breakArray)   
+   where
+   breakArray = modBreaks_flags modBreaks
+
+thenBc :: BcM a -> (a -> BcM b) -> BcM b
+thenBc (BcM expr) cont = BcM $ \st0 -> do
+  (st1, q) <- expr st0
+  let BcM k = cont q 
+  (st2, r) <- k st1
+  return (st2, r)
+
+thenBc_ :: BcM a -> BcM b -> BcM b
+thenBc_ (BcM expr) (BcM cont) = BcM $ \st0 -> do
+  (st1, _) <- expr st0
+  (st2, r) <- cont st1
+  return (st2, r)
+
+returnBc :: a -> BcM a
+returnBc result = BcM $ \st -> (return (st, result))
+
+instance Monad BcM where
+  (>>=) = thenBc
+  (>>)  = thenBc_
+  return = returnBc
+
+emitBc :: ([BcPtr] -> ProtoBCO Name) -> BcM (ProtoBCO Name)
+emitBc bco
+  = BcM $ \st -> return (st{malloced=[]}, bco (malloced st))
+
+recordMallocBc :: Ptr a -> BcM ()
+recordMallocBc a
+  = BcM $ \st -> return (st{malloced = Right (castPtr a) : malloced st}, ())
+
+recordItblMallocBc :: ItblPtr -> BcM ()
+recordItblMallocBc a
+  = BcM $ \st -> return (st{malloced = Left a : malloced st}, ())
+
+getLabelBc :: BcM Word16
+getLabelBc
+  = BcM $ \st -> do let nl = nextlabel st

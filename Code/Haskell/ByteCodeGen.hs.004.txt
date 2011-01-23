@@ -1,0 +1,39 @@
+schemeR_wrk :: [Id] -> Id -> AnnExpr Id VarSet -> ([Var], AnnExpr' Var VarSet) -> BcM (ProtoBCO Name) 
+schemeR_wrk fvs nm original_body (args, body)
+   = let 
+         all_args  = reverse args ++ fvs
+         arity     = length all_args
+
+         szsw_args = map (fromIntegral . idSizeW) all_args
+         szw_args  = sum szsw_args
+         p_init    = Map.fromList (zip all_args (mkStackOffsets 0 szsw_args))
+
+         bits = argBits (reverse (map idCgRep all_args))
+         bitmap_size = genericLength bits
+         bitmap = mkBitmap bits
+     in do
+     body_code <- schemeER_wrk szw_args p_init body   
+ 
+     emitBc (mkProtoBCO (getName nm) body_code (Right original_body)
+                arity bitmap_size bitmap False)
+
+schemeER_wrk :: Word16 -> BCEnv -> AnnExpr' Id VarSet -> BcM BCInstrList
+schemeER_wrk d p rhs
+   | Just (tickInfo, (_annot, newRhs)) <- isTickedExp' rhs = do 
+        code <- schemeE d 0 p newRhs 
+        arr <- getBreakArray 
+        let idOffSets = getVarOffSets d p tickInfo
+        let tickNumber = tickInfo_number tickInfo
+        let breakInfo = BreakInfo 
+                        { breakInfo_module = tickInfo_module tickInfo
+                        , breakInfo_number = tickNumber 
+                        , breakInfo_vars = idOffSets
+                        , breakInfo_resty = exprType (deAnnotate' newRhs)
+                        }
+        let breakInstr = case arr of
+                         BA arr# ->
+                             BRK_FUN arr# (fromIntegral tickNumber) breakInfo
+        return $ breakInstr `consOL` code
+   | otherwise = schemeE d 0 p rhs 
+
+getVarOffSets :: Word16 -> BCEnv -> TickInfo -> [(Id, Word16)]

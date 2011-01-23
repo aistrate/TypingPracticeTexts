@@ -1,0 +1,54 @@
+   | Just d_v <- lookupBCEnv_maybe v p
+   = let l = d - d_v + sz - 2
+     in return (toOL (genericReplicate sz (PUSH_L l)), sz)
+
+    | otherwise
+    = ASSERT(sz == 1) 
+      return (unitOL (PUSH_G (getName v)), sz)
+
+    where
+         sz :: Word16
+         sz = fromIntegral (idSizeW v)
+
+pushAtom _ _ (AnnLit lit)
+   = case lit of
+        MachLabel _ _ _ -> code NonPtrArg
+        MachWord _    -> code NonPtrArg
+        MachInt _     -> code PtrArg
+        MachFloat _   -> code FloatArg
+        MachDouble _  -> code DoubleArg
+        MachChar _    -> code NonPtrArg
+        MachNullAddr  -> code NonPtrArg
+        MachStr s     -> pushStr s
+        l             -> pprPanic "pushAtom" (ppr l)
+     where
+        code rep
+           = let size_host_words = fromIntegral (cgRepSizeW rep)
+             in  return (unitOL (PUSH_UBX (Left lit) size_host_words), 
+                           size_host_words)
+
+        pushStr s 
+           = let getMallocvilleAddr
+                    = case s of
+                         FastString _ n _ fp _ -> 
+                                do ptr <- ioToBc (mallocBytes (n+1))
+                                   recordMallocBc ptr
+                                   ioToBc (
+                                      withForeignPtr fp $ \p -> do
+                                         memcpy ptr p (fromIntegral n)
+                                         pokeByteOff ptr n (fromIntegral (ord '\0') :: Word8)
+                                         return ptr
+                                      )
+             in do
+                addr <- getMallocvilleAddr
+                return (unitOL (PUSH_UBX (Right addr) 1), 1)
+
+pushAtom d p (AnnCast e _)
+   = pushAtom d p (snd e)
+
+pushAtom _ _ expr
+   = pprPanic "ByteCodeGen.pushAtom" 
+              (pprCoreExpr (deAnnotate (undefined, expr)))
+
+foreign import ccall unsafe "memcpy"
+ memcpy :: Ptr a -> Ptr b -> CSize -> IO ()

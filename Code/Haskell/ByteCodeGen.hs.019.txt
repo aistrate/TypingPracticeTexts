@@ -1,0 +1,45 @@
+mkMultiBranch :: Maybe Int
+              -> [(Discr, BCInstrList)] 
+              -> BcM BCInstrList
+mkMultiBranch maybe_ncons raw_ways
+   = let d_way     = filter (isNoDiscr.fst) raw_ways
+         notd_ways = sortLe 
+                        (\w1 w2 -> leAlt (fst w1) (fst w2))
+                        (filter (not.isNoDiscr.fst) raw_ways)
+
+         mkTree :: [(Discr, BCInstrList)] -> Discr -> Discr -> BcM BCInstrList
+         mkTree [] _range_lo _range_hi = return the_default
+
+         mkTree [val] range_lo range_hi
+            | range_lo `eqAlt` range_hi 
+            = return (snd val)
+            | otherwise
+            = do label_neq <- getLabelBc
+                 return (testEQ (fst val) label_neq 
+                          `consOL` (snd val
+                          `appOL`   unitOL (LABEL label_neq)
+                          `appOL`   the_default))
+
+         mkTree vals range_lo range_hi
+            = let n = length vals `div` 2
+                  vals_lo = take n vals
+                  vals_hi = drop n vals
+                  v_mid = fst (head vals_hi)
+              in do
+              label_geq <- getLabelBc
+              code_lo <- mkTree vals_lo range_lo (dec v_mid)
+              code_hi <- mkTree vals_hi v_mid range_hi
+              return (testLT v_mid label_geq
+                        `consOL` (code_lo
+                        `appOL`   unitOL (LABEL label_geq)
+                        `appOL`   code_hi))
+ 
+         the_default 
+            = case d_way of [] -> unitOL CASEFAIL
+                            [(_, def)] -> def
+                            _ -> panic "mkMultiBranch/the_default"
+
+         testLT (DiscrI i) fail_label = TESTLT_I i fail_label
+         testLT (DiscrW i) fail_label = TESTLT_W i fail_label
+         testLT (DiscrF i) fail_label = TESTLT_F i fail_label
+         testLT (DiscrD i) fail_label = TESTLT_D i fail_label

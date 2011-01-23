@@ -1,0 +1,48 @@
+findPushSeq _
+  = panic "ByteCodeGen.findPushSeq"
+
+doCase  :: Word16 -> Sequel -> BCEnv
+        -> AnnExpr Id VarSet -> Id -> [AnnAlt Id VarSet]
+        -> Bool
+        -> BcM BCInstrList
+doCase d s p (_,scrut) bndr alts is_unboxed_tuple 
+  = let
+        ret_frame_sizeW = 2
+
+        unlifted_itbl_sizeW | isAlgCase = 0
+                            | otherwise = 1
+
+        d_bndr = d + ret_frame_sizeW + fromIntegral (idSizeW bndr)
+
+        d_alts = d_bndr + unlifted_itbl_sizeW
+
+        p_alts = Map.insert bndr (d_bndr - 1) p
+
+        bndr_ty = idType bndr
+        isAlgCase = not (isUnLiftedType bndr_ty) && not is_unboxed_tuple
+
+        codeAlt (DEFAULT, _, (_,rhs))
+           = do rhs_code <- schemeE d_alts s p_alts rhs
+                return (NoDiscr, rhs_code)
+
+        codeAlt alt@(_, bndrs, (_,rhs))
+           | null real_bndrs = do
+                rhs_code <- schemeE d_alts s p_alts rhs
+                return (my_discr alt, rhs_code)
+           | otherwise =
+             let
+                 (ptrs,nptrs) = partition (isFollowableArg.idCgRep) real_bndrs
+                 ptr_sizes    = map (fromIntegral . idSizeW) ptrs
+                 nptrs_sizes  = map (fromIntegral . idSizeW) nptrs
+                 bind_sizes   = ptr_sizes ++ nptrs_sizes
+                 size         = sum ptr_sizes + sum nptrs_sizes
+                 p' = Map.insertList
+                        (zip (reverse (ptrs ++ nptrs))
+                          (mkStackOffsets d_alts (reverse bind_sizes)))
+                        p_alts 
+             in do
+             MASSERT(isAlgCase)
+             rhs_code <- schemeE (d_alts+size) s p' rhs
+             return (my_discr alt, unitOL (UNPACK size) `appOL` rhs_code)
+           where
+             real_bndrs = filter (not.isTyCoVar) bndrs

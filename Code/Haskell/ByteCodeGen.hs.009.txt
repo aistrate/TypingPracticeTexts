@@ -1,0 +1,48 @@
+        tagToId_sequence <- implement_tagToId constr_names
+        return (push `appOL`  tagToId_sequence            
+                       `appOL`  mkSLIDE 1 (d+arg_words-s)
+                       `snocOL` ENTER)
+
+   | Just (CCall ccall_spec) <- isFCallId_maybe fn
+   = generateCCall d s p ccall_spec fn args_r_to_l
+
+   | Just con <- maybe_saturated_dcon,
+     isUnboxedTupleCon con
+   = case args_r_to_l of
+        [arg1,arg2] | isVoidArgAtom arg1 -> 
+                  unboxedTupleReturn d s p arg2
+        [arg1,arg2] | isVoidArgAtom arg2 -> 
+                  unboxedTupleReturn d s p arg1
+        _other -> unboxedTupleException
+
+   | Just con <- maybe_saturated_dcon
+   = do alloc_con <- mkConAppCode d s p con args_r_to_l
+        return (alloc_con        `appOL` 
+                  mkSLIDE 1 (d - s) `snocOL`
+                  ENTER)
+
+   | otherwise
+   = doTailCall d s p fn args_r_to_l
+
+   where
+      maybe_is_tagToEnum_call
+         = let extract_constr_Names ty
+                 | Just (tyc, _) <- splitTyConApp_maybe (repType ty),
+                   isDataTyCon tyc
+                   = map (getName . dataConWorkId) (tyConDataCons tyc)
+                 | otherwise
+                   = pprPanic "maybe_is_tagToEnum_call.extract_constr_Ids" (ppr ty)
+           in
+           case app of
+              (AnnApp (_, AnnApp (_, AnnVar v) (_, AnnType t)) arg)
+                 -> case isPrimOpId_maybe v of
+                       Just TagToEnumOp -> Just (snd arg, extract_constr_Names t)
+                       _                -> Nothing
+              _ -> Nothing
+
+      (AnnVar fn, args_r_to_l) = splitApp app
+
+      n_args = length args_r_to_l
+      maybe_saturated_dcon  
+        = case isDataConWorkId_maybe fn of
+                Just con | dataConRepArity con == n_args -> Just con

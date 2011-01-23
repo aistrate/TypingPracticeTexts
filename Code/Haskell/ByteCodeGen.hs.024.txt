@@ -1,0 +1,25 @@
+                    when (nl == maxBound) $
+                        panic "getLabelBc: Ran out of labels"
+                    return (st{nextlabel = nl + 1}, nl)
+
+getLabelsBc :: Word16 -> BcM [Word16]
+getLabelsBc n
+  = BcM $ \st -> let ctr = nextlabel st 
+                 in return (st{nextlabel = ctr+n}, [ctr .. ctr+n-1])
+
+getBreakArray :: BcM BreakArray 
+getBreakArray = BcM $ \st -> return (st, breakArray st)
+
+newUnique :: BcM Unique
+newUnique = BcM $
+   \st -> case takeUniqFromSupply (uniqSupply st) of
+             (uniq, us) -> let newState = st { uniqSupply = us }
+                           in  return (newState, uniq)
+
+newId :: Type -> BcM Id
+newId ty = do 
+    uniq <- newUnique
+    return $ mkSysLocal tickFS uniq ty
+
+tickFS :: FastString
+tickFS = fsLit "ticked"

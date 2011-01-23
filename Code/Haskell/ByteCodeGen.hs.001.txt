@@ -1,0 +1,73 @@
+module ByteCodeGen ( UnlinkedBCO, byteCodeGen, coreExprToBCOs ) where
+
+#include "HsVersions.h"
+
+import ByteCodeInstr
+import ByteCodeItbls
+import ByteCodeAsm
+import ByteCodeLink
+import LibFFI
+
+import Outputable
+import Name
+import MkId
+import Id
+import ForeignCall
+import HscTypes
+import CoreUtils
+import CoreSyn
+import PprCore
+import Literal
+import PrimOp
+import CoreFVs
+import Type
+import DataCon
+import TyCon
+import Util
+import Var
+import VarSet
+import TysPrim
+import DynFlags
+import ErrUtils
+import Unique
+import FastString
+import Panic
+import SMRep
+import Bitmap
+import OrdList
+import Constants
+
+import Data.List
+import Foreign
+import Foreign.C
+
+import Control.Monad    ( when )
+import Data.Char
+
+import UniqSupply
+import BreakArray
+import Data.Maybe
+import Module 
+import IdInfo 
+
+import Data.Map (Map)
+import qualified Data.Map as Map
+import qualified FiniteMap as Map
+
+byteCodeGen :: DynFlags
+            -> [CoreBind]
+            -> [TyCon]
+            -> ModBreaks 
+            -> IO CompiledByteCode
+byteCodeGen dflags binds tycs modBreaks 
+   = do showPass dflags "ByteCodeGen"
+
+        let flatBinds = [ (bndr, freeVars rhs) 
+                        | (bndr, rhs) <- flattenBinds binds]
+
+        us <- mkSplitUniqSupply 'y'  
+        (BcM_State _us _final_ctr mallocd _, proto_bcos) 
+           <- runBc us modBreaks (mapM schemeTopBind flatBinds)  
+
+        when (notNull mallocd)
+             (panic "ByteCodeGen.byteCodeGen: missing final emitBc?")

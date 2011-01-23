@@ -1,0 +1,38 @@
+   | (AnnVar v, args_r_to_l) <- splitApp rhs,
+     Just data_con <- isDataConWorkId_maybe v,
+     dataConRepArity data_con == length args_r_to_l
+   = do
+        alloc_code <- mkConAppCode d s p data_con args_r_to_l
+        body_code <- schemeE (d+1) s (Map.insert x d p) body
+        return (alloc_code `appOL` body_code)
+
+schemeE d s p (AnnLet binds (_,body))
+   = let (xs,rhss) = case binds of AnnNonRec x rhs  -> ([x],[rhs])
+                                   AnnRec xs_n_rhss -> unzip xs_n_rhss
+         n_binds = genericLength xs
+
+         fvss  = map (fvsToEnv p' . fst) rhss
+
+         sizes = map (\rhs_fvs -> sum (map (fromIntegral . idSizeW) rhs_fvs)) fvss
+
+         arities = map (genericLength . fst . collect) rhss
+
+         p'    = Map.insertList (zipE xs (mkStackOffsets d (genericReplicate n_binds 1))) p
+         d'    = d + n_binds
+         zipE  = zipEqual "schemeE"
+
+         build_thunk _ [] size bco off arity
+            = return (PUSH_BCO bco `consOL` unitOL (mkap (off+size) size))
+           where 
+                mkap | arity == 0 = MKAP
+                     | otherwise  = MKPAP
+         build_thunk dd (fv:fvs) size bco off arity = do
+              (push_code, pushed_szw) <- pushAtom dd p' (AnnVar fv) 
+              more_push_code <- build_thunk (dd+pushed_szw) fvs size bco off arity
+              return (push_code `appOL` more_push_code)
+
+         alloc_code = toOL (zipWith mkAlloc sizes arities)
+           where mkAlloc sz 0
+                    | is_tick     = ALLOC_AP_NOUPD sz
+                    | otherwise   = ALLOC_AP sz
+                 mkAlloc sz arity = ALLOC_PAP arity sz

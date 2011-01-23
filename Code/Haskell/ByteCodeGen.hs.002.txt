@@ -1,0 +1,53 @@
+        dumpIfSet_dyn dflags Opt_D_dump_BCOs
+           "Proto-BCOs" (vcat (intersperse (char ' ') (map ppr proto_bcos)))
+
+        assembleBCOs proto_bcos tycs
+        
+coreExprToBCOs :: DynFlags
+               -> CoreExpr
+               -> IO UnlinkedBCO
+coreExprToBCOs dflags expr
+ = do showPass dflags "ByteCodeGen"
+
+      let invented_name  = mkSystemVarName (mkPseudoUniqueE 0) (fsLit "ExprTopLevel")
+          invented_id    = Id.mkLocalId invented_name (panic "invented_id's type")
+          
+      us <- mkSplitUniqSupply 'y'
+      (BcM_State _us _final_ctr mallocd _ , proto_bco)  
+         <- runBc us emptyModBreaks (schemeTopBind (invented_id, freeVars expr))
+
+      when (notNull mallocd)
+           (panic "ByteCodeGen.coreExprToBCOs: missing final emitBc?")
+
+      dumpIfSet_dyn dflags Opt_D_dump_BCOs "Proto-BCOs" (ppr proto_bco)
+
+      assembleBCO proto_bco
+
+type BCInstrList = OrdList BCInstr
+
+type Sequel = Word16
+
+type BCEnv = Map Id Word16
+
+mkProtoBCO
+   :: name
+   -> BCInstrList
+   -> Either  [AnnAlt Id VarSet] (AnnExpr Id VarSet)
+   -> Int
+   -> Word16
+   -> [StgWord]
+   -> Bool
+   -> [BcPtr]
+   -> ProtoBCO name
+mkProtoBCO nm instrs_ordlist origin arity bitmap_size bitmap is_ret mallocd_blocks 
+   = ProtoBCO {
+        protoBCOName = nm,
+        protoBCOInstrs = maybe_with_stack_check,
+        protoBCOBitmap = bitmap,
+        protoBCOBitmapSize = bitmap_size,
+        protoBCOArity = arity,
+        protoBCOExpr = origin,
+        protoBCOPtrs = mallocd_blocks
+      }
+     where
+        maybe_with_stack_check

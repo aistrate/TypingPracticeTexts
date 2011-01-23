@@ -1,0 +1,48 @@
+     let
+         (pushs_arg, a_reps_pushed_r_to_l) = unzip code_n_reps
+         a_reps_sizeW = fromIntegral (sum (map primRepSizeW a_reps_pushed_r_to_l))
+
+         push_args    = concatOL pushs_arg
+         d_after_args = d0 + a_reps_sizeW
+         a_reps_pushed_RAW
+            | null a_reps_pushed_r_to_l || head a_reps_pushed_r_to_l /= VoidRep
+            = panic "ByteCodeGen.generateCCall: missing or invalid World token?"
+            | otherwise
+            = reverse (tail a_reps_pushed_r_to_l)
+
+         (returns_void, r_rep)
+            = case maybe_getCCallReturnRep (idType fn) of
+                 Nothing -> (True,  VoidRep)
+                 Just rr -> (False, rr) 
+         
+         get_target_info
+            = case target of
+                 DynamicTarget
+                    -> return (False, panic "ByteCodeGen.generateCCall(dyn)")
+
+                 StaticTarget target _
+                    -> do res <- ioToBc (lookupStaticPtr stdcall_adj_target)
+                          return (True, res)
+                   where
+                      stdcall_adj_target
+#ifdef mingw32_TARGET_OS
+                          | StdCallConv <- cconv
+                          = let size = fromIntegral a_reps_sizeW * wORD_SIZE in
+                            mkFastString (unpackFS target ++ '@':show size)
+#endif
+                          | otherwise
+                          = target
+
+     (is_static, static_target_addr) <- get_target_info
+     let
+
+         a_reps
+                | is_static = a_reps_pushed_RAW
+                | otherwise = if null a_reps_pushed_RAW 
+                              then panic "ByteCodeGen.generateCCall: dyn with no args"
+                              else tail a_reps_pushed_RAW
+
+         (push_Addr, d_after_Addr)
+            | is_static
+            = (toOL [PUSH_UBX (Right static_target_addr) addr_sizeW],
+               d_after_args + addr_sizeW)

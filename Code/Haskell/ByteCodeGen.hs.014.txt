@@ -1,0 +1,47 @@
+     alt_bco' <- emitBc alt_bco
+     let push_alts
+            | isAlgCase = PUSH_ALTS alt_bco'
+            | otherwise = PUSH_ALTS_UNLIFTED alt_bco' (typeCgRep bndr_ty)
+     return (push_alts `consOL` scrut_code)
+
+generateCCall :: Word16 -> Sequel
+              -> BCEnv
+              -> CCallSpec
+              -> Id
+              -> [AnnExpr' Id VarSet]
+              -> BcM BCInstrList
+
+generateCCall d0 s p (CCallSpec target cconv safety) fn args_r_to_l
+   = let 
+         addr_sizeW :: Word16
+         addr_sizeW = fromIntegral (cgRepSizeW NonPtrArg)
+
+         pargs _ [] = return []
+         pargs d (a:az) 
+            = let arg_ty = repType (exprType (deAnnotate' a))
+
+              in case splitTyConApp_maybe arg_ty of
+                    Just (t, _)
+                     | t == arrayPrimTyCon || t == mutableArrayPrimTyCon
+                       -> do rest <- pargs (d + addr_sizeW) az
+                             code <- parg_ArrayishRep (fromIntegral arrPtrsHdrSize) d p a
+                             return ((code,AddrRep):rest)
+
+                     | t == byteArrayPrimTyCon || t == mutableByteArrayPrimTyCon
+                       -> do rest <- pargs (d + addr_sizeW) az
+                             code <- parg_ArrayishRep (fromIntegral arrWordsHdrSize) d p a
+                             return ((code,AddrRep):rest)
+
+                    _
+                       -> do (code_a, sz_a) <- pushAtom d p a
+                             rest <- pargs (d+sz_a) az
+                             return ((code_a, atomPrimRep a) : rest)
+
+         parg_ArrayishRep :: Word16 -> Word16 -> BCEnv -> AnnExpr' Id VarSet
+                          -> BcM BCInstrList
+         parg_ArrayishRep hdrSize d p a
+            = do (push_fo, _) <- pushAtom d p a
+                 return (push_fo `snocOL` SWIZZLE 0 hdrSize)
+
+     in do
+     code_n_reps <- pargs d0 args_r_to_l

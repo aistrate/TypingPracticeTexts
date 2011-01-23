@@ -1,0 +1,39 @@
+splitApp :: AnnExpr' Var ann -> (AnnExpr' Var ann, [AnnExpr' Var ann])
+splitApp e | Just e' <- bcView e = splitApp e'
+splitApp (AnnApp (_,f) (_,a))    = case splitApp f of 
+                                      (f', as) -> (f', a:as)
+splitApp e                       = (e, [])
+
+bcView :: AnnExpr' Var ann -> Maybe (AnnExpr' Var ann)
+bcView (AnnNote _ (_,e))             = Just e
+bcView (AnnCast (_,e) _)             = Just e
+bcView (AnnLam v (_,e)) | isTyCoVar v  = Just e
+bcView (AnnApp (_,e) (_, AnnType _)) = Just e
+bcView _                             = Nothing
+
+isVoidArgAtom :: AnnExpr' Var ann -> Bool
+isVoidArgAtom e | Just e' <- bcView e = isVoidArgAtom e'
+isVoidArgAtom (AnnVar v)              = typePrimRep (idType v) == VoidRep
+isVoidArgAtom _                       = False
+
+atomPrimRep :: AnnExpr' Id ann -> PrimRep
+atomPrimRep e | Just e' <- bcView e = atomPrimRep e'
+atomPrimRep (AnnVar v)              = typePrimRep (idType v)
+atomPrimRep (AnnLit l)              = typePrimRep (literalType l)
+atomPrimRep other = pprPanic "atomPrimRep" (ppr (deAnnotate (undefined,other)))
+
+atomRep :: AnnExpr' Id ann -> CgRep
+atomRep e = primRepToCgRep (atomPrimRep e)
+
+isPtrAtom :: AnnExpr' Id ann -> Bool
+isPtrAtom e = atomRep e == PtrArg
+
+mkStackOffsets :: Word16 -> [Word16] -> [Word16]
+mkStackOffsets original_depth szsw
+   = map (subtract 1) (tail (scanl (+) original_depth szsw))
+
+type BcPtr = Either ItblPtr (Ptr ())
+
+data BcM_State 
+   = BcM_State { 
+        uniqSupply :: UniqSupply,

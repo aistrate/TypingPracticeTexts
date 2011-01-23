@@ -1,0 +1,49 @@
+           | is_ret && stack_usage < fromIntegral aP_STACK_SPLIM = peep_d
+           | stack_usage >= fromIntegral iNTERP_STACK_CHECK_THRESH
+           = STKCHECK stack_usage : peep_d
+           | otherwise
+           = peep_d
+             
+        stack_usage = sum (map bciStackUse peep_d)
+
+        peep_d = peep (fromOL instrs_ordlist)
+
+        peep (PUSH_L off1 : PUSH_L off2 : PUSH_L off3 : rest)
+           = PUSH_LLL off1 (off2-1) (off3-2) : peep rest
+        peep (PUSH_L off1 : PUSH_L off2 : rest)
+           = PUSH_LL off1 (off2-1) : peep rest
+        peep (i:rest)
+           = i : peep rest
+        peep []
+           = []
+
+argBits :: [CgRep] -> [Bool]
+argBits [] = []
+argBits (rep : args)
+  | isFollowableArg rep = False : argBits args
+  | otherwise = take (cgRepSizeW rep) (repeat True) ++ argBits args
+
+schemeTopBind :: (Id, AnnExpr Id VarSet) -> BcM (ProtoBCO Name)
+
+schemeTopBind (id, rhs) 
+  | Just data_con <- isDataConWorkId_maybe id,
+    isNullaryRepDataCon data_con = do
+    emitBc (mkProtoBCO (getName id) (toOL [PACK data_con 0, ENTER])
+                       (Right rhs) 0 0 [] False) 
+
+  | otherwise
+  = schemeR [] (id, rhs)
+
+schemeR :: [Id]
+        -> (Id, AnnExpr Id VarSet)
+        -> BcM (ProtoBCO Name)
+schemeR fvs (nm, rhs)
+
+   = schemeR_wrk fvs nm rhs (collect rhs)
+
+collect :: AnnExpr Id VarSet -> ([Var], AnnExpr' Id VarSet)
+collect (_, e) = go [] e
+  where
+    go xs e | Just e' <- bcView e = go xs e'
+    go xs (AnnLam x (_,e))        = go (x:xs) e
+    go xs not_lambda              = (reverse xs, not_lambda)

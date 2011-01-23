@@ -1,0 +1,43 @@
+        my_discr (DEFAULT, _, _) = NoDiscr 
+        my_discr (DataAlt dc, _, _) 
+           | isUnboxedTupleCon dc
+           = unboxedTupleException
+           | otherwise
+           = DiscrP (fromIntegral (dataConTag dc - fIRST_TAG))
+        my_discr (LitAlt l, _, _)
+           = case l of MachInt i     -> DiscrI (fromInteger i)
+                       MachWord w    -> DiscrW (fromInteger w)
+                       MachFloat r   -> DiscrF (fromRational r)
+                       MachDouble r  -> DiscrD (fromRational r)
+                       MachChar i    -> DiscrI (ord i)
+                       _ -> pprPanic "schemeE(AnnCase).my_discr" (ppr l)
+
+        maybe_ncons 
+           | not isAlgCase = Nothing
+           | otherwise 
+           = case [dc | (DataAlt dc, _, _) <- alts] of
+                []     -> Nothing
+                (dc:_) -> Just (tyConFamilySize (dataConTyCon dc))
+
+        bitmap_size = d-s
+        bitmap_size' :: Int
+        bitmap_size' = fromIntegral bitmap_size
+        bitmap = intsToReverseBitmap bitmap_size'
+                        (sortLe (<=) (filter (< bitmap_size') rel_slots))
+          where
+          binds = Map.toList p
+          rel_slots = map fromIntegral $ concat (map spread binds)
+          spread (id, offset)
+                | isFollowableArg (idCgRep id) = [ rel_offset ]
+                | otherwise = []
+                where rel_offset = d - offset - 1
+
+     in do
+     alt_stuff <- mapM codeAlt alts
+     alt_final <- mkMultiBranch maybe_ncons alt_stuff
+
+     let 
+         alt_bco_name = getName bndr
+         alt_bco = mkProtoBCO alt_bco_name alt_final (Left alts)
+                        0 bitmap_size bitmap True
+     scrut_code <- schemeE (d + ret_frame_sizeW) (d + ret_frame_sizeW) p scrut

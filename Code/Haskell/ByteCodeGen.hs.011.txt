@@ -1,0 +1,37 @@
+                  unitOL ENTER))
+  do_pushes d args reps = do
+      let (push_apply, n, rest_of_reps) = findPushSeq reps
+          (these_args, rest_of_args) = splitAt n args
+      (next_d, push_code) <- push_seq d these_args
+      instrs <- do_pushes (next_d + 1) rest_of_args rest_of_reps 
+      return (push_code `appOL` (push_apply `consOL` instrs))
+
+  push_seq d [] = return (d, nilOL)
+  push_seq d (arg:args) = do
+    (push_code, sz) <- pushAtom d p arg 
+    (final_d, more_push_code) <- push_seq (d+sz) args
+    return (final_d, push_code `appOL` more_push_code)
+
+findPushSeq :: [CgRep] -> (BCInstr, Int, [CgRep])
+findPushSeq (PtrArg: PtrArg: PtrArg: PtrArg: PtrArg: PtrArg: rest)
+  = (PUSH_APPLY_PPPPPP, 6, rest)
+findPushSeq (PtrArg: PtrArg: PtrArg: PtrArg: PtrArg: rest)
+  = (PUSH_APPLY_PPPPP, 5, rest)
+findPushSeq (PtrArg: PtrArg: PtrArg: PtrArg: rest)
+  = (PUSH_APPLY_PPPP, 4, rest)
+findPushSeq (PtrArg: PtrArg: PtrArg: rest)
+  = (PUSH_APPLY_PPP, 3, rest)
+findPushSeq (PtrArg: PtrArg: rest)
+  = (PUSH_APPLY_PP, 2, rest)
+findPushSeq (PtrArg: rest)
+  = (PUSH_APPLY_P, 1, rest)
+findPushSeq (VoidArg: rest)
+  = (PUSH_APPLY_V, 1, rest)
+findPushSeq (NonPtrArg: rest)
+  = (PUSH_APPLY_N, 1, rest)
+findPushSeq (FloatArg: rest)
+  = (PUSH_APPLY_F, 1, rest)
+findPushSeq (DoubleArg: rest)
+  = (PUSH_APPLY_D, 1, rest)
+findPushSeq (LongArg: rest)
+  = (PUSH_APPLY_L, 1, rest)

@@ -1,0 +1,49 @@
+                      (Just (tyc, tys)) -> (tyc, map typePrimRep tys)
+                      Nothing -> blargh
+         ok = ( ( r_reps `lengthIs` 2 && VoidRep == head r_reps)
+                || r_reps == [VoidRep] )
+              && isUnboxedTupleTyCon r_tycon
+              && case maybe_r_rep_to_go of
+                    Nothing    -> True
+                    Just r_rep -> r_rep /= PtrRep
+
+         blargh :: a
+         blargh = pprPanic "maybe_getCCallReturn: can't handle:" 
+                           (pprType fn_ty)
+     in 
+     if ok then maybe_r_rep_to_go else blargh
+
+implement_tagToId :: [Name] -> BcM BCInstrList
+implement_tagToId names
+   = ASSERT( notNull names )
+     do labels <- getLabelsBc (genericLength names)
+        label_fail <- getLabelBc
+        label_exit <- getLabelBc
+        let infos = zip4 labels (tail labels ++ [label_fail])
+                                [0 ..] names
+            steps = map (mkStep label_exit) infos
+        return (concatOL steps
+                  `appOL` 
+                  toOL [LABEL label_fail, CASEFAIL, LABEL label_exit])
+     where
+        mkStep l_exit (my_label, next_label, n, name_for_n)
+           = toOL [LABEL my_label, 
+                   TESTEQ_I n next_label, 
+                   PUSH_G name_for_n, 
+                   JMP l_exit]
+
+pushAtom :: Word16 -> BCEnv -> AnnExpr' Id VarSet -> BcM (BCInstrList, Word16)
+
+pushAtom d p e 
+   | Just e' <- bcView e 
+   = pushAtom d p e'
+
+pushAtom d p (AnnVar v)
+   | idCgRep v == VoidArg
+   = return (nilOL, 0)
+
+   | isFCallId v
+   = pprPanic "pushAtom: shouldn't get an FCallId here" (ppr v)
+
+   | Just primop <- isPrimOpId_maybe v
+   = return (unitOL (PUSH_PRIMOP primop), 1)

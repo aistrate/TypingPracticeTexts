@@ -1,0 +1,55 @@
+         (DiscrF f1) `leAlt` (DiscrF f2) = f1 <= f2
+         (DiscrD d1) `leAlt` (DiscrD d2) = d1 <= d2
+         (DiscrP i1) `leAlt` (DiscrP i2) = i1 <= i2
+         NoDiscr     `leAlt` NoDiscr     = True
+         _           `leAlt` _           = False
+
+         isNoDiscr NoDiscr = True
+         isNoDiscr _       = False
+
+         dec (DiscrI i) = DiscrI (i-1)
+         dec (DiscrW w) = DiscrW (w-1)
+         dec (DiscrP i) = DiscrP (i-1)
+         dec other      = other
+
+         minF, maxF :: Float
+         minD, maxD :: Double
+         minF = -1.0e37
+         maxF =  1.0e37
+         minD = -1.0e308
+         maxD =  1.0e308
+     in
+         mkTree notd_ways init_lo init_hi
+
+data Discr 
+   = DiscrI Int
+   | DiscrW Word
+   | DiscrF Float
+   | DiscrD Double
+   | DiscrP Word16
+   | NoDiscr
+
+instance Outputable Discr where
+   ppr (DiscrI i) = int i
+   ppr (DiscrW w) = text (show w)
+   ppr (DiscrF f) = text (show f)
+   ppr (DiscrD d) = text (show d)
+   ppr (DiscrP i) = ppr i
+   ppr NoDiscr    = text "DEF"
+
+lookupBCEnv_maybe :: Id -> BCEnv -> Maybe Word16
+lookupBCEnv_maybe = Map.lookup
+
+idSizeW :: Id -> Int
+idSizeW id = cgRepSizeW (typeCgRep (idType id))
+
+unboxedTupleException :: a
+unboxedTupleException 
+   = ghcError 
+        (ProgramError 
+           ("Error: bytecode compiler can't handle unboxed tuples.\n"++
+            "  Possibly due to foreign import/export decls in source.\n"++
+            "  Workaround: use -fobject-code, or compile this module to .o separately."))
+
+mkSLIDE :: Word16 -> Word16 -> OrdList BCInstr
+mkSLIDE n d = if d == 0 then nilOL else unitOL (SLIDE n d)

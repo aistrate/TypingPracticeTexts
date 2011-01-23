@@ -1,0 +1,45 @@
+            | otherwise
+            = (nilOL, d_after_args)
+
+         r_sizeW   = fromIntegral (primRepSizeW r_rep)
+         d_after_r = d_after_Addr + r_sizeW
+         r_lit     = mkDummyLiteral r_rep
+         push_r    = (if   returns_void 
+                      then nilOL 
+                      else unitOL (PUSH_UBX (Left r_lit) r_sizeW))
+
+         stk_offset   = d_after_r - s
+
+     token <- ioToBc $ prepForeignCall cconv a_reps r_rep
+     let addr_of_marshaller = castPtrToFunPtr token
+
+     recordItblMallocBc (ItblPtr (castFunPtrToPtr addr_of_marshaller))
+     let
+         do_call      = unitOL (CCALL stk_offset (castFunPtrToPtr addr_of_marshaller)
+                                 (fromIntegral (fromEnum (playInterruptible safety))))
+         wrapup       = mkSLIDE r_sizeW (d_after_r - r_sizeW - s)
+                        `snocOL` RETURN_UBX (primRepToCgRep r_rep)
+     return (
+         push_args `appOL`
+         push_Addr `appOL` push_r `appOL` do_call `appOL` wrapup
+         )
+
+mkDummyLiteral :: PrimRep -> Literal
+mkDummyLiteral pr
+   = case pr of
+        IntRep    -> MachInt 0
+        WordRep   -> MachWord 0
+        AddrRep   -> MachNullAddr
+        DoubleRep -> MachDouble 0
+        FloatRep  -> MachFloat 0
+        Int64Rep  -> MachInt64 0
+        Word64Rep -> MachWord64 0
+        _         -> panic "mkDummyLiteral"
+
+maybe_getCCallReturnRep :: Type -> Maybe PrimRep
+maybe_getCCallReturnRep fn_ty
+   = let (_a_tys, r_ty) = splitFunTys (dropForAlls fn_ty)
+         maybe_r_rep_to_go  
+            = if isSingleton r_reps then Nothing else Just (r_reps !! 1)
+         (r_tycon, r_reps) 
+            = case splitTyConApp_maybe (repType r_ty) of

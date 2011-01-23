@@ -1,0 +1,50 @@
+   =
+     doCase d s p scrut bind1 [(DEFAULT, [], rhs)] True 
+
+schemeE d s p (AnnCase scrut _ _ [(DataAlt dc, [bind1], rhs)])
+   | isUnboxedTupleCon dc
+   =
+     doCase d s p scrut bind1 [(DEFAULT, [], rhs)] True 
+
+schemeE d s p (AnnCase scrut bndr _ alts)
+   = doCase d s p scrut bndr alts False 
+
+schemeE _ _ _ expr
+   = pprPanic "ByteCodeGen.schemeE: unhandled case" 
+               (pprCoreExpr (deAnnotate' expr))
+
+isTickedExp' :: AnnExpr' Id a -> Maybe (TickInfo, AnnExpr Id a)
+isTickedExp' (AnnCase scrut _bndr _type alts)
+   | Just tickInfo <- isTickedScrut scrut,
+     [(DEFAULT, _bndr, rhs)] <- alts 
+     = Just (tickInfo, rhs)
+   where
+   isTickedScrut :: (AnnExpr Id a) -> Maybe TickInfo 
+   isTickedScrut expr
+      | Var id <- f,
+        Just (TickBox modName tickNumber) <- isTickBoxOp_maybe id
+           = Just $ TickInfo { tickInfo_number = tickNumber
+                             , tickInfo_module = modName
+                             , tickInfo_locals = idsOfArgs args
+                             }
+      | otherwise = Nothing
+      where
+      (f, args) = collectArgs $ deAnnotate expr
+      idsOfArgs :: [Expr Id] -> [Id]
+      idsOfArgs = catMaybes . map exprId 
+      exprId :: Expr Id -> Maybe Id
+      exprId (Var id) = Just id
+      exprId _        = Nothing
+
+isTickedExp' _ = Nothing
+
+schemeT :: Word16
+        -> Sequel
+        -> BCEnv
+        -> AnnExpr' Id VarSet 
+        -> BcM BCInstrList
+
+schemeT d s p app
+
+   | Just (arg, constr_names) <- maybe_is_tagToEnum_call
+   = do (push, arg_words) <- pushAtom d p arg

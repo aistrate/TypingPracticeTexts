@@ -1,0 +1,42 @@
+  = hsc_env { hsc_mod_graph = emptyMG, 
+              hsc_IC = emptyInteractiveContext,
+              hsc_HPT = emptyHomePackageTable }
+
+ppFilesFromSummaries :: [ModSummary] -> [FilePath]
+ppFilesFromSummaries summaries = map ms_hspp_file summaries
+
+class ParsedMod m where
+  modSummary   :: m -> ModSummary
+  parsedSource :: m -> ParsedSource
+
+class ParsedMod m => TypecheckedMod m where
+  renamedSource     :: m -> Maybe RenamedSource
+  typecheckedSource :: m -> TypecheckedSource
+  moduleInfo        :: m -> ModuleInfo
+  tm_internals      :: m -> (TcGblEnv, ModDetails)
+
+class TypecheckedMod m => DesugaredMod m where
+  coreModule :: m -> ModGuts
+
+data ParsedModule =
+  ParsedModule { pm_mod_summary   :: ModSummary
+               , pm_parsed_source :: ParsedSource }
+
+instance ParsedMod ParsedModule where
+  modSummary m    = pm_mod_summary m
+  parsedSource m = pm_parsed_source m
+
+data TypecheckedModule =
+  TypecheckedModule { tm_parsed_module       :: ParsedModule
+                    , tm_renamed_source      :: Maybe RenamedSource
+                    , tm_typechecked_source  :: TypecheckedSource
+                    , tm_checked_module_info :: ModuleInfo
+                    , tm_internals_          :: (TcGblEnv, ModDetails)
+                    }
+
+instance ParsedMod TypecheckedModule where
+  modSummary m   = modSummary (tm_parsed_module m)
+  parsedSource m = parsedSource (tm_parsed_module m)
+
+instance TypecheckedMod TypecheckedModule where
+  renamedSource m     = tm_renamed_source m

@@ -1,0 +1,42 @@
+       where
+          noCanDo n why = printForUser $
+                text "cannot set breakpoint on " <> ppr n <> text ": " <> why
+
+breakByModule :: Module -> [String] -> GHCi () 
+breakByModule mod (arg1:rest)
+   | all isDigit arg1 = do
+        breakByModuleLine mod (read arg1) rest
+breakByModule _ _
+   = breakSyntax
+
+breakByModuleLine :: Module -> Int -> [String] -> GHCi ()
+breakByModuleLine mod line args
+   | [] <- args = findBreakAndSet mod $ findBreakByLine line
+   | [col] <- args, all isDigit col =
+        findBreakAndSet mod $ findBreakByCoord Nothing (line, read col)
+   | otherwise = breakSyntax
+
+breakSyntax :: a
+breakSyntax = ghcError (CmdLineError "Syntax: :break [<mod>] <line> [<column>]")
+
+findBreakAndSet :: Module -> (TickArray -> Maybe (Int, SrcSpan)) -> GHCi ()
+findBreakAndSet mod lookupTickTree = do 
+   tickArray <- getTickArray mod
+   (breakArray, _) <- getModBreak mod
+   case lookupTickTree tickArray of 
+      Nothing  -> liftIO $ putStrLn $ "No breakpoints found at that location."
+      Just (tick, span) -> do
+         success <- liftIO $ setBreakFlag True breakArray tick
+         if success 
+            then do
+               (alreadySet, nm) <- 
+                     recordBreak $ BreakLocation
+                             { breakModule = mod
+                             , breakLoc = span
+                             , breakTick = tick
+                             , onBreakCmd = ""
+                             }
+               printForUser $
+                  text "Breakpoint " <> ppr nm <>
+                  if alreadySet 
+                     then text " was already set at " <> ppr span

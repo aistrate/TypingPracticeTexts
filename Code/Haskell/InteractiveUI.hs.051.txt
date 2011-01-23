@@ -1,0 +1,42 @@
+          | otherwise   = BS.concat [prefix, line]
+
+        highlight_carets no line prefix
+          | no == line1 && no == line2
+          = BS.concat [prefix, line, nl, indent, BS.replicate col1 ' ',
+                                         BS.replicate (col2-col1) '^']
+          | no == line1
+          = BS.concat [indent, BS.replicate (col1 - 2) ' ', BS.pack "vv", nl, 
+                                         prefix, line]
+          | no == line2
+          = BS.concat [prefix, line, nl, indent, BS.replicate col2 ' ',
+                                         BS.pack "^^"]
+          | otherwise   = BS.concat [prefix, line]
+         where
+           indent = BS.pack ("  " ++ replicate (length (show no)) ' ')
+           nl = BS.singleton '\n'
+
+getTickArray :: Module -> GHCi TickArray
+getTickArray modl = do
+   st <- getGHCiState
+   let arrmap = tickarrays st
+   case lookupModuleEnv arrmap modl of
+      Just arr -> return arr
+      Nothing  -> do
+        (_breakArray, ticks) <- getModBreak modl 
+        let arr = mkTickArray (assocs ticks)
+        setGHCiState st{tickarrays = extendModuleEnv arrmap modl arr}
+        return arr
+
+discardTickArrays :: GHCi ()
+discardTickArrays = do
+   st <- getGHCiState
+   setGHCiState st{tickarrays = emptyModuleEnv}
+
+mkTickArray :: [(BreakIndex,SrcSpan)] -> TickArray
+mkTickArray ticks
+  = accumArray (flip (:)) [] (1, max_line) 
+        [ (line, (nm,span)) | (nm,span) <- ticks,
+                              line <- srcSpanLines span ]
+    where
+        max_line = foldr max 0 (map GHC.srcSpanEndLine (map snd ticks))
+        srcSpanLines span = [ GHC.srcSpanStartLine span .. 

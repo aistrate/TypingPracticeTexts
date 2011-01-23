@@ -1,0 +1,49 @@
+                        else local_target 
+
+            summary' = summary{ ms_hspp_opts = dflags { hscTarget = target } }
+
+            mb_old_iface 
+                = case old_hmi of
+                     Nothing                              -> Nothing
+                     Just hm_info | isBootSummary summary -> Just iface
+                                  | not (mi_boot iface)   -> Just iface
+                                  | otherwise             -> Nothing
+                                   where 
+                                     iface = hm_iface hm_info
+
+            compile_it :: Maybe Linkable -> IO HomeModInfo
+            compile_it  mb_linkable = 
+                  compile hsc_env summary' mod_index nmods 
+                          mb_old_iface mb_linkable
+
+            compile_it_discard_iface :: Maybe Linkable -> IO HomeModInfo
+            compile_it_discard_iface mb_linkable =
+                  compile hsc_env summary' mod_index nmods
+                          Nothing mb_linkable
+
+            is_fake_linkable
+               | Just hmi <- old_hmi, Just l <- hm_linkable hmi =
+                  null (linkableUnlinked l)
+               | otherwise =
+                   False
+
+            implies False _ = True
+            implies True x  = x
+
+        in
+        case () of
+         _
+          | is_stable_obj, Just hmi <- old_hmi -> do
+                liftIO $ debugTraceMsg (hsc_dflags hsc_env) 5
+                           (text "skipping stable obj mod:" <+> ppr this_mod_name)
+                return hmi
+
+          | is_stable_obj, isNothing old_hmi -> do
+                liftIO $ debugTraceMsg (hsc_dflags hsc_env) 5
+                           (text "compiling stable on-disk mod:" <+> ppr this_mod_name)
+                linkable <- liftIO $ findObjectLinkable this_mod obj_fn
+                              (expectJust "upsweep1" mb_obj_date)
+                compile_it (Just linkable)
+
+          | not (isObjectTarget target), is_stable_bco,
+            (target /= HscNothing) `implies` not is_fake_linkable ->

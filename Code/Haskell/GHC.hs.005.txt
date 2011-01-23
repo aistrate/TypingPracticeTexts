@@ -1,0 +1,45 @@
+import FastString
+import qualified Parser
+import Lexer
+
+import System.Directory ( getModificationTime, doesFileExist,
+                          getCurrentDirectory )
+import Data.Maybe
+import Data.Map (Map)
+import qualified Data.Map as Map
+import qualified FiniteMap as Map
+import Data.List
+import qualified Data.List as List
+import Data.Typeable    ( Typeable )
+import Data.Word        ( Word8 )
+import Control.Monad
+import System.Exit      ( exitWith, ExitCode(..) )
+import System.Time      ( ClockTime, getClockTime )
+import Exception
+import Data.IORef
+import System.FilePath
+import System.IO
+import System.IO.Error  ( isDoesNotExistError )
+import Prelude hiding (init)
+
+defaultErrorHandler :: (ExceptionMonad m, MonadIO m) => DynFlags -> m a -> m a
+defaultErrorHandler dflags inner =
+  ghandle (\exception -> liftIO $ do
+           hFlush stdout
+           case fromException exception of
+                Just (ioe :: IOException) ->
+                  fatalErrorMsg dflags (text (show ioe))
+                _ -> case fromException exception of
+                     Just UserInterrupt -> exitWith (ExitFailure 1)
+                     Just StackOverflow ->
+                         fatalErrorMsg dflags (text "stack overflow: use +RTS -K<size> to increase it")
+                     _ -> case fromException exception of
+                          Just (ex :: ExitCode) -> throw ex
+                          _ ->
+                              fatalErrorMsg dflags
+                                  (text (show (Panic (show exception))))
+           exitWith (ExitFailure 1)
+         ) $
+
+  handleGhcException
+            (\ge -> liftIO $ do

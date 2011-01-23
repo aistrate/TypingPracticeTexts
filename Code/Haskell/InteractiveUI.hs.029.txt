@@ -1,0 +1,41 @@
+                      | otherwise
+                      = occ_sort names
+
+        mb_things <- mapM GHC.lookupName sorted_names
+        let filtered_things = filterOutChildren (\t -> t) (catMaybes mb_things)
+
+        rdr_env <- GHC.getGRE
+
+        let pefas              = dopt Opt_PrintExplicitForalls dflags
+            things | bang      = catMaybes mb_things
+                   | otherwise = filtered_things
+            pretty | bang      = pprTyThing
+                   | otherwise = pprTyThingInContext
+
+            labels  [] = text "-- not currently imported"
+            labels  l  = text $ intercalate "\n" $ map qualifier l
+            qualifier  = maybe "-- defined locally" 
+                             (("-- imported via "++) . intercalate ", " 
+                               . map GHC.moduleNameString)
+            importInfo = RdrName.getGRE_NameQualifier_maybes rdr_env
+            modNames   = map (importInfo . GHC.getName) things
+                                        
+            annotate mts = concatMap (\(m,ts)->labels m:ts)
+                         $ sortBy cmpQualifiers $ group mts
+              where cmpQualifiers = 
+                      compare `on` (map (fmap (map moduleNameFS)) . fst)
+            group []            = []
+            group mts@((m,_):_) = (m,map snd g) : group ng
+              where (g,ng) = partition ((==m).fst) mts
+
+        let prettyThings = map (pretty pefas) things
+            prettyThings' | bang      = annotate $ zip modNames prettyThings
+                          | otherwise = prettyThings
+        liftIO $ putStrLn $ showSDocForUser unqual (vcat prettyThings')
+
+newContextCmd :: CtxtCmd -> GHCi ()
+newContextCmd cmd = do
+  playCtxtCmd True cmd
+  st <- getGHCiState
+  let cmds = remembered_ctx st
+  setGHCiState st{ remembered_ctx = cmds ++ [cmd] }

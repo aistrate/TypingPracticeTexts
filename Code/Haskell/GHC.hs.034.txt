@@ -1,0 +1,37 @@
+  = throwOneError $ mkPlainErrMsg loc $ cannotFindModule dflags wanted_mod err
+                                
+noHsFileErr :: SrcSpan -> String -> IO a
+noHsFileErr loc path
+  = throwOneError $ mkPlainErrMsg loc $ text "Can't find" <+> text path
+ 
+packageModErr :: ModuleName -> IO a
+packageModErr mod
+  = throwOneError $ mkPlainErrMsg noSrcSpan $
+        text "module" <+> quotes (ppr mod) <+> text "is a package module"
+
+multiRootsErr :: [ModSummary] -> IO ()
+multiRootsErr [] = panic "multiRootsErr"
+multiRootsErr summs@(summ1:_)
+  = throwOneError $ mkPlainErrMsg noSrcSpan $
+        text "module" <+> quotes (ppr mod) <+> 
+        text "is defined in multiple files:" <+>
+        sep (map text files)
+  where
+    mod = ms_mod summ1
+    files = map (expectJust "checkDup" . ml_hs_file . ms_location) summs
+
+cyclicModuleErr :: [ModSummary] -> SDoc
+cyclicModuleErr ms
+  = hang (ptext (sLit "Module imports form a cycle for modules:"))
+       2 (vcat (map show_one ms))
+  where
+    mods_in_cycle = map ms_mod_name ms
+    imp_modname = unLoc . ideclName . unLoc
+    just_in_cycle = filter ((`elem` mods_in_cycle) . imp_modname)
+
+    show_one ms = 
+           vcat [ show_mod (ms_hsc_src ms) (ms_mod_name ms) <+>
+                  maybe empty (parens . text) (ml_hs_file (ms_location ms)),
+                  nest 2 $ ptext (sLit "imports:") <+> vcat [
+                     pp_imps HsBootFile (just_in_cycle $ ms_srcimps ms),
+                     pp_imps HsSrcFile  (just_in_cycle $ ms_imps ms) ]

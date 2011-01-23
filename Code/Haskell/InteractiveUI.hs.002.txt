@@ -1,0 +1,45 @@
+import System.FilePath
+import qualified Data.ByteString.Char8 as BS
+import Data.List
+import Data.Maybe
+import System.Cmd
+import System.Environment
+import System.Exit      ( exitWith, ExitCode(..) )
+import System.Directory
+import System.IO
+import System.IO.Error
+import Data.Char
+import Data.Array
+import Control.Monad as Monad
+import Text.Printf
+import Foreign
+import GHC.Exts         ( unsafeCoerce# )
+
+import GHC.IO.Exception ( IOErrorType(InvalidArgument) )
+import GHC.IO.Handle    ( hFlushAll )
+
+import GHC.TopHandler
+
+import Data.IORef       ( IORef, readIORef, writeIORef )
+
+ghciWelcomeMsg :: String
+ghciWelcomeMsg = "GHCi, version " ++ cProjectVersion ++
+                 ": http://www.haskell.org/ghc/  :? for help"
+
+cmdName :: Command -> String
+cmdName (n,_,_) = n
+
+GLOBAL_VAR(macros_ref, [], [Command])
+
+builtin_commands :: [Command]
+builtin_commands = [
+  ("?",         keepGoing help,                 noCompletion),
+  ("add",       keepGoingPaths addModule,       completeFilename),
+  ("abandon",   keepGoing abandonCmd,           noCompletion),
+  ("break",     keepGoing breakCmd,             completeIdentifier),
+  ("back",      keepGoing backCmd,              noCompletion),
+  ("browse",    keepGoing' (browseCmd False),   completeModule),
+  ("browse!",   keepGoing' (browseCmd True),    completeModule),
+  ("cd",        keepGoing' changeDirectory,     completeFilename),
+  ("check",     keepGoing' checkModule,         completeHomeModule),
+  ("continue",  keepGoing continueCmd,          noCompletion),

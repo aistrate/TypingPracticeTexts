@@ -1,0 +1,44 @@
+      (n:_) -> do
+            let modl = ASSERT( isExternalName n ) GHC.nameModule n
+            if not (GHC.isExternalName n)
+               then noCanDo n $ ppr n <>
+                                text " is not defined in an interpreted module"
+               else do
+            is_interpreted <- GHC.moduleIsInterpreted modl
+            if not is_interpreted
+               then noCanDo n $ text "module " <> ppr modl <>
+                                text " is not interpreted"
+               else and_then n
+
+sprintCmd, printCmd, forceCmd :: String -> GHCi ()
+sprintCmd = pprintCommand False False
+printCmd  = pprintCommand True False
+forceCmd  = pprintCommand False True
+
+pprintCommand :: Bool -> Bool -> String -> GHCi ()
+pprintCommand bind force str = do
+  pprintClosureCommand bind force str
+
+stepCmd :: String -> GHCi ()
+stepCmd []         = doContinue (const True) GHC.SingleStep
+stepCmd expression = runStmt expression GHC.SingleStep >> return ()
+
+stepLocalCmd :: String -> GHCi ()
+stepLocalCmd  [] = do 
+  mb_span <- getCurrentBreakSpan
+  case mb_span of
+    Nothing  -> stepCmd []
+    Just loc -> do
+       Just mod <- getCurrentBreakModule
+       current_toplevel_decl <- enclosingTickSpan mod loc
+       doContinue (`isSubspanOf` current_toplevel_decl) GHC.SingleStep
+
+stepLocalCmd expression = stepCmd expression
+
+stepModuleCmd :: String -> GHCi ()
+stepModuleCmd  [] = do 
+  mb_span <- getCurrentBreakSpan
+  case mb_span of
+    Nothing  -> stepCmd []
+    Just _ -> do
+       Just span <- getCurrentBreakSpan

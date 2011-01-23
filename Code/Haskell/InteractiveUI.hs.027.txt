@@ -1,0 +1,46 @@
+modulesLoadedMsg ok mods = do
+  dflags <- getDynFlags
+  when (verbosity dflags > 0) $ do
+   let mod_commas 
+        | null mods = text "none."
+        | otherwise = hsep (
+            punctuate comma (map ppr mods)) <> text "."
+   case ok of
+    Failed ->
+       liftIO $ putStrLn $ showSDoc (text "Failed, modules loaded: " <> mod_commas)
+    Succeeded  ->
+       liftIO $ putStrLn $ showSDoc (text "Ok, modules loaded: " <> mod_commas)
+
+typeOfExpr :: String -> InputT GHCi ()
+typeOfExpr str 
+  = handleSourceError GHC.printException
+  $ do
+       ty <- GHC.exprType str
+       dflags <- getDynFlags
+       let pefas = dopt Opt_PrintExplicitForalls dflags
+       printForUser $ sep [text str, nest 2 (dcolon <+> pprTypeForUser pefas ty)]
+
+kindOfType :: String -> InputT GHCi ()
+kindOfType str 
+  = handleSourceError GHC.printException
+  $ do
+       ty <- GHC.typeKind str
+       printForUser $ text str <+> dcolon <+> ppr ty
+
+quit :: String -> InputT GHCi Bool
+quit _ = return True
+
+shellEscape :: String -> GHCi Bool
+shellEscape str = liftIO (system str >> return False)
+
+browseCmd :: Bool -> String -> InputT GHCi ()
+browseCmd bang m = 
+  case words m of
+    ['*':s] | looksLikeModuleName s -> do 
+        m <- lift $ wantInterpretedModule s
+        browseModule bang m False
+    [s] | looksLikeModuleName s -> do
+        m <- lift $ lookupModule s
+        browseModule bang m True
+    [] -> do
+        (as,bs) <- GHC.getContext

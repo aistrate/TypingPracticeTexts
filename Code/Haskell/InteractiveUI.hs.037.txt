@@ -1,0 +1,35 @@
+  liftIO $ putStrLn $ showSDoc $ vcat $
+    text ("active package flags:"++if null pkg_flags then " none" else "")
+    : map showFlag pkg_flags
+  where showFlag (ExposePackage p) = text $ "  -package " ++ p
+        showFlag (HidePackage p)   = text $ "  -hide-package " ++ p
+        showFlag (IgnorePackage p) = text $ "  -ignore-package " ++ p
+        showFlag (ExposePackageId p) = text $ "  -package-id " ++ p
+
+showLanguages :: GHCi ()
+showLanguages = do
+   dflags <- getDynFlags
+   liftIO $ putStrLn $ showSDoc $ vcat $
+      text "active language flags:" :
+      [text ("  -X" ++ str) | (str, f, _) <- DynFlags.xFlags, xopt f dflags]
+
+completeCmd, completeMacro, completeIdentifier, completeModule,
+    completeSetModule,
+    completeHomeModule, completeSetOptions, completeShowOptions,
+    completeHomeModuleOrFile, completeExpression
+    :: CompletionFunc GHCi
+
+ghciCompleteWord :: CompletionFunc GHCi
+ghciCompleteWord line@(left,_) = case firstWord of
+    ':':cmd     | null rest     -> completeCmd line
+                | otherwise     -> do
+                        completion <- lookupCompletion cmd
+                        completion line
+    "import"    -> completeModule line
+    _           -> completeExpression line
+  where
+    (firstWord,rest) = break isSpace $ dropWhile isSpace $ reverse left
+    lookupCompletion ('!':_) = return completeFilename
+    lookupCompletion c = do
+        maybe_cmd <- liftIO $ lookupCommand' c
+        case maybe_cmd of

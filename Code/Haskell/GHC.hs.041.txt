@@ -1,0 +1,35 @@
+      case res of
+        Found _ m -> return m
+        err       -> noModError dflags noSrcSpan mod_name err
+    _otherwise -> do
+      home <- lookupLoadedHomeModule mod_name
+      case home of
+        Just m  -> return m
+        Nothing -> liftIO $ do
+           res <- findImportedModule hsc_env mod_name maybe_pkg
+           case res of
+             Found loc m | modulePackageId m /= this_pkg -> return m
+                         | otherwise -> modNotLoadedError m loc
+             err -> noModError dflags noSrcSpan mod_name err
+
+modNotLoadedError :: Module -> ModLocation -> IO a
+modNotLoadedError m loc = ghcError $ CmdLineError $ showSDoc $
+   text "module is not loaded:" <+> 
+   quotes (ppr (moduleName m)) <+>
+   parens (text (expectJust "modNotLoadedError" (ml_hs_file loc)))
+
+lookupModule :: GhcMonad m => ModuleName -> Maybe FastString -> m Module
+lookupModule mod_name (Just pkg) = findModule mod_name (Just pkg)
+lookupModule mod_name Nothing = withSession $ \hsc_env -> do
+  home <- lookupLoadedHomeModule mod_name
+  case home of
+    Just m  -> return m
+    Nothing -> liftIO $ do
+      res <- findExposedPackageModule hsc_env mod_name Nothing
+      case res of
+        Found _ m -> return m
+        err       -> noModError (hsc_dflags hsc_env) noSrcSpan mod_name err
+
+lookupLoadedHomeModule  :: GhcMonad m => ModuleName -> m (Maybe Module)
+lookupLoadedHomeModule mod_name = withSession $ \hsc_env ->
+  case lookupUFM (hsc_HPT hsc_env) mod_name of

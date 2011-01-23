@@ -1,0 +1,43 @@
+  dflags0 <- liftIO $ initDynFlags defaultDynFlags
+  dflags <- liftIO $ initSysTools mb_top_dir dflags0
+  env <- liftIO $ newHscEnv dflags
+  setSession env
+
+setSessionDynFlags :: GhcMonad m => DynFlags -> m [PackageId]
+setSessionDynFlags dflags = do
+  (dflags', preload) <- liftIO $ initPackages dflags
+  modifySession (\h -> h{ hsc_dflags = dflags' })
+  return preload
+
+guessOutputFile :: GhcMonad m => m ()
+guessOutputFile = modifySession $ \env ->
+    let dflags = hsc_dflags env
+        mod_graph = hsc_mod_graph env
+        mainModuleSrcPath :: Maybe String
+        mainModuleSrcPath = do
+            let isMain = (== mainModIs dflags) . ms_mod
+            [ms] <- return (filter isMain mod_graph)
+            ml_hs_file (ms_location ms)
+        name = fmap dropExtension mainModuleSrcPath
+
+#if defined(mingw32_HOST_OS)
+        name_exe = fmap (<.> "exe") name
+#else
+        name_exe = name
+#endif
+    in
+    case outputFile dflags of
+        Just _ -> env
+        Nothing -> env { hsc_dflags = dflags { outputFile = name_exe } }
+
+setTargets :: GhcMonad m => [Target] -> m ()
+setTargets targets = modifySession (\h -> h{ hsc_targets = targets })
+
+getTargets :: GhcMonad m => m [Target]
+getTargets = withSession (return . hsc_targets)
+
+addTarget :: GhcMonad m => Target -> m ()
+addTarget target
+  = modifySession (\h -> h{ hsc_targets = target : hsc_targets h })
+
+removeTarget :: GhcMonad m => TargetId -> m ()

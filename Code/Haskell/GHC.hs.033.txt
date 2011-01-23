@@ -1,0 +1,45 @@
+                              ms_imps      = the_imps,
+                              ms_hs_date   = src_timestamp,
+                              ms_obj_date  = obj_timestamp }))
+
+getObjTimestamp :: ModLocation -> Bool -> IO (Maybe ClockTime)
+getObjTimestamp location is_boot
+  = if is_boot then return Nothing
+               else modificationTimeIfExists (ml_obj_file location)
+
+preprocessFile :: HscEnv
+               -> FilePath
+               -> Maybe Phase
+               -> Maybe (StringBuffer,ClockTime)
+               -> IO (DynFlags, FilePath, StringBuffer)
+preprocessFile hsc_env src_fn mb_phase Nothing
+  = do
+        (dflags', hspp_fn) <- preprocess hsc_env (src_fn, mb_phase)
+        buf <- hGetStringBuffer hspp_fn
+        return (dflags', hspp_fn, buf)
+
+preprocessFile hsc_env src_fn mb_phase (Just (buf, _time))
+  = do
+        let dflags = hsc_dflags hsc_env
+        let 
+            local_opts = getOptions dflags buf src_fn
+        (dflags', leftovers, warns)
+            <- parseDynamicNoPackageFlags dflags local_opts
+        checkProcessArgsResult leftovers
+        handleFlagWarnings dflags' warns
+
+        let
+            needs_preprocessing
+                | Just (Unlit _) <- mb_phase    = True
+                | Nothing <- mb_phase, Unlit _ <- startPhase src_fn  = True
+                | xopt Opt_Cpp dflags'          = True
+                | dopt Opt_Pp  dflags'          = True
+                | otherwise                     = False
+
+        when needs_preprocessing $
+           ghcError (ProgramError "buffer needs preprocesing; interactive check disabled")
+
+        return (dflags', src_fn, buf)
+
+noModError :: DynFlags -> SrcSpan -> ModuleName -> FindResult -> IO ab
+noModError dflags loc wanted_mod err

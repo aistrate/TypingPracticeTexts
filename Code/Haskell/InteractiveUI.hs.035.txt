@@ -1,0 +1,45 @@
+isPlus ('+':opt) = Left opt
+isPlus other     = Right other
+
+setOpt, unsetOpt :: String -> GHCi ()
+
+setOpt str
+  = case strToGHCiOpt str of
+        Nothing -> liftIO (putStrLn ("unknown option: '" ++ str ++ "'"))
+        Just o  -> setOption o
+
+unsetOpt str
+  = case strToGHCiOpt str of
+        Nothing -> liftIO (putStrLn ("unknown option: '" ++ str ++ "'"))
+        Just o  -> unsetOption o
+
+strToGHCiOpt :: String -> (Maybe GHCiOption)
+strToGHCiOpt "m" = Just Multiline
+strToGHCiOpt "s" = Just ShowTiming
+strToGHCiOpt "t" = Just ShowType
+strToGHCiOpt "r" = Just RevertCAFs
+strToGHCiOpt _   = Nothing
+
+optToStr :: GHCiOption -> String
+optToStr Multiline  = "m"
+optToStr ShowTiming = "s"
+optToStr ShowType   = "t"
+optToStr RevertCAFs = "r"
+
+showCmd :: String -> GHCi ()
+showCmd str = do
+  st <- getGHCiState
+  case words str of
+        ["args"]     -> liftIO $ putStrLn (show (args st))
+        ["prog"]     -> liftIO $ putStrLn (show (progname st))
+        ["prompt"]   -> liftIO $ putStrLn (show (prompt st))
+        ["editor"]   -> liftIO $ putStrLn (show (editor st))
+        ["stop"]     -> liftIO $ putStrLn (show (stop st))
+        ["modules" ] -> showModules
+        ["bindings"] -> showBindings
+        ["linker"]   -> liftIO showLinkerState
+        ["breaks"]   -> showBkptTable
+        ["context"]  -> showContext
+        ["packages"]  -> showPackages
+        ["languages"]  -> showLanguages
+        _ -> ghcError (CmdLineError ("syntax:  :show [ args | prog | prompt | editor | stop | modules | bindings\n"++

@@ -1,0 +1,43 @@
+                      _     -> Nothing
+
+     case pick (order failed_graph) of
+       Just file -> return file
+       Nothing   -> 
+         do targets <- GHC.getTargets
+            case msum (map fromTarget targets) of
+              Just file -> return file
+              Nothing   -> ghcError (CmdLineError "No files to edit.")
+          
+  where fromTarget (GHC.Target (GHC.TargetFile f _) _ _) = Just f
+        fromTarget _ = Nothing
+
+defineMacro :: Bool -> String -> GHCi ()
+defineMacro _ (':':_) =
+  liftIO $ putStrLn "macro name cannot start with a colon"
+defineMacro overwrite s = do
+  let (macro_name, definition) = break isSpace s
+  macros <- liftIO (readIORef macros_ref)
+  let defined = map cmdName macros
+  if (null macro_name) 
+        then if null defined
+                then liftIO $ putStrLn "no macros defined"
+                else liftIO $ putStr ("the following macros are defined:\n" ++
+                                      unlines defined)
+        else do
+  if (not overwrite && macro_name `elem` defined)
+        then ghcError (CmdLineError 
+                ("macro '" ++ macro_name ++ "' is already defined"))
+        else do
+
+  let filtered = [ cmd | cmd <- macros, cmdName cmd /= macro_name ]
+
+  let new_expr = '(' : definition ++ ") :: String -> IO String"
+
+  handleSourceError (\e -> GHC.printException e) $
+   do
+    hv <- GHC.compileExpr new_expr
+    liftIO (writeIORef macros_ref
+            (filtered ++ [(macro_name, lift . runMacro hv, noCompletion)]))
+
+runMacro :: GHC.HValue -> String -> GHCi Bool
+runMacro fun s = do

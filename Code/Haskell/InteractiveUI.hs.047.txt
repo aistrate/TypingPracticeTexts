@@ -1,0 +1,40 @@
+                     else text " activated at " <> ppr span
+            else do
+            printForUser $ text "Breakpoint could not be activated at" 
+                                 <+> ppr span
+
+findBreakByLine :: Int -> TickArray -> Maybe (BreakIndex,SrcSpan)
+findBreakByLine line arr
+  | not (inRange (bounds arr) line) = Nothing
+  | otherwise =
+    listToMaybe (sortBy (leftmost_largest `on` snd)  complete)   `mplus`
+    listToMaybe (sortBy (leftmost_smallest `on` snd) incomplete) `mplus`
+    listToMaybe (sortBy (rightmost `on` snd) ticks)
+  where 
+        ticks = arr ! line
+
+        starts_here = [ tick | tick@(_,span) <- ticks,
+                               GHC.srcSpanStartLine span == line ]
+
+        (complete,incomplete) = partition ends_here starts_here
+            where ends_here (_,span) = GHC.srcSpanEndLine span == line
+
+findBreakByCoord :: Maybe FastString -> (Int,Int) -> TickArray
+                 -> Maybe (BreakIndex,SrcSpan)
+findBreakByCoord mb_file (line, col) arr
+  | not (inRange (bounds arr) line) = Nothing
+  | otherwise =
+    listToMaybe (sortBy (rightmost `on` snd) contains ++
+                 sortBy (leftmost_smallest `on` snd) after_here)
+  where 
+        ticks = arr ! line
+
+        contains = [ tick | tick@(_,span) <- ticks, span `spans` (line,col),
+                            is_correct_file span ]
+
+        is_correct_file span
+                 | Just f <- mb_file = GHC.srcSpanFile span == f
+                 | otherwise         = True
+
+        after_here = [ tick | tick@(_,span) <- ticks,
+                              GHC.srcSpanStartLine span == line,

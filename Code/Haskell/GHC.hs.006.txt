@@ -1,0 +1,53 @@
+                hFlush stdout
+                case ge of
+                     PhaseFailed _ code -> exitWith code
+                     Signal _ -> exitWith (ExitFailure 1)
+                     _ -> do fatalErrorMsg dflags (text (show ge))
+                             exitWith (ExitFailure 1)
+            ) $
+  inner
+
+defaultCleanupHandler :: (ExceptionMonad m, MonadIO m) =>
+                         DynFlags -> m a -> m a
+defaultCleanupHandler dflags inner =
+    inner `gfinally`
+          (liftIO $ do
+              cleanTempFiles dflags
+              cleanTempDirs dflags
+          )
+
+printException :: GhcMonad m => SourceError -> m ()
+printException err = do
+  dflags <- getSessionDynFlags
+  liftIO $ printBagOfErrors dflags (srcErrorMessages err)
+
+{-# DEPRECATED printExceptionAndWarnings "use printException instead" #-}
+printExceptionAndWarnings :: GhcMonad m => SourceError -> m ()
+printExceptionAndWarnings = printException
+
+runGhc :: Maybe FilePath
+       -> Ghc a
+       -> IO a
+runGhc mb_top_dir ghc = do
+  ref <- newIORef undefined
+  let session = Session ref
+  flip unGhc session $ do
+    initGhcMonad mb_top_dir
+    ghc
+
+runGhcT :: (ExceptionMonad m, Functor m, MonadIO m) =>
+           Maybe FilePath
+        -> GhcT m a
+        -> m a
+runGhcT mb_top_dir ghct = do
+  ref <- liftIO $ newIORef undefined
+  let session = Session ref
+  flip unGhcT session $ do
+    initGhcMonad mb_top_dir
+    ghct
+
+initGhcMonad :: GhcMonad m => Maybe FilePath -> m ()
+initGhcMonad mb_top_dir = do
+  liftIO $ installSignalHandlers
+
+  liftIO $ StaticFlags.initStaticOpts

@@ -1,0 +1,45 @@
+                            AcyclicSCC ms -> ms_mod_name ms == _mod; _ -> False )
+                  List.init partial_mg0
+                | otherwise
+                = partial_mg0
+  
+            stable_mg = 
+                [ AcyclicSCC ms
+                | AcyclicSCC ms <- full_mg,
+                  ms_mod_name ms `elem` stable_obj++stable_bco,
+                  ms_mod_name ms `notElem` [ ms_mod_name ms' | 
+                                                AcyclicSCC ms' <- partial_mg ] ]
+
+            mg = stable_mg ++ partial_mg
+
+        let cleanup = cleanTempFilesExcept dflags
+                          (ppFilesFromSummaries (flattenSCCs mg2_with_srcimps))
+
+        liftIO $ debugTraceMsg dflags 2 (hang (text "Ready for upsweep")
+                                   2 (ppr mg))
+
+        setSession hsc_env{ hsc_HPT = emptyHomePackageTable }
+        (upsweep_ok, modsUpswept)
+           <- upsweep pruned_hpt stable_mods cleanup mg
+
+        let modsDone = reverse modsUpswept
+
+        if succeeded upsweep_ok
+
+         then 
+           do liftIO $ debugTraceMsg dflags 2 (text "Upsweep completely successful.")
+
+              liftIO $ cleanTempFilesExcept dflags (ppFilesFromSummaries modsDone)
+
+              let ofile = outputFile dflags
+              let no_hs_main = dopt Opt_NoHsMain dflags
+              let 
+                main_mod = mainModIs dflags
+                a_root_is_Main = any ((==main_mod).ms_mod) mod_graph
+                do_linking = a_root_is_Main || no_hs_main || ghcLink dflags == LinkDynLib
+
+              when (ghcLink dflags == LinkBinary 
+                    && isJust ofile && not do_linking) $
+                liftIO $ debugTraceMsg dflags 1 $
+                    text ("Warning: output was redirected with -o, " ++
+                          "but no output will be generated\n" ++

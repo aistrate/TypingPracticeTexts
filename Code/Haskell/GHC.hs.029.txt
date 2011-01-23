@@ -1,0 +1,43 @@
+    concat [ [(m,True), (m,False)] | m <- ms_home_srcimps s ] 
+         ++ [ (m,False) | m <- ms_home_imps s ] 
+
+home_imps :: [Located (ImportDecl RdrName)] -> [Located ModuleName]
+home_imps imps = [ ideclName i |  L _ i <- imps, isLocal (ideclPkgQual i) ]
+  where isLocal Nothing = True
+        isLocal (Just pkg) | pkg == fsLit "this" = True -- "this" is special
+        isLocal _ = False
+
+ms_home_allimps :: ModSummary -> [ModuleName]
+ms_home_allimps ms = map unLoc (ms_home_srcimps ms ++ ms_home_imps ms)
+
+ms_home_srcimps :: ModSummary -> [Located ModuleName]
+ms_home_srcimps = home_imps . ms_srcimps
+
+ms_home_imps :: ModSummary -> [Located ModuleName]
+ms_home_imps = home_imps . ms_imps
+
+summariseFile
+        :: HscEnv
+        -> [ModSummary]
+        -> FilePath
+        -> Maybe Phase
+        -> Bool
+        -> Maybe (StringBuffer,ClockTime)
+        -> IO ModSummary
+
+summariseFile hsc_env old_summaries file mb_phase obj_allowed maybe_buf
+   | Just old_summary <- findSummaryBySourceFile old_summaries file
+   = do
+        let location = ms_location old_summary
+
+        src_timestamp <- case maybe_buf of
+                           Just (_,t) -> return t
+                           Nothing    -> liftIO $ getModificationTime file
+
+        if ms_hs_date old_summary == src_timestamp 
+           then do
+                  obj_timestamp <-
+                    if isObjectTarget (hscTarget (hsc_dflags hsc_env)) 
+                        || obj_allowed
+                        then liftIO $ getObjTimestamp location False
+                        else return Nothing

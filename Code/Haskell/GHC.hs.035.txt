@@ -1,0 +1,42 @@
+                ]
+    show_mod hsc_src mod = ppr mod <> text (hscSourceString hsc_src)
+    pp_imps src imps = fsep (map (show_mod src . unLoc . ideclName . unLoc) imps)
+
+workingDirectoryChanged :: GhcMonad m => m ()
+workingDirectoryChanged = withSession $ (liftIO . flushFinderCaches)
+
+getModuleGraph :: GhcMonad m => m ModuleGraph
+getModuleGraph = liftM hsc_mod_graph getSession
+
+needsTemplateHaskell :: ModuleGraph -> Bool
+needsTemplateHaskell ms =
+    any (xopt Opt_TemplateHaskell . ms_hspp_opts) ms
+
+isLoaded :: GhcMonad m => ModuleName -> m Bool
+isLoaded m = withSession $ \hsc_env ->
+  return $! isJust (lookupUFM (hsc_HPT hsc_env) m)
+
+getBindings :: GhcMonad m => m [TyThing]
+getBindings = withSession $ \hsc_env ->
+   let 
+       occ_env = mkOccEnv [ (nameOccName (idName id), AnId id) 
+                          | id <- ic_tmp_ids (hsc_IC hsc_env) ]
+   in
+   return (occEnvElts occ_env)
+
+getPrintUnqual :: GhcMonad m => m PrintUnqualified
+getPrintUnqual = withSession $ \hsc_env ->
+  return (icPrintUnqual (hsc_dflags hsc_env) (hsc_IC hsc_env))
+
+data ModuleInfo = ModuleInfo {
+        minf_type_env  :: TypeEnv,
+        minf_exports   :: NameSet,
+        minf_rdr_env   :: Maybe GlobalRdrEnv,
+        minf_instances :: [Instance]
+#ifdef GHCI
+        ,minf_modBreaks :: ModBreaks 
+#endif
+  }
+
+getModuleInfo :: GhcMonad m => Module -> m (Maybe ModuleInfo)
+getModuleInfo mdl = withSession $ \hsc_env -> do

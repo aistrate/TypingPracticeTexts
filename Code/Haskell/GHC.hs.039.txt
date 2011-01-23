@@ -1,0 +1,29 @@
+  m <- getModSummary (moduleName mod)
+  case ml_hs_file $ ms_location m of
+    Nothing -> throw $ mkApiErr (text "No source available for module " <+> ppr mod)
+    Just sourceFile -> do
+        source <- liftIO $ hGetStringBuffer sourceFile
+        return (sourceFile, source, ms_hspp_opts m)
+
+getTokenStream :: GhcMonad m => Module -> m [Located Token]
+getTokenStream mod = do
+  (sourceFile, source, flags) <- getModuleSourceAndFlags mod
+  let startLoc = mkSrcLoc (mkFastString sourceFile) 1 1
+  case lexTokenStream source startLoc flags of
+    POk _ ts  -> return ts
+    PFailed span err -> throw $ mkSrcErr (unitBag $ mkPlainErrMsg span err)
+
+getRichTokenStream :: GhcMonad m => Module -> m [(Located Token, String)]
+getRichTokenStream mod = do
+  (sourceFile, source, flags) <- getModuleSourceAndFlags mod
+  let startLoc = mkSrcLoc (mkFastString sourceFile) 1 1
+  case lexTokenStream source startLoc flags of
+    POk _ ts -> return $ addSourceToTokens startLoc source ts
+    PFailed span err -> throw $ mkSrcErr (unitBag $ mkPlainErrMsg span err)
+
+addSourceToTokens :: SrcLoc -> StringBuffer -> [Located Token]
+                  -> [(Located Token, String)]
+addSourceToTokens _ _ [] = []
+addSourceToTokens loc buf (t@(L span _) : ts)
+    | not (isGoodSrcSpan span) = (t,"") : addSourceToTokens loc buf ts
+    | otherwise = (t,str) : addSourceToTokens newLoc newBuf ts

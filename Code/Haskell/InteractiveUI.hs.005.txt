@@ -1,0 +1,23 @@
+ "   :add [*]<module> ...        add module(s) to the current target set\n" ++
+ "   :browse[!] [[*]<mod>]       display the names defined by module <mod>\n" ++
+ "                               (!: more details; *: all top-level names)\n" ++
+ "   :cd <dir>                   change directory to <dir>\n" ++
+ "   :cmd <expr>                 run the commands returned by <expr>::IO String\n" ++
+ "   :ctags[!] [<file>]          create tags file for Vi (default: \"tags\")\n" ++
+ "                               (!: use regex instead of line number)\n" ++
+ "   :def <cmd> <expr>           define a command :<cmd>\n" ++
+ "   :edit <file>                edit file\n" ++
+ "   :edit                       edit last module\n" ++
+ "   :etags [<file>]             create tags file for Emacs (default: \"TAGS\")\n" ++
+ "   :help, :?                   display this list of commands\n" ++
+ "   :info [<name> ...]          display information about the given names\n" ++
+ "   :kind <type>                show the kind of <type>\n" ++
+ "   :load [*]<module> ...       load module(s) and their dependents\n" ++
+ "   :main [<arguments> ...]     run the main function with the given arguments\n" ++
+ "   :module [+/-] [*]<mod> ...  set the context for expression evaluation\n" ++
+ "   :quit                       exit GHCi\n" ++
+ "   :reload                     reload the current module set\n" ++
+ "   :run function [<arguments> ...] run the function with the given arguments\n" ++
+ "   :type <expr>                show the type of <expr>\n" ++
+ "   :undef <cmd>                undefine user-defined command :<cmd>\n" ++
+ "   :!<command>                 run the shell command <command>\n" ++

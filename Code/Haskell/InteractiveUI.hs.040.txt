@@ -1,0 +1,37 @@
+wrapIdentCompleter :: (String -> GHCi [String]) -> CompletionFunc GHCi
+wrapIdentCompleter = wrapCompleter word_break_chars
+
+wrapIdentCompleterWithModifier :: String -> (Maybe Char -> String -> GHCi [String]) -> CompletionFunc GHCi
+wrapIdentCompleterWithModifier modifChars fun = completeWordWithPrev Nothing word_break_chars
+    $ \rest -> fmap (map simpleCompletion) . fmap sort . fun (getModifier rest)
+ where
+  getModifier = find (`elem` modifChars)
+
+allExposedModules :: DynFlags -> [ModuleName]
+allExposedModules dflags 
+ = concat (map exposedModules (filter exposed (eltsUFM pkg_db)))
+ where
+  pkg_db = pkgIdMap (pkgState dflags)
+
+completeExpression = completeQuotedWord (Just '\\') "\"" listFiles
+                        completeIdentifier
+
+handler :: SomeException -> GHCi Bool
+
+handler exception = do
+  flushInterpBuffers
+  liftIO installSignalHandlers
+  ghciHandle handler (showException exception >> return False)
+
+showException :: SomeException -> GHCi ()
+showException se =
+  liftIO $ case fromException se of
+           Just (CmdLineError s)    -> putStrLn s
+           Just ph@(PhaseFailed {}) -> putStrLn (showGhcException ph "")
+           Just other_ghc_ex        -> print other_ghc_ex
+           Nothing                  ->
+               case fromException se of
+               Just UserInterrupt -> putStrLn "Interrupted."
+               _                  -> putStrLn ("*** Exception: " ++ show se)
+
+ghciHandle :: MonadException m => (SomeException -> m a) -> m a -> m a

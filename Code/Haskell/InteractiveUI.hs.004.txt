@@ -1,0 +1,41 @@
+  ("step",      keepGoing stepCmd,              completeIdentifier),
+  ("steplocal", keepGoing stepLocalCmd,         completeIdentifier),
+  ("stepmodule",keepGoing stepModuleCmd,        completeIdentifier),
+  ("type",      keepGoing' typeOfExpr,          completeExpression),
+  ("trace",     keepGoing traceCmd,             completeExpression),
+  ("undef",     keepGoing undefineMacro,        completeMacro),
+  ("unset",     keepGoing unsetOptions,         completeSetOptions)
+  ]
+
+word_break_chars :: String
+word_break_chars = let symbols = "!#$%&*+/<=>?@\\^|-~"
+                       specials = "(),;[]`{}"
+                       spaces = " \t\n"
+                   in spaces ++ specials ++ symbols
+
+flagWordBreakChars :: String
+flagWordBreakChars = " \t\n"
+
+keepGoing :: (String -> GHCi ()) -> (String -> InputT GHCi Bool)
+keepGoing a str = keepGoing' (lift . a) str
+
+keepGoing' :: Monad m => (String -> m ()) -> String -> m Bool
+keepGoing' a str = a str >> return False
+
+keepGoingPaths :: ([FilePath] -> InputT GHCi ()) -> (String -> InputT GHCi Bool)
+keepGoingPaths a str
+ = do case toArgs str of
+          Left err -> Encoding.encode err >>= liftIO . BS.hPutStrLn stderr
+          Right args -> a args
+      return False
+
+shortHelpText :: String
+shortHelpText = "use :? for help.\n"
+
+helpText :: String
+helpText =
+ " Commands available from the prompt:\n" ++
+ "\n" ++
+ "   <statement>                 evaluate/run <statement>\n" ++
+ "   :                           repeat last command\n" ++
+ "   :{\\n ..lines.. \\n:}\\n       multiline command\n" ++

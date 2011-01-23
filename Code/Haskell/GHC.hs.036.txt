@@ -1,0 +1,42 @@
+  let mg = hsc_mod_graph hsc_env
+  if mdl `elem` map ms_mod mg
+        then liftIO $ getHomeModuleInfo hsc_env (moduleName mdl)
+        else do
+  
+ liftIO $ getPackageModuleInfo hsc_env mdl
+
+getPackageModuleInfo :: HscEnv -> Module -> IO (Maybe ModuleInfo)
+#ifdef GHCI
+getPackageModuleInfo hsc_env mdl = do
+  mb_avails <- hscGetModuleExports hsc_env mdl
+  case mb_avails of
+    Nothing -> return Nothing
+    Just avails -> do
+        eps <- readIORef (hsc_EPS hsc_env)
+        let 
+            names  = availsToNameSet avails
+            pte    = eps_PTE eps
+            tys    = [ ty | name <- concatMap availNames avails,
+                            Just ty <- [lookupTypeEnv pte name] ]
+        return (Just (ModuleInfo {
+                        minf_type_env  = mkTypeEnv tys,
+                        minf_exports   = names,
+                        minf_rdr_env   = Just $! availsToGlobalRdrEnv (moduleName mdl) avails,
+                        minf_instances = error "getModuleInfo: instances for package module unimplemented",
+                        minf_modBreaks = emptyModBreaks  
+                }))
+#else
+getPackageModuleInfo _hsc_env _mdl = do
+  return Nothing
+#endif
+
+getHomeModuleInfo :: HscEnv -> ModuleName -> IO (Maybe ModuleInfo)
+getHomeModuleInfo hsc_env mdl = 
+  case lookupUFM (hsc_HPT hsc_env) mdl of
+    Nothing  -> return Nothing
+    Just hmi -> do
+      let details = hm_details hmi
+      return (Just (ModuleInfo {
+                        minf_type_env  = md_types details,
+                        minf_exports   = availsToNameSet (md_exports details),
+                        minf_rdr_env   = mi_globals $! hm_iface hmi,

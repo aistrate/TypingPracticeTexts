@@ -1,0 +1,38 @@
+                                  breakModule loc == mod,
+                                  breakTick loc == nm ]
+
+printStoppedAtBreakInfo :: Resume -> [Name] -> GHCi ()
+printStoppedAtBreakInfo resume names = do
+  printForUser $ ptext (sLit "Stopped at") <+>
+    ppr (GHC.resumeSpan resume)
+  let namesSorted = sortBy compareNames names
+  tythings <- catMaybes `liftM` mapM GHC.lookupName namesSorted
+  docs <- pprTypeAndContents [id | AnId id <- tythings]
+  printForUserPartWay docs
+
+printTypeOfNames :: [Name] -> GHCi ()
+printTypeOfNames names
+ = mapM_ (printTypeOfName ) $ sortBy compareNames names
+
+compareNames :: Name -> Name -> Ordering
+n1 `compareNames` n2 = compareWith n1 `compare` compareWith n2
+    where compareWith n = (getOccString n, getSrcSpan n)
+
+printTypeOfName :: Name -> GHCi ()
+printTypeOfName n
+   = do maybe_tything <- GHC.lookupName n
+        case maybe_tything of
+            Nothing    -> return ()
+            Just thing -> printTyThing thing
+
+data MaybeCommand = GotCommand Command | BadCommand | NoLastCommand
+
+specialCommand :: String -> InputT GHCi Bool
+specialCommand ('!':str) = lift $ shellEscape (dropWhile isSpace str)
+specialCommand str = do
+  let (cmd,rest) = break isSpace str
+  maybe_cmd <- lift $ lookupCommand cmd
+  case maybe_cmd of
+    GotCommand (_,f,_) -> f (dropWhile isSpace rest)
+    BadCommand ->
+      do liftIO $ hPutStr stdout ("unknown command ':" ++ cmd ++ "'\n"

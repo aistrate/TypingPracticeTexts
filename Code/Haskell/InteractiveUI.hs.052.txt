@@ -1,0 +1,41 @@
+                              GHC.srcSpanEndLine span ]
+
+lookupModule :: GHC.GhcMonad m => String -> m Module
+lookupModule modName
+   = GHC.lookupModule (GHC.mkModuleName modName) Nothing
+
+discardActiveBreakPoints :: GHCi ()
+discardActiveBreakPoints = do
+   st <- getGHCiState
+   mapM_ (turnOffBreak.snd) (breaks st)
+   setGHCiState $ st { breaks = [] }
+
+deleteBreak :: Int -> GHCi ()
+deleteBreak identity = do
+   st <- getGHCiState
+   let oldLocations    = breaks st
+       (this,rest)     = partition (\loc -> fst loc == identity) oldLocations
+   if null this 
+      then printForUser (text "Breakpoint" <+> ppr identity <+>
+                         text "does not exist")
+      else do
+           mapM_ (turnOffBreak.snd) this
+           setGHCiState $ st { breaks = rest }
+
+turnOffBreak :: BreakLocation -> GHCi Bool
+turnOffBreak loc = do
+  (arr, _) <- getModBreak (breakModule loc)
+  liftIO $ setBreakFlag False arr (breakTick loc)
+
+getModBreak :: Module -> GHCi (GHC.BreakArray, Array Int SrcSpan)
+getModBreak mod = do
+   Just mod_info <- GHC.getModuleInfo mod
+   let modBreaks  = GHC.modInfoModBreaks mod_info
+   let array      = GHC.modBreaks_flags modBreaks
+   let ticks      = GHC.modBreaks_locs  modBreaks
+   return (array, ticks)
+
+setBreakFlag :: Bool -> GHC.BreakArray -> Int -> IO Bool 
+setBreakFlag toggle array index
+   | toggle    = GHC.setBreakOn array index 
+   | otherwise = GHC.setBreakOff array index

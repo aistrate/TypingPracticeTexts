@@ -1,0 +1,50 @@
+           then do
+               putStrLn $ "*** WARNING: " ++ name ++ 
+                          " is writable by someone else, IGNORING!"
+               return False
+          else return True
+#endif
+
+fileLoop :: MonadIO m => Handle -> InputT m (Maybe String)
+fileLoop hdl = do
+   l <- liftIO $ tryIO $ hGetLine hdl
+   case l of
+        Left e | isEOFError e              -> return Nothing
+               | InvalidArgument <- etype  -> return Nothing
+               | otherwise                 -> liftIO $ ioError e
+                where etype = ioeGetErrorType e
+        Right l -> return (Just l)
+
+mkPrompt :: GHCi String
+mkPrompt = do
+  (toplevs,exports) <- GHC.getContext
+  resumes <- GHC.getResumeContext
+
+  context_bit <-
+        case resumes of
+            [] -> return empty
+            r:_ -> do
+                let ix = GHC.resumeHistoryIx r
+                if ix == 0
+                   then return (brackets (ppr (GHC.resumeSpan r)) <> space)
+                   else do
+                        let hist = GHC.resumeHistory r !! (ix-1)
+                        span <- GHC.getHistorySpan hist
+                        return (brackets (ppr (negate ix) <> char ':' 
+                                          <+> ppr span) <> space)
+  let
+        dots | _:rs <- resumes, not (null rs) = text "... "
+             | otherwise = empty
+
+        modules_bit = 
+             hsep (map (\m -> char '*'  <> ppr (GHC.moduleName m)) toplevs) <+>
+             hsep (map (ppr . GHC.moduleName) (nub (map fst exports)))
+
+        deflt_prompt = dots <> context_bit <> modules_bit
+
+        f ('%':'s':xs) = deflt_prompt <> f xs
+        f ('%':'%':xs) = char '%' <> f xs
+        f (x:xs) = char x <> f xs
+        f [] = empty
+  st <- getGHCiState
+  return (showSDoc (f (prompt st)))

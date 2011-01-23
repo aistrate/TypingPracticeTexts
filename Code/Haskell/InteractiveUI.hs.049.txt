@@ -1,0 +1,38 @@
+list2 [arg] = do
+        wantNameFromInterpretedModule noCanDo arg $ \name -> do
+        let loc = GHC.srcSpanStart (GHC.nameSrcSpan name)
+        if GHC.isGoodSrcLoc loc
+               then do
+                  tickArray <- ASSERT( isExternalName name )
+                               lift $ getTickArray (GHC.nameModule name)
+                  let mb_span = findBreakByCoord (Just (GHC.srcLocFile loc))
+                                        (GHC.srcLocLine loc, GHC.srcLocCol loc)
+                                        tickArray
+                  case mb_span of
+                    Nothing       -> listAround (GHC.srcLocSpan loc) False
+                    Just (_,span) -> listAround span False
+               else
+                  noCanDo name $ text "can't find its location: " <>
+                                 ppr loc
+    where
+        noCanDo n why = printForUser $
+            text "cannot list source code for " <> ppr n <> text ": " <> why
+list2  _other = 
+        liftIO $ putStrLn "syntax:  :list [<line> | <module> <line> | <identifier>]"
+
+listModuleLine :: Module -> Int -> InputT GHCi ()
+listModuleLine modl line = do
+   graph <- GHC.getModuleGraph
+   let this = filter ((== modl) . GHC.ms_mod) graph
+   case this of
+     [] -> panic "listModuleLine"
+     summ:_ -> do
+           let filename = expectJust "listModuleLine" (ml_hs_file (GHC.ms_location summ))
+               loc = GHC.mkSrcLoc (mkFastString (filename)) line 0
+           listAround (GHC.srcLocSpan loc) False
+
+listAround :: MonadIO m => SrcSpan -> Bool -> InputT m ()
+listAround span do_highlight = do
+      contents <- liftIO $ BS.readFile (unpackFS file)
+      let 
+          lines = BS.split '\n' contents

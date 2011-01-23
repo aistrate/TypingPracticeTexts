@@ -1,0 +1,46 @@
+                              GHC.srcSpanStartCol span >= col ]
+
+do_bold :: Bool
+do_bold = (`isPrefixOf` unsafePerformIO mTerm) `any` ["xterm", "linux"]
+    where mTerm = System.Environment.getEnv "TERM"
+                  `catchIO` \_ -> return "TERM not set"
+
+start_bold :: String
+start_bold = "\ESC[1m"
+end_bold :: String
+end_bold   = "\ESC[0m"
+
+listCmd :: String -> InputT GHCi ()
+listCmd c = listCmd' c
+
+listCmd' :: String -> InputT GHCi ()
+listCmd' "" = do
+   mb_span <- lift getCurrentBreakSpan
+   case mb_span of
+      Nothing ->
+          printForUser $ text "Not stopped at a breakpoint; nothing to list"
+      Just span
+       | GHC.isGoodSrcSpan span -> listAround span True
+       | otherwise ->
+          do resumes <- GHC.getResumeContext
+             case resumes of
+                 [] -> panic "No resumes"
+                 (r:_) ->
+                     do let traceIt = case GHC.resumeHistory r of
+                                      [] -> text "rerunning with :trace,"
+                                      _ -> empty
+                            doWhat = traceIt <+> text ":back then :list"
+                        printForUser (text "Unable to list source for" <+>
+                                      ppr span
+                                   $$ text "Try" <+> doWhat)
+listCmd' str = list2 (words str)
+
+list2 :: [String] -> InputT GHCi ()
+list2 [arg] | all isDigit arg = do
+    (toplevel, _) <- GHC.getContext
+    case toplevel of
+        [] -> liftIO $ putStrLn "No module to list"
+        (mod : _) -> listModuleLine mod (read arg)
+list2 [arg1,arg2] | looksLikeModuleName arg1, all isDigit arg2 = do
+        mod <- wantInterpretedModule arg1
+        listModuleLine mod (read arg2)

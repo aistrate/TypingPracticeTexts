@@ -1,0 +1,37 @@
+        case (as,bs) of
+          (as@(_:_), _)   -> browseModule bang (last as) True
+          ([],  bs@(_:_)) -> browseModule bang (fst (last bs)) True
+          ([], [])  -> ghcError (CmdLineError ":browse: no current module")
+    _ -> ghcError (CmdLineError "syntax:  :browse <module>")
+
+browseModule :: Bool -> Module -> Bool -> InputT GHCi ()
+browseModule bang modl exports_only = do
+  current_unqual <- GHC.getPrintUnqual
+  (as,bs) <- GHC.getContext
+  prel_mod <- lift getPrelude
+  if exports_only then GHC.setContext [] [(prel_mod,Nothing), (modl,Nothing)]
+                  else GHC.setContext [modl] []
+  target_unqual <- GHC.getPrintUnqual
+  GHC.setContext as bs
+
+  let unqual = if bang then current_unqual else target_unqual
+
+  mb_mod_info <- GHC.getModuleInfo modl
+  case mb_mod_info of
+    Nothing -> ghcError (CmdLineError ("unknown module: " ++
+                                GHC.moduleNameString (GHC.moduleName modl)))
+    Just mod_info -> do
+        dflags <- getDynFlags
+        let names
+               | exports_only = GHC.modInfoExports mod_info
+               | otherwise    = GHC.modInfoTopLevelScope mod_info
+                                `orElse` []
+
+            sorted_names = loc_sort local ++ occ_sort external
+                where 
+                (local,external) = ASSERT( all isExternalName names )
+                                   partition ((==modl) . nameModule) names
+                occ_sort = sortBy (compare `on` nameOccName) 
+                loc_sort names
+                      | n:_ <- names, isGoodSrcSpan (nameSrcSpan n)
+                      = sortBy (compare `on` nameSrcSpan) names

@@ -1,0 +1,44 @@
+                                           (L rootLoc modl) obj_allowed 
+                                           maybe_buf excl_mods
+                case maybe_summary of
+                   Nothing -> packageModErr modl
+                   Just s  -> return s
+
+        rootLoc = mkGeneralSrcSpan (fsLit "<command line>")
+
+        checkDuplicates :: NodeMap [ModSummary] -> IO ()
+        checkDuplicates root_map 
+           | allow_dup_roots = return ()
+           | null dup_roots  = return ()
+           | otherwise       = liftIO $ multiRootsErr (head dup_roots)
+           where
+             dup_roots :: [[ModSummary]]
+             dup_roots = filterOut isSingleton (nodeMapElts root_map)
+
+        loop :: [(Located ModuleName,IsBootInterface)]
+             -> NodeMap [ModSummary]
+             -> IO [ModSummary]
+        loop [] done      = return (concat (nodeMapElts done))
+        loop ((wanted_mod, is_boot) : ss) done 
+          | Just summs <- Map.lookup key done
+          = if isSingleton summs then
+                loop ss done
+            else
+                do { multiRootsErr summs; return [] }
+          | otherwise
+          = do mb_s <- summariseModule hsc_env old_summary_map 
+                                       is_boot wanted_mod True
+                                       Nothing excl_mods
+               case mb_s of
+                   Nothing -> loop ss done
+                   Just s  -> loop (msDeps s ++ ss) (Map.insert key [s] done)
+          where
+            key = (unLoc wanted_mod, if is_boot then HsBootFile else HsSrcFile)
+
+mkRootMap :: [ModSummary] -> NodeMap [ModSummary]
+mkRootMap summaries = Map.insertListWith (flip (++))
+                                         [ (msKey s, [s]) | s <- summaries ]
+                                         Map.empty
+
+msDeps :: ModSummary -> [(Located ModuleName, IsBootInterface)]
+msDeps s = 

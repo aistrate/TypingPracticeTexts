@@ -1,0 +1,42 @@
+getCurrentBreakModule = do
+  resumes <- GHC.getResumeContext
+  case resumes of
+    [] -> return Nothing
+    (r:_) -> do
+        let ix = GHC.resumeHistoryIx r
+        if ix == 0
+           then return (GHC.breakInfo_module `liftM` GHC.resumeBreakInfo r)
+           else do
+                let hist = GHC.resumeHistory r !! (ix-1)
+                return $ Just $ GHC.getHistoryModule  hist
+
+noArgs :: GHCi () -> String -> GHCi ()
+noArgs m "" = m
+noArgs _ _  = liftIO $ putStrLn "This command takes no arguments"
+
+help :: String -> GHCi ()
+help _ = liftIO (putStr helpText)
+
+info :: String -> InputT GHCi ()
+info "" = ghcError (CmdLineError "syntax: ':i <thing-you-want-info-about>'")
+info s  = handleSourceError GHC.printException $
+          do { let names = words s
+             ; dflags <- getDynFlags
+             ; let pefas = dopt Opt_PrintExplicitForalls dflags
+             ; mapM_ (infoThing pefas) names }
+  where
+    infoThing pefas str = do
+        names     <- GHC.parseName str
+        mb_stuffs <- mapM GHC.getInfo names
+        let filtered = filterOutChildren (\(t,_f,_i) -> t) (catMaybes mb_stuffs)
+        unqual <- GHC.getPrintUnqual
+        liftIO $ putStrLn $ showSDocForUser unqual $
+                     vcat (intersperse (text "") $
+                           map (pprInfo pefas) filtered)
+
+filterOutChildren :: (a -> TyThing) -> [a] -> [a]
+filterOutChildren get_thing xs 
+  = filterOut has_parent xs
+  where
+    all_names = mkNameSet (map (getName . get_thing) xs)
+    has_parent x = case pprTyThingParent_maybe (get_thing x) of

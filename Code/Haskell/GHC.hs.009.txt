@@ -1,0 +1,45 @@
+  liftIO $ showPass dflags "Chasing dependencies"
+  liftIO $ debugTraceMsg dflags 2 (hcat [
+             text "Chasing modules from: ",
+             hcat (punctuate comma (map pprTarget targets))])
+
+  mod_graph <- liftIO $ downsweep hsc_env old_graph excluded_mods allow_dup_roots
+  modifySession $ \_ -> hsc_env { hsc_mod_graph = mod_graph }
+  return mod_graph
+
+data LoadHowMuch
+   = LoadAllTargets
+   | LoadUpTo ModuleName
+   | LoadDependenciesOf ModuleName
+
+load :: GhcMonad m => LoadHowMuch -> m SuccessFlag
+load how_much = do
+   mod_graph <- depanal [] False
+   load2 how_much mod_graph
+
+type WarnErrLogger = GhcMonad m => Maybe SourceError -> m ()
+
+defaultWarnErrLogger :: WarnErrLogger
+defaultWarnErrLogger Nothing  = return ()
+defaultWarnErrLogger (Just e) = printException e
+
+load2 :: GhcMonad m => LoadHowMuch -> [ModSummary]
+      -> m SuccessFlag
+load2 how_much mod_graph = do
+        guessOutputFile
+        hsc_env <- getSession
+
+        let hpt1      = hsc_HPT hsc_env
+        let dflags    = hsc_dflags hsc_env
+
+        let all_home_mods = [ms_mod_name s 
+                            | s <- mod_graph, not (isBootSummary s)]
+            bad_boot_mods = [s        | s <- mod_graph, isBootSummary s,
+                                        not (ms_mod_name s `elem` all_home_mods)]
+        ASSERT( null bad_boot_mods ) return ()
+
+        let checkHowMuch (LoadUpTo m)           = checkMod m
+            checkHowMuch (LoadDependenciesOf m) = checkMod m
+            checkHowMuch _ = id
+
+            checkMod m and_then

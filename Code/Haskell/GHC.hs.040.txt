@@ -1,0 +1,36 @@
+    where
+      (newLoc, newBuf, str) = go "" loc buf
+      start = srcSpanStart span
+      end = srcSpanEnd span
+      go acc loc buf | loc < start = go acc nLoc nBuf
+                     | start <= loc && loc < end = go (ch:acc) nLoc nBuf
+                     | otherwise = (loc, buf, reverse acc)
+          where (ch, nBuf) = nextChar buf
+                nLoc = advanceSrcLoc loc ch
+
+showRichTokenStream :: [(Located Token, String)] -> String
+showRichTokenStream ts = go startLoc ts ""
+    where sourceFile = srcSpanFile (getLoc . fst . head $ ts)
+          startLoc = mkSrcLoc sourceFile 1 1
+          go _ [] = id
+          go loc ((L span _, str):ts)
+              | not (isGoodSrcSpan span) = go loc ts
+              | locLine == tokLine = ((replicate (tokCol - locCol) ' ') ++)
+                                     . (str ++)
+                                     . go tokEnd ts
+              | otherwise = ((replicate (tokLine - locLine) '\n') ++)
+                            . ((replicate tokCol ' ') ++)
+                            . (str ++)
+                            . go tokEnd ts
+              where (locLine, locCol) = (srcLocLine loc, srcLocCol loc)
+                    (tokLine, tokCol) = (srcSpanStartLine span, srcSpanStartCol span)
+                    tokEnd = srcSpanEnd span
+
+findModule :: GhcMonad m => ModuleName -> Maybe FastString -> m Module
+findModule mod_name maybe_pkg = withSession $ \hsc_env -> do
+  let 
+    dflags   = hsc_dflags hsc_env
+    this_pkg = thisPackage dflags
+  case maybe_pkg of
+    Just pkg | fsToPackageId pkg /= this_pkg && pkg /= fsLit "this" -> liftIO $ do
+      res <- findImportedModule hsc_env mod_name maybe_pkg

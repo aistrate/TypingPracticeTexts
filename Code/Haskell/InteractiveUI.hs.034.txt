@@ -1,0 +1,48 @@
+          ++ (concat . intersperse ", " $ map unLoc leftovers)
+        else return ()
+
+      new_pkgs <- setDynFlags dflags'
+
+      dflags <- getDynFlags
+      when (packageFlags dflags /= pkg_flags) $ do
+        liftIO $ hPutStrLn stderr "package flags have changed, resetting and loading new packages..."
+        GHC.setTargets []
+        _ <- GHC.load LoadAllTargets
+        liftIO (linkPackages dflags new_pkgs)
+        setContextAfterLoad ([],[]) False []
+      return ()
+
+unsetOptions :: String -> GHCi ()
+unsetOptions str
+  =
+     let opts = words str
+         (minus_opts, rest1) = partition isMinus opts
+         (plus_opts, rest2)  = partitionWith isPlus rest1
+         (other_opts, rest3) = partition (`elem` map fst defaulters) rest2
+
+         defaulters = 
+           [ ("args"  , setArgs default_args)
+           , ("prog"  , setProg default_progname)
+           , ("prompt", setPrompt default_prompt)
+           , ("editor", liftIO findEditor >>= setEditor)
+           , ("stop"  , setStop default_stop)
+           ]
+
+         no_flag ('-':'f':rest) = return ("-fno-" ++ rest)
+         no_flag f = ghcError (ProgramError ("don't know how to reverse " ++ f))
+
+     in if (not (null rest3))
+           then liftIO (putStrLn ("unknown option: '" ++ head rest3 ++ "'"))
+           else do
+             mapM_ (fromJust.flip lookup defaulters) other_opts
+
+             mapM_ unsetOpt plus_opts
+
+             no_flags <- mapM no_flag minus_opts
+             newDynFlags no_flags
+
+isMinus :: String -> Bool
+isMinus ('-':_) = True
+isMinus _ = False
+
+isPlus :: String -> Either String String

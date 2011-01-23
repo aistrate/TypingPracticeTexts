@@ -1,0 +1,44 @@
+        case found of
+             Found location mod 
+                | isJust (ml_hs_file location) ->
+                         just_found location mod
+                | otherwise -> 
+                        ASSERT(modulePackageId mod /= thisPackage dflags)
+                        return Nothing
+                        
+             err -> noModError dflags loc wanted_mod err
+
+    just_found location mod = do
+        let location' | is_boot   = addBootSuffixLocn location
+                      | otherwise = location
+            src_fn = expectJust "summarise2" (ml_hs_file location')
+
+        maybe_t <- modificationTimeIfExists src_fn
+        case maybe_t of
+          Nothing -> noHsFileErr loc src_fn
+          Just t  -> new_summary location' mod src_fn t
+
+    new_summary location mod src_fn src_timestamp
+      = do
+        (dflags', hspp_fn, buf) <- preprocessFile hsc_env src_fn Nothing maybe_buf
+        (srcimps, the_imps, L mod_loc mod_name) <- getImports dflags' buf hspp_fn src_fn
+
+        when (mod_name /= wanted_mod) $
+                throwOneError $ mkPlainErrMsg mod_loc $ 
+                              text "File name does not match module name:" 
+                              $$ text "Saw:" <+> quotes (ppr mod_name)
+                              $$ text "Expected:" <+> quotes (ppr wanted_mod)
+
+        obj_timestamp <-
+           if isObjectTarget (hscTarget (hsc_dflags hsc_env))
+              || obj_allowed
+              then getObjTimestamp location is_boot
+              else return Nothing
+
+        return (Just (ModSummary { ms_mod       = mod,
+                              ms_hsc_src   = hsc_src,
+                              ms_location  = location,
+                              ms_hspp_file = hspp_fn,
+                              ms_hspp_opts = dflags',
+                              ms_hspp_buf  = Just buf,
+                              ms_srcimps   = srcimps,

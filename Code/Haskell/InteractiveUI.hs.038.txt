@@ -1,0 +1,36 @@
+            Just (_,_,f) -> return f
+            Nothing -> return completeFilename
+
+completeCmd = wrapCompleter " " $ \w -> do
+  macros <- liftIO $ readIORef macros_ref
+  let macro_names = map (':':) . map cmdName $ macros
+  let command_names = map (':':) . map cmdName $ builtin_commands
+  let{ candidates = case w of
+      ':' : ':' : _ -> map (':':) command_names
+      _ -> nub $ macro_names ++ command_names }
+  return $ filter (w `isPrefixOf`) candidates
+
+completeMacro = wrapIdentCompleter $ \w -> do
+  cmds <- liftIO $ readIORef macros_ref
+  return (filter (w `isPrefixOf`) (map cmdName cmds))
+
+completeIdentifier = wrapIdentCompleter $ \w -> do
+  rdrs <- GHC.getRdrNamesInScope
+  return (filter (w `isPrefixOf`) (map (showSDoc.ppr) rdrs))
+
+completeModule = wrapIdentCompleter $ \w -> do
+  dflags <- GHC.getSessionDynFlags
+  let pkg_mods = allExposedModules dflags
+  loaded_mods <- liftM (map GHC.ms_mod_name) getLoadedModules
+  return $ filter (w `isPrefixOf`)
+        $ map (showSDoc.ppr) $ loaded_mods ++ pkg_mods
+
+completeSetModule = wrapIdentCompleterWithModifier "+-" $ \m w -> do
+  modules <- case m of
+    Just '-' -> do
+      (toplevs, exports) <- GHC.getContext
+      return $ map GHC.moduleName (nub (map fst exports) ++ toplevs)
+    _ -> do
+      dflags <- GHC.getSessionDynFlags
+      let pkg_mods = allExposedModules dflags
+      loaded_mods <- liftM (map GHC.ms_mod_name) getLoadedModules

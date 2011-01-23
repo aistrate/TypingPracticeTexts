@@ -1,0 +1,54 @@
+   GHC.setContext [] [(prel_mod, Nothing)]
+
+   default_editor <- liftIO $ findEditor
+
+   startGHCi (runGHCi srcs maybe_exprs)
+        GHCiState{ progname = default_progname,
+                   args = default_args,
+                   prompt = default_prompt,
+                   stop = default_stop,
+                   editor = default_editor,
+                   options = [],
+                   prelude = prel_mod,
+                   break_ctr = 0,
+                   breaks = [],
+                   tickarrays = emptyModuleEnv,
+                   last_command = Nothing,
+                   cmdqueue = [],
+                   remembered_ctx = [],
+                   ghc_e = isJust maybe_exprs
+                 }
+
+   return ()
+
+withGhcAppData :: (FilePath -> IO a) -> IO a -> IO a
+withGhcAppData right left = do
+    either_dir <- tryIO (getAppUserDataDirectory "ghc")
+    case either_dir of
+        Right dir ->
+            do createDirectoryIfMissing False dir `catchIO` \_ -> return ()
+               right dir
+        _ -> left
+
+runGHCi :: [(FilePath, Maybe Phase)] -> Maybe [String] -> GHCi ()
+runGHCi paths maybe_exprs = do
+  let
+   read_dot_files = not opt_IgnoreDotGhci
+
+   current_dir = return (Just ".ghci")
+
+   app_user_dir = liftIO $ withGhcAppData
+                    (\dir -> return (Just (dir </> "ghci.conf")))
+                    (return Nothing)
+
+   home_dir = do
+    either_dir <- liftIO $ tryIO (getEnv "HOME")
+    case either_dir of
+      Right home -> return (Just (home </> ".ghci"))
+      _ -> return Nothing
+
+   canonicalizePath' :: FilePath -> IO (Maybe FilePath)
+   canonicalizePath' fp = liftM Just (canonicalizePath fp)
+                `catchIO` \_ -> return Nothing
+
+   sourceConfigFile :: FilePath -> GHCi ()

@@ -1,0 +1,40 @@
+       let f some_span = srcSpanFileName_maybe span == srcSpanFileName_maybe some_span
+       doContinue f GHC.SingleStep
+
+stepModuleCmd expression = stepCmd expression
+
+enclosingTickSpan :: Module -> SrcSpan -> GHCi SrcSpan
+enclosingTickSpan mod src = do
+  ticks <- getTickArray mod
+  let line = srcSpanStartLine src
+  ASSERT (inRange (bounds ticks) line) do
+  let enclosing_spans = [ span | (_,span) <- ticks ! line
+                               , srcSpanEnd span >= srcSpanEnd src]
+  return . head . sortBy leftmost_largest $ enclosing_spans
+
+traceCmd :: String -> GHCi ()
+traceCmd []         = doContinue (const True) GHC.RunAndLogSteps
+traceCmd expression = runStmt expression GHC.RunAndLogSteps >> return ()
+
+continueCmd :: String -> GHCi ()
+continueCmd = noArgs $ doContinue (const True) GHC.RunToCompletion
+
+doContinue :: (SrcSpan -> Bool) -> SingleStep -> GHCi ()
+doContinue pred step = do 
+  runResult <- resume pred step
+  _ <- afterRunStmt pred runResult
+  return ()
+
+abandonCmd :: String -> GHCi ()
+abandonCmd = noArgs $ do
+  b <- GHC.abandon
+  when (not b) $ liftIO $ putStrLn "There is no computation running."
+
+deleteCmd :: String -> GHCi ()
+deleteCmd argLine = do
+   deleteSwitch $ words argLine
+   where
+   deleteSwitch :: [String] -> GHCi ()
+   deleteSwitch [] =
+      liftIO $ putStrLn "The delete command requires at least one argument."
+   deleteSwitch ("*":_rest) = discardActiveBreakPoints

@@ -1,0 +1,41 @@
+  str <- liftIO ((unsafeCoerce# fun :: String -> IO String) s)
+  seqList str (return ())
+  enqueueCommands (lines str)
+  return False
+
+undefineMacro :: String -> GHCi ()
+undefineMacro str = mapM_ undef (words str) 
+ where undef macro_name = do
+        cmds <- liftIO (readIORef macros_ref)
+        if (macro_name `notElem` map cmdName cmds) 
+           then ghcError (CmdLineError 
+                ("macro '" ++ macro_name ++ "' is not defined"))
+           else do
+            liftIO (writeIORef macros_ref (filter ((/= macro_name) . cmdName) cmds))
+
+cmdCmd :: String -> GHCi ()
+cmdCmd str = do
+  let expr = '(' : str ++ ") :: IO String"
+  handleSourceError (\e -> GHC.printException e) $
+   do
+    hv <- GHC.compileExpr expr
+    cmds <- liftIO $ (unsafeCoerce# hv :: IO String)
+    enqueueCommands (lines cmds)
+    return ()
+
+loadModuleName :: GHC.GhcMonad m => ImportDecl RdrName -> m Module
+loadModuleName = flip GHC.findModule Nothing . unLoc . ideclName
+
+loadModule :: [(FilePath, Maybe Phase)] -> InputT GHCi SuccessFlag
+loadModule fs = timeIt (loadModule' fs)
+
+loadModule_ :: [FilePath] -> InputT GHCi ()
+loadModule_ fs = loadModule (zip fs (repeat Nothing)) >> return ()
+
+loadModule' :: [(FilePath, Maybe Phase)] -> InputT GHCi SuccessFlag
+loadModule' files = do
+  prev_context <- GHC.getContext
+
+  _ <- GHC.abandonAll
+  lift discardActiveBreakPoints
+  GHC.setTargets []

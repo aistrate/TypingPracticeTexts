@@ -1,0 +1,66 @@
+        Token,
+        getTokenStream, getRichTokenStream,
+        showRichTokenStream, addSourceToTokens,
+
+        parser,
+
+        cyclicModuleErr,
+  ) where
+
+#include "HsVersions.h"
+
+#ifdef GHCI
+import qualified Linker
+import Linker           ( HValue )
+import ByteCodeInstr
+import BreakArray
+import InteractiveEval
+#endif
+
+import HscMain
+import DriverPipeline
+import GhcMonad
+import TcIface          ( typecheckIface )
+import TcRnTypes
+import TcRnMonad        ( initIfaceCheck )
+import Packages
+import NameSet
+import RdrName
+import qualified HsSyn
+import HsSyn hiding ((<.>))
+import Type
+import Coercion         ( synTyConResKind )
+import TcType           hiding( typeKind )
+import Id
+import Var
+import TysPrim          ( alphaTyVars )
+import TyCon
+import Class
+import DataCon
+import Name             hiding ( varName )
+import InstEnv
+import SrcLoc
+import CoreSyn          ( CoreBind )
+import TidyPgm
+import DriverPhases     ( Phase(..), isHaskellSrcFilename, startPhase )
+import HeaderInfo
+import Finder
+import HscTypes
+import DynFlags
+import StaticFlagParser
+import qualified StaticFlags
+import SysTools     ( initSysTools, cleanTempFiles, cleanTempFilesExcept,
+                      cleanTempDirs )
+import Annotations
+import Module
+import UniqFM
+import Panic
+import Digraph
+import Bag              ( unitBag, listToBag )
+import ErrUtils
+import MonadUtils
+import Util
+import StringBuffer
+import Outputable
+import BasicTypes
+import Maybes           ( expectJust, mapCatMaybes )

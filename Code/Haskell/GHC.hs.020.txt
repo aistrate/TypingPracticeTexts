@@ -1,0 +1,52 @@
+findPartiallyCompletedCycles :: [Module] -> [SCC ModSummary] -> [Module]
+findPartiallyCompletedCycles modsDone theGraph
+   = chew theGraph
+     where
+        chew [] = []
+        chew ((AcyclicSCC _):rest) = chew rest
+        chew ((CyclicSCC vs):rest)
+           = let names_in_this_cycle = nub (map ms_mod vs)
+                 mods_in_this_cycle  
+                    = nub ([done | done <- modsDone, 
+                                   done `elem` names_in_this_cycle])
+                 chewed_rest = chew rest
+             in 
+             if   notNull mods_in_this_cycle
+                  && length mods_in_this_cycle < length names_in_this_cycle
+             then mods_in_this_cycle ++ chewed_rest
+             else chewed_rest
+
+upsweep
+    :: GhcMonad m
+    => HomePackageTable
+    -> ([ModuleName],[ModuleName])
+    -> IO ()
+    -> [SCC ModSummary]
+    -> m (SuccessFlag,
+          [ModSummary])
+
+upsweep old_hpt stable_mods cleanup sccs = do
+   (res, done) <- upsweep' old_hpt [] sccs 1 (length sccs)
+   return (res, reverse done)
+ where
+
+  upsweep' _old_hpt done
+     [] _ _
+   = return (Succeeded, done)
+
+  upsweep' _old_hpt done
+     (CyclicSCC ms:_) _ _
+   = do dflags <- getSessionDynFlags
+        liftIO $ fatalErrorMsg dflags (cyclicModuleErr ms)
+        return (Failed, done)
+
+  upsweep' old_hpt done
+     (AcyclicSCC mod:mods) mod_index nmods
+   = do
+        let logger _mod = defaultWarnErrLogger
+
+        hsc_env <- getSession
+        mb_mod_info
+            <- handleSourceError
+                   (\err -> do logger mod (Just err); return Nothing) $ do
+                 mod_info <- liftIO $ upsweep_mod hsc_env old_hpt stable_mods

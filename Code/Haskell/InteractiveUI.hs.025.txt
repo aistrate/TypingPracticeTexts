@@ -1,0 +1,37 @@
+  lift discardActiveBreakPoints
+  ok <- trySuccess $ GHC.load howmuch
+  afterLoad ok retain_context prev_context
+  return ok
+
+afterLoad :: SuccessFlag -> Bool -> ([Module],[(Module, Maybe (ImportDecl RdrName))]) -> InputT GHCi ()
+afterLoad ok retain_context prev_context = do
+  lift revertCAFs
+  lift discardTickArrays
+  loaded_mod_summaries <- getLoadedModules
+  let loaded_mods = map GHC.ms_mod loaded_mod_summaries
+      loaded_mod_names = map GHC.moduleName loaded_mods
+  modulesLoadedMsg ok loaded_mod_names
+
+  lift $ setContextAfterLoad prev_context retain_context loaded_mod_summaries
+
+setContextAfterLoad :: ([Module],[(Module, Maybe (ImportDecl RdrName))]) -> Bool -> [GHC.ModSummary] -> GHCi ()
+setContextAfterLoad prev keep_ctxt [] = do
+  prel_mod <- getPrelude
+  setContextKeepingPackageModules prev keep_ctxt ([], [(prel_mod, Nothing)])
+setContextAfterLoad prev keep_ctxt ms = do
+  targets <- GHC.getTargets
+  case [ m | Just m <- map (findTarget ms) targets ] of
+        []    -> 
+          let graph' = flattenSCCs (GHC.topSortModuleGraph True ms Nothing) in
+          load_this (last graph')         
+        (m:_) -> 
+          load_this m
+ where
+   findTarget ms t
+    = case filter (`matches` t) ms of
+        []    -> Nothing
+        (m:_) -> Just m
+
+   summary `matches` Target (TargetModule m) _ _
+        = GHC.ms_mod_name summary == m
+   summary `matches` Target (TargetFile f _) _ _ 

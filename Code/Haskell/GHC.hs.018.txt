@@ -1,0 +1,42 @@
+                           module dependency graph"
+  where
+        gutsToCoreModule :: Either (CgGuts, ModDetails) ModGuts -> CoreModule
+        gutsToCoreModule (Left (cg, md))  = CoreModule {
+          cm_module = cg_module cg,    cm_types = md_types md,
+          cm_imports = cg_dir_imps cg, cm_binds = cg_binds cg
+        }
+        gutsToCoreModule (Right mg) = CoreModule {
+          cm_module  = mg_module mg,                   cm_types   = mg_types mg,
+          cm_imports = moduleEnvKeys (mg_dir_imps mg), cm_binds   = mg_binds mg
+         }
+
+unload :: HscEnv -> [Linkable] -> IO ()
+unload hsc_env stable_linkables
+  = case ghcLink (hsc_dflags hsc_env) of
+#ifdef GHCI
+        LinkInMemory -> Linker.unload (hsc_dflags hsc_env) stable_linkables
+#else
+        LinkInMemory -> panic "unload: no interpreter"
+                                hsc_env stable_linkables
+#endif
+        _other -> return ()
+
+checkStability
+        :: HomePackageTable
+        -> [SCC ModSummary]
+        -> [ModuleName]
+        -> ([ModuleName],
+            [ModuleName])
+
+checkStability hpt sccs all_home_mods = foldl checkSCC ([],[]) sccs
+  where
+   checkSCC (stable_obj, stable_bco) scc0
+     | stableObjects = (scc_mods ++ stable_obj, stable_bco)
+     | stableBCOs    = (stable_obj, scc_mods ++ stable_bco)
+     | otherwise     = (stable_obj, stable_bco)
+     where
+        scc = flattenSCC scc0
+        scc_mods = map ms_mod_name scc
+        home_module m   = m `elem` all_home_mods && m `notElem` scc_mods
+
+        scc_allimps = nub (filter home_module (concatMap ms_home_allimps scc))

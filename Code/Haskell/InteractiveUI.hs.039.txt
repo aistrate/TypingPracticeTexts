@@ -1,0 +1,36 @@
+      return $ loaded_mods ++ pkg_mods
+  return $ filter (w `isPrefixOf`) $ map (showSDoc.ppr) modules
+
+completeHomeModule = wrapIdentCompleter listHomeModules
+
+listHomeModules :: String -> GHCi [String]
+listHomeModules w = do
+    g <- GHC.getModuleGraph
+    let home_mods = map GHC.ms_mod_name g
+    return $ sort $ filter (w `isPrefixOf`)
+            $ map (showSDoc.ppr) home_mods
+
+completeSetOptions = wrapCompleter flagWordBreakChars $ \w -> do
+  return (filter (w `isPrefixOf`) options)
+    where options = "args":"prog":"prompt":"editor":"stop":flagList
+          flagList = map head $ group $ sort allFlags
+
+completeShowOptions = wrapCompleter flagWordBreakChars $ \w -> do
+  return (filter (w `isPrefixOf`) options)
+    where options = ["args", "prog", "prompt", "editor", "stop",
+                     "modules", "bindings", "linker", "breaks",
+                     "context", "packages", "languages"]
+
+completeHomeModuleOrFile = completeWord Nothing filenameWordBreakChars
+                $ unionComplete (fmap (map simpleCompletion) . listHomeModules)
+                            listFiles
+
+unionComplete :: Monad m => (a -> m [b]) -> (a -> m [b]) -> a -> m [b]
+unionComplete f1 f2 line = do
+  cs1 <- f1 line
+  cs2 <- f2 line
+  return (cs1 ++ cs2)
+
+wrapCompleter :: String -> (String -> GHCi [String]) -> CompletionFunc GHCi
+wrapCompleter breakChars fun = completeWord Nothing breakChars
+    $ fmap (map simpleCompletion) . fmap sort . fun

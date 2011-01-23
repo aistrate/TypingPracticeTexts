@@ -1,0 +1,43 @@
+                     Just p  -> getName p `elemNameSet` all_names
+                     Nothing -> False
+
+pprInfo :: PrintExplicitForalls -> (TyThing, Fixity, [GHC.Instance]) -> SDoc
+pprInfo pefas (thing, fixity, insts)
+  =  pprTyThingInContextLoc pefas thing
+  $$ show_fixity fixity
+  $$ vcat (map GHC.pprInstance insts)
+  where
+    show_fixity fix 
+        | fix == GHC.defaultFixity = empty
+        | otherwise                = ppr fix <+> ppr (GHC.getName thing)
+
+runMain :: String -> GHCi ()
+runMain s = case toArgs s of
+            Left err   -> liftIO (hPutStrLn stderr err)
+            Right args ->
+                do dflags <- getDynFlags
+                   case mainFunIs dflags of
+                       Nothing -> doWithArgs args "main"
+                       Just f  -> doWithArgs args f
+
+runRun :: String -> GHCi ()
+runRun s = case toCmdArgs s of
+           Left err          -> liftIO (hPutStrLn stderr err)
+           Right (cmd, args) -> doWithArgs args cmd
+
+doWithArgs :: [String] -> String -> GHCi ()
+doWithArgs args cmd = enqueueCommands ["System.Environment.withArgs " ++
+                                       show args ++ " (" ++ cmd ++ ")"]
+
+addModule :: [FilePath] -> InputT GHCi ()
+addModule files = do
+  lift revertCAFs
+  files <- mapM expandPath files
+  targets <- mapM (\m -> GHC.guessTarget m Nothing) files
+  mapM_ GHC.removeTarget [ tid | Target tid _ _ <- targets ]
+  mapM_ GHC.addTarget targets
+  prev_context <- GHC.getContext
+  ok <- trySuccess $ GHC.load LoadAllTargets
+  afterLoad ok False prev_context
+
+changeDirectory :: String -> InputT GHCi ()

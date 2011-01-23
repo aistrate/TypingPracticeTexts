@@ -1,0 +1,39 @@
+parseModule :: GhcMonad m => ModSummary -> m ParsedModule
+parseModule ms = do
+   hsc_env <- getSession
+   let hsc_env_tmp = hsc_env { hsc_dflags = ms_hspp_opts ms }
+   rdr_module <- liftIO $ hscParse hsc_env_tmp ms
+   return (ParsedModule ms rdr_module)
+
+typecheckModule :: GhcMonad m => ParsedModule -> m TypecheckedModule
+typecheckModule pmod = do
+ let ms = modSummary pmod
+ hsc_env <- getSession
+ let hsc_env_tmp = hsc_env { hsc_dflags = ms_hspp_opts ms }
+ (tc_gbl_env, rn_info)
+       <- liftIO $ hscTypecheckRename hsc_env_tmp ms (parsedSource pmod)
+ details <- liftIO $ makeSimpleDetails hsc_env_tmp tc_gbl_env
+ return $
+     TypecheckedModule {
+       tm_internals_          = (tc_gbl_env, details),
+       tm_parsed_module       = pmod,
+       tm_renamed_source      = rn_info,
+       tm_typechecked_source  = tcg_binds tc_gbl_env,
+       tm_checked_module_info =
+         ModuleInfo {
+           minf_type_env  = md_types details,
+           minf_exports   = availsToNameSet $ md_exports details,
+           minf_rdr_env   = Just (tcg_rdr_env tc_gbl_env),
+           minf_instances = md_insts details
+#ifdef GHCI
+           ,minf_modBreaks = emptyModBreaks
+#endif
+         }}
+
+desugarModule :: GhcMonad m => TypecheckedModule -> m DesugaredModule
+desugarModule tcm = do
+ let ms = modSummary tcm
+ let (tcg, _) = tm_internals tcm
+ hsc_env <- getSession
+ let hsc_env_tmp = hsc_env { hsc_dflags = ms_hspp_opts ms }
+ guts <- liftIO $ hscDesugar hsc_env_tmp ms tcg

@@ -1,0 +1,38 @@
+                ASSERT(isJust old_hmi)
+                let Just hmi = old_hmi in do
+                liftIO $ debugTraceMsg (hsc_dflags hsc_env) 5
+                           (text "skipping stable BCO mod:" <+> ppr this_mod_name)
+                return hmi
+
+          | not (isObjectTarget target),
+            Just hmi <- old_hmi,
+            Just l <- hm_linkable hmi,
+            not (isObjectLinkable l),
+            (target /= HscNothing) `implies` not is_fake_linkable,
+            linkableTime l >= ms_hs_date summary -> do
+                liftIO $ debugTraceMsg (hsc_dflags hsc_env) 5
+                           (text "compiling non-stable BCO mod:" <+> ppr this_mod_name)
+                compile_it (Just l)
+
+          | isObjectTarget target,
+            Just obj_date <- mb_obj_date,
+            obj_date >= hs_date -> do
+                case old_hmi of
+                  Just hmi
+                    | Just l <- hm_linkable hmi,
+                      isObjectLinkable l && linkableTime l == obj_date -> do
+                          liftIO $ debugTraceMsg (hsc_dflags hsc_env) 5
+                                     (text "compiling mod with new on-disk obj:" <+> ppr this_mod_name)
+                          compile_it (Just l)
+                  _otherwise -> do
+                          liftIO $ debugTraceMsg (hsc_dflags hsc_env) 5
+                                     (text "compiling mod with new on-disk obj2:" <+> ppr this_mod_name)
+                          linkable <- liftIO $ findObjectLinkable this_mod obj_fn obj_date
+                          compile_it_discard_iface (Just linkable)
+
+         _otherwise -> do
+                liftIO $ debugTraceMsg (hsc_dflags hsc_env) 5
+                           (text "compiling mod:" <+> ppr this_mod_name)
+                compile_it Nothing
+
+retainInTopLevelEnvs :: [ModuleName] -> HomePackageTable -> HomePackageTable

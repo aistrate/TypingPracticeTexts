@@ -1,0 +1,39 @@
+  _ <- GHC.load LoadAllTargets
+
+  let (filenames, phases) = unzip files
+  exp_filenames <- mapM expandPath filenames
+  let files' = zip exp_filenames phases
+  targets <- mapM (uncurry GHC.guessTarget) files'
+
+  GHC.setTargets targets
+  doLoad False prev_context LoadAllTargets
+
+checkModule :: String -> InputT GHCi ()
+checkModule m = do
+  let modl = GHC.mkModuleName m
+  prev_context <- GHC.getContext
+  ok <- handleSourceError (\e -> GHC.printException e >> return False) $ do
+          r <- GHC.typecheckModule =<< GHC.parseModule =<< GHC.getModSummary modl
+          liftIO $ putStrLn $ showSDoc $
+           case GHC.moduleInfo r of
+             cm | Just scope <- GHC.modInfoTopLevelScope cm ->
+                let
+                    (local,global) = ASSERT( all isExternalName scope )
+                                     partition ((== modl) . GHC.moduleName . GHC.nameModule) scope
+                in
+                        (text "global names: " <+> ppr global) $$
+                        (text "local  names: " <+> ppr local)
+             _ -> empty
+          return True
+  afterLoad (successIf ok) False prev_context
+
+reloadModule :: String -> InputT GHCi ()
+reloadModule m = do
+  prev_context <- GHC.getContext
+  _ <- doLoad True prev_context $
+        if null m then LoadAllTargets 
+                  else LoadUpTo (GHC.mkModuleName m)
+  return ()
+
+doLoad :: Bool -> ([Module],[(Module, Maybe (ImportDecl RdrName))]) -> LoadHowMuch -> InputT GHCi SuccessFlag
+doLoad retain_context prev_context howmuch = do

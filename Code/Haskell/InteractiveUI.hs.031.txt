@@ -1,0 +1,49 @@
+        Import str -> do
+          m_idecl <- maybe_fail $ GHC.parseImportDecl str
+          case m_idecl of
+            Nothing    -> return ()
+            Just idecl -> do
+              m_mdl <- maybe_fail $ loadModuleName idecl
+              case m_mdl of
+                Nothing -> return ()
+                Just m -> GHC.setContext prev_as (prev_bs ++ [(m, Just idecl)])
+    
+  where
+    maybe_fail | fail      = liftM Just
+               | otherwise = trymaybe
+
+    do_checks as bs = do
+         as' <- mapM (maybe_fail . wantInterpretedModule) as
+         bs' <- mapM (maybe_fail . lookupModule) bs
+         return (catMaybes as', map contextualize (catMaybes bs'))
+
+    contextualize x = (x,Nothing)
+    deleteAllBy f a b = filter (\x->(not (any (f x) b))) a
+
+trymaybe ::GHCi a -> GHCi (Maybe a)
+trymaybe m = do
+    r <- ghciTry m
+    case r of
+      Left _  -> return Nothing
+      Right a -> return (Just a)
+
+setCmd :: String -> GHCi ()
+setCmd ""
+  = do st <- getGHCiState
+       let opts = options st
+       liftIO $ putStrLn (showSDoc (
+              text "options currently set: " <> 
+              if null opts
+                   then text "none."
+                   else hsep (map (\o -> char '+' <> text (optToStr o)) opts)
+           ))
+       dflags <- getDynFlags
+       liftIO $ putStrLn (showSDoc (
+          vcat (text "GHCi-specific dynamic flag settings:" 
+               :map (flagSetting dflags) ghciFlags)
+          ))
+       liftIO $ putStrLn (showSDoc (
+          vcat (text "other dynamic, non-language, flag settings:" 
+               :map (flagSetting dflags) others)
+          ))
+  where flagSetting dflags (str, f, _)

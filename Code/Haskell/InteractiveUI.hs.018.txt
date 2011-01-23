@@ -1,0 +1,49 @@
+                           ++ shortHelpText)
+         return False
+    NoLastCommand ->
+      do liftIO $ hPutStr stdout ("there is no last command to perform\n"
+                           ++ shortHelpText)
+         return False
+
+lookupCommand :: String -> GHCi (MaybeCommand)
+lookupCommand "" = do
+  st <- getGHCiState
+  case last_command st of
+      Just c -> return $ GotCommand c
+      Nothing -> return NoLastCommand
+lookupCommand str = do
+  mc <- liftIO $ lookupCommand' str
+  st <- getGHCiState
+  setGHCiState st{ last_command = mc }
+  return $ case mc of
+           Just c -> GotCommand c
+           Nothing -> BadCommand
+
+lookupCommand' :: String -> IO (Maybe Command)
+lookupCommand' ":" = return Nothing
+lookupCommand' str' = do
+  macros <- readIORef macros_ref
+  let{ (str, cmds) = case str' of
+      ':' : rest -> (rest, builtin_commands)
+      _ -> (str', macros ++ builtin_commands) }
+  return $ case [ c | c <- cmds, str == cmdName c ] of
+           c:_ -> Just c
+           [] -> case [ c | c@(s,_,_) <- cmds, str `isPrefixOf` s ] of
+                 [] -> Nothing
+                 c:_ -> Just c
+
+getCurrentBreakSpan :: GHCi (Maybe SrcSpan)
+getCurrentBreakSpan = do
+  resumes <- GHC.getResumeContext
+  case resumes of
+    [] -> return Nothing
+    (r:_) -> do
+        let ix = GHC.resumeHistoryIx r
+        if ix == 0
+           then return (Just (GHC.resumeSpan r))
+           else do
+                let hist = GHC.resumeHistory r !! (ix-1)
+                span <- GHC.getHistorySpan hist
+                return (Just span)
+
+getCurrentBreakModule :: GHCi (Maybe Module)

@@ -1,0 +1,49 @@
+                | m `elem` all_home_mods = and_then
+                | otherwise = do 
+                        liftIO $ errorMsg dflags (text "no such module:" <+>
+                                         quotes (ppr m))
+                        return Failed
+
+        checkHowMuch how_much $ do
+
+        let mg2_with_srcimps :: [SCC ModSummary]
+            mg2_with_srcimps = topSortModuleGraph True mod_graph Nothing
+
+        warnUnnecessarySourceImports mg2_with_srcimps
+
+        let
+            stable_mods@(stable_obj,stable_bco)
+                = checkStability hpt1 mg2_with_srcimps all_home_mods
+
+            pruned_hpt = pruneHomePackageTable hpt1 
+                                (flattenSCCs mg2_with_srcimps)
+                                stable_mods
+
+        _ <- liftIO $ evaluate pruned_hpt
+
+        modifySession $ \_ -> hsc_env{ hsc_IC = emptyInteractiveContext,
+                                       hsc_HPT = pruned_hpt }
+
+        liftIO $ debugTraceMsg dflags 2 (text "Stable obj:" <+> ppr stable_obj $$
+                                text "Stable BCO:" <+> ppr stable_bco)
+
+        let stable_linkables = [ linkable
+                               | m <- stable_obj++stable_bco,
+                                 Just hmi <- [lookupUFM pruned_hpt m],
+                                 Just linkable <- [hm_linkable hmi] ]
+        liftIO $ unload hsc_env stable_linkables
+
+        let full_mg :: [SCC ModSummary]
+            full_mg    = topSortModuleGraph False mod_graph Nothing
+
+            maybe_top_mod = case how_much of
+                                LoadUpTo m           -> Just m
+                                LoadDependenciesOf m -> Just m
+                                _                    -> Nothing
+
+            partial_mg0 :: [SCC ModSummary]
+            partial_mg0 = topSortModuleGraph False mod_graph maybe_top_mod
+
+            partial_mg
+                | LoadDependenciesOf _mod <- how_much
+                = ASSERT( case last partial_mg0 of 

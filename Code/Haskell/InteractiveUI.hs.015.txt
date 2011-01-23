@@ -1,0 +1,44 @@
+   let buf =  stringToStringBuffer stmt
+       loc  = mkSrcLoc (fsLit (progname st)) line_number 1
+       pstate = Lexer.mkPState dflags buf loc
+   case Lexer.unP goToEnd pstate of
+     (Lexer.POk _ False) -> return $ Just stmt
+     _other              -> do
+       st <- lift getGHCiState
+       let p = prompt st
+       lift $ setGHCiState st{ prompt = "%s| " }
+       mb_stmt <- ghciHandle (\ex -> case fromException ex of
+                            Just UserInterrupt -> return Nothing
+                            _ -> case fromException ex of
+                                 Just ghc_e ->
+                                   do liftIO (print (ghc_e :: GhcException))
+                                      return Nothing
+                                 _other -> liftIO (Exception.throwIO ex)) 
+                     getStmt
+       lift $ getGHCiState >>= \st->setGHCiState st{ prompt = p }
+       case mb_stmt of
+         Nothing  -> return Nothing
+         Just str -> if str == ""
+           then return $ Just stmt
+           else checkInputForLayout (stmt++"\n"++str) (line_number+1) getStmt
+     where goToEnd = do
+             eof <- Lexer.nextIsEOF
+             if eof 
+               then Lexer.activeContext
+               else Lexer.lexer return >> goToEnd
+
+enqueueCommands :: [String] -> GHCi ()
+enqueueCommands cmds = do
+  st <- getGHCiState
+  setGHCiState st{ cmdqueue = cmds ++ cmdqueue st }
+
+runStmt :: String -> SingleStep -> GHCi Bool
+runStmt stmt step
+ | null (filter (not.isSpace) stmt)
+ = return False
+ | "import " `isPrefixOf` stmt
+ = do newContextCmd (Import stmt); return False
+ | otherwise
+ = do
+      _ <- liftIO $ tryIO $ hFlushAll stdin
+      result <- GhciMonad.runStmt stmt step

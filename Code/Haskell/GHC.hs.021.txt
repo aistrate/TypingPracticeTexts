@@ -1,0 +1,53 @@
+                                                  mod mod_index nmods
+                 logger mod Nothing
+                 return (Just mod_info)
+
+        liftIO cleanup
+
+        case mb_mod_info of
+          Nothing -> return (Failed, done)
+          Just mod_info -> do
+                let this_mod = ms_mod_name mod
+
+                    hpt1     = addToUFM (hsc_HPT hsc_env) this_mod mod_info
+                    hsc_env1 = hsc_env { hsc_HPT = hpt1 }
+
+                    old_hpt1 | isBootSummary mod = old_hpt
+                             | otherwise = delFromUFM old_hpt this_mod
+
+                    done' = mod:done
+
+                hsc_env2 <- liftIO $ reTypecheckLoop hsc_env1 mod done'
+                setSession hsc_env2
+
+                upsweep' old_hpt1 done' mods (mod_index+1) nmods
+
+upsweep_mod :: HscEnv
+            -> HomePackageTable
+            -> ([ModuleName],[ModuleName])
+            -> ModSummary
+            -> Int
+            -> Int
+            -> IO HomeModInfo
+
+upsweep_mod hsc_env old_hpt (stable_obj, stable_bco) summary mod_index nmods
+   =    let 
+            this_mod_name = ms_mod_name summary
+            this_mod    = ms_mod summary
+            mb_obj_date = ms_obj_date summary
+            obj_fn      = ml_obj_file (ms_location summary)
+            hs_date     = ms_hs_date summary
+
+            is_stable_obj = this_mod_name `elem` stable_obj
+            is_stable_bco = this_mod_name `elem` stable_bco
+
+            old_hmi = lookupUFM old_hpt this_mod_name
+
+            dflags = ms_hspp_opts summary
+            prevailing_target = hscTarget (hsc_dflags hsc_env)
+            local_target      = hscTarget dflags
+
+            target = if prevailing_target /= local_target
+                        && (not (isObjectTarget prevailing_target)
+                            || not (isObjectTarget local_target))
+                        then prevailing_target

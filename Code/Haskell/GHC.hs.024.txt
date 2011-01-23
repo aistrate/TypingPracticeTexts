@@ -1,0 +1,39 @@
+retainInTopLevelEnvs keep_these hpt
+   = listToUFM   [ (mod, expectJust "retain" mb_mod_info)
+                 | mod <- keep_these
+                 , let mb_mod_info = lookupUFM hpt mod
+                 , isJust mb_mod_info ]
+
+reTypecheckLoop :: HscEnv -> ModSummary -> ModuleGraph -> IO HscEnv
+reTypecheckLoop hsc_env ms graph
+  | not (isBootSummary ms) && 
+    any (\m -> ms_mod m == this_mod && isBootSummary m) graph
+  = do
+        let mss = reachableBackwards (ms_mod_name ms) graph
+            non_boot = filter (not.isBootSummary) mss
+        debugTraceMsg (hsc_dflags hsc_env) 2 $
+           text "Re-typechecking loop: " <> ppr (map ms_mod_name non_boot)
+        typecheckLoop hsc_env (map ms_mod_name non_boot)
+  | otherwise
+  = return hsc_env
+ where
+  this_mod = ms_mod ms
+
+typecheckLoop :: HscEnv -> [ModuleName] -> IO HscEnv
+typecheckLoop hsc_env mods = do
+  new_hpt <-
+    fixIO $ \new_hpt -> do
+      let new_hsc_env = hsc_env{ hsc_HPT = new_hpt }
+      mds <- initIfaceCheck new_hsc_env $ 
+                mapM (typecheckIface . hm_iface) hmis
+      let new_hpt = addListToUFM old_hpt 
+                        (zip mods [ hmi{ hm_details = details }
+                                  | (hmi,details) <- zip hmis mds ])
+      return new_hpt
+  return hsc_env{ hsc_HPT = new_hpt }
+  where
+    old_hpt = hsc_HPT hsc_env
+    hmis    = map (expectJust "typecheckLoop" . lookupUFM old_hpt) mods
+
+reachableBackwards :: ModuleName -> [ModSummary] -> [ModSummary]
+reachableBackwards mod summaries

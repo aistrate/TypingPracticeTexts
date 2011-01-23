@@ -1,0 +1,46 @@
+          -> IsBootInterface
+          -> Located ModuleName
+          -> Bool
+          -> Maybe (StringBuffer, ClockTime)
+          -> [ModuleName]
+          -> IO (Maybe ModSummary)
+
+summariseModule hsc_env old_summary_map is_boot (L loc wanted_mod) 
+                obj_allowed maybe_buf excl_mods
+  | wanted_mod `elem` excl_mods
+  = return Nothing
+
+  | Just old_summary <- Map.lookup (wanted_mod, hsc_src) old_summary_map
+  = do
+        let location = ms_location old_summary
+            src_fn = expectJust "summariseModule" (ml_hs_file location)
+
+        case maybe_buf of
+           Just (_,t) -> check_timestamp old_summary location src_fn t
+           Nothing    -> do
+                m <- tryIO (getModificationTime src_fn)
+                case m of
+                   Right t -> check_timestamp old_summary location src_fn t
+                   Left e | isDoesNotExistError e -> find_it
+                          | otherwise             -> ioError e
+
+  | otherwise  = find_it
+  where
+    dflags = hsc_dflags hsc_env
+
+    hsc_src = if is_boot then HsBootFile else HsSrcFile
+
+    check_timestamp old_summary location src_fn src_timestamp
+        | ms_hs_date old_summary == src_timestamp = do
+                obj_timestamp <- 
+                    if isObjectTarget (hscTarget (hsc_dflags hsc_env))
+                       || obj_allowed
+                       then getObjTimestamp location is_boot
+                       else return Nothing
+                return (Just old_summary{ ms_obj_date = obj_timestamp })
+        | otherwise = 
+                new_summary location (ms_mod old_summary) src_fn src_timestamp
+
+    find_it = do
+        uncacheModule hsc_env wanted_mod
+        found <- findImportedModule hsc_env wanted_mod Nothing

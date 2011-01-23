@@ -1,0 +1,44 @@
+#endif
+
+isDictonaryId :: Id -> Bool
+isDictonaryId id
+  = case tcSplitSigmaTy (idType id) of { (_tvs, _theta, tau) -> isDictTy tau }
+
+lookupGlobalName :: GhcMonad m => Name -> m (Maybe TyThing)
+lookupGlobalName name = withSession $ \hsc_env -> do
+   liftIO $ lookupTypeHscEnv hsc_env name
+
+findGlobalAnns :: (GhcMonad m, Typeable a) => ([Word8] -> a) -> AnnTarget Name -> m [a]
+findGlobalAnns deserialize target = withSession $ \hsc_env -> do
+    ann_env <- liftIO $ prepareAnnotations hsc_env Nothing
+    return (findAnns deserialize ann_env target)
+
+#ifdef GHCI
+getGRE :: GhcMonad m => m GlobalRdrEnv
+getGRE = withSession $ \hsc_env-> return $ ic_rn_gbl_env (hsc_IC hsc_env)
+#endif
+
+packageDbModules :: GhcMonad m =>
+                    Bool
+                 -> m [Module]
+packageDbModules only_exposed = do
+   dflags <- getSessionDynFlags
+   let pkgs = eltsUFM (pkgIdMap (pkgState dflags))
+   return $
+     [ mkModule pid modname | p <- pkgs
+                            , not only_exposed || exposed p
+                            , let pid = packageConfigId p
+                            , modname <- exposedModules p ]
+
+dataConType :: DataCon -> Type
+dataConType dc = idType (dataConWrapId dc)
+
+pprParenSymName :: NamedThing a => a -> SDoc
+pprParenSymName a = parenSymOcc (getOccName a) (ppr (getName a))
+
+#if 0
+
+#endif
+
+getModuleSourceAndFlags :: GhcMonad m => Module -> m (String, StringBuffer, DynFlags)
+getModuleSourceAndFlags mod = do

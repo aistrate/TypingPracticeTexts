@@ -1,0 +1,47 @@
+removeTarget target_id
+  = modifySession (\h -> h{ hsc_targets = filter (hsc_targets h) })
+  where
+   filter targets = [ t | t@(Target id _ _) <- targets, id /= target_id ]
+
+guessTarget :: GhcMonad m => String -> Maybe Phase -> m Target
+guessTarget str (Just phase)
+   = return (Target (TargetFile str (Just phase)) True Nothing)
+guessTarget str Nothing
+   | isHaskellSrcFilename file
+   = return (target (TargetFile file Nothing))
+   | otherwise
+   = do exists <- liftIO $ doesFileExist hs_file
+        if exists
+           then return (target (TargetFile hs_file Nothing))
+           else do
+        exists <- liftIO $ doesFileExist lhs_file
+        if exists
+           then return (target (TargetFile lhs_file Nothing))
+           else do
+        if looksLikeModuleName file
+           then return (target (TargetModule (mkModuleName file)))
+           else do
+        throwGhcException
+                 (ProgramError (showSDoc $
+                 text "target" <+> quotes (text file) <+> 
+                 text "is not a module name or a source file"))
+     where 
+         (file,obj_allowed)
+                | '*':rest <- str = (rest, False)
+                | otherwise       = (str,  True)
+
+         hs_file  = file <.> "hs"
+         lhs_file = file <.> "lhs"
+
+         target tid = Target tid obj_allowed Nothing
+
+depanal :: GhcMonad m =>
+           [ModuleName]
+        -> Bool
+        -> m ModuleGraph
+depanal excluded_mods allow_dup_roots = do
+  hsc_env <- getSession
+  let
+         dflags  = hsc_dflags hsc_env
+         targets = hsc_targets hsc_env
+         old_graph = hsc_mod_graph hsc_env

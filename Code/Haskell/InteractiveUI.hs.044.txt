@@ -1,0 +1,44 @@
+   deleteSwitch idents = do
+      mapM_ deleteOneBreak idents 
+      where
+      deleteOneBreak :: String -> GHCi ()
+      deleteOneBreak str
+         | all isDigit str = deleteBreak (read str)
+         | otherwise = return ()
+
+historyCmd :: String -> GHCi ()
+historyCmd arg
+  | null arg        = history 20
+  | all isDigit arg = history (read arg)
+  | otherwise       = liftIO $ putStrLn "Syntax:  :history [num]"
+  where
+  history num = do
+    resumes <- GHC.getResumeContext
+    case resumes of
+      [] -> liftIO $ putStrLn "Not stopped at a breakpoint"
+      (r:_) -> do
+        let hist = GHC.resumeHistory r
+            (took,rest) = splitAt num hist
+        case hist of
+          [] -> liftIO $ putStrLn $
+                   "Empty history. Perhaps you forgot to use :trace?"
+          _  -> do
+                 spans <- mapM GHC.getHistorySpan took
+                 let nums  = map (printf "-%-3d:") [(1::Int)..]
+                     names = map GHC.historyEnclosingDecls took
+                 printForUser (vcat(zipWith3 
+                                 (\x y z -> x <+> y <+> z) 
+                                 (map text nums) 
+                                 (map (bold . hcat . punctuate colon . map text) names)
+                                 (map (parens . ppr) spans)))
+                 liftIO $ putStrLn $ if null rest then "<end of history>" else "..."
+
+bold :: SDoc -> SDoc
+bold c | do_bold   = text start_bold <> c <> text end_bold
+       | otherwise = c
+
+backCmd :: String -> GHCi ()
+backCmd = noArgs $ do
+  (names, _, span) <- GHC.back
+  printForUser $ ptext (sLit "Logged breakpoint at") <+> ppr span
+  printTypeOfNames names

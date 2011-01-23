@@ -1,0 +1,37 @@
+        | Just f' <- GHC.ml_hs_file (GHC.ms_location summary)   = f == f'
+   _ `matches` _
+        = False
+
+   load_this summary | m <- GHC.ms_mod summary = do
+        b <- GHC.moduleIsInterpreted m
+        if b then setContextKeepingPackageModules prev keep_ctxt ([m], [])
+             else do
+                prel_mod <- getPrelude
+                setContextKeepingPackageModules prev keep_ctxt ([],[(prel_mod,Nothing),(m,Nothing)])
+
+setContextKeepingPackageModules
+        :: ([Module],[(Module, Maybe (ImportDecl RdrName))])
+        -> Bool
+        -> ([Module],[(Module, Maybe (ImportDecl RdrName))])
+        -> GHCi ()
+setContextKeepingPackageModules prev_context keep_ctxt (as,bs) = do
+  let (_,bs0) = prev_context
+  prel_mod <- getPrelude
+  let pkg_modules = filter ((\p -> not (isHomeModule p) && p /= prel_mod) . fst) bs0
+  let bs1 = if null as then nubBy sameFst ((prel_mod,Nothing) : bs) else bs
+  GHC.setContext as (nubBy sameFst (bs1 ++ pkg_modules))
+  if keep_ctxt
+     then do
+          st <- getGHCiState
+          mapM_ (playCtxtCmd False) (remembered_ctx st)
+     else do
+          st <- getGHCiState
+          setGHCiState st{ remembered_ctx = [] }
+
+isHomeModule :: Module -> Bool
+isHomeModule mod = GHC.modulePackageId mod == mainPackageId
+
+sameFst :: (Module, Maybe (ImportDecl RdrName)) -> (Module, Maybe (ImportDecl RdrName)) -> Bool
+sameFst x y = fst x == fst y
+
+modulesLoadedMsg :: SuccessFlag -> [ModuleName] -> InputT GHCi ()

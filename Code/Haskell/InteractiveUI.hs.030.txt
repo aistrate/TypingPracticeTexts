@@ -1,0 +1,44 @@
+setContext :: String -> GHCi ()
+setContext str
+  | all sensible strs = newContextCmd cmd
+  | otherwise = ghcError (CmdLineError "syntax:  :module [+/-] [*]M1 ... [*]Mn")
+  where
+    (cmd, strs) =
+        case str of 
+                '+':stuff -> rest AddModules stuff
+                '-':stuff -> rest RemModules stuff
+                stuff     -> rest SetContext stuff
+
+    rest cmd stuff = (cmd as bs, strs)
+       where strs = words stuff
+             (as,bs) = partitionWith starred strs
+
+    sensible ('*':m) = looksLikeModuleName m
+    sensible m       = looksLikeModuleName m
+
+    starred ('*':m) = Left m
+    starred m       = Right m
+
+playCtxtCmd:: Bool -> CtxtCmd -> GHCi ()
+playCtxtCmd fail cmd = do
+    (prev_as,prev_bs) <- GHC.getContext
+    case cmd of
+        SetContext as bs -> do
+          (as',bs') <- do_checks as bs
+          prel_mod <- getPrelude
+          let bs'' = if null as && prel_mod `notElem` (map fst bs')
+                        then (prel_mod,Nothing):bs'
+                        else bs'
+          GHC.setContext as' bs''
+
+        AddModules as bs -> do
+          (as',bs') <- do_checks as bs
+          let remaining_as = prev_as \\ (as' ++ map fst bs')
+              remaining_bs = deleteAllBy sameFst prev_bs (bs' ++ map contextualize as')
+          GHC.setContext (remaining_as ++ as') (remaining_bs ++ bs')
+
+        RemModules as bs -> do
+          (as',bs') <- do_checks as bs
+          let new_as = prev_as \\ (as' ++ map fst bs')
+              new_bs = deleteAllBy sameFst prev_bs (map contextualize as' ++ bs')
+          GHC.setContext new_as new_bs

@@ -1,0 +1,51 @@
+ "   :show packages              show the currently active package flags\n" ++
+ "   :show languages             show the currently active language flags\n" ++
+ "   :show <setting>             show value of <setting>, which is one of\n" ++
+ "                                  [args, prog, prompt, editor, stop]\n" ++
+ "\n" 
+
+findEditor :: IO String
+findEditor = do
+  getEnv "EDITOR" 
+    `catchIO` \_ -> do
+#if mingw32_HOST_OS
+        win <- System.Win32.getWindowsDirectory
+        return (win </> "notepad.exe")
+#else
+        return ""
+#endif
+
+foreign import ccall unsafe "rts_isProfiled" isProfiled :: IO CInt
+
+default_progname, default_prompt, default_stop :: String
+default_progname = "<interactive>"
+default_prompt = "%s> "
+default_stop = ""
+
+default_args :: [String]
+default_args = []
+
+interactiveUI :: [(FilePath, Maybe Phase)] -> Maybe [String]
+              -> Ghc ()
+interactiveUI srcs maybe_exprs = do
+   i <- liftIO $ isProfiled
+   when (i /= 0) $ 
+     ghcError (InstallationError "GHCi cannot be used when compiled with -prof")
+
+   _ <- liftIO $ newStablePtr stdin
+   _ <- liftIO $ newStablePtr stdout
+   _ <- liftIO $ newStablePtr stderr
+
+   initInterpBuffering
+
+   liftIO $ when (isNothing maybe_exprs) $ do
+
+        turnOffBuffering
+        hFlush stdout
+        hSetBuffering stdout NoBuffering
+        hSetBuffering stdin NoBuffering
+#if defined(mingw32_HOST_OS)
+        hSetEncoding stdin utf8
+#endif
+
+   prel_mod <- GHC.lookupModule (GHC.mkModuleName "Prelude") Nothing

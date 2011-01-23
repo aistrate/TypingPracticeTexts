@@ -1,0 +1,42 @@
+changeDirectory "" = do
+  either_dir <- liftIO $ tryIO getHomeDirectory
+  case either_dir of
+     Left _e -> return ()
+     Right dir -> changeDirectory dir
+changeDirectory dir = do
+  graph <- GHC.getModuleGraph
+  when (not (null graph)) $
+        liftIO $ putStrLn "Warning: changing directory causes all loaded modules to be unloaded,\nbecause the search path has changed."
+  prev_context <- GHC.getContext
+  GHC.setTargets []
+  _ <- GHC.load LoadAllTargets
+  lift $ setContextAfterLoad prev_context False []
+  GHC.workingDirectoryChanged
+  dir <- expandPath dir
+  liftIO $ setCurrentDirectory dir
+
+trySuccess :: GHC.GhcMonad m => m SuccessFlag -> m SuccessFlag
+trySuccess act =
+    handleSourceError (\e -> do GHC.printException e
+                                return Failed) $ do
+      act
+
+editFile :: String -> GHCi ()
+editFile str =
+  do file <- if null str then chooseEditFile else return str
+     st <- getGHCiState
+     let cmd = editor st
+     when (null cmd) 
+       $ ghcError (CmdLineError "editor not set, use :set editor")
+     _ <- liftIO $ system (cmd ++ ' ':file)
+     return ()
+
+chooseEditFile :: GHCi String
+chooseEditFile =
+  do let hasFailed x = fmap not $ GHC.isLoaded $ GHC.ms_mod_name x
+
+     graph <- GHC.getModuleGraph
+     failed_graph <- filterM hasFailed graph
+     let order g  = flattenSCCs $ GHC.topSortModuleGraph True g Nothing
+         pick xs  = case xs of
+                      x : _ -> GHC.ml_hs_file (GHC.ms_location x)

@@ -1,0 +1,46 @@
+queryQueue :: GHCi (Maybe String)
+queryQueue = do
+  st <- getGHCiState
+  case cmdqueue st of
+    []   -> return Nothing
+    c:cs -> do setGHCiState st{ cmdqueue = cs }
+               return (Just c)
+
+runCommands :: InputT GHCi (Maybe String) -> InputT GHCi ()
+runCommands = runCommands' handler
+
+runCommands' :: (SomeException -> GHCi Bool)
+             -> InputT GHCi (Maybe String) -> InputT GHCi ()
+runCommands' eh getCmd = do
+    b <- ghandle (\e -> case fromException e of
+                          Just UserInterrupt -> return $ Just False
+                          _ -> case fromException e of
+                                 Just ghc_e ->
+                                   do liftIO (print (ghc_e :: GhcException))
+                                      return Nothing
+                                 _other ->
+                                   liftIO (Exception.throwIO e))
+            (runOneCommand eh getCmd)
+    case b of
+      Nothing -> return ()
+      Just _  -> runCommands' eh getCmd
+
+runOneCommand :: (SomeException -> GHCi Bool) -> InputT GHCi (Maybe String)
+            -> InputT GHCi (Maybe Bool)
+runOneCommand eh getCmd = do
+  mb_cmd <- noSpace (lift queryQueue)
+  mb_cmd <- maybe (noSpace getCmd) (return . Just) mb_cmd
+  case mb_cmd of
+    Nothing -> return Nothing
+    Just c  -> ghciHandle (\e -> lift $ eh e >>= return . Just) $
+             handleSourceError printErrorAndKeepGoing
+               (doCommand c)
+  where
+    printErrorAndKeepGoing err = do
+        GHC.printException err
+        return $ Just True
+
+    noSpace q = q >>= maybe (return Nothing)
+                            (\c->case removeSpaces c of 
+                                   ""   -> noSpace q
+                                   ":{" -> multiLineCmd q

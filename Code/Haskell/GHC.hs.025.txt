@@ -1,0 +1,39 @@
+  = [ ms | (ms,_,_) <- reachableG (transposeG graph) root ]
+  where
+        (graph, lookup_node) = moduleGraphNodes False summaries
+        root  = expectJust "reachableBackwards" (lookup_node HsBootFile mod)
+
+type SummaryNode = (ModSummary, Int, [Int])
+
+topSortModuleGraph
+          :: Bool
+          -> [ModSummary]
+          -> Maybe ModuleName
+          -> [SCC ModSummary]
+
+topSortModuleGraph drop_hs_boot_nodes summaries mb_root_mod
+  = map (fmap summaryNodeSummary) $ stronglyConnCompG initial_graph
+  where
+    (graph, lookup_node) = moduleGraphNodes drop_hs_boot_nodes summaries
+    
+    initial_graph = case mb_root_mod of
+        Nothing -> graph
+        Just root_mod ->
+            let root | Just node <- lookup_node HsSrcFile root_mod, graph `hasVertexG` node = node
+                     | otherwise = ghcError (ProgramError "module does not exist")
+            in graphFromEdgedVertices (seq root (reachableG graph root))
+
+summaryNodeKey :: SummaryNode -> Int
+summaryNodeKey (_, k, _) = k
+
+summaryNodeSummary :: SummaryNode -> ModSummary
+summaryNodeSummary (s, _, _) = s
+
+moduleGraphNodes :: Bool -> [ModSummary]
+  -> (Graph SummaryNode, HscSource -> ModuleName -> Maybe SummaryNode)
+moduleGraphNodes drop_hs_boot_nodes summaries = (graphFromEdgedVertices nodes, lookup_node)
+  where
+    numbered_summaries = zip summaries [1..]
+
+    lookup_node :: HscSource -> ModuleName -> Maybe SummaryNode
+    lookup_node hs_src mod = Map.lookup (mod, hs_src) node_map

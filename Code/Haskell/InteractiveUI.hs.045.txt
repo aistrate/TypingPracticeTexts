@@ -1,0 +1,41 @@
+  st <- getGHCiState
+  enqueueCommands [stop st]
+
+forwardCmd :: String -> GHCi ()
+forwardCmd = noArgs $ do
+  (names, ix, span) <- GHC.forward
+  printForUser $ (if (ix == 0)
+                    then ptext (sLit "Stopped at")
+                    else ptext (sLit "Logged breakpoint at")) <+> ppr span
+  printTypeOfNames names
+  st <- getGHCiState
+  enqueueCommands [stop st]
+
+breakCmd :: String -> GHCi ()
+breakCmd argLine = do
+   breakSwitch $ words argLine
+
+breakSwitch :: [String] -> GHCi ()
+breakSwitch [] = do
+   liftIO $ putStrLn "The break command requires at least one argument."
+breakSwitch (arg1:rest)
+   | looksLikeModuleName arg1 && not (null rest) = do
+        mod <- wantInterpretedModule arg1
+        breakByModule mod rest
+   | all isDigit arg1 = do
+        (toplevel, _) <- GHC.getContext
+        case toplevel of
+           (mod : _) -> breakByModuleLine mod (read arg1) rest
+           [] -> do 
+              liftIO $ putStrLn "Cannot find default module for breakpoint." 
+              liftIO $ putStrLn "Perhaps no modules are loaded for debugging?"
+   | otherwise = do
+        wantNameFromInterpretedModule noCanDo arg1 $ \name -> do
+        let loc = GHC.srcSpanStart (GHC.nameSrcSpan name)
+        if GHC.isGoodSrcLoc loc
+               then ASSERT( isExternalName name ) 
+                    findBreakAndSet (GHC.nameModule name) $ 
+                         findBreakByCoord (Just (GHC.srcLocFile loc))
+                                          (GHC.srcLocLine loc, 
+                                           GHC.srcLocCol loc)
+               else noCanDo name $ text "can't find its location: " <> ppr loc

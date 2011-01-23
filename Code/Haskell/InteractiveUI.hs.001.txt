@@ -1,0 +1,59 @@
+{-# OPTIONS -fno-cse #-}
+
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+
+module InteractiveUI ( interactiveUI, ghciWelcomeMsg ) where
+
+#include "HsVersions.h"
+
+import qualified GhciMonad
+import GhciMonad hiding (runStmt)
+import GhciTags
+import Debugger
+
+import qualified GHC hiding (resume, runStmt)
+import GHC              ( LoadHowMuch(..), Target(..),  TargetId(..),
+                          TyThing(..), Phase,
+                          BreakIndex, Resume, SingleStep,
+                          Ghc, handleSourceError )
+import PprTyThing
+import DynFlags
+import qualified Lexer
+import StringBuffer
+
+import Packages
+import UniqFM
+
+import HscTypes ( handleFlagWarnings )
+import HsImpExp
+import qualified RdrName ( getGRE_NameQualifier_maybes )
+import RdrName (RdrName)
+import Outputable       hiding (printForUser, printForUserPartWay)
+import Module
+import Name
+import SrcLoc
+
+import Digraph
+import BasicTypes hiding (isTopLevel)
+import Panic      hiding (showException)
+import Config
+import StaticFlags
+import Linker
+import Util
+import NameSet
+import Maybes           ( orElse, expectJust )
+import FastString
+import Encoding
+import Foreign.C
+
+#ifndef mingw32_HOST_OS
+import System.Posix hiding (getEnv)
+#else
+import qualified System.Win32
+#endif
+
+import System.Console.Haskeline as Haskeline
+import qualified System.Console.Haskeline.Encoding as Encoding
+import Control.Monad.Trans
+
+import Exception hiding (catch, block, unblock)

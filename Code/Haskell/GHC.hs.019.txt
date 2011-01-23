@@ -1,0 +1,50 @@
+        stable_obj_imps = map (`elem` stable_obj) scc_allimps
+        stable_bco_imps = map (`elem` stable_bco) scc_allimps
+
+        stableObjects = 
+           and stable_obj_imps
+           && all object_ok scc
+
+        stableBCOs = 
+           and (zipWith (||) stable_obj_imps stable_bco_imps)
+           && all bco_ok scc
+
+        object_ok ms
+          | Just t <- ms_obj_date ms  =  t >= ms_hs_date ms 
+                                         && same_as_prev t
+          | otherwise = False
+          where
+             same_as_prev t = case lookupUFM hpt (ms_mod_name ms) of
+                                Just hmi  | Just l <- hm_linkable hmi
+                                 -> isObjectLinkable l && t == linkableTime l
+                                _other  -> True
+
+        bco_ok ms
+          = case lookupUFM hpt (ms_mod_name ms) of
+                Just hmi  | Just l <- hm_linkable hmi ->
+                        not (isObjectLinkable l) && 
+                        linkableTime l >= ms_hs_date ms
+                _other  -> False
+
+pruneHomePackageTable
+   :: HomePackageTable
+   -> [ModSummary]
+   -> ([ModuleName],[ModuleName])
+   -> HomePackageTable
+
+pruneHomePackageTable hpt summ (stable_obj, stable_bco)
+  = mapUFM prune hpt
+  where prune hmi
+          | is_stable modl = hmi'
+          | otherwise      = hmi'{ hm_details = emptyModDetails }
+          where
+           modl = moduleName (mi_module (hm_iface hmi))
+           hmi' | Just l <- hm_linkable hmi, linkableTime l < ms_hs_date ms
+                = hmi{ hm_linkable = Nothing }
+                | otherwise
+                = hmi
+                where ms = expectJust "prune" (lookupUFM ms_map modl)
+
+        ms_map = listToUFM [(ms_mod_name ms, ms) | ms <- summ]
+
+        is_stable m = m `elem` stable_obj || m `elem` stable_bco

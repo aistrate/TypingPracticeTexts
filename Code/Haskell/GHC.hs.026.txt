@@ -1,0 +1,39 @@
+    lookup_key :: HscSource -> ModuleName -> Maybe Int
+    lookup_key hs_src mod = fmap summaryNodeKey (lookup_node hs_src mod)
+
+    node_map :: NodeMap SummaryNode
+    node_map = Map.fromList [ ((moduleName (ms_mod s), ms_hsc_src s), node)
+                            | node@(s, _, _) <- nodes ]
+
+    nodes :: [SummaryNode]
+    nodes = [ (s, key, out_keys)
+            | (s, key) <- numbered_summaries
+            , not (isBootSummary s && drop_hs_boot_nodes)
+            , let out_keys = out_edge_keys hs_boot_key (map unLoc (ms_home_srcimps s)) ++
+                             out_edge_keys HsSrcFile   (map unLoc (ms_home_imps s)) ++
+                             (
+                              if drop_hs_boot_nodes || ms_hsc_src s == HsBootFile 
+                              then [] 
+                              else case lookup_key HsBootFile (ms_mod_name s) of
+                                    Nothing -> []
+                                    Just k  -> [k]) ]
+
+    hs_boot_key | drop_hs_boot_nodes = HsSrcFile
+                | otherwise          = HsBootFile
+
+    out_edge_keys :: HscSource -> [ModuleName] -> [Int]
+    out_edge_keys hi_boot ms = mapCatMaybes (lookup_key hi_boot) ms
+
+type NodeKey   = (ModuleName, HscSource)
+type NodeMap a = Map NodeKey a
+
+msKey :: ModSummary -> NodeKey
+msKey (ModSummary { ms_mod = mod, ms_hsc_src = boot }) = (moduleName mod,boot)
+
+mkNodeMap :: [ModSummary] -> NodeMap ModSummary
+mkNodeMap summaries = Map.fromList [ (msKey s, s) | s <- summaries]
+        
+nodeMapElts :: NodeMap a -> [a]
+nodeMapElts = Map.elems
+
+warnUnnecessarySourceImports :: GhcMonad m => [SCC ModSummary] -> m ()

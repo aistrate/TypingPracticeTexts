@@ -1,0 +1,40 @@
+      afterRunStmt (const True) result
+
+afterRunStmt :: (SrcSpan -> Bool) -> GHC.RunResult -> GHCi Bool
+afterRunStmt _ (GHC.RunException e) = throw e
+afterRunStmt step_here run_result = do
+  resumes <- GHC.getResumeContext
+  case run_result of
+     GHC.RunOk names -> do
+        show_types <- isOptionSet ShowType
+        when show_types $ printTypeOfNames names
+     GHC.RunBreak _ names mb_info
+         | isNothing  mb_info ||
+           step_here (GHC.resumeSpan $ head resumes) -> do
+               mb_id_loc <- toBreakIdAndLocation mb_info
+               let breakCmd = maybe "" ( \(_,l) -> onBreakCmd l ) mb_id_loc
+               if (null breakCmd)
+                 then printStoppedAtBreakInfo (head resumes) names
+                 else enqueueCommands [breakCmd]
+               st <- getGHCiState
+               enqueueCommands [stop st]
+               return ()
+         | otherwise -> resume step_here GHC.SingleStep >>=
+                        afterRunStmt step_here >> return ()
+     _ -> return ()
+
+  flushInterpBuffers
+  liftIO installSignalHandlers
+  b <- isOptionSet RevertCAFs
+  when b revertCAFs
+
+  return (case run_result of GHC.RunOk _ -> True; _ -> False)
+
+toBreakIdAndLocation ::
+  Maybe GHC.BreakInfo -> GHCi (Maybe (Int, BreakLocation))
+toBreakIdAndLocation Nothing = return Nothing
+toBreakIdAndLocation (Just info) = do
+  let mod = GHC.breakInfo_module info
+      nm  = GHC.breakInfo_number info
+  st <- getGHCiState
+  return $ listToMaybe [ id_loc | id_loc@(_,loc) <- breaks st,

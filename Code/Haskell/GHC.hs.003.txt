@@ -1,0 +1,62 @@
+        isDataConWorkId, idDataCon,
+        isBottomingId, isDictonaryId,
+        recordSelectorFieldLabel,
+
+        TyCon, 
+        tyConTyVars, tyConDataCons, tyConArity,
+        isClassTyCon, isSynTyCon, isNewTyCon, isPrimTyCon, isFunTyCon,
+        isFamilyTyCon,
+        synTyConDefn, synTyConType, synTyConResKind,
+
+        TyVar,
+        alphaTyVars,
+
+        DataCon,
+        dataConSig, dataConType, dataConTyCon, dataConFieldLabels,
+        dataConIsInfix, isVanillaDataCon, dataConUserType,
+        dataConStrictMarks,  
+        StrictnessMark(..), isMarkedStrict,
+
+        Class, 
+        classMethods, classSCTheta, classTvsFds,
+        pprFundeps,
+
+        Instance, 
+        instanceDFunId, pprInstance, pprInstanceHdr,
+
+        Type, splitForAllTys, funResultTy, 
+        pprParendType, pprTypeApp, 
+        Kind,
+        PredType,
+        ThetaType, pprForAll, pprThetaArrow,
+
+        TyThing(..), 
+
+        module HsSyn,
+
+        FixityDirection(..), 
+        defaultFixity, maxPrecedence, 
+        negateFixity,
+        compareFixity,
+
+        SrcLoc, pprDefnLoc,
+        mkSrcLoc, isGoodSrcLoc, noSrcLoc,
+        srcLocFile, srcLocLine, srcLocCol,
+        SrcSpan,
+        mkSrcSpan, srcLocSpan, isGoodSrcSpan, noSrcSpan,
+        srcSpanStart, srcSpanEnd,
+        srcSpanFile, 
+        srcSpanStartLine, srcSpanEndLine, 
+        srcSpanStartCol, srcSpanEndCol,
+
+        Located(..),
+
+        noLoc, mkGeneralLocated,
+
+        getLoc, unLoc,
+
+        eqLocated, cmpLocated, combineLocs, addCLoc,
+        leftmost_smallest, leftmost_largest, rightmost,
+        spans, isSubspanOf,
+
+        GhcException(..), showGhcException,

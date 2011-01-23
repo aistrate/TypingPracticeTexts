@@ -1,0 +1,39 @@
+   sourceConfigFile file = do
+     exists <- liftIO $ doesFileExist file
+     when exists $ do
+       dir_ok  <- liftIO $ checkPerms (getDirectory file)
+       file_ok <- liftIO $ checkPerms file
+       when (dir_ok && file_ok) $ do
+         either_hdl <- liftIO $ tryIO (openFile file ReadMode)
+         case either_hdl of
+           Left _e   -> return ()
+           Right hdl ->
+               do runInputTWithPrefs defaultPrefs defaultSettings $
+                            runCommands $ fileLoop hdl
+                  liftIO (hClose hdl `catchIO` \_ -> return ())
+     where
+      getDirectory f = case takeDirectory f of "" -> "."; d -> d
+
+  when (read_dot_files) $ do
+    mcfgs0 <- sequence [ current_dir, app_user_dir, home_dir ]
+    mcfgs <- liftIO $ mapM canonicalizePath' (catMaybes mcfgs0)
+    mapM_ sourceConfigFile $ nub $ catMaybes mcfgs
+
+  when (not (null paths)) $ do
+     ok <- ghciHandle (\e -> do showException e; return Failed) $
+                runInputTWithPrefs defaultPrefs defaultSettings $ do
+                    let (filePaths, phases) = unzip paths
+                    filePaths' <- mapM (Encoding.decode . BS.pack) filePaths
+                    loadModule (zip filePaths' phases)
+     when (isJust maybe_exprs && failed ok) $
+        liftIO (exitWith (ExitFailure 1))
+
+  is_tty <- liftIO (hIsTerminalDevice stdin)
+  dflags <- getDynFlags
+  let show_prompt = verbosity dflags > 0 || is_tty
+
+  case maybe_exprs of
+        Nothing ->
+          do
+            runGHCiInput $ runCommands $ nextInputLine show_prompt is_tty
+        Just exprs -> do

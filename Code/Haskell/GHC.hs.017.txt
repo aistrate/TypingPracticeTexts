@@ -1,0 +1,43 @@
+compileCoreToObj simplify cm@(CoreModule{ cm_module = mName }) = do
+  dflags      <- getSessionDynFlags
+  currentTime <- liftIO $ getClockTime
+  cwd         <- liftIO $ getCurrentDirectory
+  modLocation <- liftIO $ mkHiOnlyModLocation dflags (hiSuf dflags) cwd
+                   ((moduleNameSlashes . moduleName) mName)
+
+  let modSummary = ModSummary { ms_mod = mName,
+         ms_hsc_src = ExtCoreFile,
+         ms_location = modLocation,
+         ms_hs_date = currentTime,
+         ms_obj_date = Nothing,
+         ms_srcimps = [],
+         ms_imps = [],
+         ms_hspp_file = "",
+         ms_hspp_opts = dflags,
+         ms_hspp_buf = Nothing
+      }
+
+  hsc_env <- getSession
+  liftIO $ hscCompileCore hsc_env simplify modSummary (cm_binds cm)
+
+compileCore :: GhcMonad m => Bool -> FilePath -> m CoreModule
+compileCore simplify fn = do
+   target <- guessTarget fn Nothing
+   addTarget target
+   _ <- load LoadAllTargets
+   modGraph <- depanal [] True
+   case find ((== fn) . msHsFilePath) modGraph of
+     Just modSummary -> do
+       mod_guts <- coreModule `fmap`
+                      (desugarModule =<< typecheckModule =<< parseModule modSummary)
+       liftM gutsToCoreModule $
+         if simplify
+          then do
+             hsc_env <- getSession
+             simpl_guts <- liftIO $ hscSimplify hsc_env mod_guts
+             tidy_guts <- liftIO $ tidyProgram hsc_env simpl_guts
+             return $ Left tidy_guts
+          else
+             return $ Right mod_guts
+
+     Nothing -> panic "compileToCoreModule: target FilePath not found in\

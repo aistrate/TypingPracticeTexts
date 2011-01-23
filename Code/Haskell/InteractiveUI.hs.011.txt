@@ -1,0 +1,43 @@
+            enqueueCommands exprs
+            let handle e = do st <- getGHCiState
+                              flushInterpBuffers
+                              liftIO $ withProgName (progname st)
+                                     $ topHandler e
+            runInputTWithPrefs defaultPrefs defaultSettings $ do
+                runCommands' handle (return Nothing)
+
+  liftIO $ when (verbosity dflags > 0) $ putStrLn "Leaving GHCi."
+
+runGHCiInput :: InputT GHCi a -> GHCi a
+runGHCiInput f = do
+    histFile <- liftIO $ withGhcAppData (\dir -> return (Just (dir </> "ghci_history")))
+                                        (return Nothing)
+    let settings = setComplete ghciCompleteWord
+                    $ defaultSettings {historyFile = histFile}
+    runInputT settings f
+
+nextInputLine :: Bool -> Bool -> InputT GHCi (Maybe String)
+nextInputLine show_prompt is_tty
+  | is_tty = do
+    prompt <- if show_prompt then lift mkPrompt else return ""
+    getInputLine prompt
+  | otherwise = do
+    when show_prompt $ lift mkPrompt >>= liftIO . putStr
+    fileLoop stdin
+
+checkPerms :: String -> IO Bool
+#ifdef mingw32_HOST_OS
+checkPerms _ =
+  return True
+#else
+checkPerms name =
+  handleIO (\_ -> return False) $ do
+     st <- getFileStatus name
+     me <- getRealUserID
+     if fileOwner st /= me then do
+        putStrLn $ "WARNING: " ++ name ++ " is owned by someone else, IGNORING!"
+        return False
+      else do
+        let mode =  System.Posix.fileMode st
+        if (groupWriteMode == (mode `intersectFileModes` groupWriteMode))
+           || (otherWriteMode == (mode `intersectFileModes` otherWriteMode)) 

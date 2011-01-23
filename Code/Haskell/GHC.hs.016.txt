@@ -1,0 +1,48 @@
+ return $
+     DesugaredModule {
+       dm_typechecked_module = tcm,
+       dm_core_module        = guts
+     }
+
+loadModule :: (TypecheckedMod mod, GhcMonad m) => mod -> m mod
+loadModule tcm = do
+   let ms = modSummary tcm
+   let mod = ms_mod_name ms
+   let loc = ms_location ms
+   let (tcg, _details) = tm_internals tcm
+
+   mb_linkable <- case ms_obj_date ms of
+                     Just t | t > ms_hs_date ms  -> do
+                         l <- liftIO $ findObjectLinkable (ms_mod ms) 
+                                                  (ml_obj_file loc) t
+                         return (Just l)
+                     _otherwise -> return Nothing
+                                                
+   hsc_env <- getSession
+   mod_info <- liftIO $ compile' (hscNothingBackendOnly     tcg,
+                                  hscInteractiveBackendOnly tcg,
+                                  hscBatchBackendOnly       tcg)
+                                  hsc_env ms 1 1 Nothing mb_linkable
+
+   modifySession $ \e -> e{ hsc_HPT = addToUFM (hsc_HPT e) mod mod_info }
+   return tcm
+
+data CoreModule
+  = CoreModule {
+      cm_module   :: !Module,
+      cm_types    :: !TypeEnv,
+      cm_binds    :: [CoreBind],
+      cm_imports  :: ![Module]
+    }
+
+instance Outputable CoreModule where
+   ppr (CoreModule {cm_module = mn, cm_types = te, cm_binds = cb}) =
+      text "%module" <+> ppr mn <+> ppr te $$ vcat (map ppr cb)
+
+compileToCoreModule :: GhcMonad m => FilePath -> m CoreModule
+compileToCoreModule = compileCore False
+
+compileToCoreSimplified :: GhcMonad m => FilePath -> m CoreModule
+compileToCoreSimplified = compileCore True
+
+compileCoreToObj :: GhcMonad m => Bool -> CoreModule -> m ()

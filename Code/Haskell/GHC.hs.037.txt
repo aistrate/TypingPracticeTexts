@@ -1,0 +1,42 @@
+                        minf_instances = md_insts details
+#ifdef GHCI
+                       ,minf_modBreaks = getModBreaks hmi
+#endif
+                        }))
+
+modInfoTyThings :: ModuleInfo -> [TyThing]
+modInfoTyThings minf = typeEnvElts (minf_type_env minf)
+
+modInfoTopLevelScope :: ModuleInfo -> Maybe [Name]
+modInfoTopLevelScope minf
+  = fmap (map gre_name . globalRdrEnvElts) (minf_rdr_env minf)
+
+modInfoExports :: ModuleInfo -> [Name]
+modInfoExports minf = nameSetToList $! minf_exports minf
+
+modInfoInstances :: ModuleInfo -> [Instance]
+modInfoInstances = minf_instances
+
+modInfoIsExportedName :: ModuleInfo -> Name -> Bool
+modInfoIsExportedName minf name = elemNameSet name (minf_exports minf)
+
+mkPrintUnqualifiedForModule :: GhcMonad m =>
+                               ModuleInfo
+                            -> m (Maybe PrintUnqualified)
+mkPrintUnqualifiedForModule minf = withSession $ \hsc_env -> do
+  return (fmap (mkPrintUnqualified (hsc_dflags hsc_env)) (minf_rdr_env minf))
+
+modInfoLookupName :: GhcMonad m =>
+                     ModuleInfo -> Name
+                  -> m (Maybe TyThing)
+modInfoLookupName minf name = withSession $ \hsc_env -> do
+   case lookupTypeEnv (minf_type_env minf) name of
+     Just tyThing -> return (Just tyThing)
+     Nothing      -> do
+       eps <- liftIO $ readIORef (hsc_EPS hsc_env)
+       return $! lookupType (hsc_dflags hsc_env) 
+                            (hsc_HPT hsc_env) (eps_PTE eps) name
+
+#ifdef GHCI
+modInfoModBreaks :: ModuleInfo -> ModBreaks
+modInfoModBreaks = minf_modBreaks  

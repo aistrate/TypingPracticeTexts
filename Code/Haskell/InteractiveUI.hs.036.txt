@@ -1,0 +1,45 @@
+                                     "               | breaks | context | packages | languages ]"))
+
+showModules :: GHCi ()
+showModules = do
+  loaded_mods <- getLoadedModules
+  let show_one ms = do m <- GHC.showModule ms; liftIO (putStrLn m)
+  mapM_ show_one loaded_mods
+
+getLoadedModules :: GHC.GhcMonad m => m [GHC.ModSummary]
+getLoadedModules = do
+  graph <- GHC.getModuleGraph
+  filterM (GHC.isLoaded . GHC.ms_mod_name) graph
+
+showBindings :: GHCi ()
+showBindings = do
+  bindings <- GHC.getBindings
+  docs     <- pprTypeAndContents
+                  [ id | AnId id <- sortBy compareTyThings bindings]
+  printForUserPartWay docs
+
+compareTyThings :: TyThing -> TyThing -> Ordering
+t1 `compareTyThings` t2 = getName t1 `compareNames` getName t2
+
+printTyThing :: TyThing -> GHCi ()
+printTyThing tyth = do dflags <- getDynFlags
+                       let pefas = dopt Opt_PrintExplicitForalls dflags
+                       printForUser (pprTyThing pefas tyth)
+
+showBkptTable :: GHCi ()
+showBkptTable = do
+  st <- getGHCiState
+  printForUser $ prettyLocations (breaks st)
+
+showContext :: GHCi ()
+showContext = do
+   resumes <- GHC.getResumeContext
+   printForUser $ vcat (map pp_resume (reverse resumes))
+  where
+   pp_resume resume =
+        ptext (sLit "--> ") <> text (GHC.resumeStmt resume)
+        $$ nest 2 (ptext (sLit "Stopped at") <+> ppr (GHC.resumeSpan resume))
+
+showPackages :: GHCi ()
+showPackages = do
+  pkg_flags <- fmap packageFlags getDynFlags

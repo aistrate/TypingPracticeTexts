@@ -1,0 +1,41 @@
+ghciHandle h m = Haskeline.catch m $ \e -> unblock (h e)
+
+ghciTry :: GHCi a -> GHCi (Either SomeException a)
+ghciTry (GHCi m) = GHCi $ \s -> gtry (m s)
+
+expandPath :: MonadIO m => String -> InputT m String
+expandPath path = do
+    exp_path <- liftIO $ expandPathIO path
+    enc <- fmap BS.unpack $ Encoding.encode exp_path
+    return enc
+
+expandPathIO :: String -> IO String
+expandPathIO path = 
+  case dropWhile isSpace path of
+   ('~':d) -> do
+        tilde <- getHomeDirectory
+        return (tilde ++ '/':d)
+   other -> 
+        return other
+
+wantInterpretedModule :: GHC.GhcMonad m => String -> m Module
+wantInterpretedModule str = do
+   modl <- lookupModule str
+   dflags <- getDynFlags
+   when (GHC.modulePackageId modl /= thisPackage dflags) $
+      ghcError (CmdLineError ("module '" ++ str ++ "' is from another package;\nthis command requires an interpreted module"))
+   is_interpreted <- GHC.moduleIsInterpreted modl
+   when (not is_interpreted) $
+       ghcError (CmdLineError ("module '" ++ str ++ "' is not interpreted; try \':add *" ++ str ++ "' first"))
+   return modl
+
+wantNameFromInterpretedModule :: GHC.GhcMonad m
+                              => (Name -> SDoc -> m ())
+                              -> String
+                              -> (Name -> m ())
+                              -> m ()
+wantNameFromInterpretedModule noCanDo str and_then =
+  handleSourceError GHC.printException $ do
+   names <- GHC.parseName str
+   case names of
+      []    -> return ()

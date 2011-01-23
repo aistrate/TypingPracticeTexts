@@ -1,0 +1,43 @@
+    Just mod_info      -> return (Just (mi_module (hm_iface mod_info)))
+    _not_a_home_module -> return Nothing
+
+#ifdef GHCI
+getHistorySpan :: GhcMonad m => History -> m SrcSpan
+getHistorySpan h = withSession $ \hsc_env ->
+                          return$ InteractiveEval.getHistorySpan hsc_env h
+
+obtainTermFromVal :: GhcMonad m => Int ->  Bool -> Type -> a -> m Term
+obtainTermFromVal bound force ty a =
+    withSession $ \hsc_env ->
+      liftIO $ InteractiveEval.obtainTermFromVal hsc_env bound force ty a
+
+obtainTermFromId :: GhcMonad m => Int -> Bool -> Id -> m Term
+obtainTermFromId bound force id =
+    withSession $ \hsc_env ->
+      liftIO $ InteractiveEval.obtainTermFromId hsc_env bound force id
+
+#endif
+
+lookupName :: GhcMonad m => Name -> m (Maybe TyThing)
+lookupName name =
+     withSession $ \hsc_env -> 
+       liftIO $ hscTcRcLookupName hsc_env name
+
+parser :: String
+       -> DynFlags
+       -> FilePath
+       -> Either ErrorMessages (WarningMessages, Located (HsModule RdrName))
+
+parser str dflags filename = 
+   let
+       loc  = mkSrcLoc (mkFastString filename) 1 1
+       buf  = stringToStringBuffer str
+   in
+   case unP Parser.parseModule (mkPState dflags buf loc) of
+
+     PFailed span err   -> 
+         Left (unitBag (mkPlainErrMsg span err))
+
+     POk pst rdr_module ->
+         let (warns,_) = getMessages pst in
+         Right (warns, rdr_module)

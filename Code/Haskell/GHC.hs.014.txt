@@ -1,0 +1,34 @@
+  typecheckedSource m = tm_typechecked_source m
+  moduleInfo m = tm_checked_module_info m
+  tm_internals m      = tm_internals_ m
+
+data DesugaredModule =
+  DesugaredModule { dm_typechecked_module :: TypecheckedModule
+                  , dm_core_module        :: ModGuts
+             }
+
+instance ParsedMod DesugaredModule where
+  modSummary m   = modSummary (dm_typechecked_module m)
+  parsedSource m = parsedSource (dm_typechecked_module m)
+
+instance TypecheckedMod DesugaredModule where
+  renamedSource m     = renamedSource (dm_typechecked_module m)
+  typecheckedSource m = typecheckedSource (dm_typechecked_module m)
+  moduleInfo m        = moduleInfo (dm_typechecked_module m)
+  tm_internals m      = tm_internals_ (dm_typechecked_module m)
+
+instance DesugaredMod DesugaredModule where
+  coreModule m = dm_core_module m
+
+type ParsedSource      = Located (HsModule RdrName)
+type RenamedSource     = (HsGroup Name, [LImportDecl Name], Maybe [LIE Name],
+                          Maybe LHsDocString)
+type TypecheckedSource = LHsBinds Id
+
+getModSummary :: GhcMonad m => ModuleName -> m ModSummary
+getModSummary mod = do
+   mg <- liftM hsc_mod_graph getSession
+   case [ ms | ms <- mg, ms_mod_name ms == mod, not (isBootSummary ms) ] of
+     [] -> throw $ mkApiErr (text "Module not part of module graph")
+     [ms] -> return ms
+     multiple -> throw $ mkApiErr (text "getModSummary is ambiguous: " <+> ppr multiple)

@@ -1,0 +1,41 @@
+                                   c    -> return (Just c) )
+    multiLineCmd q = do
+      st <- lift getGHCiState
+      let p = prompt st
+      lift $ setGHCiState st{ prompt = "%s| " }
+      mb_cmd <- collectCommand q ""
+      lift $ getGHCiState >>= \st->setGHCiState st{ prompt = p }
+      return mb_cmd
+    collectCommand q c = q >>= 
+      maybe (liftIO (ioError collectError))
+            (\l->if removeSpaces l == ":}" 
+                 then return (Just $ removeSpaces c) 
+                 else collectCommand q (c ++ "\n" ++ map normSpace l))
+      where normSpace '\r' = ' '
+            normSpace   c  = c
+    collectError = userError "unterminated multiline command :{ .. :}"
+    doCommand (':' : cmd) = do
+      result <- specialCommand cmd
+      case result of
+        True -> return Nothing
+        _    -> return $ Just True
+    doCommand stmt        = do 
+      ml <- lift $ isOptionSet Multiline
+      if ml
+        then do 
+          mb_stmt <- checkInputForLayout stmt 1 getCmd
+          case mb_stmt of
+            Nothing      -> return $ Just True
+            Just ml_stmt -> do
+              result <- timeIt $ lift $ runStmt ml_stmt GHC.RunToCompletion
+              return $ Just result
+        else do
+          result <- timeIt $ lift $ runStmt stmt GHC.RunToCompletion
+          return $ Just result
+
+checkInputForLayout :: String -> Int -> InputT GHCi (Maybe String)
+                    -> InputT GHCi (Maybe String)
+checkInputForLayout stmt line_number getStmt = do
+   dflags' <- lift $ getDynFlags
+   let dflags = xopt_set dflags' Opt_AlternativeLayoutRule
+   st <- lift $ getGHCiState

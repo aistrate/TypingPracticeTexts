@@ -1,0 +1,49 @@
+                          "because there is no " ++ 
+                          moduleNameString (moduleName main_mod) ++ " module.")
+
+              hsc_env1 <- getSession
+              linkresult <- liftIO $ link (ghcLink dflags) dflags do_linking (hsc_HPT hsc_env1)
+
+              loadFinish Succeeded linkresult
+
+         else 
+           do liftIO $ debugTraceMsg dflags 2 (text "Upsweep partially successful.")
+
+              let modsDone_names
+                     = map ms_mod modsDone
+              let mods_to_zap_names 
+                     = findPartiallyCompletedCycles modsDone_names 
+                          mg2_with_srcimps
+              let mods_to_keep
+                     = filter ((`notElem` mods_to_zap_names).ms_mod) 
+                          modsDone
+
+              hsc_env1 <- getSession
+              let hpt4 = retainInTopLevelEnvs (map ms_mod_name mods_to_keep) 
+                                              (hsc_HPT hsc_env1)
+
+              liftIO $ cleanTempFilesExcept dflags (ppFilesFromSummaries mods_to_keep)
+
+              ASSERT(all (isJust.hm_linkable) 
+                        (eltsUFM (hsc_HPT hsc_env))) do
+        
+              linkresult <- liftIO $ link (ghcLink dflags) dflags False hpt4
+
+              modifySession $ \hsc_env -> hsc_env{ hsc_HPT = hpt4 }
+              loadFinish Failed linkresult
+
+loadFinish :: GhcMonad m =>
+              SuccessFlag -> SuccessFlag
+           -> m SuccessFlag
+loadFinish _all_ok Failed
+  = do hsc_env <- getSession
+       liftIO $ unload hsc_env []
+       modifySession discardProg
+       return Failed
+
+loadFinish all_ok Succeeded
+  = do modifySession $ \hsc_env -> hsc_env{ hsc_IC = emptyInteractiveContext }
+       return all_ok
+
+discardProg :: HscEnv -> HscEnv
+discardProg hsc_env

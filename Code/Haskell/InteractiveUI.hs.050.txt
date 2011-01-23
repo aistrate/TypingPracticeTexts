@@ -1,0 +1,40 @@
+          these_lines = take (line2 - line1 + 1 + pad_before + pad_after) $ 
+                        drop (line1 - 1 - pad_before) $ lines
+          fst_line = max 1 (line1 - pad_before)
+          line_nos = [ fst_line .. ]
+
+          highlighted | do_highlight = zipWith highlight line_nos these_lines
+                      | otherwise    = [\p -> BS.concat[p,l] | l <- these_lines]
+
+          bs_line_nos = [ BS.pack (show l ++ "  ") | l <- line_nos ]
+          prefixed = zipWith ($) highlighted bs_line_nos
+      let output = BS.intercalate (BS.pack "\n") prefixed
+      utf8Decoded <- liftIO $ BS.useAsCStringLen output
+                        $ \(p,n) -> utf8DecodeString (castPtr p) n
+      liftIO $ putStrLn utf8Decoded
+  where
+        file  = GHC.srcSpanFile span
+        line1 = GHC.srcSpanStartLine span
+        col1  = GHC.srcSpanStartCol span - 1
+        line2 = GHC.srcSpanEndLine span
+        col2  = GHC.srcSpanEndCol span - 1
+
+        pad_before | line1 == 1 = 0
+                   | otherwise  = 1
+        pad_after = 1
+
+        highlight | do_bold   = highlight_bold
+                  | otherwise = highlight_carets
+
+        highlight_bold no line prefix
+          | no == line1 && no == line2
+          = let (a,r) = BS.splitAt col1 line
+                (b,c) = BS.splitAt (col2-col1) r
+            in
+            BS.concat [prefix, a,BS.pack start_bold,b,BS.pack end_bold,c]
+          | no == line1
+          = let (a,b) = BS.splitAt col1 line in
+            BS.concat [prefix, a, BS.pack start_bold, b]
+          | no == line2
+          = let (a,b) = BS.splitAt col2 line in
+            BS.concat [prefix, a, BS.pack end_bold, b]

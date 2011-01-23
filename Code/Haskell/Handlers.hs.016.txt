@@ -1,0 +1,37 @@
+                      " have been merged into your edits below. " ++
+                      if conflicts
+                         then "Please resolve conflicts and Save."
+                         else "Please review and Save."
+               withMessages [mergeMsg] $
+                 withInput "editedText" mergedText $
+                   withInput "sha1" (revId mergedWithRev) editPage
+
+indexPage :: Handler
+indexPage = do
+  path' <- getPath
+  base' <- getWikiBase
+  let prefix' = if null path' then "" else path' ++ "/"
+  fs <- getFileStore
+  listing <- liftIO $ directory fs prefix'
+  let isDiscussionPage (FSFile f) = isDiscussPageFile f
+      isDiscussionPage (FSDirectory _) = False
+  let prunedListing = filter (not . isDiscussionPage) listing
+  let htmlIndex = fileListToHtml base' prefix' prunedListing
+  formattedPage defaultPageLayout{
+                  pgPageName = prefix',
+                  pgShowPageTools = False,
+                  pgTabs = [],
+                  pgScripts = [],
+                  pgTitle = "Contents"} htmlIndex
+
+fileListToHtml :: String -> String -> [Resource] -> Html
+fileListToHtml base' prefix files =
+  let fileLink (FSFile f) | isPageFile f =
+        li ! [theclass "page"  ] <<
+          anchor ! [href $ base' ++ urlForPage (prefix ++ dropExtension f)] <<
+            dropExtension f
+      fileLink (FSFile f) =
+        li ! [theclass "upload"] << anchor ! [href $ base' ++ urlForPage (prefix ++ f)] << f
+      fileLink (FSDirectory f) =
+        li ! [theclass "folder"] <<
+          anchor ! [href $ base' ++ urlForPage (prefix ++ f) ++ "/"] << f

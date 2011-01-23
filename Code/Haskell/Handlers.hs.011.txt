@@ -1,0 +1,46 @@
+        ]
+  let contents = ulist ! [theclass "history"] << map revToListItem hist'
+  formattedPage defaultPageLayout{
+                  pgMessages = pMessages params,
+                  pgShowPageTools = False,
+                  pgTabs = [],
+                  pgTitle = "Recent changes"
+                  } (heading +++ contents)
+
+showPageDiff :: Handler
+showPageDiff = withData $ \(params :: Params) -> do
+  page <- getPage
+  showDiff (pathForPage page) page params
+
+showFileDiff :: Handler
+showFileDiff = withData $ \(params :: Params) -> do
+  page <- getPage
+  showDiff page page params
+
+showDiff :: String -> String -> Params -> Handler
+showDiff file page params = do
+  let from = pFrom params
+  let to = pTo params
+  when (from == Nothing && to == Nothing) mzero
+  fs <- getFileStore
+  from' <- case (from, to) of
+              (Just _, _)        -> return from
+              (Nothing, Nothing) -> return from
+              (Nothing, Just t)  -> do 
+                pageHist <- liftIO $ history fs [file]
+                                     (TimeRange Nothing Nothing)
+                let (_, upto) = break (\r -> idsMatch fs (revId r) t)
+                                  pageHist
+                return $ if length upto >= 2
+                            then Just $ revId $ upto !! 1
+                            else Nothing
+  result' <- liftIO $ try $ getDiff fs file from' to
+  case result' of
+       Left NotFound  -> mzero
+       Left e         -> liftIO $ throwIO e
+       Right htmlDiff -> formattedPage defaultPageLayout{
+                                          pgPageName = page,
+                                          pgRevision = from',
+                                          pgMessages = pMessages params,
+                                          pgTabs = DiffTab :
+                                                   pgTabs defaultPageLayout,

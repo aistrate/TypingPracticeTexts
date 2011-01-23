@@ -1,0 +1,43 @@
+import qualified Text.XHtml as X ( method )
+import Data.List (intersperse, nub, sortBy, find, isPrefixOf, inits, sort)
+import Data.Maybe (fromMaybe, mapMaybe, isJust, catMaybes)
+import Data.Ord (comparing)
+import Data.Char (toLower, isSpace)
+import Control.Monad.Reader
+import qualified Data.ByteString.Lazy as B
+import qualified Data.ByteString as S
+import Network.HTTP (urlEncodeVars)
+import Data.Time (getCurrentTime, addUTCTime)
+import Data.FileStore
+import System.Log.Logger (logM, Priority(..))
+
+handleAny :: Handler
+handleAny = uriRest $ \uri ->
+  let path' = uriPath uri
+  in  do fs <- getFileStore
+         mimetype <- getMimeTypeForExtension
+                      (takeExtension path')
+         res <- liftIO $ try
+                (retrieve fs path' Nothing :: IO B.ByteString)
+         case res of
+                Right contents -> ignoreFilters >>
+                                  (ok $ setContentType mimetype $
+                                    (toResponse noHtml) {rsBody = contents})
+                Left NotFound  -> anyRequest mzero
+                Left e         -> error (show e)
+
+debugHandler :: Handler
+debugHandler = withData $ \(params :: Params) -> do
+  req <- askRq
+  liftIO $ logM "gitit" DEBUG (show req)
+  page <- getPage
+  liftIO $ logM "gitit" DEBUG $ "Page = '" ++ page ++ "'\n" ++
+              show params
+  mzero
+
+randomPage :: Handler
+randomPage = do
+  fs <- getFileStore
+  files <- liftIO $ index fs
+  let pages = map dropExtension $
+                filter (\f -> isPageFile f && not (isDiscussPageFile f)) files

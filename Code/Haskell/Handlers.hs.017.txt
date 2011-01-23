@@ -1,0 +1,41 @@
+      updirs = drop 1 $ inits $ splitPath $ '/' : prefix
+      uplink = foldr (\d accum ->
+                  concatHtml [ anchor ! [theclass "updir",
+                                         href $ if length d <= 1
+                                                   then base' ++ "/_index"
+                                                   else base' ++
+                                                        urlForPage (joinPath $ drop 1 d)] <<
+                  lastNote "fileListToHtml" d, accum]) noHtml updirs
+  in uplink +++ ulist ! [theclass "index"] << map fileLink files
+
+categoryPage :: Handler
+categoryPage = do
+  category <- getPath
+  cfg <- getConfig
+  let repoPath = repositoryPath cfg
+  let categoryDescription = "Category: " ++ category
+  fs <- getFileStore
+  files <- liftIO $ index fs
+  let pages = filter (\f -> isPageFile f && not (isDiscussPageFile f)) files
+  matches <- liftM catMaybes $
+             forM pages $ \f ->
+               liftIO (readFileUTF8 $ repoPath </> f) >>= \s ->
+               return $ if category `elem` (extractCategories s)
+                           then Just $ dropExtension f
+                           else Nothing
+  base' <- getWikiBase
+  let toMatchListItem file = li <<
+        [ anchor ! [href $ base' ++ urlForPage (dropExtension file)] << dropExtension file ]
+  let htmlMatches = ulist << map toMatchListItem matches
+  formattedPage defaultPageLayout{
+                  pgPageName = categoryDescription,
+                  pgShowPageTools = False,
+                  pgTabs = [],
+                  pgScripts = ["search.js"],
+                  pgTitle = categoryDescription }
+                htmlMatches
+
+categoryListPage :: Handler
+categoryListPage = do
+  cfg <- getConfig
+  let repoPath = repositoryPath cfg

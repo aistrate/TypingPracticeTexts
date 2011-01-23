@@ -1,0 +1,46 @@
+  let readonly = if isJust (pRevision params)
+                    then [strAttr "readonly" "yes",
+                          strAttr "style" "color: gray"]
+                    else []
+  base' <- getWikiBase
+  cfg <- getConfig
+  let editForm = gui (base' ++ urlForPage page) ! [identifier "editform"] <<
+                   [ sha1Box
+                   , textarea ! (readonly ++ [cols "80", name "editedText",
+                                  identifier "editedText"]) << raw
+                   , br
+                   , label << "Description of changes:"
+                   , br
+                   , textfield "logMsg" ! (readonly ++ [value logMsg])
+                   , submit "update" "Save"
+                   , primHtmlChar "nbsp"
+                   , submit "cancel" "Discard"
+                   , primHtmlChar "nbsp"
+                   , input ! [thetype "button", theclass "editButton",
+                              identifier "previewButton",
+                              strAttr "onClick" "updatePreviewPane();",
+                              strAttr "style" "display: none;",
+                              value "Preview" ]
+                   , thediv ! [ identifier "previewpane" ] << noHtml
+                   ]
+  formattedPage defaultPageLayout{
+                  pgPageName = page,
+                  pgMessages = messages,
+                  pgRevision = rev,
+                  pgShowPageTools = False,
+                  pgShowSiteNav = False,
+                  pgMarkupHelp = Just $ markupHelp cfg,
+                  pgSelectedTab = EditTab,
+                  pgScripts = ["preview.js"],
+                  pgTitle = ("Editing " ++ page)
+                  } editForm
+
+confirmDelete :: Handler
+confirmDelete = do
+  page <- getPage
+  fs <- getFileStore
+  pageTest <- liftIO $ try $ latest fs (pathForPage page)
+  fileToDelete <- case pageTest of
+                       Right _        -> return $ pathForPage page
+                       Left  NotFound -> do
+                         fileTest <- liftIO $ try $ latest fs page

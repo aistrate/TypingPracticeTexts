@@ -1,0 +1,35 @@
+  page <- getPage
+  cfg <- getConfig
+  mbUser <- getLoggedInUser
+  (user, email) <- case mbUser of
+                        Nothing -> fail "User must be logged in to delete page."
+                        Just u  -> return (uUsername u, uEmail u)
+  editedText <- case pEditedText params of
+                     Nothing -> error "No body text in POST request"
+                     Just b  -> applyPreCommitPlugins b
+  let logMsg = pLogMsg params `orIfNull` defaultSummary cfg
+  let oldSHA1 = pSHA1 params
+  fs <- getFileStore
+  base' <- getWikiBase
+  if null . filter (not . isSpace) $ logMsg
+     then withMessages ["Description cannot be empty."] editPage
+     else do
+       when (length editedText > fromIntegral (maxPageSize cfg)) $
+          error "Page exceeds maximum size."
+       modifyRes <- if null oldSHA1
+                       then liftIO $ create fs (pathForPage page)
+                                       (Author user email) logMsg editedText >>
+                                     return (Right ())
+                       else do
+                         expireCachedFile (pathForPage page) `mplus` return ()
+                         liftIO $ catch (modify fs (pathForPage page)
+                                            oldSHA1 (Author user email) logMsg
+                                            editedText)
+                                     (\e -> if e == Unchanged
+                                               then return (Right ())
+                                               else throwIO e)
+       case modifyRes of
+            Right () -> seeOther (base' ++ urlForPage page) $ toResponse $ p << "Page updated"
+            Left (MergeInfo mergedWithRev conflicts mergedText) -> do
+               let mergeMsg = "The page has been edited since you checked it out. " ++
+                      "Changes from revision " ++ revId mergedWithRev ++

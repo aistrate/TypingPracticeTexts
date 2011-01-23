@@ -1,0 +1,42 @@
+        , thespan ! [theclass "author"] << anchor ! [href $ base' ++ "/_activity?" ++
+            urlEncodeVars [("forUser", authorName $ revAuthor rev)]] <<
+              (authorName $ revAuthor rev)
+        , stringToHtml "): "
+        , anchor ! [href (base' ++ urlForPage page ++ "?revision=" ++ revId rev)] <<
+           thespan ! [theclass "subject"] <<  revDescription rev
+        , noscript <<
+            ([ stringToHtml " [compare with "
+             , anchor ! [href $ base' ++ "/_diff" ++ urlForPage page ++ "?to=" ++ revId rev] <<
+                  "previous" ] ++
+             (if pos /= 1
+                  then [ primHtmlChar "nbsp"
+                       , primHtmlChar "bull"
+                       , primHtmlChar "nbsp"
+                       , anchor ! [href $ base' ++ "/_diff" ++ urlForPage page ++ "?from=" ++
+                                  revId rev] << "current"
+                       ]
+                  else []) ++
+             [stringToHtml "]"])
+        ]
+  if null hist
+     then mzero
+     else do
+       let contents = ulist ! [theclass "history"] <<
+                        zipWith versionToHtml hist
+                        [(length hist), (length hist - 1)..1]
+       let tabs = if file == page
+                     then [ViewTab,HistoryTab]
+                     else pgTabs defaultPageLayout
+       formattedPage defaultPageLayout{
+                        pgPageName = page,
+                        pgMessages = pMessages params,
+                        pgScripts = ["dragdiff.js"],
+                        pgTabs = tabs,
+                        pgSelectedTab = HistoryTab,
+                        pgTitle = ("Changes to " ++ page)
+                        } contents
+
+showActivity :: Handler
+showActivity = withData $ \(params :: Params) -> do
+  currTime <- liftIO getCurrentTime
+  let oneMonthAgo = addUTCTime (-60 * 60 * 24 * 30) currTime

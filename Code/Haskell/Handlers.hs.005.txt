@@ -1,0 +1,31 @@
+  let imageExtensions = [".png", ".jpg", ".gif"]
+  let errors = validate
+                 [ (null . filter (not . isSpace) $ logMsg,
+                    "Description cannot be empty.")
+                 , (null origPath, "File not found.")
+                 , (inStaticDir,  "Destination is inside static directory.")
+                 , (inTemplatesDir,  "Destination is inside templates directory.")
+                 , (not overwrite && exists, "A file named '" ++ wikiname ++
+                    "' already exists in the repository: choose a new name " ++
+                    "or check the box to overwrite the existing file.")
+                 , (B.length fileContents > fromIntegral (maxUploadSize cfg),
+                    "File exceeds maximum upload size.")
+                 , (isPageFile wikiname,
+                    "This file extension is reserved for wiki pages.")
+                 ]
+  if null errors
+     then do
+       expireCachedFile wikiname `mplus` return ()
+       liftIO $ save fs wikiname (Author user email) logMsg fileContents
+       let contents = thediv <<
+             [ h2 << ("Uploaded " ++ show (B.length fileContents) ++ " bytes")
+             , if takeExtension wikiname `elem` imageExtensions
+                  then p << "To add this image to a page, use:" +++
+                       pre << ("![alt text](/" ++ wikiname ++ ")")
+                  else p << "To link to this resource from a page, use:" +++
+                       pre << ("[link label](/" ++ wikiname ++ ")") ]
+       formattedPage defaultPageLayout{
+                       pgMessages = pMessages params,
+                       pgShowPageTools = False,
+                       pgTabs = [],
+                       pgTitle = "Upload successful"}

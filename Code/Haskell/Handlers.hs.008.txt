@@ -1,0 +1,40 @@
+                    thestyle "display: none;"] << if length contents > 0
+                                                     then "[show matches]"
+                                                     else ""
+        , pre ! [theclass "matches"] << unlines contents]
+  let htmlMatches = preamble +++
+                    olist << map toMatchListItem
+                             (reverse $ sortBy (comparing relevance) matches)
+  formattedPage defaultPageLayout{
+                  pgMessages = pMessages params,
+                  pgShowPageTools = False,
+                  pgTabs = [],
+                  pgScripts = ["search.js"],
+                  pgTitle = "Search results"}
+                htmlMatches
+
+showPageHistory :: Handler
+showPageHistory = withData $ \(params :: Params) -> do
+  page <- getPage
+  showHistory (pathForPage page) page params
+
+showFileHistory :: Handler
+showFileHistory = withData $ \(params :: Params) -> do
+  file <- getPage
+  showHistory file file params
+
+showHistory :: String -> String -> Params -> Handler
+showHistory file page params =  do
+  currTime <- liftIO getCurrentTime
+  let oneYearAgo = addUTCTime (-60 * 60 * 24 * 365) currTime
+  let since = case pSince params of
+                   Nothing -> Just oneYearAgo
+                   Just t  -> Just t
+  fs <- getFileStore
+  hist <- liftIO $ history fs [file] (TimeRange since Nothing)
+  base' <- getWikiBase
+  let versionToHtml rev pos = li ! [theclass "difflink", intAttr "order" pos,
+                                    strAttr "revision" (revId rev),
+                                    strAttr "diffurl" (base' ++ "/_diff/" ++ page)] <<
+        [ thespan ! [theclass "date"] << (show $ revDateTime rev)
+        , stringToHtml " ("

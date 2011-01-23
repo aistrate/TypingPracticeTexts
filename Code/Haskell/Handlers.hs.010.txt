@@ -1,0 +1,33 @@
+  let since = case pSince params of
+                   Nothing -> Just oneMonthAgo
+                   Just t  -> Just t
+  let forUser = pForUser params
+  fs <- getFileStore
+  hist <- liftIO $ history fs [] (TimeRange since Nothing)
+  let hist' = case forUser of
+                   Nothing -> hist
+                   Just u  -> filter (\r -> authorName (revAuthor r) == u) hist
+  let fileFromChange (Added f)    = f
+      fileFromChange (Modified f) = f
+      fileFromChange (Deleted f)  = f
+  let dropDotPage file = if isPageFile file
+                            then dropExtension file
+                            else file
+  base' <- getWikiBase
+  let fileAnchor revis file =
+        anchor ! [href $ base' ++ "/_diff" ++ urlForPage file ++ "?to=" ++ revis] << file
+  let filesFor changes revis = intersperse (primHtmlChar "nbsp") $
+        map (fileAnchor revis . dropDotPage . fileFromChange) changes
+  let heading = h1 << ("Recent changes by " ++ fromMaybe "all users" forUser)
+  let revToListItem rev = li <<
+        [ thespan ! [theclass "date"] << (show $ revDateTime rev)
+        , stringToHtml " ("
+        , thespan ! [theclass "author"] <<
+            anchor ! [href $ base' ++ "/_activity?" ++
+              urlEncodeVars [("forUser", authorName $ revAuthor rev)]] <<
+                (authorName $ revAuthor rev)
+        , stringToHtml "): "
+        , thespan ! [theclass "subject"] << revDescription rev
+        , stringToHtml " ("
+        , thespan ! [theclass "files"] << filesFor (revChanges rev) (revId rev)
+        , stringToHtml ")"

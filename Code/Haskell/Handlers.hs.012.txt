@@ -1,0 +1,40 @@
+                                          pgSelectedTab = DiffTab
+                                          }
+                                       htmlDiff
+
+getDiff :: FileStore -> FilePath -> Maybe RevisionId -> Maybe RevisionId
+        -> IO Html
+getDiff fs file from to = do
+  rawDiff <- diff fs file from to
+  let diffLineToHtml (B, xs) = thespan << unlines xs
+      diffLineToHtml (F, xs) = thespan ! [theclass "deleted"] << unlines xs
+      diffLineToHtml (S, xs) = thespan ! [theclass "added"]   << unlines xs
+  return $ h2 ! [theclass "revision"] <<
+             ("Changes from " ++ fromMaybe "beginning" from ++
+              " to " ++ fromMaybe "current" to) +++
+           pre ! [theclass "diff"] << map diffLineToHtml rawDiff
+
+editPage :: Handler
+editPage = withData $ \(params :: Params) -> do
+  let rev = pRevision params
+  fs <- getFileStore
+  page <- getPage
+  let getRevisionAndText = catch
+        (do c <- liftIO $ retrieve fs (pathForPage page) rev
+            r <- liftIO $ latest fs (pathForPage page) >>= revision fs
+            return (Just $ revId r, c))
+        (\e -> if e == NotFound
+                  then return (Nothing, "")
+                  else throwIO e)
+  (mbRev, raw) <- case pEditedText params of
+                         Nothing -> liftIO getRevisionAndText
+                         Just t  -> let r = if null (pSHA1 params)
+                                               then Nothing
+                                               else Just (pSHA1 params)
+                                    in return (r, t)
+  let messages = pMessages params
+  let logMsg = pLogMsg params
+  let sha1Box = case mbRev of
+                 Just r  -> textfield "sha1" ! [thestyle "display: none",
+                                                value r]
+                 Nothing -> noHtml

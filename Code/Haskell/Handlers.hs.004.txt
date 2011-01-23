@@ -1,0 +1,40 @@
+              , noscript << " (leave blank to use the same filename)"
+              , stringToHtml ":"
+              , br
+              , textfield "wikiname" ! [value wikiname]
+              , primHtmlChar "nbsp"
+              , checkbox "overwrite" "yes"
+              , label << "Overwrite existing file" ]
+       , p << [ label << "Description of content or changes:"
+              , br
+              , textfield "logMsg" ! [size "60", value logMsg]
+              , submit "upload" "Upload" ]
+       ]
+  formattedPage defaultPageLayout{
+                   pgMessages = pMessages params,
+                   pgScripts = ["uploadForm.js"],
+                   pgShowPageTools = False,
+                   pgTabs = [],
+                   pgTitle = "Upload a file"} upForm
+
+uploadFile :: Handler
+uploadFile = withData $ \(params :: Params) -> do
+  let origPath = pFilename params
+  let fileContents = pFileContents params
+  let wikiname = pWikiname params `orIfNull` takeFileName origPath
+  let logMsg = pLogMsg params
+  cfg <- getConfig
+  mbUser <- getLoggedInUser
+  (user, email) <- case mbUser of
+                        Nothing -> fail "User must be logged in to delete page."
+                        Just u  -> return (uUsername u, uEmail u)
+  let overwrite = pOverwrite params
+  fs <- getFileStore
+  exists <- liftIO $ catch (latest fs wikiname >> return True) $ \e ->
+                      if e == NotFound
+                         then return False
+                         else throwIO e >> return True
+  inStaticDir <- liftIO $
+                  (repositoryPath cfg </> wikiname) `isInsideDir` staticDir cfg
+  inTemplatesDir <- liftIO $
+                  (repositoryPath cfg </> wikiname) `isInsideDir` templatesDir cfg

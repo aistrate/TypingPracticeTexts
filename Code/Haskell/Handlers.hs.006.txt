@@ -1,0 +1,38 @@
+                     contents
+     else withMessages errors uploadForm
+
+goToPage :: Handler
+goToPage = withData $ \(params :: Params) -> do
+  let gotopage = pGotoPage params
+  fs <- getFileStore
+  allPageNames <- liftM (map dropExtension . filter isPageFile) $
+                   liftIO $ index fs
+  let findPage f = find f allPageNames
+  let exactMatch f = gotopage == f
+  let insensitiveMatch f = (map toLower gotopage) == (map toLower f)
+  let prefixMatch f = (map toLower gotopage) `isPrefixOf` (map toLower f)
+  base' <- getWikiBase
+  case findPage exactMatch of
+       Just m  -> seeOther (base' ++ urlForPage m) $ toResponse
+                     "Redirecting to exact match"
+       Nothing -> case findPage insensitiveMatch of
+                       Just m  -> seeOther (base' ++ urlForPage m) $ toResponse
+                                    "Redirecting to case-insensitive match"
+                       Nothing -> case findPage prefixMatch of
+                                       Just m  -> seeOther (base' ++ urlForPage m) $
+                                                  toResponse $ "Redirecting" ++
+                                                    " to partial match"
+                                       Nothing -> withInput "patterns" gotopage searchResults
+
+searchResults :: Handler
+searchResults = withData $ \(params :: Params) -> do
+  let patterns = pPatterns params
+  fs <- getFileStore
+  matchLines <- if null patterns
+                   then return []
+                   else liftIO $ catch (search fs SearchQuery{
+                                                  queryPatterns = patterns
+                                                , queryWholeWords = True
+                                                , queryMatchAll = True
+                                                , queryIgnoreCase = True })
+                                       (\(_ :: FileStoreError)  -> return [])

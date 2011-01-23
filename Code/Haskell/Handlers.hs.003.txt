@@ -1,0 +1,44 @@
+  base' <- getWikiBase
+  if null pages
+     then error "No pages found!"
+     else do
+       TOD _ picosecs <- liftIO getClockTime
+       let newPage = pages !!
+                     ((fromIntegral picosecs `div` 1000000) `mod` length pages)
+       seeOther (base' ++ urlForPage newPage) $ toResponse $
+         p << "Redirecting to a random page"
+
+discussPage :: Handler
+discussPage = do
+  page <- getPage
+  base' <- getWikiBase
+  seeOther (base' ++ urlForPage (if isDiscussPage page then page else ('@':page))) $
+                     toResponse "Redirecting to discussion page"
+
+createPage :: Handler
+createPage = do
+  page <- getPage
+  base' <- getWikiBase
+  case page of
+       ('_':_) -> mzero
+       _       -> formattedPage defaultPageLayout{
+                                      pgPageName = page
+                                    , pgTabs = []
+                                    , pgTitle = "Create " ++ page ++ "?"
+                                    } $
+                    p << [ stringToHtml ("There is no page '" ++ page ++
+                              "'.  You may create the page by "),
+                            anchor ! [href $ base' ++ "/_edit" ++ urlForPage page] <<
+                              "clicking here." ]
+
+uploadForm :: Handler
+uploadForm = withData $ \(params :: Params) -> do
+  let origPath = pFilename params
+  let wikiname = pWikiname params `orIfNull` takeFileName origPath
+  let logMsg = pLogMsg params
+  let upForm = form ! [X.method "post", enctype "multipart/form-data"] <<
+       fieldset <<
+       [ p << [label << "File to upload:"
+              , br
+              , afile "file" ! [value origPath] ]
+       , p << [ label << "Name on wiki, including extension"

@@ -1,0 +1,7 @@
+Bond (finance)
+
+In finance, a bond is a debt security, in which the authorized issuer owes the holders a debt and, depending on the terms of the bond, is obliged to pay interest (the coupon) and/or to repay the principal at a later date, termed maturity. A bond is a formal contract to repay borrowed money with interest at fixed intervals.
+
+Thus a bond is like a loan: the issuer is the borrower (debtor), the holder is the lender (creditor), and the coupon is the interest. Bonds provide the borrower with external funds to finance long-term investments, or, in the case of government bonds, to finance current expenditure. Certificates of deposit (CDs) or commercial paper are considered to be money market instruments and not bonds. Bonds must be repaid at fixed intervals over a period of time.
+
+Bonds and stocks are both securities, but the major difference between the two is that (capital) stockholders have an equity stake in the company (i.e., they are owners), whereas bondholders have a creditor stake in the company (i.e., they are lenders). Another difference is that bonds usually have a defined term, or maturity, after which the bond is redeemed, whereas stocks may be outstanding indefinitely. An exception is a consol bond, which is a perpetuity (i.e., bond with no maturity).

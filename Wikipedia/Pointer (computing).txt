@@ -1,0 +1,9 @@
+Pointer (computing)
+
+In computer science, a pointer is a programming language data type whose value refers directly to (or "points to") another value stored elsewhere in the computer memory using its address. For high-level programming languages, pointers effectively take the place of general purpose registers in low-level languages such as assembly language or machine code, but may be in available memory. A pointer references a location in memory, and obtaining the value at the location a pointer refers to is known as dereferencing the pointer. A pointer is a simple, less abstracted implementation of the more abstracted reference data type. Several languages support some type of pointer, although some have more restrictions on their use than others.
+
+Pointers to data significantly improve performance for repetitive operations such as traversing strings, lookup tables, control tables and tree structures. In particular, it is often much cheaper in time and space to copy and dereference pointers than it is to copy and access the data to which the pointers point.
+
+Pointers are also used to hold the addresses of entry points for called subroutines in procedural programming and for run-time linking to dynamic link libraries (DLLs). In Object-oriented programming, pointers to functions are used for binding methods, often using what are called virtual method tables.
+
+While "pointer" has been used to refer to references in general, it more properly applies to data structures whose interface explicitly allows the pointer to be manipulated (arithmetically via pointer arithmetic) as a memory address, as opposed to a magic cookie or capability where this is not possible. Because pointers allow both protected and unprotected access to memory addresses, there are risks associated with using them particularly in the latter case.

@@ -1,0 +1,9 @@
+Radar
+
+Radar is an object-detection system which uses electromagnetic waves -- specifically radio waves -- to determine the range, altitude, direction, or speed of both moving and fixed objects such as aircraft, ships, spacecraft, guided missiles, motor vehicles, weather formations, and terrain. The radar dish, or antenna, transmits pulses of radio waves or microwaves which bounce off any object in their path. The object returns a tiny part of the wave's energy to a dish or antenna which is usually located at the same site as the transmitter.
+
+Practical radar was developed in secrecy during World War II by Britain and other nations. The term RADAR was coined in 1940 by the U.S. Navy as an acronym for radio detection and ranging. The term radar has since entered the English and other languages as the common noun radar, losing all capitalization. In the United Kingdom, this technology was initially called RDF (range and direction finding), using the same acronym as the one for radio direction finding to conceal its ranging capability.
+
+The modern uses of radar are highly diverse, including air traffic control, radar astronomy, air-defense systems, antimissile systems; nautical radars to locate landmarks and other ships; aircraft anticollision systems; ocean-surveillance systems, outer-space surveillance and rendezvous systems; meteorological precipitation monitoring; altimetry and flight-control systems; guided-missile target-locating systems; and ground-penetrating radar geological observations.
+
+Other systems similar to radar have been used in other parts of the electromagnetic spectrum. One example is "lidar", which uses visible light from lasers rather than radio waves.

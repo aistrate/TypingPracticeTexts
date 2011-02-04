@@ -1,0 +1,15 @@
+Mach number
+
+Mach number (Ma or M) is the speed of an object moving through air, or any other fluid substance, divided by the speed of sound as it is in that substance for its particular physical conditions, including those of temperature and pressure. It is commonly used to represent the speed of an object when it is traveling close to or above the speed of sound.
+
+ M = V / a
+
+where
+
+ M is the Mach number
+ V is the relative velocity of the source to the medium and
+ a is the speed of sound in the medium
+
+The Mach number is named after Austrian physicist and philosopher Ernst Mach, a designation proposed by aeronautical engineer Jakob Ackeret. Because the Mach number is often viewed as a dimensionless quantity rather than a unit of measure, with Mach, the number comes after the unit; the second Mach number is "Mach 2" instead of "2 Mach" (or Machs). This is somewhat reminiscent of the early modern ocean sounding unit "mark" (a synonym for fathom), which was also unit-first, and may have influenced the use of the term Mach. In the decade preceding faster-than-sound human flight, aeronautical engineers referred to the speed of sound as Mach's number, never "Mach 1."
+
+In French, the Mach number is sometimes called the "nombre de Sarrau" ("Sarrau number") after Emile Sarrau, researching on explosions in the 1870s and 1880s.

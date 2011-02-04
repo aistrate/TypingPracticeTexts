@@ -1,0 +1,9 @@
+Option (finance)
+
+In finance, an option is a derivative financial instrument that establishes a contract between two parties concerning the buying or selling of an asset at a reference price. The buyer of the option gains the right, but not the obligation, to engage in some specific transaction on the asset, while the seller incurs the obligation to fulfill the transaction if so requested by the buyer. The price of an option derives from the difference between the reference price and the value of the underlying asset (commonly a stock, a bond, a currency or a futures contract) plus a premium based on the time remaining until the expiration of the option. Other types of options exist, and options can in principle be created for any type of valuable asset.
+
+An option which conveys the right to buy something is called a call; an option which conveys the right to sell is called a put. The reference price at which the underlying may be traded is called the strike price or exercise price. The process of activating an option and thereby trading the underlying at the agreed-upon price is referred to as exercising it. Most options have an expiration date. If the option is not exercised by the expiration date, it becomes void and worthless.
+
+In return for granting the option, called writing the option, the originator of the option collects a payment, the premium, from the buyer. The writer of an option must make good on delivering (or receiving) the underlying asset or its cash equivalent, if the option is exercised.
+
+An option can usually be sold by its original buyer to another party. Many options are created in standardized form and traded on an anonymous options exchange among the general public, while other over-the-counter options are customized to the desires of the buyer on an ad hoc basis, usually by an investment bank.

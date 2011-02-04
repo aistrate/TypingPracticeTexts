@@ -1,0 +1,9 @@
+Macro photography
+
+Macro photography is close-up photography of usually very small subjects. The classical definition is that the image projected on the "film plane" (i.e., film or a digital sensor) is close to the same size as the subject.
+
+In recent years, the term macro has been used in marketing material to mean being able to focus on a subject close enough so that when a regular 6x4 inch (15x10 cm) print is made, the image is life-size or larger. With 35mm film this requires a magnification ratio of only approximately 1:4, which demands a lower lens quality than 1:1. With digital cameras the actual image size is rarely stated, so that the magnification ratio is largely irrelevant; cameras instead advertise their closest focusing distance.
+
+Macroscopy competes with the digital microscope where a small camera tube can be attached directly to a computer, usually via USB port. Macroscopy also competes with photomicroscopy, and it is much less expensive to achieve high quality images. However, high magnification images are more difficult using macroscopy.
+
+The method is especially useful in forensic work, where small details at crime or accident scenes may often be very significant towards solving the crime. Trace evidence such as fingerprints and skid marks are especially important, and easily recorded using macroscopy. Fracture surfaces from broken products are very revealing using fractography, especially when photographed using glancing light to highlight surface details.

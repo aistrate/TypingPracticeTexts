@@ -1,0 +1,13 @@
+Unique key
+
+In relational database design, a unique key can uniquely identify each row in a table, and is closely related to the Superkey concept. A unique key comprises a single column or a set of columns. No two distinct rows in a table can have the same value (or combination of values) in those columns if NULL values are not used. Depending on its design, a table may have arbitrarily many unique keys but at most one primary key.
+
+Unique keys do not enforce the NOT NULL constraint in practice. Because NULL is not an actual value (it represents the lack of a value), when two rows are compared, and both rows have NULL in a column, the column values are not considered to be equal. Thus, in order for a unique key to uniquely identify each row in a table, NULL values must not be used. However, a column defined as a unique key column allows only one NULL value, which in turn can uniquely identify that row/tuple.
+
+A unique key must uniquely identify all possible rows that exist in a table and not only the currently existing rows. Examples of unique keys are Social Security numbers (associated with a specific person) or ISBNs (associated with a specific book). Telephone books and dictionaries cannot use names, words, or Dewey Decimal system numbers as candidate keys because they do not uniquely identify telephone numbers or words.
+
+A table can have at most one primary key, but more than one unique key. A primary key is a combination of columns which uniquely specify a row. It is a special case of unique keys. One difference is that for unique keys the implicit NOT NULL constraint is not automatically enforced, while for primary keys it is enforced. Thus, the values in unique key columns may or may not be NULL. Another difference is that primary keys must be defined using another syntax. Thus Primary Key column allows no row having NULL while Unique Key column allows only one row having null value.
+
+The relational model, as expressed through relational calculus and relational algebra, does not distinguish between primary keys and other kinds of keys. Primary keys were added to the SQL standard mainly as a convenience to the application programmer.
+
+Unique keys as well as primary keys can be referenced by foreign keys.

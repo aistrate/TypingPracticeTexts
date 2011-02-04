@@ -1,0 +1,7 @@
+Aerogel
+
+Aerogel is a manufactured material with the lowest bulk density of any known porous solid. It is derived from a gel in which the liquid component of the gel has been replaced with a gas. The result is an extremely low-density solid, with a notable effectiveness as a thermal insulator. It is nicknamed frozen smoke, solid smoke, solid air or blue smoke due to its translucent nature and the way light scatters in the material; however, it feels like expanded polystyrene (styrofoam) to the touch.
+
+Aerogel was first created by Samuel Stephens Kistler in 1931, as a result of a bet with Charles Learned over who could replace the liquid in 'jellies' with gas without causing shrinkage.
+
+Aerogels are produced by extracting the liquid component of a gel through supercritical drying. This allows the liquid to be slowly drawn off without causing the solid matrix in the gel to collapse from capillary action, as would happen with conventional evaporation. The first aerogels were produced from silica gels. Kistler's later work involved aerogels based on alumina, chromia and tin oxide. Carbon aerogels were first developed in the late 1980s.

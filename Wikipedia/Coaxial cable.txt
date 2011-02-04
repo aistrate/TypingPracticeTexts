@@ -1,0 +1,7 @@
+Coaxial cable
+
+Coaxial cable, or coax, is an electrical cable with an inner conductor surrounded by a flexible, tubular insulating layer, surrounded by a tubular conducting shield. The term coaxial comes from the inner conductor and the outer shield sharing the same geometric axis. Coaxial cable was invented by English engineer and mathematician Oliver Heaviside, who first patented the design in 1880.
+
+Coaxial cable is used as a transmission line for radio frequency signals, in applications such as connecting radio transmitters and receivers with their antennas, computer network (Internet) connections, and distributing cable television signals. One advantage of coax over other types of radio transmission line is that in an ideal coaxial cable the electromagnetic field carrying the signal exists only in the space between the inner and outer conductors. This allows coaxial cable runs to be installed next to metal objects such as gutters without the power losses that occur in other types of transmission lines, and provides protection of the signal from external electromagnetic interference.
+
+Coaxial cable differs from other shielded cable used for carrying lower frequency signals such as audio signals, in that the dimensions of the cable are controlled to give a precise, constant conductor spacing, which is needed for it to function efficiently as a radio frequency transmission line.

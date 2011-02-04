@@ -1,0 +1,11 @@
+International Standard Book Number
+
+The International Standard Book Number (ISBN) is a unique numeric commercial book identifier based upon the 9-digit Standard Book Numbering (SBN) code created by Gordon Foster, now Emeritus Professor of Statistics at Trinity College, Dublin, for the booksellers and stationers W.H. Smith and others in 1966.
+
+The 10-digit ISBN format was developed by the International Organization for Standardization and was published in 1970 as international standard ISO 2108. (However, the 9-digit SBN code was used in the United Kingdom until 1974.) Currently, the ISO's TC 46/SC 9 is responsible for the ISBN. The ISO on-line facility only refers back to 1978.
+
+Since 1 January 2007, ISBNs have contained 13 digits, a format that is compatible with Bookland EAN-13s.
+
+Occasionally, a book may appear without a printed ISBN if it is printed privately or the author does not follow the usual ISBN procedure; however, this is usually later rectified.
+
+A similar numeric identifier, the International Standard Serial Number (ISSN), identifies periodical publications such as magazines.

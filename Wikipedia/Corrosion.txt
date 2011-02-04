@@ -1,0 +1,7 @@
+Corrosion
+
+Corrosion is the disintegration of an engineered material into its constituent atoms due to chemical reactions with its surroundings. In the most common use of the word, this means electrochemical oxidation of metals in reaction with an oxidant such as oxygen. Formation of an oxide of iron due to oxidation of the iron atoms in solid solution is a well-known example of electrochemical corrosion, commonly known as rusting. This type of damage typically produces oxide(s) and/or salt(s) of the original metal. Corrosion can also refer to other materials than metals, such as ceramics or polymers, although in this context, the term degradation is more common.
+
+In other words, corrosion is the wearing away of metals due to a chemical reaction.
+
+Many structural alloys corrode merely from exposure to moisture in the air, but the process can be strongly affected by exposure to certain substances. Corrosion can be concentrated locally to form a pit or crack, or it can extend across a wide area more or less uniformly corroding the surface. Because corrosion is a diffusion controlled process, it occurs on exposed surfaces. As a result, methods to reduce the activity of the exposed surface, such as passivation and chromate-conversion, can increase a material's corrosion resistance. However, some corrosion mechanisms are less visible and less predictable.

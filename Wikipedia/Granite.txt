@@ -1,0 +1,9 @@
+Granite
+
+Granite is a common and widely occurring type of intrusive, felsic, igneous rock. Granites usually have a medium- to coarse-grained texture. Occasionally some individual crystals (phenocrysts) are larger than the groundmass, in which case the texture is known as porphyritic. A granitic rock with a porphyritic texture is sometimes known as a porphyry. Granites can be pink to gray in color, depending on their chemistry and mineralogy. By definition, granite has a color index (the percentage of the rock made up of dark minerals) of less than 25%. Outcrops of granite tend to form tors and rounded massifs. Granites sometimes occur in circular depressions surrounded by a range of hills, formed by the metamorphic aureole or hornfels. Granite is usually found in the continental plates of the Earth's crust.
+
+Granite is nearly always massive (lacking internal structures), hard and tough, and therefore it has gained widespread use as a construction stone. The average density of granite is between 2.65 and 2.75 g/cm^3, its compressive strength usually lies above 200 MPa, and its viscosity at standard temperature and pressure is 3-6 * 10^19 Pa*s.
+
+The word granite comes from the Latin granum, a grain, in reference to the coarse-grained structure of such a crystalline rock.
+
+Granitoid is a general, descriptive field term for light-colored, coarse-grained igneous rocks. Petrographic examination is required for identification of specific types of granitoids.

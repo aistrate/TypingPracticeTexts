@@ -1,0 +1,7 @@
+Shock wave
+
+A shock wave (also called shock front or simply "shock") is a type of propagating disturbance. Like an ordinary wave, it carries energy and can propagate through a medium (solid, liquid, gas or plasma) or in some cases in the absence of a material medium, through a field such as the electromagnetic field. Shock waves are characterized by an abrupt, nearly discontinuous change in the characteristics of the medium. Across a shock there is always an extremely rapid rise in pressure, temperature and density of the flow. In supersonic flows, expansion is achieved through an expansion fan. A shock wave travels through most media at a higher speed than an ordinary wave.
+
+Unlike solitons (another kind of nonlinear wave), the energy of a shock wave dissipates relatively quickly with distance. Also, the accompanying expansion wave approaches and eventually merges with the shock wave, partially cancelling it out. Thus the sonic boom associated with the passage of a supersonic aircraft is the sound wave resulting from the degradation and merging of the shock wave and the expansion wave produced by the aircraft.
+
+When a shock wave passes through matter, the total energy is preserved but the energy which can be extracted as work decreases and entropy increases. This, for example, creates additional drag force on aircraft with shocks.

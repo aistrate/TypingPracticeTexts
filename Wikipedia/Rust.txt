@@ -1,0 +1,5 @@
+Rust
+
+Rust is a general term for a series of iron oxides. Colloquially, the term is applied to red oxides, formed by the reaction of iron and oxygen in the presence of water or air moisture. Yet, there are also other forms of rust, such as the result of the reaction of iron and chlorine in an environment deprived of oxygen, such as rebar used in underwater concrete pillars, which generates green rust. Several forms of rust are distinguishable visually and by spectroscopy, and form under different circumstances. Rust consists of hydrated iron(III) oxides Fe2O3*nH2O and iron(III) oxide-hydroxide (FeO(OH), Fe(OH)3). Given sufficient time, oxygen, and water, any iron mass will eventually convert entirely to rust and disintegrate. Surface rust provides no protection to the underlying iron unlike the formation of patina on copper surfaces.
+
+Rusting is the common term for corrosion of iron and its alloys, such as steel. Many other metals undergo equivalent corrosion, but the resulting oxides are not commonly called rust.

@@ -1,0 +1,7 @@
+Dictionary
+
+A dictionary, also referred to as a lexicon, wordbook, or vocabulary, is a collection of words in one or more specific languages, often listed alphabetically, with usage information, definitions, etymologies, phonetics, pronunciations, and other information; or a book of words in one language with their equivalents in another, also known as a lexicon. According to Nielsen 2008 a dictionary may be regarded as a lexicographical product that is characterised by three significant features: (1) it has been prepared for one or more functions; (2) it contains data that have been selected for the purpose of fulfilling those functions; and (3) its lexicographic structures link and establish relationships between the data so that they can meet the needs of users and fulfil the functions of the dictionary.
+
+Further, each word may have multiple meanings. Some dictionaries include each separate meaning in the order of most common usage while others list definitions in historical order, with the oldest usage first.
+
+In many languages, words can appear in many different forms, but only the undeclined or unconjugated form appears as the headword in most dictionaries. Dictionaries are most commonly found in the form of a book, but some newer dictionaries, like StarDict and the New Oxford American Dictionary are dictionary software running on PDAs or computers. There are also many online dictionaries accessible via the Internet.

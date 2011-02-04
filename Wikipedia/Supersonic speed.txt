@@ -1,0 +1,7 @@
+Supersonic speed
+
+Supersonic speed is a rate of travel of an object that is larger than the speed of sound (Mach 1). For objects traveling in dry air of a temperature of 20 C (68 F) this speed is approximately 343 m/s, 1,125 ft/s, 768 mph or 1,236 km/h. Speeds greater than five times the speed of sound (Mach 5) are often referred to as hypersonic. Flight during which only some parts of the air around an object, such as the ends of rotor blades, reach supersonic speeds are called transonic. This occurs typically somewhere between Mach 0.8 and Mach 1.2.
+
+Sounds are traveling vibrations in the form of pressure waves in an elastic medium. In gases, sound travels longitudinally at different speeds, mostly depending on the molecular mass and temperature of the gas, and pressure has little effect. Since air temperature and composition varies significantly with altitude, Mach numbers for aircraft may change despite a constant travel speed. In water at room temperature supersonic speed can be considered as any speed greater than 1,440 m/s (4,724 ft/s). In solids, sound waves can be polarized longitudinally or transversely and have even higher velocities.
+
+Supersonic fracture is crack motion faster than the speed of sound in a brittle material.

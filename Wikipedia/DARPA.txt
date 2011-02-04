@@ -1,0 +1,11 @@
+DARPA
+
+The Defense Advanced Research Projects Agency (DARPA) is an agency of the United States Department of Defense responsible for the development of new technology for use by the military. DARPA has been responsible for funding the development of many technologies which have had a major effect on the world, including computer networking, as well as NLS, which was both the first hypertext system, and an important precursor to the contemporary ubiquitous graphical user interface.
+
+Its original name was simply Advanced Research Projects Agency (ARPA), but it was renamed to "DARPA" (for Defense) in March 1972, then renamed "ARPA" again in February 1993, and then renamed "DARPA" again in March 1996.
+
+DARPA was established during 1958 (as ARPA) in response to the Soviet launching of Sputnik during 1957, with the mission of keeping U.S. military technology more sophisticated than that of the nation's potential enemies. From DARPA's own introduction,
+
+ "DARPA's original mission, established in 1958, was to prevent technological surprise like the launch of Sputnik, which signaled that the Soviets had beaten the U.S. into space. The mission statement has evolved over time. Today, DARPA's mission is still to prevent technological surprise to the US, but also to create technological surprise for its enemies."
+
+DARPA is independent from other more conventional military R&D and reports directly to senior Department of Defense management. DARPA has around 240 personnel (about 140 technical) directly managing a $3.2 billion budget. These figures are "on average" since DARPA focuses on short-term (two to four-year) projects run by small, purpose-built teams.

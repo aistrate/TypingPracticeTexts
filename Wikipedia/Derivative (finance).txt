@@ -1,0 +1,17 @@
+Derivative (finance)
+
+In finance, a derivative is a financial instrument (or, more simply, an agreement between two parties) that has a value, based on the expected future price movements of the asset to which it is linked--called the underlying asset-- such as a share or a currency. There are many kinds of derivatives, with the most common being swaps, futures, and options. Derivatives are a form of alternative investment.
+
+A derivative is not a stand-alone asset, since it has no value of its own. However, more common types of derivatives have been traded on markets before their expiration date as if they were assets. Among the oldest of these are rice futures, which have been traded on the Dojima Rice Exchange since the eighteenth century.
+
+Derivatives are usually broadly categorized by:
+
+- the relationship between the underlying asset and the derivative (e.g., forward, option, swap);
+- the type of underlying asset (e.g., equity derivatives, foreign exchange derivatives, interest rate derivatives, commodity derivatives or credit derivatives);
+- the market in which they trade (e.g., exchange-traded or over-the-counter);
+- their pay-off profile.
+
+Another arbitrary distinction is between:
+
+- vanilla derivatives (simple and more common); and
+- exotic derivatives (more complicated and specialized).

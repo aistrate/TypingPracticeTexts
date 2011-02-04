@@ -1,0 +1,15 @@
+Futures contract
+
+In finance, a futures contract is a standardized contract between two parties to buy or sell a specified asset (eg.oranges, oil, gold) of standardized quantity and quality at a specified future date at a price agreed today (the futures price). The contracts are traded on a futures exchange. Futures contracts are not "direct" securities like stocks, bonds, rights or warrants. They are still securities, however, though they are a type of derivative contract. The party agreeing to buy the underlying asset in the future assumes a long position, and the party agreeing to sell the asset in the future assumes a short position.
+
+The price is determined by the instantaneous equilibrium between the forces of supply and demand among competing buy and sell orders on the exchange at the time of the purchase or sale of the contract.
+
+In many cases, the underlying asset to a futures contract may not be traditional "commodities" at all - that is, for financial futures, the underlying asset or item can be currencies, securities or financial instruments and intangible assets or referenced items such as stock indexes and interest rates.
+
+The future date is called the delivery date or final settlement date. The official price of the futures contract at the end of a day's trading session on the exchange is called the settlement price for that day of business on the exchange.
+
+A closely related contract is a forward contract; they differ in certain respects. Future contracts are very similar to forward contracts, except they are exchange-traded and defined on standardized assets. Unlike forwards, futures typically have interim partial settlements or "true-ups" in margin requirements. For typical forwards, the net gain or loss accrued over the life of the contract is realized on the delivery date.
+
+A futures contract gives the holder the obligation to make or take delivery under the terms of the contract, whereas an option grants the buyer the right, but not the obligation, to establish a position previously held by the seller of the option. In other words, the owner of an options contract may exercise the contract, but both parties of a "futures contract" must fulfill the contract on the settlement date. The seller delivers the underlying asset to the buyer, or, if it is a cash-settled futures contract, then cash is transferred from the futures trader who sustained a loss to the one who made a profit. To exit the commitment prior to the settlement date, the holder of a futures position has to offset his/her position by either selling a long position or buying back (covering) a short position, effectively closing out the futures position and its contract obligations.
+
+Futures contracts, or simply futures, (but not future or future contract) are exchange-traded derivatives. The exchange's clearing house acts as counterparty on all contracts, sets margin requirements, and crucially also provides a mechanism for settlement.

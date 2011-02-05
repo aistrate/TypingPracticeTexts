@@ -1,0 +1,45 @@
+        else:
+            logger.info('No %s egg found; downloading' % project_name)
+        cmd.extend(['--always-copy', '-U', project_name])
+    logger.start_progress('Installing %s...' % project_name)
+    logger.indent += 2
+    cwd = None
+    if project_name == 'distribute':
+        env['DONT_PATCH_SETUPTOOLS'] = 'true'
+
+    def _filter_ez_setup(line):
+        return filter_ez_setup(line, project_name)
+
+    if not os.access(os.getcwd(), os.W_OK):
+        cwd = tempfile.mkdtemp()
+        if source is not None and os.path.exists(source):
+            target = os.path.join(cwd, os.path.split(source)[-1])
+            shutil.copy(source, target)
+    try:
+        call_subprocess(cmd, show_stdout=False,
+                        filter_stdout=_filter_ez_setup,
+                        extra_env=env,
+                        remove_from_env=remove_from_env,
+                        cwd=cwd)
+    finally:
+        logger.indent -= 2
+        logger.end_progress()
+        if os.getcwd() != old_chdir:
+            os.chdir(old_chdir)
+        if is_jython and os._name == 'nt':
+            os.remove(ez_setup)
+
+def file_search_dirs():
+    here = os.path.dirname(os.path.abspath(__file__))
+    dirs = ['.', here,
+            join(here, 'virtualenv_support')]
+    if os.path.splitext(os.path.dirname(__file__))[0] != 'virtualenv':
+        try:
+            import virtualenv
+        except ImportError:
+            pass
+        else:
+            dirs.append(os.path.join(os.path.dirname(virtualenv.__file__), 'virtualenv_support'))
+    return [d for d in dirs if os.path.isdir(d)]
+
+def install_setuptools(py_executable, unzip=False):

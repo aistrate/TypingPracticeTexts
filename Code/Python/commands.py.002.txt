@@ -1,0 +1,47 @@
+            "suggested that you choose an\nalternate name, and if you'd "
+            "like that name to be accessible as\n'%s', add a route "
+            "to your projects config/routing.py file similar\nto:\n"
+            "    map.connect('%s', controller='my_%s')" \
+            % (name, name, name, name))
+    return True
+
+def check_controller_existence(base_package, directory, name): 
+    
+    filename = os.path.join(base_package, 'controllers', directory,
+                            name + '.py')
+    if os.path.exists(filename): 
+        raise BadCommand('Controller %s already exists.' %
+                         os.path.join(directory, name))
+
+class ControllerCommand(Command):
+    
+    summary = __doc__.splitlines()[0]
+    usage = '\n' + __doc__
+
+    min_args = 1
+    max_args = 1
+    group_name = 'pylons'
+
+    default_verbosity = 3
+
+    parser = Command.standard_parser(simulate=True)
+    parser.add_option('--no-test',
+                      action='store_true',
+                      dest='no_test',
+                      help="Don't create the test; just the controller")
+
+    def command(self):
+        
+        try:
+            file_op = FileOp(source_dir=('pylons', 'templates'))
+            try:
+                name, directory = file_op.parse_path_name_args(self.args[0])
+            except:
+                raise BadCommand('No egg_info directory was found')
+
+            base_package = file_op.find_dir('controllers', True)[0]
+            if base_package.lower() == name.lower():
+                raise BadCommand(
+                    'Your controller name should not be the same as '
+                    'the package name %r.' % base_package)
+            name = name.replace('-', '_')

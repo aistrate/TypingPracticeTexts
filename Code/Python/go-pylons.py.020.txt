@@ -1,0 +1,32 @@
+        logger.fatal(
+            'ERROR: virtualenv is not compatible with this system or executable')
+        if sys.platform == 'win32':
+            logger.fatal(
+                'Note: some Windows users have reported this error when they installed Python for "Only this user".  The problem may be resolvable if you install Python "For all users".  (See https://bugs.launchpad.net/virtualenv/+bug/352844)')
+        sys.exit(100)
+    else:
+        logger.info('Got sys.prefix result: %r' % proc_stdout)
+
+    pydistutils = os.path.expanduser('~/.pydistutils.cfg')
+    if os.path.exists(pydistutils):
+        logger.notify('Please make sure you remove any previous custom paths from '
+                      'your %s file.' % pydistutils)
+    return py_executable
+
+def install_activate(home_dir, bin_dir, prompt=None):
+    if sys.platform == 'win32' or is_jython and os._name == 'nt':
+        files = {'activate.bat': ACTIVATE_BAT,
+                 'deactivate.bat': DEACTIVATE_BAT}
+        if os.environ.get('OS') == 'Windows_NT' and os.environ.get('OSTYPE') == 'cygwin':
+            files['activate'] = ACTIVATE_SH
+    else:
+        files = {'activate': ACTIVATE_SH}
+
+        files['activate.fish'] = ACTIVATE_FISH
+
+        files['activate.csh'] = ACTIVATE_CSH
+
+    files['activate_this.py'] = ACTIVATE_THIS
+    vname = os.path.basename(os.path.abspath(home_dir))
+    for name, content in files.items():
+        content = content.replace('__VIRTUAL_PROMPT__', prompt or '')

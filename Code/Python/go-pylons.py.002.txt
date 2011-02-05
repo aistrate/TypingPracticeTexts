@@ -1,0 +1,45 @@
+    REQUIRED_MODULES.extend(['sets', '__future__'])
+if is_pypy:
+    REQUIRED_MODULES.extend(['traceback', 'linecache'])
+
+class Logger(object):
+
+    DEBUG = logging.DEBUG
+    INFO = logging.INFO
+    NOTIFY = (logging.INFO+logging.WARN)/2
+    WARN = WARNING = logging.WARN
+    ERROR = logging.ERROR
+    FATAL = logging.FATAL
+
+    LEVELS = [DEBUG, INFO, NOTIFY, WARN, ERROR, FATAL]
+
+    def __init__(self, consumers):
+        self.consumers = consumers
+        self.indent = 0
+        self.in_progress = None
+        self.in_progress_hanging = False
+
+    def debug(self, msg, *args, **kw):
+        self.log(self.DEBUG, msg, *args, **kw)
+    def info(self, msg, *args, **kw):
+        self.log(self.INFO, msg, *args, **kw)
+    def notify(self, msg, *args, **kw):
+        self.log(self.NOTIFY, msg, *args, **kw)
+    def warn(self, msg, *args, **kw):
+        self.log(self.WARN, msg, *args, **kw)
+    def error(self, msg, *args, **kw):
+        self.log(self.WARN, msg, *args, **kw)
+    def fatal(self, msg, *args, **kw):
+        self.log(self.FATAL, msg, *args, **kw)
+    def log(self, level, msg, *args, **kw):
+        if args:
+            if kw:
+                raise TypeError(
+                    "You may give positional or keyword arguments, not both")
+        args = args or kw
+        rendered = None
+        for consumer_level, consumer in self.consumers:
+            if self.level_matches(level, consumer_level):
+                if (self.in_progress_hanging
+                    and consumer in (sys.stdout, sys.stderr)):
+                    self.in_progress_hanging = False

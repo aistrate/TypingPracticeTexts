@@ -1,0 +1,45 @@
+            f, filename, _ = imp.find_module(modname)
+        except ImportError:
+            logger.info("Cannot import bootstrap module: %s" % modname)
+        else:
+            if f is not None:
+                f.close()
+            dst_filename = change_prefix(filename, dst_prefix)
+            copyfile(filename, dst_filename)
+            if filename.endswith('.pyc'):
+                pyfile = filename[:-1]
+                if os.path.exists(pyfile):
+                    copyfile(pyfile, dst_filename[:-1])
+
+def install_python(home_dir, lib_dir, inc_dir, bin_dir, site_packages, clear):
+    
+    if sys.executable.startswith(bin_dir):
+        print 'Please use the *system* python to run this script'
+        return
+
+    if clear:
+        rmtree(lib_dir)
+        logger.notify('Not deleting %s', bin_dir)
+
+    if hasattr(sys, 'real_prefix'):
+        logger.notify('Using real prefix %r' % sys.real_prefix)
+        prefix = sys.real_prefix
+    else:
+        prefix = sys.prefix
+    mkdir(lib_dir)
+    fix_lib64(lib_dir)
+    stdlib_dirs = [os.path.dirname(os.__file__)]
+    if sys.platform == 'win32':
+        stdlib_dirs.append(join(os.path.dirname(stdlib_dirs[0]), 'DLLs'))
+    elif sys.platform == 'darwin':
+        stdlib_dirs.append(join(stdlib_dirs[0], 'site-packages'))
+    if hasattr(os, 'symlink'):
+        logger.info('Symlinking Python bootstrap modules')
+    else:
+        logger.info('Copying Python bootstrap modules')
+    logger.indent += 2
+    try:
+        for stdlib_dir in stdlib_dirs:
+            if not os.path.isdir(stdlib_dir):
+                continue
+            for fn in os.listdir(stdlib_dir):

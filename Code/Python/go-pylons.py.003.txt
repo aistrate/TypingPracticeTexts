@@ -1,0 +1,54 @@
+                    sys.stdout.write('\n')
+                    sys.stdout.flush()
+                if rendered is None:
+                    if args:
+                        rendered = msg % args
+                    else:
+                        rendered = msg
+                    rendered = ' '*self.indent + rendered
+                if hasattr(consumer, 'write'):
+                    consumer.write(rendered+'\n')
+                else:
+                    consumer(rendered)
+
+    def start_progress(self, msg):
+        assert not self.in_progress, (
+            "Tried to start_progress(%r) while in_progress %r"
+            % (msg, self.in_progress))
+        if self.level_matches(self.NOTIFY, self._stdout_level()):
+            sys.stdout.write(msg)
+            sys.stdout.flush()
+            self.in_progress_hanging = True
+        else:
+            self.in_progress_hanging = False
+        self.in_progress = msg
+
+    def end_progress(self, msg='done.'):
+        assert self.in_progress, (
+            "Tried to end_progress without start_progress")
+        if self.stdout_level_matches(self.NOTIFY):
+            if not self.in_progress_hanging:
+                sys.stdout.write('...' + self.in_progress + msg + '\n')
+                sys.stdout.flush()
+            else:
+                sys.stdout.write(msg + '\n')
+                sys.stdout.flush()
+        self.in_progress = None
+        self.in_progress_hanging = False
+
+    def show_progress(self):
+        
+        if self.in_progress_hanging:
+            sys.stdout.write('.')
+            sys.stdout.flush()
+
+    def stdout_level_matches(self, level):
+        
+        return self.level_matches(level, self._stdout_level())
+
+    def _stdout_level(self):
+        
+        for level, consumer in self.consumers:
+            if consumer is sys.stdout:
+                return level
+        return self.FATAL

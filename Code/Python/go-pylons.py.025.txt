@@ -1,0 +1,58 @@
+    f = open(filename, 'w')
+    f.write(new_link)
+    f.close()
+
+def make_relative_path(source, dest, dest_is_directory=True):
+    
+    source = os.path.dirname(source)
+    if not dest_is_directory:
+        dest_filename = os.path.basename(dest)
+        dest = os.path.dirname(dest)
+    dest = os.path.normpath(os.path.abspath(dest))
+    source = os.path.normpath(os.path.abspath(source))
+    dest_parts = dest.strip(os.path.sep).split(os.path.sep)
+    source_parts = source.strip(os.path.sep).split(os.path.sep)
+    while dest_parts and source_parts and dest_parts[0] == source_parts[0]:
+        dest_parts.pop(0)
+        source_parts.pop(0)
+    full_parts = ['..']*len(source_parts) + dest_parts
+    if not dest_is_directory:
+        full_parts.append(dest_filename)
+    if not full_parts:
+        return './'
+    return os.path.sep.join(full_parts)
+
+def create_bootstrap_script(extra_text, python_version=''):
+    
+    filename = __file__
+    if filename.endswith('.pyc'):
+        filename = filename[:-1]
+    f = open(filename, 'rb')
+    content = f.read()
+    f.close()
+    py_exe = 'python%s' % python_version
+    content = (('#!/usr/bin/env %s\n' % py_exe)
+               + '## WARNING: This file is generated\n'
+               + content)
+    return content.replace('##EXT' 'END##', extra_text)
+
+import os, subprocess
+def after_install(options, home_dir):
+    etc = join(home_dir, 'etc')
+    if sys.platform == 'win32':
+        lib_dir = join(home_dir, 'Lib')
+        bin_dir = join(home_dir, 'Scripts')
+    elif is_jython:
+        lib_dir = join(home_dir, 'Lib')
+        bin_dir = join(home_dir, 'bin')
+    else:
+        lib_dir = join(home_dir, 'lib', py_version)
+        bin_dir = join(home_dir, 'bin')
+
+    if not os.path.exists(etc):
+        os.makedirs(etc)
+    subprocess.call([join(bin_dir, 'easy_install'),
+        '-f', 'http://pylonshq.com/download/1.0', 'Pylons==1.0'])
+
+if __name__ == '__main__':
+    main()

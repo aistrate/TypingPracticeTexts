@@ -1,0 +1,29 @@
+        content = content.replace('__VIRTUAL_WINPROMPT__', prompt or '(%s)' % vname)
+        content = content.replace('__VIRTUAL_ENV__', os.path.abspath(home_dir))
+        content = content.replace('__VIRTUAL_NAME__', vname)
+        content = content.replace('__BIN_NAME__', os.path.basename(bin_dir))
+        writefile(os.path.join(bin_dir, name), content)
+
+def install_distutils(home_dir):
+    distutils_path = change_prefix(distutils.__path__[0], home_dir)
+    mkdir(distutils_path)
+    home_dir = os.path.abspath(home_dir)
+    writefile(os.path.join(distutils_path, '__init__.py'), DISTUTILS_INIT)
+    writefile(os.path.join(distutils_path, 'distutils.cfg'), DISTUTILS_CFG, overwrite=False)
+
+def fix_lib64(lib_dir):
+    
+    if [p for p in distutils.sysconfig.get_config_vars().values()
+        if isinstance(p, basestring) and 'lib64' in p]:
+        logger.debug('This system uses lib64; symlinking lib64 to lib')
+        assert os.path.basename(lib_dir) == 'python%s' % sys.version[:3], (
+            "Unexpected python lib dir: %r" % lib_dir)
+        lib_parent = os.path.dirname(lib_dir)
+        assert os.path.basename(lib_parent) == 'lib', (
+            "Unexpected parent dir: %r" % lib_parent)
+        copyfile(lib_parent, os.path.join(os.path.dirname(lib_parent), 'lib64'))
+
+def resolve_interpreter(exe):
+    
+    if os.path.abspath(exe) != exe:
+        paths = os.environ.get('PATH', '').split(os.pathsep)

@@ -1,0 +1,40 @@
+            module_dir = pluraldirectory.replace('/', os.path.sep)
+            check_controller_existence(base_package, module_dir, name)
+            
+            fullname = os.path.join(pluraldirectory, pluralname)
+            controller_name = util.class_name_from_module_name(
+                pluralname.split('/')[-1])
+            if not fullname.startswith(os.sep):
+                fullname = os.sep + fullname
+            testname = fullname.replace(os.sep, '_')[1:]
+
+            nameprefix = ''
+            path = ''
+            if pluraldirectory:
+                nameprefix = pluraldirectory.replace(os.path.sep, '_') + '_'
+                path = pluraldirectory + '/'
+                
+            controller_c = ''
+            if nameprefix:
+                controller_c = ", controller='%s', \n\t" % \
+                    '/'.join([pluraldirectory, pluralname])
+                controller_c += "path_prefix='/%s', name_prefix='%s'" % \
+                    (pluraldirectory, nameprefix)
+            command = "map.resource('%s', '%s'%s)\n" % \
+                (singularname, pluralname, controller_c)
+
+            file_op.template_vars.update(
+                {'classname': controller_name,
+                 'pluralname': pluralname,
+                 'singularname': singularname,
+                 'name': controller_name,
+                 'nameprefix': nameprefix,
+                 'package':base_package,
+                 'path':path,
+                 'resource_command': command.replace('\n\t', '\n%s#%s' % \
+                                                         (' '*4, ' '*9)),
+                 'fname': os.path.join(pluraldirectory, pluralname),
+                 'importstatement': importstatement})
+
+            resource_command = ("\nTo create the appropriate RESTful mapping, "
+                                "add a map statement to your\n")

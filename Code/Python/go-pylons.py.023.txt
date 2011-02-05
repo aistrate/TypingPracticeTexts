@@ -1,0 +1,41 @@
+    for filename in os.listdir(bin_dir):
+        filename = os.path.join(bin_dir, filename)
+        if not os.path.isfile(filename):
+            continue
+        f = open(filename, 'rb')
+        lines = f.readlines()
+        f.close()
+        if not lines:
+            logger.warn('Script %s is an empty file' % filename)
+            continue
+        if not lines[0].strip().startswith(shebang):
+            if os.path.basename(filename) in OK_ABS_SCRIPTS:
+                logger.debug('Cannot make script %s relative' % filename)
+            elif lines[0].strip() == new_shebang:
+                logger.info('Script %s has already been made relative' % filename)
+            else:
+                logger.warn('Script %s cannot be made relative (it\'s not a normal script that starts with %s)'
+                            % (filename, shebang))
+            continue
+        logger.notify('Making script %s relative' % filename)
+        lines = [new_shebang+'\n', activate+'\n'] + lines[1:]
+        f = open(filename, 'wb')
+        f.writelines(lines)
+        f.close()
+
+def fixup_pth_and_egg_link(home_dir, sys_path=None):
+    
+    home_dir = os.path.normcase(os.path.abspath(home_dir))
+    if sys_path is None:
+        sys_path = sys.path
+    for path in sys_path:
+        if not path:
+            path = '.'
+        if not os.path.isdir(path):
+            continue
+        path = os.path.normcase(os.path.abspath(path))
+        if not path.startswith(home_dir):
+            logger.debug('Skipping system (non-environment) directory %s' % path)
+            continue
+        for filename in os.listdir(path):
+            filename = os.path.join(path, filename)

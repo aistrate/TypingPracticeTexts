@@ -1,0 +1,55 @@
+import os
+import sys
+
+import paste.fixture
+import paste.registry
+from paste.deploy import loadapp
+from paste.script.command import Command, BadCommand
+from paste.script.filemaker import FileOp
+from tempita import paste_script_template_renderer
+
+import pylons
+import pylons.util as util
+
+__all__ = ['ControllerCommand', 'RestControllerCommand', 'ShellCommand']
+
+def can_import(name):
+    
+    try:
+        __import__(name)
+        return True
+    except ImportError:
+        return False
+
+def is_minimal_template(package, fail_fast=False):
+    
+    minimal_template = False
+    try:
+        __import__(package + '.lib.base')
+    except ImportError, ie:
+        if 'No module named lib.base' in str(ie):
+            minimal_template = True
+    except:
+        if fail_fast:
+            raise
+    return minimal_template
+
+def defines_render(package):
+    
+    base_module = (is_minimal_template(package) and package + '.controllers' or
+                   package + '.lib.base')
+    try:
+        base = __import__(base_module, globals(), locals(), ['__doc__'])
+    except:
+        return False
+    return callable(getattr(base, 'render', None))
+
+def validate_name(name):
+    
+    if not name:
+        raise BadCommand('Please give the name of a controller.')
+    if name != 'setup' and can_import(name):
+        raise BadCommand(
+            "\n\nA module named '%s' is already present in your "
+            "PYTHON_PATH.\nChoosing a conflicting name will likely cause "
+            "import problems in\nyour controller at some point. It's "

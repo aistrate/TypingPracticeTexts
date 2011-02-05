@@ -1,0 +1,48 @@
+        '--no-site-packages',
+        dest='no_site_packages',
+        action='store_true',
+        help="Don't give access to the global site-packages dir to the "
+             "virtual environment")
+
+    parser.add_option(
+        '--unzip-setuptools',
+        dest='unzip_setuptools',
+        action='store_true',
+        help="Unzip Setuptools or Distribute when installing it")
+
+    parser.add_option(
+        '--relocatable',
+        dest='relocatable',
+        action='store_true',
+        help='Make an EXISTING virtualenv environment relocatable.  '
+        'This fixes up scripts and makes all .pth files relative')
+
+    parser.add_option(
+        '--distribute',
+        dest='use_distribute',
+        action='store_true',
+        help='Use Distribute instead of Setuptools. Set environ variable '
+        'VIRTUALENV_USE_DISTRIBUTE to make it the default ')
+
+    parser.add_option(
+        '--prompt=',
+        dest='prompt',
+        help='Provides an alternative prompt prefix for this environment')
+
+    if 'extend_parser' in globals():
+        extend_parser(parser)
+
+    options, args = parser.parse_args()
+
+    global logger
+
+    if 'adjust_options' in globals():
+        adjust_options(options, args)
+
+    verbosity = options.verbose - options.quiet
+    logger = Logger([(Logger.level_for_integer(2-verbosity), sys.stdout)])
+
+    if options.python and not os.environ.get('VIRTUALENV_INTERPRETER_RUNNING'):
+        env = os.environ.copy()
+        interpreter = resolve_interpreter(options.python)
+        if interpreter == sys.executable:

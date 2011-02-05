@@ -1,0 +1,49 @@
+        for prefix in ('Extracting', 'Now working', 'Installing', 'Before',
+                       'Scanning', 'Setuptools', 'Egg', 'Already',
+                       'running', 'writing', 'reading', 'installing',
+                       'creating', 'copying', 'byte-compiling', 'removing',
+                       'Processing'):
+            if line.startswith(prefix):
+                return Logger.DEBUG
+        return Logger.DEBUG
+    for prefix in ['Reading ', 'Best match', 'Processing setuptools',
+                   'Copying setuptools', 'Adding setuptools',
+                   'Installing ', 'Installed ']:
+        if line.startswith(prefix):
+            return Logger.DEBUG
+    return Logger.INFO
+
+def main():
+    parser = optparse.OptionParser(
+        version=virtualenv_version,
+        usage="%prog [OPTIONS] DEST_DIR")
+
+    parser.add_option(
+        '-v', '--verbose',
+        action='count',
+        dest='verbose',
+        default=0,
+        help="Increase verbosity")
+
+    parser.add_option(
+        '-q', '--quiet',
+        action='count',
+        dest='quiet',
+        default=0,
+        help='Decrease verbosity')
+
+    parser.add_option(
+        '-p', '--python',
+        dest='python',
+        metavar='PYTHON_EXE',
+        help='The Python interpreter to use, e.g., --python=python2.5 will use the python2.5 '
+        'interpreter to create the new environment.  The default is the interpreter that '
+        'virtualenv was installed with (%s)' % sys.executable)
+
+    parser.add_option(
+        '--clear',
+        dest='clear',
+        action='store_true',
+        help="Clear out the non-root install and start from scratch")
+
+    parser.add_option(

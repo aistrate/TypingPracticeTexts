@@ -1,0 +1,43 @@
+            self.logging_file_config(config_file)
+        
+        sys.path.insert(0, here_dir)
+
+        wsgiapp = loadapp(config_name, relative_to=here_dir)
+        test_app = paste.fixture.TestApp(wsgiapp)
+
+        tresponse = test_app.get('/_test_vars')
+        request_id = int(tresponse.body)
+
+        test_app.pre_request_hook = lambda self: \
+            paste.registry.restorer.restoration_end()
+        test_app.post_request_hook = lambda self: \
+            paste.registry.restorer.restoration_begin(request_id)
+
+        paste.registry.restorer.restoration_begin(request_id)
+                
+        pkg_name = pylons.config['pylons.package']
+
+        if is_minimal_template(pkg_name, True):
+            model_module = None
+            helpers_module = pkg_name + '.helpers'
+            base_module = pkg_name + '.controllers'
+        else:
+            model_module = pkg_name + '.model'
+            helpers_module = pkg_name + '.lib.helpers'
+            base_module = pkg_name + '.lib.base'
+
+        if model_module and can_import(model_module):
+            locs['model'] = sys.modules[model_module]
+
+        if can_import(helpers_module):
+            locs['h'] = sys.modules[helpers_module]
+
+        exec ('from pylons import app_globals, config, request, response, '
+              'session, tmpl_context, url') in locs
+        exec ('from pylons.controllers.util import abort, redirect') in locs
+        exec 'from pylons.i18n import _, ungettext, N_' in locs
+        locs.pop('__builtins__', None)
+        
+        __import__(base_module)
+
+        base = sys.modules[base_module]

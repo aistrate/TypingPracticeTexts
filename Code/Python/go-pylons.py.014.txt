@@ -1,0 +1,41 @@
+                sys.exit(3)
+            home_dir = win32api.GetShortPathName(home_dir)
+        lib_dir = join(home_dir, 'Lib')
+        inc_dir = join(home_dir, 'Include')
+        bin_dir = join(home_dir, 'Scripts')
+    elif is_jython:
+        lib_dir = join(home_dir, 'Lib')
+        inc_dir = join(home_dir, 'Include')
+        bin_dir = join(home_dir, 'bin')
+    elif is_pypy:
+        lib_dir = home_dir
+        inc_dir = join(home_dir, 'include')
+        bin_dir = join(home_dir, 'bin')
+    else:
+        lib_dir = join(home_dir, 'lib', py_version)
+        inc_dir = join(home_dir, 'include', py_version)
+        bin_dir = join(home_dir, 'bin')
+    return home_dir, lib_dir, inc_dir, bin_dir
+
+def change_prefix(filename, dst_prefix):
+    prefixes = [sys.prefix]
+    if hasattr(sys, 'real_prefix'):
+        prefixes.append(sys.real_prefix)
+    prefixes = map(os.path.abspath, prefixes)
+    filename = os.path.abspath(filename)
+    for src_prefix in prefixes:
+        if filename.startswith(src_prefix):
+            _, relpath = filename.split(src_prefix, 1)
+            assert relpath[0] == os.sep
+            relpath = relpath[1:]
+            return join(dst_prefix, relpath)
+    assert False, "Filename %s does not start with any of these prefixes: %s" % \
+        (filename, prefixes)
+
+def copy_required_modules(dst_prefix):
+    import imp
+    for modname in REQUIRED_MODULES:
+        if modname in sys.builtin_module_names:
+            logger.info("Ignoring built-in bootstrap module: %s" % modname)
+            continue
+        try:

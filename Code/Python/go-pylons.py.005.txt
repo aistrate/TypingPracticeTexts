@@ -1,0 +1,52 @@
+    if not os.path.exists(dest):
+        logger.info('Writing %s', dest)
+        f = open(dest, 'wb')
+        f.write(content)
+        f.close()
+        return
+    else:
+        f = open(dest, 'rb')
+        c = f.read()
+        f.close()
+        if c != content:
+            if not overwrite:
+                logger.notify('File %s exists with different content; not overwriting', dest)
+                return
+            logger.notify('Overwriting %s with new content', dest)
+            f = open(dest, 'wb')
+            f.write(content)
+            f.close()
+        else:
+            logger.info('Content %s already in place', dest)
+
+def rmtree(dir):
+    if os.path.exists(dir):
+        logger.notify('Deleting tree %s', dir)
+        shutil.rmtree(dir)
+    else:
+        logger.info('Do not need to delete %s; already gone', dir)
+
+def make_exe(fn):
+    if hasattr(os, 'chmod'):
+        oldmode = os.stat(fn).st_mode & 07777
+        newmode = (oldmode | 0555) & 07777
+        os.chmod(fn, newmode)
+        logger.info('Changed mode of %s to %s', fn, oct(newmode))
+
+def _find_file(filename, dirs):
+    for dir in dirs:
+        if os.path.exists(join(dir, filename)):
+            return join(dir, filename)
+    return filename
+
+def _install_req(py_executable, unzip=False, distribute=False):
+    if not distribute:
+        setup_fn = 'setuptools-0.6c11-py%s.egg' % sys.version[:3]
+        project_name = 'setuptools'
+        bootstrap_script = EZ_SETUP_PY
+        source = None
+    else:
+        setup_fn = None
+        source = 'distribute-0.6.14.tar.gz'
+        project_name = 'distribute'
+        bootstrap_script = DISTRIBUTE_SETUP_PY

@@ -1,0 +1,45 @@
+        base_public = [__name for __name in dir(base) if not \
+                       __name.startswith('_') or __name == '_']
+        locs.update((name, getattr(base, name)) for name in base_public)
+        locs.update(dict(wsgiapp=wsgiapp, app=test_app))
+
+        mapper = tresponse.config.get('routes.map')
+        if mapper:
+            locs['mapper'] = mapper
+
+        banner = "  All objects from %s are available\n" % base_module
+        banner += "  Additional Objects:\n"
+        if mapper:
+            banner += "  %-10s -  %s\n" % ('mapper', 'Routes mapper object')
+        banner += "  %-10s -  %s\n" % ('wsgiapp',
+            "This project's WSGI App instance")
+        banner += "  %-10s -  %s\n" % ('app',
+            'paste.fixture wrapped around wsgiapp')
+
+        try:
+            if self.options.disable_ipython:
+                raise ImportError()
+
+            from IPython.Shell import IPShellEmbed
+
+            shell = IPShellEmbed(argv=self.args)
+            shell.set_banner(shell.IP.BANNER + '\n\n' + banner)
+            try:
+                shell(local_ns=locs, global_ns={})
+            finally:
+                paste.registry.restorer.restoration_end()
+        except ImportError:
+            import code
+            py_prefix = sys.platform.startswith('java') and 'J' or 'P'
+            newbanner = "Pylons Interactive Shell\n%sython %s\n\n" % \
+                (py_prefix, sys.version)
+            banner = newbanner + banner
+            shell = code.InteractiveConsole(locals=locs)
+            try:
+                import readline
+            except ImportError:
+                pass
+            try:
+                shell.interact(banner)
+            finally:
+                paste.registry.restorer.restoration_end()

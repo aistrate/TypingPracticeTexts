@@ -1,0 +1,50 @@
+            msg = str(sys.exc_info()[1])
+            raise BadCommand('An unknown error occurred. %s' % msg)
+
+class RestControllerCommand(Command):
+    
+    summary = __doc__.splitlines()[0]
+    usage = '\n' + __doc__
+
+    min_args = 2
+    max_args = 2
+    group_name = 'pylons'
+
+    default_verbosity = 3
+
+    parser = Command.standard_parser(simulate=True)
+    parser.add_option('--no-test',
+                      action='store_true',
+                      dest='no_test',
+                      help="Don't create the test; just the controller")
+
+    def command(self):
+        
+        try:
+            file_op = FileOp(source_dir=('pylons', 'templates'))
+            try:
+                singularname, singulardirectory = \
+                    file_op.parse_path_name_args(self.args[0])
+                pluralname, pluraldirectory = \
+                    file_op.parse_path_name_args(self.args[1])
+
+            except:
+                raise BadCommand('No egg_info directory was found')
+
+            base_package = file_op.find_dir('controllers', True)[0]
+            if base_package.lower() == pluralname.lower():
+                raise BadCommand(
+                    'Your controller name should not be the same as '
+                    'the package name %r.'% base_package)
+            for name in [pluralname]:
+                name = name.replace('-', '_')
+                validate_name(name)
+
+            if is_minimal_template(base_package):
+                importstatement = ('from %s.controllers import BaseController'
+                                   % base_package)
+            else:
+                importstatement = ('from %s.lib.base import BaseController' %
+                                   base_package)
+            if defines_render(base_package):
+                importstatement += ', render'

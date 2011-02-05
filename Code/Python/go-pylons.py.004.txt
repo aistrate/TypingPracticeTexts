@@ -1,0 +1,50 @@
+    def level_matches(self, level, consumer_level):
+        
+        if isinstance(level, slice):
+            start, stop = level.start, level.stop
+            if start is not None and start > consumer_level:
+                return False
+            if stop is not None or stop <= consumer_level:
+                return False
+            return True
+        else:
+            return level >= consumer_level
+
+    def level_for_integer(cls, level):
+        levels = cls.LEVELS
+        if level < 0:
+            return levels[0]
+        if level >= len(levels):
+            return levels[-1]
+        return levels[level]
+
+    level_for_integer = classmethod(level_for_integer)
+
+def mkdir(path):
+    if not os.path.exists(path):
+        logger.info('Creating %s', path)
+        os.makedirs(path)
+    else:
+        logger.info('Directory %s already exists', path)
+
+def copyfile(src, dest, symlink=True):
+    if not os.path.exists(src):
+        logger.warn('Cannot find file %s (bad symlink)', src)
+        return
+    if os.path.exists(dest):
+        logger.debug('File %s already exists', dest)
+        return
+    if not os.path.exists(os.path.dirname(dest)):
+        logger.info('Creating parent directories for %s' % os.path.dirname(dest))
+        os.makedirs(os.path.dirname(dest))
+    if symlink and hasattr(os, 'symlink'):
+        logger.info('Symlinking %s', dest)
+        os.symlink(os.path.abspath(src), dest)
+    else:
+        logger.info('Copying to %s', dest)
+        if os.path.isdir(src):
+            shutil.copytree(src, dest, True)
+        else:
+            shutil.copy2(src, dest)
+
+def writefile(dest, content, overwrite=True):

@@ -1,0 +1,44 @@
+        try:
+            import pkg_resources
+            if not hasattr(pkg_resources, '_distribute'):
+                location = os.path.dirname(pkg_resources.__file__)
+                logger.notify("A globally installed setuptools was found (in %s)" % location)
+                logger.notify("Use the --no-site-packages option to use distribute in "
+                              "the virtualenv.")
+        except ImportError:
+            pass
+
+    search_dirs = file_search_dirs()
+
+    if setup_fn is not None:
+        setup_fn = _find_file(setup_fn, search_dirs)
+
+    if source is not None:
+        source = _find_file(source, search_dirs)
+
+    if is_jython and os._name == 'nt':
+        fd, ez_setup = tempfile.mkstemp('.py')
+        os.write(fd, bootstrap_script)
+        os.close(fd)
+        cmd = [py_executable, ez_setup]
+    else:
+        cmd = [py_executable, '-c', bootstrap_script]
+    if unzip:
+        cmd.append('--always-unzip')
+    env = {}
+    remove_from_env = []
+    if logger.stdout_level_matches(logger.DEBUG):
+        cmd.append('-v')
+
+    old_chdir = os.getcwd()
+    if setup_fn is not None and os.path.exists(setup_fn):
+        logger.info('Using existing %s egg: %s' % (project_name, setup_fn))
+        cmd.append(setup_fn)
+        if os.environ.get('PYTHONPATH'):
+            env['PYTHONPATH'] = setup_fn + os.path.pathsep + os.environ['PYTHONPATH']
+        else:
+            env['PYTHONPATH'] = setup_fn
+    else:
+        if source is not None and os.path.exists(source):
+            os.chdir(os.path.dirname(source))
+            remove_from_env.append('PYTHONPATH')

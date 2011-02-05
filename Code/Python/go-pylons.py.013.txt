@@ -1,0 +1,44 @@
+        if raise_on_returncode:
+            if all_output:
+                logger.notify('Complete output from command %s:' % cmd_desc)
+                logger.notify('\n'.join(all_output) + '\n----------------------------------------')
+            raise OSError(
+                "Command %s failed with error code %s"
+                % (cmd_desc, proc.returncode))
+        else:
+            logger.warn(
+                "Command %s had error code %s"
+                % (cmd_desc, proc.returncode))
+
+def create_environment(home_dir, site_packages=True, clear=False,
+                       unzip_setuptools=False, use_distribute=False,
+                       prompt=None):
+    
+    home_dir, lib_dir, inc_dir, bin_dir = path_locations(home_dir)
+
+    py_executable = os.path.abspath(install_python(
+        home_dir, lib_dir, inc_dir, bin_dir,
+        site_packages=site_packages, clear=clear))
+
+    install_distutils(home_dir)
+
+    if use_distribute or os.environ.get('VIRTUALENV_USE_DISTRIBUTE'):
+        install_distribute(py_executable, unzip=unzip_setuptools)
+    else:
+        install_setuptools(py_executable, unzip=unzip_setuptools)
+
+    install_pip(py_executable)
+
+    install_activate(home_dir, bin_dir, prompt)
+
+def path_locations(home_dir):
+    
+    if sys.platform == 'win32':
+        mkdir(home_dir)
+        if ' ' in home_dir:
+            try:
+                import win32api
+            except ImportError:
+                print 'Error: the path "%s" has a space in it' % home_dir
+                print 'To handle these kinds of paths, the win32api module must be installed:'
+                print '  http://sourceforge.net/projects/pywin32/'

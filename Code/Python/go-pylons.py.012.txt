@@ -1,0 +1,55 @@
+                    filter_stdout=None, cwd=None,
+                    raise_on_returncode=True, extra_env=None,
+                    remove_from_env=None):
+    cmd_parts = []
+    for part in cmd:
+        if len(part) > 40:
+            part = part[:30]+"..."+part[-5:]
+        if ' ' in part or '\n' in part or '"' in part or "'" in part:
+            part = '"%s"' % part.replace('"', '\\"')
+        cmd_parts.append(part)
+    cmd_desc = ' '.join(cmd_parts)
+    if show_stdout:
+        stdout = None
+    else:
+        stdout = subprocess.PIPE
+    logger.debug("Running command %s" % cmd_desc)
+    if extra_env or remove_from_env:
+        env = os.environ.copy()
+        if extra_env:
+            env.update(extra_env)
+        if remove_from_env:
+            for varname in remove_from_env:
+                env.pop(varname, None)
+    else:
+        env = None
+    try:
+        proc = subprocess.Popen(
+            cmd, stderr=subprocess.STDOUT, stdin=None, stdout=stdout,
+            cwd=cwd, env=env)
+    except Exception, e:
+        logger.fatal(
+            "Error %s while executing command %s" % (e, cmd_desc))
+        raise
+    all_output = []
+    if stdout is not None:
+        stdout = proc.stdout
+        while 1:
+            line = stdout.readline()
+            if not line:
+                break
+            line = line.rstrip()
+            all_output.append(line)
+            if filter_stdout:
+                level = filter_stdout(line)
+                if isinstance(level, tuple):
+                    level, line = level
+                logger.log(level, line)
+                if not logger.stdout_level_matches(level):
+                    logger.show_progress()
+            else:
+                logger.info(line)
+    else:
+        proc.communicate()
+    proc.wait()
+    if proc.returncode:

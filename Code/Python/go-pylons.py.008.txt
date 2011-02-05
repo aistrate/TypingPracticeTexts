@@ -1,0 +1,39 @@
+    _install_req(py_executable, unzip)
+
+def install_distribute(py_executable, unzip=False):
+    _install_req(py_executable, unzip, distribute=True)
+
+_pip_re = re.compile(r'^pip-.*(zip|tar.gz|tar.bz2|tgz|tbz)$', re.I)
+def install_pip(py_executable):
+    filenames = []
+    for dir in file_search_dirs():
+        filenames.extend([join(dir, fn) for fn in os.listdir(dir)
+                          if _pip_re.search(fn)])
+    filenames = [(os.path.basename(filename).lower(), i, filename) for i, filename in enumerate(filenames)]
+    filenames.sort()
+    filenames = [filename for basename, i, filename in filenames]
+    if not filenames:
+        filename = 'pip'
+    else:
+        filename = filenames[-1]
+    easy_install_script = 'easy_install'
+    if sys.platform == 'win32':
+        easy_install_script = 'easy_install-script.py'
+    cmd = [py_executable, join(os.path.dirname(py_executable), easy_install_script), filename]
+    if filename == 'pip':
+        logger.info('Installing pip from network...')
+    else:
+        logger.info('Installing %s' % os.path.basename(filename))
+    logger.indent += 2
+    def _filter_setup(line):
+        return filter_ez_setup(line, 'pip')
+    try:
+        call_subprocess(cmd, show_stdout=False,
+                        filter_stdout=_filter_setup)
+    finally:
+        logger.indent -= 2
+
+def filter_ez_setup(line, project_name='setuptools'):
+    if not line.strip():
+        return Logger.DEBUG
+    if project_name == 'distribute':

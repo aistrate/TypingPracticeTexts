@@ -1,0 +1,38 @@
+                if fn != 'site-packages' and os.path.splitext(fn)[0] in REQUIRED_FILES:
+                    copyfile(join(stdlib_dir, fn), join(lib_dir, fn))
+        copy_required_modules(home_dir)
+    finally:
+        logger.indent -= 2
+    mkdir(join(lib_dir, 'site-packages'))
+    import site
+    site_filename = site.__file__
+    if site_filename.endswith('.pyc'):
+        site_filename = site_filename[:-1]
+    elif site_filename.endswith('$py.class'):
+        site_filename = site_filename.replace('$py.class', '.py')
+    site_filename_dst = change_prefix(site_filename, home_dir)
+    site_dir = os.path.dirname(site_filename_dst)
+    writefile(site_filename_dst, SITE_PY)
+    writefile(join(site_dir, 'orig-prefix.txt'), prefix)
+    site_packages_filename = join(site_dir, 'no-global-site-packages.txt')
+    if not site_packages:
+        writefile(site_packages_filename, '')
+    else:
+        if os.path.exists(site_packages_filename):
+            logger.info('Deleting %s' % site_packages_filename)
+            os.unlink(site_packages_filename)
+
+    if is_pypy:
+        stdinc_dir = join(prefix, 'include')
+    else:
+        stdinc_dir = join(prefix, 'include', py_version)
+    if os.path.exists(stdinc_dir):
+        copyfile(stdinc_dir, inc_dir)
+    else:
+        logger.debug('No include dir %s' % stdinc_dir)
+
+    if sys.exec_prefix != prefix:
+        if sys.platform == 'win32':
+            exec_dir = join(sys.exec_prefix, 'lib')
+        elif is_jython:
+            exec_dir = join(sys.exec_prefix, 'Lib')

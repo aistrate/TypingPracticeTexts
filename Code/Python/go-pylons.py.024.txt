@@ -1,0 +1,44 @@
+            if filename.endswith('.pth'):
+                if not os.access(filename, os.W_OK):
+                    logger.warn('Cannot write .pth file %s, skipping' % filename)
+                else:
+                    fixup_pth_file(filename)
+            if filename.endswith('.egg-link'):
+                if not os.access(filename, os.W_OK):
+                    logger.warn('Cannot write .egg-link file %s, skipping' % filename)
+                else:
+                    fixup_egg_link(filename)
+
+def fixup_pth_file(filename):
+    lines = []
+    prev_lines = []
+    f = open(filename)
+    prev_lines = f.readlines()
+    f.close()
+    for line in prev_lines:
+        line = line.strip()
+        if (not line or line.startswith('#') or line.startswith('import ')
+            or os.path.abspath(line) != line):
+            lines.append(line)
+        else:
+            new_value = make_relative_path(filename, line)
+            if line != new_value:
+                logger.debug('Rewriting path %s as %s (in %s)' % (line, new_value, filename))
+            lines.append(new_value)
+    if lines == prev_lines:
+        logger.info('No changes to .pth file %s' % filename)
+        return
+    logger.notify('Making paths in .pth file %s relative' % filename)
+    f = open(filename, 'w')
+    f.write('\n'.join(lines) + '\n')
+    f.close()
+
+def fixup_egg_link(filename):
+    f = open(filename)
+    link = f.read().strip()
+    f.close()
+    if os.path.abspath(link) != link:
+        logger.debug('Link in %s already relative' % filename)
+        return
+    new_link = make_relative_path(filename, link)
+    logger.notify('Rewriting link %s in %s as %s' % (link, filename, new_link))

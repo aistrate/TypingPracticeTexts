@@ -1,0 +1,7 @@
+Slide rule
+
+The slide rule, also known colloquially as a slipstick, is a mechanical analog computer. The slide rule is used primarily for multiplication and division, and also for functions such as roots, logarithms and trigonometry, but is not normally used for addition or subtraction.
+
+Slide rules come in a diverse range of styles and generally appear in a linear or circular form with a standardized set of markings (scales) essential to performing mathematical computations. Slide rules manufactured for specialized fields such as aviation or finance typically feature additional scales that aid in calculations common to that field.
+
+William Oughtred and others developed the slide rule in the 17th century based on the emerging work on logarithms by John Napier. Before the advent of the pocket calculator, it was the most commonly used calculation tool in science and engineering. The use of slide rules continued to grow through the 1950s and 1960s even as digital computing devices were being gradually introduced; but around 1974 the electronic scientific calculator made it largely obsolete and most suppliers left the business.

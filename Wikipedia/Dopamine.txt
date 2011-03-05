@@ -1,0 +1,5 @@
+Dopamine
+
+Dopamine is a catecholamine neurotransmitter present in a wide variety of animals, including both vertebrates and invertebrates. In the brain, this substituted phenethylamine functions as a neurotransmitter, activating the five known types of dopamine receptors--D1, D2, D3, D4, and D5--and their variants. Dopamine is produced in several areas of the brain, including the substantia nigra and the ventral tegmental area. Dopamine is also a neurohormone released by the hypothalamus. Its main function as a hormone is to inhibit the release of prolactin from the anterior lobe of the pituitary.
+
+Dopamine is available as an intravenous medication acting on the sympathetic nervous system, producing effects such as increased heart rate and blood pressure. However, because dopamine cannot cross the blood-brain barrier, dopamine given as a drug does not directly affect the central nervous system. To increase the amount of dopamine in the brains of patients with diseases such as Parkinson's disease and dopa-responsive dystonia, L-DOPA (the precursor of dopamine), is often given because it crosses the blood-brain barrier relatively easily.

@@ -1,0 +1,11 @@
+Analog computer
+
+An analog computer is a form of computer that uses the continuously-changeable aspects of physical phenomena such as electrical, mechanical, or hydraulic quantities to model the problem being solved. In contrast, digital computers represent varying quantities incrementally, as their numerical values change.
+
+Mechanical analog computers were very important in gun fire control in World War II and the Korean War; they were made in significant numbers. In particular, development of transistors made electronic analog computers practical, and before digital computers had developed sufficiently, they were commonly used in science and industry.
+
+Analog computers can have a very wide range of complexity. Slide rules and nomographs are the simplest, while naval gunfire control computers and large hybrid digital/analog computers were among the most complicated.
+
+Setting up an analog computer required scale factors to be chosen, along with initial conditions--that is, starting values. Another essential was creating the required network of interconnections between computing elements. Sometimes it was necessary to re-think the structure of the problem so that the computer would function satisfactorily. No variables could be allowed to exceed the computer's limits, and differentiation was to be avoided, typically by rearranging the "network" of interconnects, using integrators in a different sense.
+
+Running an electronic analog computer, assuming a satisfactory setup, started with the computer held with some variables fixed at their initial values. Moving a switch released the holds and permitted the problem to run. In some instances, the computer could, after a certain running time interval, repeatedly return to the initial-conditions state to reset the problem, and run it again.

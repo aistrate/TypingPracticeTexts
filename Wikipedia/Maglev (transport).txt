@@ -1,0 +1,9 @@
+Maglev (transport)
+
+Maglev (derived from magnetic levitation), is a system of transportation that suspends, guides and propels vehicles, predominantly trains, using magnetic levitation from a very large number of magnets for lift and propulsion. This method has the potential to be faster, quieter and smoother than wheeled mass transit systems. The power needed for levitation is usually not a particularly large percentage of the overall consumption; most of the power used is needed to overcome air drag, as with any other high speed train.
+
+The highest recorded speed of a Maglev train is 581 kilometres per hour (361 mph), achieved in Japan in 2003, only 6 kilometres per hour (3.7 mph) faster than the conventional TGV wheel-rail speed record.
+
+The first commercial maglev people mover was simply called "MAGLEV" and officially opened in 1984 near Birmingham, England. It operated on an elevated 600-metre (2,000 ft) section of monorail track between Birmingham International Airport and Birmingham International railway station, running at speeds up to 42 km/h (26 mph); the system was eventually closed in 1995 due to reliability problems.
+
+Perhaps the most well known implementation of high-speed maglev technology currently operating commercially is the Shanghai Maglev Train, an IOS (initial operating segment) demonstration line of the German-built Transrapid train in Shanghai, China that transports people 30 km (19 mi) to the airport in just 7 minutes 20 seconds, achieving a top speed of 431 km/h (268 mph), averaging 250 km/h (160 mph).

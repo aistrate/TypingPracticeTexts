@@ -1,0 +1,9 @@
+Automotive battery
+
+An automotive battery is a type of rechargeable battery that supplies electric energy to an automobile. Usually this refers to an SLI battery (starting, lighting, ignition) to power the starter motor, the lights, and the ignition system of a vehicle's engine. This also may describe a traction battery used for the main power source of an electric vehicle.
+
+Automotive SLI batteries are usually lead-acid type, and are made of six galvanic cells in series to provide a 12 volt system. Each cell provides 2.1 volts for a total of 12.6 volt at full charge. Heavy vehicles such as highway trucks, often equipped with Diesel engines, may have two batteries in series for a 24 volt system, or may have parallel strings of batteries.
+
+Lead-acid batteries are made up of plates of lead and separate plates of lead dioxide, which are submerged into an electrolyte solution of about 35% sulfuric acid and 65% water. This causes a chemical reaction that releases electrons, allowing them to flow through conductors to produce electricity. As the battery discharges, the acid of the electrolyte reacts with the materials of the plates, changing their surface to lead sulfate. When the battery is recharged, the chemical reaction is reversed: the lead sulfate reforms into lead oxide and lead. With the plates restored to their original condition, the process may now be repeated.
+
+Battery recycling of automotive batteries reduces resources required for manufacture of new batteries and diverts toxic lead from landfills or improper disposal.

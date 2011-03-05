@@ -1,0 +1,13 @@
+Calculator
+
+An electronic calculator (usually called simply a calculator) is a small, usually inexpensive electronic device used to perform the basic operations of arithmetic. Modern calculators are more portable than most computers, though most PDAs are comparable in size to handheld calculators.
+
+The first electronic calculator was created in the 1960s, building on the history of tools such as the abacus, developed around 2000 BC; and the mechanical calculator, developed in the 17th century. It was developed in parallel with the analog computers of the day.
+
+Pocket-sized devices become available in the 1970s, especially after the invention of the microprocessor developed serendipitously by Intel for a busicom calculator.
+
+Modern calculators are electrically powered (usually by battery and/or solar cell) and vary from cheap, give-away, credit-card sized models to sturdy adding machine-like models with built-in printers. They first became popular in the late 1960s as decreasing size and cost of electronics made possible devices for calculations, avoiding the use of scarce and expensive computer resources. By the 1980s, calculator prices had reduced to a point where a basic calculator was affordable to most. By the 1990s they had become common in math classes in schools, with the idea that students could be freed from basic calculations and focus on the concepts.
+
+Computer operating systems as far back as early Unix have included interactive calculator programs such as dc and hoc, and calculator functions are included in almost all PDA-type devices (save a few dedicated address book and dictionary devices).
+
+In addition to general purpose calculators, there are those designed for specific markets; for example, there are scientific calculators which focus on operations slightly more complex than those specific to arithmetic - for instance, trigonometric and statistical calculations. Some calculators even have the ability to do computer algebra. Graphing calculators can be used to graph functions defined on the real line, or higher dimensional Euclidean space. They often serve other purposes, however.

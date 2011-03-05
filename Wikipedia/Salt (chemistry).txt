@@ -1,0 +1,7 @@
+Salt (chemistry)
+
+In chemistry, salts are ionic compounds that can result from the neutralization reaction of an acid and a base. They are composed of cations (positively charged ions) and anions (negative ions) so that the product is electrically neutral (without a net charge). These component ions can be inorganic such as chloride (Cl^-), as well as organic such as acetate (CH3COO^-) and monatomic ions such as fluoride (F^-), as well as polyatomic ions such as sulfate (SO4^2-).
+
+There are several varieties of salts. Salts that hydrolyze to produce hydroxide ions when dissolved in water are basic salts and salts that hydrolyze to produce hydronium ions in water are acid salts. Neutral salts are those that are neither acid nor basic salts. Zwitterions contain an anionic center and a cationic center in the same molecule but are not considered to be salts. Examples include amino acids, many metabolites, peptides and proteins.
+
+Molten salts and solutions containing dissolved salts (e.g. sodium chloride in water) are called electrolytes, as they are able to conduct electricity. As observed in the cytoplasm of cells, in blood, urine, plant saps and mineral waters, mixtures of many different ions in solution usually do not form defined salts after evaporation of the water. Therefore, their salt content is given for the respective ions.

@@ -1,0 +1,7 @@
+Derivative
+
+In calculus, a branch of mathematics, the derivative is a measure of how a function changes as its input changes. Loosely speaking, a derivative can be thought of as how much one quantity is changing in response to changes in some other quantity; for example, the derivative of the position of a moving object with respect to time is the object's instantaneous velocity. Conversely, the integral of the object's velocity over time is how much the object's position changes from the time when the integral begins to the time when the integral ends.
+
+The derivative of a function at a chosen input value describes the best linear approximation of the function near that input value. For a real-valued function of a single real variable, the derivative at a point equals the slope of the tangent line to the graph of the function at that point. In higher dimensions, the derivative of a function at a point is a linear transformation called the linearization. A closely related notion is the differential of a function.
+
+The process of finding a derivative is called differentiation. The reverse process is called antidifferentiation. The fundamental theorem of calculus states that antidifferentiation is the same as integration. Differentiation and integration constitute the two fundamental operations in single-variable calculus.

@@ -1,0 +1,9 @@
+Chemical synapse
+
+Chemical synapses are specialized junctions through which neurons signal to each other and to non-neuronal cells such as those in muscles or glands. Chemical synapses allow neurons to form circuits within the central nervous system. They are crucial to the biological computations that underlie perception and thought. They allow the nervous system to connect to and control other systems of the body.
+
+At a chemical synapse, one neuron releases a neurotransmitter into a small space (the synapse) that is adjacent to another neuron. Neurotransmitters must then be cleared out of the synapse efficiently so that the synapse can be ready to function again as soon as possible.
+
+The adult human brain is estimated to contain from 10^14 to 5 x 10^14 (100-500 trillion) synapses. Every cubic millimeter of cerebral cortex contains roughly a billion of them.
+
+The word "synapse" comes from "synaptein", which Sir Charles Scott Sherrington and colleagues coined from the Greek "syn-" ("together") and "haptein" ("to clasp"). Chemical synapses are not the only type of biological synapse: electrical and immunological synapses also exist. Without a qualifier, however, "synapse" commonly means chemical synapse.

@@ -1,0 +1,7 @@
+Fourier analysis
+
+In mathematics, Fourier analysis is a subject area which grew from the study of Fourier series. The subject began with the study of the way general functions may be represented by sums of simpler trigonometric functions. Fourier analysis is named after Joseph Fourier, who showed that representing a function by a trigonometric series greatly simplifies the study of heat propagation.
+
+Today, the subject of Fourier analysis encompasses a vast spectrum of mathematics. In the sciences and engineering, the process of decomposing a function into simpler pieces is often called Fourier analysis, while the operation of rebuilding the function from these pieces is known as Fourier synthesis. In mathematics, the term Fourier analysis often refers to the study of both operations.
+
+The decomposition process itself is called a Fourier transform. The transform is often given a more specific name which depends upon the domain and other properties of the function being transformed. Moreover, the original concept of Fourier analysis has been extended over time to apply to more and more abstract and general situations, and the general field is often known as harmonic analysis. Each transform used for analysis has a corresponding inverse transform that can be used for synthesis.

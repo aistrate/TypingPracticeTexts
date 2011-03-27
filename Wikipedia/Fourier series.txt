@@ -1,0 +1,11 @@
+Fourier series
+
+In mathematics, a Fourier series decomposes any periodic function or periodic signal into the sum of a (possibly infinite) set of simple oscillating functions, namely sines and cosines (or complex exponentials). The study of Fourier series is a branch of Fourier analysis. Fourier series were introduced by Joseph Fourier (1768-1830) for the purpose of solving the heat equation in a metal plate.
+
+The heat equation is a partial differential equation. Prior to Fourier's work, no solution to the heat equation was known in the general case, although particular solutions were known if the heat source behaved in a simple way, in particular, if the heat source was a sine or cosine wave. These simple solutions are now sometimes called eigensolutions. Fourier's idea was to model a complicated heat source as a superposition (or linear combination) of simple sine and cosine waves, and to write the solution as a superposition of the corresponding eigensolutions. This superposition or linear combination is called the Fourier series.
+
+Although the original motivation was to solve the heat equation, it later became obvious that the same techniques could be applied to a wide array of mathematical and physical problems, and especially those involving linear differential equations with constant coefficients, for which the eigensolutions are sinusoids. The Fourier series has many such applications in electrical engineering, vibration analysis, acoustics, optics, signal processing, image processing, quantum mechanics, econometrics, thin-walled shell theory, etc.
+
+The Fourier series is named in honour of Joseph Fourier (1768-1830), who made important contributions to the study of trigonometric series, after preliminary investigations by Leonhard Euler, Jean le Rond d'Alembert, and Daniel Bernoulli. He applied this technique to find the solution of the heat equation, publishing his initial results in his 1807 Memoire sur la propagation de la chaleur dans les corps solides and 1811, and publishing his Theorie analytique de la chaleur in 1822.
+
+From a modern point of view, Fourier's results are somewhat informal, due to the lack of a precise notion of function and integral in the early nineteenth century. Later, Dirichlet and Riemann expressed Fourier's results with greater precision and formality.

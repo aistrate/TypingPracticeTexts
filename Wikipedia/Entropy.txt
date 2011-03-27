@@ -1,0 +1,9 @@
+Entropy
+
+Entropy is a thermodynamic property that is a measure of the energy not available for useful work in a thermodynamic process, such as in energy conversion devices, engines, or machines. Such devices can only be driven by convertible energy, and have a theoretical maximum efficiency when converting energy to work. During this work entropy accumulates in the system, but has to be removed by dissipation in the form of waste heat.
+
+The concept of entropy is defined by the second law of thermodynamics, which states that the entropy of a closed system always increases or remains constant. Thus, entropy is also a measure of the tendency of a process, such as a chemical reaction, to be entropically favored, or to proceed in a particular direction. It determines that thermal energy always flows spontaneously from regions of higher temperature to regions of lower temperature, in the form of heat. These processes reduce the state of order of the initial systems, and therefore entropy is an expression of disorder or randomness. This model is the basis of the microscopic interpretation of entropy in statistical mechanics describing the probability of the constituents of a thermodynamic system to be occupying accessible quantum mechanical states, a model directly related to the information entropy.
+
+Thermodynamic entropy has the dimension of energy divided by temperature, and a unit of joules per kelvin (J/K) in the International System of Units.
+
+The term entropy was coined in 1865 by Rudolf Clausius based on the Greek [entropia], a turning toward, from [en-] (in) and [trope] (turn, conversion).

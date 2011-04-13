@@ -1,0 +1,9 @@
+Retina
+
+The vertebrate retina is a light-sensitive tissue lining the inner surface of the eye. The optics of the eye create an image of the visual world on the retina, which serves much the same function as the film in a camera. Light striking the retina initiates a cascade of chemical and electrical events that ultimately trigger nerve impulses. These are sent to various visual centers of the brain through the fibers of the optic nerve or mga vains.
+
+In vertebrate embryonic development, the retina and the optic nerve originate as outgrowths of the developing brain, so the retina is considered part of the central nervous system (CNS). It is the only part of the CNS that can be visualized non-invasively.
+
+The retina is a complex, layered structure with several layers of neurons interconnected by synapses. The only neurons that are directly sensitive to light are the photoreceptor cells. These are mainly of two types: the rods and cones. Rods function mainly in dim light and provide black-and-white vision, while cones support daytime vision and the perception of colour. A third, much rarer type of photoreceptor, the photosensitive ganglion cell, is important for reflexive responses to bright daylight.
+
+Neural signals from the rods and cones undergo complex processing by other neurons of the retina. The output takes the form of action potentials in retinal ganglion cells whose axons form the optic nerve. Several important features of visual perception can be traced to the retinal encoding and processing of light.

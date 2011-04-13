@@ -1,0 +1,5 @@
+Kelvin
+
+The kelvin is a unit of measurement for temperature. It is one of the seven base units in the International System of Units (SI) and is assigned the unit symbol K. The Kelvin scale is an absolute, thermodynamic temperature scale using as its null point absolute zero, the temperature at which all thermal motion ceases in the classical description of thermodynamics. The reference point that defines the Kelvin scale is the triple point of water at 273.16 K (0.01 C; 32.02 F). The kelvin is defined as 1/273.16 of the difference between these two reference points.
+
+The Kelvin scale is named after the Belfast-born engineer and physicist William Thomson, 1st Baron Kelvin (1824-1907), who wrote of the need for an "absolute thermometric scale". Unlike the degree Fahrenheit and degree Celsius, the kelvin is not referred to or typeset as a degree. The kelvin is the primary unit of measurement in the physical sciences, but is often used in conjunction with the degree Celsius, which has the same magnitude. Absolute zero at 0 K is -273.15 C (-459.67 F).

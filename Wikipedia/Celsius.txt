@@ -1,0 +1,9 @@
+Celsius
+
+Celsius is a scale and unit of measurement for temperature. It is named after the Swedish astronomer Anders Celsius (1701-1744), who developed a similar temperature scale two years before his death. The degree Celsius ( C) can refer to a specific temperature on the Celsius scale as well as a unit to indicate a temperature interval, a difference between two temperatures or an uncertainty. The unit was known until 1948 as centigrade from the latin "centum" translated as 100 and "gradus" translated as "steps".
+
+Celsius is a variation on the thermometer to measure temperature.
+
+From 1744 until 1954, 0 C was defined as the freezing point of water and 100 C was defined as the boiling point of water, both at a pressure of one standard atmosphere with mercury being the working material Although these defining correlations are commonly taught in schools today, by international agreement the unit "degree Celsius" and the Celsius scale are currently defined by two different points: absolute zero, and the triple point of VSMOW (specially prepared water). This definition also precisely relates the Celsius scale to the Kelvin scale, which defines the SI base unit of thermodynamic temperature (symbol: K). Absolute zero, the hypothetical but unattainable temperature at which matter exhibits zero entropy, is defined as being precisely 0 K and -273.15 C. The temperature value of the triple point of water is defined as being precisely 273.16 K and 0.01 C.
+
+This definition fixes the magnitude of both the degree Celsius and the kelvin as precisely 1 part in 273.16 (approximately 0.00366) of the difference between absolute zero and the triple point of water. Thus, it sets the magnitude of one degree Celsius and that of one kelvin as exactly the same. Additionally, it establishes the difference between the two scales' null points as being precisely 273.15 degrees Celsius (-273.15 C = 0 K and 0 C = 273.15 K).

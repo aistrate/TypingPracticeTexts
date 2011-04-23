@@ -1,0 +1,64 @@
+      if (b.length)
+        next.unshift( mk_block( b, block.trailing ) );
+
+      return [];
+    },
+
+    para: function para( block, next ) {
+      return [ ["para"].concat( this.processInline( block ) ) ];
+    }
+  }
+}
+
+Markdown.dialects.Gruber.inline = {
+    __call__: function inline( text, patterns ) {
+      var out = [ ],
+          m,
+          re = new RegExp( "([\\s\\S]*?)(" + (patterns.source || patterns) + ")", "g" ),
+          lastIndex = 0;
+
+      function add(x) {
+        if (typeof x == "string" && typeof out[out.length-1] == "string")
+          out[ out.length-1 ] += x;
+        else
+          out.push(x);
+      }
+
+      while ( ( m = re.exec(text) ) != null) {
+        if ( m[1] ) add( m[1] );
+        else        m[1] = { length: 0 };
+
+        var res;
+        if ( m[2] in this.dialect.inline ) {
+          res = this.dialect.inline[ m[2] ].call(
+                    this,
+                    text.substr( m.index + m[1].length ), m, out );
+        }
+        res = res || [ m[2].length, m[2] ];
+
+        var len = res.shift();
+        re.lastIndex += ( len - m[2].length );
+
+        res.forEach(add);
+
+        lastIndex = re.lastIndex;
+      }
+
+      if ( text.length > lastIndex )
+        add( text.substr( lastIndex ) );
+
+      return out;
+    },
+
+    "\\": function escaped( text ) {
+      if ( text.match( /^\\[\\`\*_{}\[\]()#\+.!\-]/ ) )
+        return [ 2, text[1] ];
+      else
+        return [ 1, "\\" ];
+    },
+
+    "![": function image( text ) {
+      var m = text.match( /^!\[(.*?)\][ \t]*\([ \t]*(\S*)(?:[ \t]+(["'])(.*?)\3)?[ \t]*\)/ );
+
+      if ( m ) {
+        if ( m[2] && m[2][0] == '<' && m[2][m[2].length-1] == '>' )

@@ -1,0 +1,54 @@
+}
+
+function bnpDLShiftTo(n,r) {
+  var this_array = this.array;
+  var r_array = r.array;
+  var i;
+  for(i = this.t-1; i >= 0; --i) r_array[i+n] = this_array[i];
+  for(i = n-1; i >= 0; --i) r_array[i] = 0;
+  r.t = this.t+n;
+  r.s = this.s;
+}
+
+function bnpDRShiftTo(n,r) {
+  var this_array = this.array;
+  var r_array = r.array;
+  for(var i = n; i < this.t; ++i) r_array[i-n] = this_array[i];
+  r.t = Math.max(this.t-n,0);
+  r.s = this.s;
+}
+
+function bnpLShiftTo(n,r) {
+  var this_array = this.array;
+  var r_array = r.array;
+  var bs = n%BI_DB;
+  var cbs = BI_DB-bs;
+  var bm = (1<<cbs)-1;
+  var ds = Math.floor(n/BI_DB), c = (this.s<<bs)&BI_DM, i;
+  for(i = this.t-1; i >= 0; --i) {
+    r_array[i+ds+1] = (this_array[i]>>cbs)|c;
+    c = (this_array[i]&bm)<<bs;
+  }
+  for(i = ds-1; i >= 0; --i) r_array[i] = 0;
+  r_array[ds] = c;
+  r.t = this.t+ds+1;
+  r.s = this.s;
+  r.clamp();
+}
+
+function bnpRShiftTo(n,r) {
+  var this_array = this.array;
+  var r_array = r.array;
+  r.s = this.s;
+  var ds = Math.floor(n/BI_DB);
+  if(ds >= this.t) { r.t = 0; return; }
+  var bs = n%BI_DB;
+  var cbs = BI_DB-bs;
+  var bm = (1<<bs)-1;
+  r_array[0] = this_array[ds]>>bs;
+  for(var i = ds+1; i < this.t; ++i) {
+    r_array[i-ds-1] |= (this_array[i]&bm)<<cbs;
+    r_array[i-ds] = this_array[i]>>bs;
+  }
+  if(bs > 0) r_array[this.t-ds-1] |= (this.s&bm)<<cbs;
+  r.t = this.t-ds;

@@ -1,0 +1,69 @@
+function extract_attr( jsonml ) {
+  return jsonml instanceof Array
+      && jsonml.length > 1
+      && typeof jsonml[ 1 ] === "object"
+      && !( jsonml[ 1 ] instanceof Array )
+      ? jsonml[ 1 ]
+      : undefined;
+}
+
+function process_meta_hash( meta_string ) {
+  var meta = split_meta_hash( meta_string ),
+      attr = {};
+
+  for ( var i = 0; i < meta.length; ++i ) {
+    if ( /^#/.test( meta[ i ] ) ) {
+      attr.id = meta[ i ].substring( 1 );
+    }
+    else if ( /^\./.test( meta[ i ] ) ) {
+      if ( attr['class'] ) {
+        attr['class'] = attr['class'] + meta[ i ].replace( /./, " " );
+      }
+      else {
+        attr['class'] = meta[ i ].substring( 1 );
+      }
+    }
+    else if ( /=/.test( meta[ i ] ) ) {
+      var s = meta[ i ].split( /=/ );
+      attr[ s[ 0 ] ] = s[ 1 ];
+    }
+  }
+
+  return attr;
+}
+
+function split_meta_hash( meta_string ) {
+  var meta = meta_string.split( "" ),
+      parts = [ "" ],
+      in_quotes = false;
+
+  while ( meta.length ) {
+    var letter = meta.shift();
+    switch ( letter ) {
+      case " " :
+        if ( in_quotes ) {
+          parts[ parts.length - 1 ] += letter;
+        }
+        else {
+          parts.push( "" );
+        }
+        break;
+      case "'" :
+      case '"' :
+        in_quotes = !in_quotes;
+        break;
+      case "\\" :
+        letter = meta.shift();
+      default :
+        parts[ parts.length - 1 ] += letter;
+        break;
+    }
+  }
+
+  return parts;
+}
+
+expose.renderJsonML = function( jsonml, options ) {
+  options = options || {};
+  options.root = options.root || false;
+  options.xhtml = options.xhtml || false;

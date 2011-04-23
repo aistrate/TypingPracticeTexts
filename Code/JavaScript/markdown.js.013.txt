@@ -1,0 +1,62 @@
+Markdown.dialects.Maruku.block.document_meta = function document_meta( block, next ) {
+  if ( block.lineNumber > 1 ) return undefined;
+
+  if ( ! block.match( /^(?:\w+:.*\n)*\w+:.*$/ ) ) return undefined;
+
+  if ( !extract_attr( this.tree ) ) {
+    this.tree.splice( 1, 0, {} );
+  }
+
+  var pairs = block.split( /\n/ );
+  for ( p in pairs ) {
+    var m = pairs[ p ].match( /(\w+):\s*(.*)$/ ),
+        key = m[ 1 ].toLowerCase(),
+        value = m[ 2 ];
+
+    this.tree[ 1 ][ key ] = value;
+  }
+
+  return [];
+}
+
+Markdown.dialects.Maruku.block.block_meta = function block_meta( block, next ) {
+  var m = block.match( /(^|\n) {0,3}\{:\s*((?:\\\}|[^\}])*)\s*\}$/ );
+  if ( !m ) return undefined;
+
+  var attr = process_meta_hash( m[ 2 ] );
+
+  if ( m[ 1 ] === "" ) {
+    var node = this.tree[ this.tree.length - 1 ],
+        hash = extract_attr( node );
+
+    if ( typeof node === "string" ) return undefined;
+
+    if ( !hash ) {
+      hash = {};
+      node.splice( 1, 0, hash );
+    }
+
+    for ( a in attr ) {
+      hash[ a ] = attr[ a ];
+    }
+
+    return [];
+  }
+
+  var b = block.replace( /\n.*$/, "" ),
+      result = this.processBlock( b, [] );
+
+  var hash = extract_attr( result[ 0 ] );
+  if ( !hash ) {
+    hash = {};
+    result[ 0 ].splice( 1, 0, hash );
+  }
+
+  for ( a in attr ) {
+    hash[ a ] = attr[ a ];
+  }
+
+  return result;
+}
+
+Markdown.dialects.Maruku.block.definition_list = function definition_list( block, next ) {

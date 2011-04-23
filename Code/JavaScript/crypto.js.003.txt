@@ -1,0 +1,58 @@
+  var this_array = this.array;
+  this.t = 1;
+  this.s = (x<0)?-1:0;
+  if(x > 0) this_array[0] = x;
+  else if(x < -1) this_array[0] = x+DV;
+  else this.t = 0;
+}
+
+function nbv(i) { var r = nbi(); r.fromInt(i); return r; }
+
+function bnpFromString(s,b) {
+  var this_array = this.array;
+  var k;
+  if(b == 16) k = 4;
+  else if(b == 8) k = 3;
+  else if(b == 256) k = 8;
+  else if(b == 2) k = 1;
+  else if(b == 32) k = 5;
+  else if(b == 4) k = 2;
+  else { this.fromRadix(s,b); return; }
+  this.t = 0;
+  this.s = 0;
+  var i = s.length, mi = false, sh = 0;
+  while(--i >= 0) {
+    var x = (k==8)?s[i]&0xff:intAt(s,i);
+    if(x < 0) {
+      if(s.charAt(i) == "-") mi = true;
+      continue;
+    }
+    mi = false;
+    if(sh == 0)
+      this_array[this.t++] = x;
+    else if(sh+k > BI_DB) {
+      this_array[this.t-1] |= (x&((1<<(BI_DB-sh))-1))<<sh;
+      this_array[this.t++] = (x>>(BI_DB-sh));
+    }
+    else
+      this_array[this.t-1] |= x<<sh;
+    sh += k;
+    if(sh >= BI_DB) sh -= BI_DB;
+  }
+  if(k == 8 && (s[0]&0x80) != 0) {
+    this.s = -1;
+    if(sh > 0) this_array[this.t-1] |= ((1<<(BI_DB-sh))-1)<<sh;
+  }
+  this.clamp();
+  if(mi) BigInteger.ZERO.subTo(this,this);
+}
+
+function bnpClamp() {
+  var this_array = this.array;
+  var c = this.s&BI_DM;
+  while(this.t > 0 && this_array[this.t-1] == c) --this.t;
+}
+
+function bnToString(b) {
+  var this_array = this.array;
+  if(this.s < 0) return "-"+this.negate().toString(b);

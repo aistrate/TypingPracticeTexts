@@ -1,0 +1,110 @@
+    for ( var i in attrs ) {
+      jsonml[ 1 ][ i ] = attrs[ i ];
+    }
+    attrs = jsonml[ 1 ];
+  }
+
+  if ( typeof jsonml === "string" ) {
+    return jsonml;
+  }
+
+  switch ( jsonml[ 0 ] ) {
+    case "header":
+      jsonml[ 0 ] = "h" + jsonml[ 1 ].level;
+      delete jsonml[ 1 ].level;
+      break;
+    case "bulletlist":
+      jsonml[ 0 ] = "ul";
+      break;
+    case "numberlist":
+      jsonml[ 0 ] = "ol";
+      break;
+    case "listitem":
+      jsonml[ 0 ] = "li";
+      break;
+    case "para":
+      jsonml[ 0 ] = "p";
+      break;
+    case "markdown":
+      jsonml[ 0 ] = "html";
+      if ( attrs ) delete attrs.references;
+      break;
+    case "code_block":
+      jsonml[ 0 ] = "pre";
+      var i = attrs ? 2 : 1;
+      var code = [ "code" ];
+      code.push.apply( code, jsonml.splice( i ) );
+      jsonml[ i ] = code;
+      break;
+    case "inlinecode":
+      jsonml[ 0 ] = "code";
+      break;
+    case "img":
+      jsonml[ 1 ].src = jsonml[ 1 ].href;
+      delete jsonml[ 1 ].href;
+      break;
+    case "linebreak":
+      jsonml[0] = "br";
+    break;
+    case "link":
+      jsonml[ 0 ] = "a";
+      break;
+    case "link_ref":
+      jsonml[ 0 ] = "a";
+
+      var ref = references[ attrs.ref ];
+
+      if ( ref ) {
+        delete attrs.ref;
+
+        attrs.href = ref.href;
+        if ( ref.title ) {
+          attrs.title = ref.title;
+        }
+
+        delete attrs.original;
+      }
+      else {
+        return attrs.original;
+      }
+      break;
+  }
+
+  var i = 1;
+
+  if ( attrs ) {
+    for ( var key in jsonml[ 1 ] ) {
+      i = 2;
+    }
+    if ( i === 1 ) {
+      jsonml.splice( i, 1 );
+    }
+  }
+
+  for ( ; i < jsonml.length; ++i ) {
+    jsonml[ i ] = arguments.callee( jsonml[ i ], references );
+  }
+
+  return jsonml;
+}
+
+function merge_text_nodes( jsonml ) {
+  var i = extract_attr( jsonml ) ? 2 : 1;
+
+  while ( i < jsonml.length ) {
+    if ( typeof jsonml[ i ] === "string" ) {
+      if ( i + 1 < jsonml.length && typeof jsonml[ i + 1 ] === "string" ) {
+        jsonml[ i ] += jsonml.splice( i + 1, 1 )[ 0 ];
+      }
+      else {
+        ++i;
+      }
+    }
+    else {
+      arguments.callee( jsonml[ i ] );
+      ++i;
+    }
+  }
+}
+
+})(exports);

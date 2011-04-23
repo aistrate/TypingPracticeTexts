@@ -1,0 +1,62 @@
+var Crypto = new BenchmarkSuite('Crypto', 266181, [
+  new Benchmark("Encrypt", encrypt),
+  new Benchmark("Decrypt", decrypt)
+]);
+
+var dbits;
+var BI_DB;
+var BI_DM;
+var BI_DV;
+
+var BI_FP;
+var BI_FV;
+var BI_F1;
+var BI_F2;
+
+var canary = 0xdeadbeefcafe;
+var j_lm = ((canary&0xffffff)==0xefcafe);
+
+function BigInteger(a,b,c) {
+  this.array = new Array();
+  if(a != null)
+    if("number" == typeof a) this.fromNumber(a,b,c);
+    else if(b == null && "string" != typeof a) this.fromString(a,256);
+    else this.fromString(a,b);
+}
+
+function nbi() { return new BigInteger(null); }
+
+function am1(i,x,w,j,c,n) {
+  var this_array = this.array;
+  var w_array    = w.array;
+  while(--n >= 0) {
+    var v = x*this_array[i++]+w_array[j]+c;
+    c = Math.floor(v/0x4000000);
+    w_array[j++] = v&0x3ffffff;
+  }
+  return c;
+}
+
+function am2(i,x,w,j,c,n) {
+  var this_array = this.array;
+  var w_array    = w.array;
+  var xl = x&0x7fff, xh = x>>15;
+  while(--n >= 0) {
+    var l = this_array[i]&0x7fff;
+    var h = this_array[i++]>>15;
+    var m = xh*l+h*xl;
+    l = xl*l+((m&0x7fff)<<15)+w_array[j]+(c&0x3fffffff);
+    c = (l>>>30)+(m>>>15)+xh*h+(c>>>30);
+    w_array[j++] = l&0x3fffffff;
+  }
+  return c;
+}
+
+function am3(i,x,w,j,c,n) {
+  var this_array = this.array;
+  var w_array    = w.array;
+
+  var xl = x&0x3fff, xh = x>>14;
+  while(--n >= 0) {
+    var l = this_array[i]&0x3fff;
+    var h = this_array[i++]>>14;

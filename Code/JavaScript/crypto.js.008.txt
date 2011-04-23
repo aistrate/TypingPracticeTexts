@@ -1,0 +1,52 @@
+  this.abs().divRemTo(a,null,r);
+  if(this.s < 0 && r.compareTo(BigInteger.ZERO) > 0) a.subTo(r,r);
+  return r;
+}
+
+function Classic(m) { this.m = m; }
+function cConvert(x) {
+  if(x.s < 0 || x.compareTo(this.m) >= 0) return x.mod(this.m);
+  else return x;
+}
+function cRevert(x) { return x; }
+function cReduce(x) { x.divRemTo(this.m,null,x); }
+function cMulTo(x,y,r) { x.multiplyTo(y,r); this.reduce(r); }
+function cSqrTo(x,r) { x.squareTo(r); this.reduce(r); }
+
+Classic.prototype.convert = cConvert;
+Classic.prototype.revert = cRevert;
+Classic.prototype.reduce = cReduce;
+Classic.prototype.mulTo = cMulTo;
+Classic.prototype.sqrTo = cSqrTo;
+
+function bnpInvDigit() {
+  var this_array = this.array;
+  if(this.t < 1) return 0;
+  var x = this_array[0];
+  if((x&1) == 0) return 0;
+  var y = x&3;
+  y = (y*(2-(x&0xf)*y))&0xf;
+  y = (y*(2-(x&0xff)*y))&0xff;
+  y = (y*(2-(((x&0xffff)*y)&0xffff)))&0xffff;
+  y = (y*(2-x*y%BI_DV))%BI_DV;
+  return (y>0)?BI_DV-y:-y;
+}
+
+function Montgomery(m) {
+  this.m = m;
+  this.mp = m.invDigit();
+  this.mpl = this.mp&0x7fff;
+  this.mph = this.mp>>15;
+  this.um = (1<<(BI_DB-15))-1;
+  this.mt2 = 2*m.t;
+}
+
+function montConvert(x) {
+  var r = nbi();
+  x.abs().dlShiftTo(this.m.t,r);
+  r.divRemTo(this.m,null,r);
+  if(x.s < 0 && r.compareTo(BigInteger.ZERO) > 0) this.m.subTo(r,r);
+  return r;
+}
+
+function montRevert(x) {

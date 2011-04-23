@@ -1,0 +1,52 @@
+function bnpBitwiseTo(a,op,r) {
+  var this_array = this.array;
+  var a_array    = a.array;
+  var r_array    = r.array;
+  var i, f, m = Math.min(a.t,this.t);
+  for(i = 0; i < m; ++i) r_array[i] = op(this_array[i],a_array[i]);
+  if(a.t < this.t) {
+    f = a.s&BI_DM;
+    for(i = m; i < this.t; ++i) r_array[i] = op(this_array[i],f);
+    r.t = this.t;
+  }
+  else {
+    f = this.s&BI_DM;
+    for(i = m; i < a.t; ++i) r_array[i] = op(f,a_array[i]);
+    r.t = a.t;
+  }
+  r.s = op(this.s,a.s);
+  r.clamp();
+}
+
+function op_and(x,y) { return x&y; }
+function bnAnd(a) { var r = nbi(); this.bitwiseTo(a,op_and,r); return r; }
+
+function op_or(x,y) { return x|y; }
+function bnOr(a) { var r = nbi(); this.bitwiseTo(a,op_or,r); return r; }
+
+function op_xor(x,y) { return x^y; }
+function bnXor(a) { var r = nbi(); this.bitwiseTo(a,op_xor,r); return r; }
+
+function op_andnot(x,y) { return x&~y; }
+function bnAndNot(a) { var r = nbi(); this.bitwiseTo(a,op_andnot,r); return r; }
+
+function bnNot() {
+  var this_array = this.array;
+  var r = nbi();
+  var r_array = r.array;
+
+  for(var i = 0; i < this.t; ++i) r_array[i] = BI_DM&~this_array[i];
+  r.t = this.t;
+  r.s = ~this.s;
+  return r;
+}
+
+function bnShiftLeft(n) {
+  var r = nbi();
+  if(n < 0) this.rShiftTo(-n,r); else this.lShiftTo(n,r);
+  return r;
+}
+
+function bnShiftRight(n) {
+  var r = nbi();
+  if(n < 0) this.lShiftTo(-n,r); else this.rShiftTo(n,r);

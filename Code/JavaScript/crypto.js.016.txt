@@ -1,0 +1,51 @@
+function nMulTo(x,y,r) { x.multiplyTo(y,r); }
+function nSqrTo(x,r) { x.squareTo(r); }
+
+NullExp.prototype.convert = nNop;
+NullExp.prototype.revert = nNop;
+NullExp.prototype.mulTo = nMulTo;
+NullExp.prototype.sqrTo = nSqrTo;
+
+function bnPow(e) { return this.exp(e,new NullExp()); }
+
+function bnpMultiplyLowerTo(a,n,r) {
+  var r_array = r.array;
+  var a_array = a.array;
+  var i = Math.min(this.t+a.t,n);
+  r.s = 0;
+  r.t = i;
+  while(i > 0) r_array[--i] = 0;
+  var j;
+  for(j = r.t-this.t; i < j; ++i) r_array[i+this.t] = this.am(0,a_array[i],r,i,0,this.t);
+  for(j = Math.min(a.t,n); i < j; ++i) this.am(0,a_array[i],r,i,0,n-i);
+  r.clamp();
+}
+
+function bnpMultiplyUpperTo(a,n,r) {
+  var r_array = r.array;
+  var a_array = a.array;
+  --n;
+  var i = r.t = this.t+a.t-n;
+  r.s = 0;
+  while(--i >= 0) r_array[i] = 0;
+  for(i = Math.max(n-this.t,0); i < a.t; ++i)
+    r_array[this.t+i-n] = this.am(n-i,a_array[i],r,0,0,this.t+i-n);
+  r.clamp();
+  r.drShiftTo(1,r);
+}
+
+function Barrett(m) {
+  this.r2 = nbi();
+  this.q3 = nbi();
+  BigInteger.ONE.dlShiftTo(2*m.t,this.r2);
+  this.mu = this.r2.divide(m);
+  this.m = m;
+}
+
+function barrettConvert(x) {
+  if(x.s < 0 || x.t > 2*this.m.t) return x.mod(this.m);
+  else if(x.compareTo(this.m) < 0) return x;
+  else { var r = nbi(); x.copyTo(r); this.reduce(r); return r; }
+}
+
+function barrettRevert(x) { return x; }

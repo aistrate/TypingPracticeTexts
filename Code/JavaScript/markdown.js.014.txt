@@ -1,0 +1,64 @@
+  var tight = /^((?:[^\s:].*\n)+):\s+([^]+)$/,
+      list = [ "dl" ];
+
+  if ( ( m = block.match( tight ) ) ) {
+    var blocks = [ block ];
+    while ( next.length && tight.exec( next[ 0 ] ) ) {
+      blocks.push( next.shift() );
+    }
+
+    for ( var b = 0; b < blocks.length; ++b ) {
+      var m = blocks[ b ].match( tight ),
+          terms = m[ 1 ].replace( /\n$/, "" ).split( /\n/ ),
+          defns = m[ 2 ].split( /\n:\s+/ );
+
+      for ( var i = 0; i < terms.length; ++i ) {
+        list.push( [ "dt", terms[ i ] ] );
+      }
+
+      for ( var i = 0; i < defns.length; ++i ) {
+        list.push( [ "dd" ].concat( this.processInline( defns[ i ].replace( /(\n)\s+/, "$1" ) ) ) );
+      }
+    }
+  }
+  else {
+    return undefined;
+  }
+
+  return [ list ];
+}
+
+Markdown.dialects.Maruku.inline[ "{:" ] = function inline_meta( text, matches, out ) {
+  if ( !out.length ) {
+    return [ 2, "{:" ];
+  }
+
+  var before = out[ out.length - 1 ];
+
+  if ( typeof before === "string" ) {
+    return [ 2, "{:" ];
+  }
+
+  var m = text.match( /^\{:\s*((?:\\\}|[^\}])*)\s*\}/ );
+
+  if ( !m ) {
+    return [ 2, "{:" ];
+  }
+
+  var meta = process_meta_hash( m[ 1 ] ),
+      attr = extract_attr( before );
+
+  if ( !attr ) {
+    attr = {};
+    before.splice( 1, 0, attr );
+  }
+
+  for ( var k in meta ) {
+    attr[ k ] = meta[ k ];
+  }
+
+  return [ m[ 0 ].length, "" ];
+}
+
+Markdown.buildBlockOrder ( Markdown.dialects.Maruku.block );
+Markdown.buildInlinePatterns( Markdown.dialects.Maruku.inline );

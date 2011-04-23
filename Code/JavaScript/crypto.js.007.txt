@@ -1,0 +1,57 @@
+  r.s = 0;
+  r.clamp();
+}
+
+function bnpDivRemTo(m,q,r) {
+  var pm = m.abs();
+  if(pm.t <= 0) return;
+  var pt = this.abs();
+  if(pt.t < pm.t) {
+    if(q != null) q.fromInt(0);
+    if(r != null) this.copyTo(r);
+    return;
+  }
+  if(r == null) r = nbi();
+  var y = nbi(), ts = this.s, ms = m.s;
+  var pm_array = pm.array;
+  var nsh = BI_DB-nbits(pm_array[pm.t-1]);
+  if(nsh > 0) { pm.lShiftTo(nsh,y); pt.lShiftTo(nsh,r); }
+  else { pm.copyTo(y); pt.copyTo(r); }
+  var ys = y.t;
+
+  var y_array = y.array;
+  var y0 = y_array[ys-1];
+  if(y0 == 0) return;
+  var yt = y0*(1<<BI_F1)+((ys>1)?y_array[ys-2]>>BI_F2:0);
+  var d1 = BI_FV/yt, d2 = (1<<BI_F1)/yt, e = 1<<BI_F2;
+  var i = r.t, j = i-ys, t = (q==null)?nbi():q;
+  y.dlShiftTo(j,t);
+
+  var r_array = r.array;
+  if(r.compareTo(t) >= 0) {
+    r_array[r.t++] = 1;
+    r.subTo(t,r);
+  }
+  BigInteger.ONE.dlShiftTo(ys,t);
+  t.subTo(y,y);
+  while(y.t < ys) y_array[y.t++] = 0;
+  while(--j >= 0) {
+    var qd = (r_array[--i]==y0)?BI_DM:Math.floor(r_array[i]*d1+(r_array[i-1]+e)*d2);
+    if((r_array[i]+=y.am(0,qd,r,j,0,ys)) < qd) {
+      y.dlShiftTo(j,t);
+      r.subTo(t,r);
+      while(r_array[i] < --qd) r.subTo(t,r);
+    }
+  }
+  if(q != null) {
+    r.drShiftTo(ys,q);
+    if(ts != ms) BigInteger.ZERO.subTo(q,q);
+  }
+  r.t = ys;
+  r.clamp();
+  if(nsh > 0) r.rShiftTo(nsh,r);
+  if(ts < 0) BigInteger.ZERO.subTo(r,r);
+}
+
+function bnMod(a) {
+  var r = nbi();

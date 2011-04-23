@@ -1,0 +1,65 @@
+          }
+          break;
+        }
+        return ret;
+      }
+
+      function paragraphify(s, i, stack) {
+        var list = s.list;
+        var last_li = list[list.length-1];
+
+        if (last_li[1] instanceof Array && last_li[1][0] == "para") {
+          return;
+        }
+        if (i+1 == stack.length) {
+          last_li.push( ["para"].concat( last_li.splice(1) ) );
+        }
+        else {
+          var sublist = last_li.pop();
+          last_li.push( ["para"].concat( last_li.splice(1) ), sublist );
+        }
+      }
+
+      return function( block, next ) {
+        var m = block.match( is_list_re );
+        if ( !m ) return undefined;
+
+        function make_list( m ) {
+          var list = bullet_list( m[2] )
+                   ? ["bulletlist"]
+                   : ["numberlist"];
+
+          stack.push( { list: list, indent: m[1] } );
+          return list;
+        }
+
+        var stack = [],
+            list = make_list( m ),
+            last_li,
+            loose = false,
+            ret = [ stack[0].list ];
+
+        loose_search:
+        while( true ) {
+          var lines = block.split( /(?=\n)/ );
+
+          var li_accumulate = "";
+
+          tight_search:
+          for (var line_no=0; line_no < lines.length; line_no++) {
+            var nl = "",
+                l = lines[line_no].replace(/^\n/, function(n) { nl = n; return "" });
+
+            var line_re = regex_for_depth( stack.length );
+
+            m = l.match( line_re );
+
+            if ( m[1] !== undefined ) {
+              if ( li_accumulate.length ) {
+                add( last_li, loose, this.processInline( li_accumulate ), nl );
+                loose = false;
+                li_accumulate = "";
+              }
+
+              m[1] = expand_tab( m[1] );
+              var wanted_depth = Math.floor(m[1].length/4)+1;

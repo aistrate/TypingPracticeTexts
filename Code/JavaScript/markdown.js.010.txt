@@ -1,0 +1,63 @@
+          m[2] = m[2].substring( 1, m[2].length - 1 );
+
+        m[2] == this.dialect.inline.__call__.call( this, m[2], /\\/ )[0];
+
+        var attrs = { alt: m[1], href: m[2] || "" };
+        if ( m[4] !== undefined)
+          attrs.title = m[4];
+
+        return [ m[0].length, [ "img", attrs ] ];
+      }
+
+      m = text.match( /^!\[(.*?)\][ \t]*\[(.*?)\]/ );
+
+      if ( m ) {
+        return [ m[0].length, [ "img_ref", { alt: m[1], ref: m[2].toLowerCase(), text: m[0] } ] ];
+      }
+
+      return [ 2, "![" ];
+    },
+
+    "[": function link( text ) {
+      var m = text.match( /^\[([\s\S]*?)\][ \t]*\([ \t]*(\S+)(?:[ \t]+(["'])(.*?)\3)?[ \t]*\)/ );
+
+      if ( m ) {
+        if ( m[2] && m[2][0] == '<' && m[2][m[2].length-1] == '>' )
+          m[2] = m[2].substring( 1, m[2].length - 1 );
+
+        m[2] = this.dialect.inline.__call__.call( this, m[2], /\\/ )[0];
+
+        var attrs = { href: m[2] || "" };
+        if ( m[4] !== undefined)
+          attrs.title = m[4];
+
+        return [ m[0].length, [ "link", attrs, m[1] ] ];
+      }
+
+      m = text.match( /^\[([\s\S]*?)\](?: ?\[(.*?)\])?/ );
+
+      if ( m ) {
+        if ( m[2] === undefined || m[2] === "" ) m[2] = m[1];
+
+        return [
+          m[ 0 ].length,
+          [
+            "link_ref",
+            {
+              ref: m[ 2 ].toLowerCase(),
+              original: m[ 0 ]
+            },
+            m[ 1 ]
+          ]
+        ];
+      }
+
+      return [ 1, "[" ];
+    },
+
+    "<": function autoLink( text ) {
+      var m;
+
+      if ( ( m = text.match( /^<(?:((https?|ftp|mailto):[^>]+)|(.*?@.*?\.[a-zA-Z]+))>/ ) ) != null ) {
+        if ( m[3] ) {
+          return [ m[0].length, [ "link", { href: "mailto:" + m[3] }, m[3] ] ];

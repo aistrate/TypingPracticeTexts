@@ -1,0 +1,68 @@
+  r.clamp();
+}
+
+function bnpSubTo(a,r) {
+  var this_array = this.array;
+  var r_array = r.array;
+  var a_array = a.array;
+  var i = 0, c = 0, m = Math.min(a.t,this.t);
+  while(i < m) {
+    c += this_array[i]-a_array[i];
+    r_array[i++] = c&BI_DM;
+    c >>= BI_DB;
+  }
+  if(a.t < this.t) {
+    c -= a.s;
+    while(i < this.t) {
+      c += this_array[i];
+      r_array[i++] = c&BI_DM;
+      c >>= BI_DB;
+    }
+    c += this.s;
+  }
+  else {
+    c += this.s;
+    while(i < a.t) {
+      c -= a_array[i];
+      r_array[i++] = c&BI_DM;
+      c >>= BI_DB;
+    }
+    c -= a.s;
+  }
+  r.s = (c<0)?-1:0;
+  if(c < -1) r_array[i++] = BI_DV+c;
+  else if(c > 0) r_array[i++] = c;
+  r.t = i;
+  r.clamp();
+}
+
+function bnpMultiplyTo(a,r) {
+  var this_array = this.array;
+  var r_array = r.array;
+  var x = this.abs(), y = a.abs();
+  var y_array = y.array;
+
+  var i = x.t;
+  r.t = i+y.t;
+  while(--i >= 0) r_array[i] = 0;
+  for(i = 0; i < y.t; ++i) r_array[i+x.t] = x.am(0,y_array[i],r,i,0,x.t);
+  r.s = 0;
+  r.clamp();
+  if(this.s != a.s) BigInteger.ZERO.subTo(r,r);
+}
+
+function bnpSquareTo(r) {
+  var x = this.abs();
+  var x_array = x.array;
+  var r_array = r.array;
+
+  var i = r.t = 2*x.t;
+  while(--i >= 0) r_array[i] = 0;
+  for(i = 0; i < x.t-1; ++i) {
+    var c = x.am(i,x_array[i],r,2*i,0,1);
+    if((r_array[i+x.t]+=x.am(i+1,2*x_array[i],r,2*i+1,c,x.t-i-1)) >= BI_DV) {
+      r_array[i+x.t] -= BI_DV;
+      r_array[i+x.t+1] = 1;
+    }
+  }
+  if(r.t > 0) r_array[r.t-1] += x.am(i,x_array[i],r,2*i,0,1);

@@ -1,0 +1,60 @@
+  var content = [];
+
+  if ( options.root ) {
+    content.push( render_tree( jsonml, options.xhtml ) );
+  }
+  else {
+    jsonml.shift();
+    if ( jsonml.length && typeof jsonml[ 0 ] === "object" && !( jsonml[ 0 ] instanceof Array ) ) {
+      jsonml.shift();
+    }
+
+    while ( jsonml.length ) {
+      content.push( render_tree( jsonml.shift(), options.xhtml ) );
+    }
+  }
+
+  return content.join( "\n\n" );
+}
+
+function render_tree( jsonml, xhtml ) {
+  if ( typeof jsonml === "string" ) {
+    return jsonml.replace( /&/g, "&amp;" )
+                 .replace( /</g, "&lt;" )
+                 .replace( />/g, "&gt;" );
+  }
+
+  var tag = jsonml.shift(),
+      attributes = {},
+      content = [];
+
+  if ( jsonml.length && typeof jsonml[ 0 ] === "object" && !( jsonml[ 0 ] instanceof Array ) ) {
+    attributes = jsonml.shift();
+  }
+
+  while ( jsonml.length ) {
+    content.push( arguments.callee( jsonml.shift(), xhtml ) );
+  }
+
+  var tag_attrs = "";
+  for ( var a in attributes ) {
+    tag_attrs += " " + a + '="' + attributes[ a ] + '"';
+  }
+  
+  var markup = "<"+ tag + tag_attrs;
+  var contentstr = content.join( "" );
+  if ( xhtml && contentstr.length == 0 ) {
+    markup +=  " />";
+  }
+  else {
+    markup += ">" + contentstr + "</" + tag + ">";
+  }
+  return markup;
+}
+
+function convert_tree_to_html( tree, references ) {
+  var jsonml = tree.slice( 0 );
+
+  var attrs = extract_attr( jsonml );
+  if ( attrs ) {
+    jsonml[ 1 ] = {};

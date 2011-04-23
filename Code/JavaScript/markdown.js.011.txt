@@ -1,0 +1,63 @@
+        }
+        else if ( m[2] == "mailto" ) {
+          return [ m[0].length, [ "link", { href: m[1] }, m[1].substr("mailto:".length ) ] ];
+        }
+        else
+          return [ m[0].length, [ "link", { href: m[1] }, m[1] ] ];
+      }
+
+      return [ 1, "<" ];
+    },
+
+    "`": function inlineCode( text ) {
+      var m = text.match( /(`+)(([\s\S]*?)\1)/ );
+
+      if ( m && m[2] )
+        return [ m[1].length + m[2].length, [ "inlinecode", m[3] ] ];
+      else {
+        return [ 1, "`" ];
+      }
+    },
+
+    "  \n": function lineBreak( text ) {
+      return [ 3, [ "linebreak" ] ];
+    }
+
+}
+
+function strong_em( tag, md ) {
+
+  var state_slot = tag + "_state",
+      other_slot = tag == "strong" ? "em_state" : "strong_state";
+
+  function CloseTag(len) {
+    this.len_after = len;
+    this.name = "close_" + md;
+  }
+
+  return function ( text, orig_match ) {
+
+    if (this[state_slot][0] == md) {
+      this[state_slot].shift();
+
+      return[ text.length, new CloseTag(text.length-md.length) ];
+    }
+    else {
+      var other = this[other_slot].slice(),
+          state = this[state_slot].slice();
+
+      this[state_slot].unshift(md);
+
+      var res = this.processInline( text.substr( md.length ) );
+
+      var last = res[res.length - 1];
+
+      var check = this[state_slot].shift();
+      if (last instanceof CloseTag) {
+        res.pop();
+        var consumed = text.length - last.len_after;
+        return [ consumed, [ tag ].concat(res) ];
+      }
+      else {
+        this[other_slot] = other;
+        this[state_slot] = state;

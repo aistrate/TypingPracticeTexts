@@ -1,0 +1,61 @@
+  var blocks = source instanceof Array
+             ? source
+             : this.split_blocks( source );
+
+  var old_tree = this.tree;
+  try {
+    this.tree = custom_root || this.tree || [ "markdown" ];
+
+    blocks:
+    while ( blocks.length ) {
+      var b = this.processBlock( blocks.shift(), blocks );
+
+      if ( !b.length ) continue blocks;
+
+      this.tree.push.apply( this.tree, b );
+    }
+    return this.tree;
+  }
+  finally {
+    if ( custom_root )
+      this.tree = old_tree;
+  }
+
+}
+
+Markdown.prototype.debug = function () {
+  var args = Array.prototype.slice.call( arguments);
+  args.unshift(this.debug_indent);
+  print.apply( print, args );
+}
+
+Markdown.prototype.loop_re_over_block = function( re, block, cb ) {
+  var m,
+      b = block.valueOf();
+
+  while ( b.length && (m = re(b) ) != null) {
+    b = b.substr( m[0].length );
+    cb.call(this, m);
+  }
+  return b;
+}
+
+Markdown.dialects = {};
+
+Markdown.dialects.Gruber = {
+  block: {
+    atxHeader: function atxHeader( block, next ) {
+      var m = block.match( /^(#{1,6})\s*(.*?)\s*#*\s*(?:\n|$)/ );
+
+      if ( !m ) return undefined;
+
+      var header = [ "header", { level: m[ 1 ].length }, m[ 2 ] ];
+
+      if ( m[0].length < block.length )
+        next.unshift( mk_block( block.substr( m[0].length ), block.trailing, block.lineNumber + 2 ) );
+
+      return [ header ];
+    },
+
+    setextHeader: function setextHeader( block, next ) {
+      var m = block.match( /^(.*)\n([-=])\2\2+(?:\n|$)/ );

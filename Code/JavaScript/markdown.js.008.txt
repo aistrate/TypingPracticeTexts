@@ -1,0 +1,61 @@
+      if ( !block.match( /^>/m ) )
+        return undefined;
+
+      var jsonml = [];
+
+      if ( block[ 0 ] != ">" ) {
+        var lines = block.split( /\n/ ),
+            prev = [];
+
+        while ( lines.length && lines[ 0 ][ 0 ] != ">" ) {
+            prev.push( lines.shift() );
+        }
+
+        block = lines.join( "\n" );
+        jsonml.push.apply( jsonml, this.processBlock( prev.join( "\n" ), [] ) );
+      }
+
+      while ( next.length && next[ 0 ][ 0 ] == ">" ) {
+        var b = next.shift();
+        block += block.trailing + b;
+        block.trailing = b.trailing;
+      }
+
+      var input = block.replace( /^> ?/gm, '' ),
+          old_tree = this.tree;
+      jsonml.push( this.toTree( input, [ "blockquote" ] ) );
+
+      return jsonml;
+    },
+
+    referenceDefn: function referenceDefn( block, next) {
+      var re = /^\s*\[(.*?)\]:\s*(\S+)(?:\s+(?:(['"])(.*?)\3|\((.*?)\)))?\n?/;
+
+      if ( !block.match(re) )
+        return undefined;
+
+      if ( !extract_attr( this.tree ) ) {
+        this.tree.splice( 1, 0, {} );
+      }
+
+      var attrs = extract_attr( this.tree );
+
+      if ( attrs.references === undefined ) {
+        attrs.references = {};
+      }
+
+      var b = this.loop_re_over_block(re, block, function( m ) {
+
+        if ( m[2] && m[2][0] == '<' && m[2][m[2].length-1] == '>' )
+          m[2] = m[2].substring( 1, m[2].length - 1 );
+
+        var ref = attrs.references[ m[1].toLowerCase() ] = {
+          href: m[2]
+        };
+
+        if (m[4] !== undefined)
+          ref.title = m[4];
+        else if (m[5] !== undefined)
+          ref.title = m[5];
+
+      } );

@@ -1,0 +1,54 @@
+        return [ md.length, md ];
+      }
+    }
+  }
+}
+
+Markdown.dialects.Gruber.inline["**"] = strong_em("strong", "**");
+Markdown.dialects.Gruber.inline["__"] = strong_em("strong", "__");
+Markdown.dialects.Gruber.inline["*"]  = strong_em("em", "*");
+Markdown.dialects.Gruber.inline["_"]  = strong_em("em", "_");
+
+Markdown.buildBlockOrder = function(d) {
+  var ord = [];
+  for ( var i in d ) {
+    if ( i == "__order__" || i == "__call__" ) continue;
+    ord.push( i );
+  }
+  d.__order__ = ord;
+}
+
+Markdown.buildInlinePatterns = function(d) {
+  var patterns = [];
+
+  for ( var i in d ) {
+    if (i == "__call__") continue;
+    var l = i.replace( /([\\.*+?|()\[\]{}])/g, "\\$1" )
+             .replace( /\n/, "\\n" );
+    patterns.push( i.length == 1 ? l : "(?:" + l + ")" );
+  }
+
+  patterns = patterns.join("|");
+
+  var fn = d.__call__;
+  d.__call__ = function(text, pattern) {
+    if (pattern != undefined)
+      return fn.call(this, text, pattern);
+    else
+      return fn.call(this, text, patterns);
+  }
+}
+
+Markdown.subclassDialect = function( d ) {
+  function Block() {};
+  Block.prototype = d.block;
+  function Inline() {};
+  Inline.prototype = d.inline;
+
+  return { block: new Block(), inline: new Inline() };
+}
+
+Markdown.buildBlockOrder ( Markdown.dialects.Gruber.block );
+Markdown.buildInlinePatterns( Markdown.dialects.Gruber.inline );
+
+Markdown.dialects.Maruku = Markdown.subclassDialect( Markdown.dialects.Gruber );

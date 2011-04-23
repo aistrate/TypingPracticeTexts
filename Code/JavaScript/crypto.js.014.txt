@@ -1,0 +1,60 @@
+  return r;
+}
+
+function lbit(x) {
+  if(x == 0) return -1;
+  var r = 0;
+  if((x&0xffff) == 0) { x >>= 16; r += 16; }
+  if((x&0xff) == 0) { x >>= 8; r += 8; }
+  if((x&0xf) == 0) { x >>= 4; r += 4; }
+  if((x&3) == 0) { x >>= 2; r += 2; }
+  if((x&1) == 0) ++r;
+  return r;
+}
+
+function bnGetLowestSetBit() {
+  var this_array = this.array;
+  for(var i = 0; i < this.t; ++i)
+    if(this_array[i] != 0) return i*BI_DB+lbit(this_array[i]);
+  if(this.s < 0) return this.t*BI_DB;
+  return -1;
+}
+
+function cbit(x) {
+  var r = 0;
+  while(x != 0) { x &= x-1; ++r; }
+  return r;
+}
+
+function bnBitCount() {
+  var r = 0, x = this.s&BI_DM;
+  for(var i = 0; i < this.t; ++i) r += cbit(this_array[i]^x);
+  return r;
+}
+
+function bnTestBit(n) {
+  var this_array = this.array;
+  var j = Math.floor(n/BI_DB);
+  if(j >= this.t) return(this.s!=0);
+  return((this_array[j]&(1<<(n%BI_DB)))!=0);
+}
+
+function bnpChangeBit(n,op) {
+  var r = BigInteger.ONE.shiftLeft(n);
+  this.bitwiseTo(r,op,r);
+  return r;
+}
+
+function bnSetBit(n) { return this.changeBit(n,op_or); }
+
+function bnClearBit(n) { return this.changeBit(n,op_andnot); }
+
+function bnFlipBit(n) { return this.changeBit(n,op_xor); }
+
+function bnpAddTo(a,r) {
+  var this_array = this.array;
+  var a_array = a.array;
+  var r_array = r.array;
+  var i = 0, c = 0, m = Math.min(a.t,this.t);
+  while(i < m) {
+    c += this_array[i]+a_array[i];

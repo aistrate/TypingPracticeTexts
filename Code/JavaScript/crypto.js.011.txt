@@ -1,0 +1,57 @@
+  return ((this_array[1]&((1<<(32-BI_DB))-1))<<BI_DB)|this_array[0];
+}
+
+function bnByteValue() {
+  var this_array = this.array;
+  return (this.t==0)?this.s:(this_array[0]<<24)>>24;
+}
+
+function bnShortValue() {
+  var this_array = this.array;
+  return (this.t==0)?this.s:(this_array[0]<<16)>>16;
+}
+
+function bnpChunkSize(r) { return Math.floor(Math.LN2*BI_DB/Math.log(r)); }
+
+function bnSigNum() {
+  var this_array = this.array;
+  if(this.s < 0) return -1;
+  else if(this.t <= 0 || (this.t == 1 && this_array[0] <= 0)) return 0;
+  else return 1;
+}
+
+function bnpToRadix(b) {
+  if(b == null) b = 10;
+  if(this.signum() == 0 || b < 2 || b > 36) return "0";
+  var cs = this.chunkSize(b);
+  var a = Math.pow(b,cs);
+  var d = nbv(a), y = nbi(), z = nbi(), r = "";
+  this.divRemTo(d,y,z);
+  while(y.signum() > 0) {
+    r = (a+z.intValue()).toString(b).substr(1) + r;
+    y.divRemTo(d,y,z);
+  }
+  return z.intValue().toString(b) + r;
+}
+
+function bnpFromRadix(s,b) {
+  this.fromInt(0);
+  if(b == null) b = 10;
+  var cs = this.chunkSize(b);
+  var d = Math.pow(b,cs), mi = false, j = 0, w = 0;
+  for(var i = 0; i < s.length; ++i) {
+    var x = intAt(s,i);
+    if(x < 0) {
+      if(s.charAt(i) == "-" && this.signum() == 0) mi = true;
+      continue;
+    }
+    w = b*w+x;
+    if(++j >= cs) {
+      this.dMultiply(d);
+      this.dAddOffset(w,0);
+      j = 0;
+      w = 0;
+    }
+  }
+  if(j > 0) {
+    this.dMultiply(Math.pow(b,j));

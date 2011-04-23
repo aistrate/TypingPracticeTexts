@@ -1,0 +1,56 @@
+    this.dAddOffset(w,0);
+  }
+  if(mi) BigInteger.ZERO.subTo(this,this);
+}
+
+function bnpFromNumber(a,b,c) {
+  if("number" == typeof b) {
+    if(a < 2) this.fromInt(1);
+    else {
+      this.fromNumber(a,c);
+      if(!this.testBit(a-1))
+        this.bitwiseTo(BigInteger.ONE.shiftLeft(a-1),op_or,this);
+      if(this.isEven()) this.dAddOffset(1,0);
+      while(!this.isProbablePrime(b)) {
+        this.dAddOffset(2,0);
+        if(this.bitLength() > a) this.subTo(BigInteger.ONE.shiftLeft(a-1),this);
+      }
+    }
+  }
+  else {
+    var x = new Array(), t = a&7;
+    x.length = (a>>3)+1;
+    b.nextBytes(x);
+    if(t > 0) x[0] &= ((1<<t)-1); else x[0] = 0;
+    this.fromString(x,256);
+  }
+}
+
+function bnToByteArray() {
+  var this_array = this.array;
+  var i = this.t, r = new Array();
+  r[0] = this.s;
+  var p = BI_DB-(i*BI_DB)%8, d, k = 0;
+  if(i-- > 0) {
+    if(p < BI_DB && (d = this_array[i]>>p) != (this.s&BI_DM)>>p)
+      r[k++] = d|(this.s<<(BI_DB-p));
+    while(i >= 0) {
+      if(p < 8) {
+        d = (this_array[i]&((1<<p)-1))<<(8-p);
+        d |= this_array[--i]>>(p+=BI_DB-8);
+      }
+      else {
+        d = (this_array[i]>>(p-=8))&0xff;
+        if(p <= 0) { p += BI_DB; --i; }
+      }
+      if((d&0x80) != 0) d |= -256;
+      if(k == 0 && (this.s&0x80) != (d&0x80)) ++k;
+      if(k > 0 || d != this.s) r[k++] = d;
+    }
+  }
+  return r;
+}
+
+function bnEquals(a) { return(this.compareTo(a)==0); }
+function bnMin(a) { return(this.compareTo(a)<0)?this:a; }
+function bnMax(a) { return(this.compareTo(a)>0)?this:a; }

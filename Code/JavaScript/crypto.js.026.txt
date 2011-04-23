@@ -1,0 +1,40 @@
+    var q1 = this.q.subtract(BigInteger.ONE);
+    var phi = p1.multiply(q1);
+    if(phi.gcd(ee).compareTo(BigInteger.ONE) == 0) {
+      this.n = this.p.multiply(this.q);
+      this.d = ee.modInverse(phi);
+      this.dmp1 = this.d.mod(p1);
+      this.dmq1 = this.d.mod(q1);
+      this.coeff = this.q.modInverse(this.p);
+      break;
+    }
+  }
+}
+
+function RSADoPrivate(x) {
+  if(this.p == null || this.q == null)
+    return x.modPow(this.d, this.n);
+
+  var xp = x.mod(this.p).modPow(this.dmp1, this.p);
+  var xq = x.mod(this.q).modPow(this.dmq1, this.q);
+
+  while(xp.compareTo(xq) < 0)
+    xp = xp.add(this.p);
+  return xp.subtract(xq).multiply(this.coeff).mod(this.p).multiply(this.q).add(xq);
+}
+
+function RSADecrypt(ctext) {
+  var c = parseBigInt(ctext, 16);
+  var m = this.doPrivate(c);
+  if(m == null) return null;
+  return pkcs1unpad2(m, (this.n.bitLength()+7)>>3);
+}
+
+RSAKey.prototype.doPrivate = RSADoPrivate;
+
+RSAKey.prototype.setPrivate = RSASetPrivate;
+RSAKey.prototype.setPrivateEx = RSASetPrivateEx;
+RSAKey.prototype.generate = RSAGenerate;
+RSAKey.prototype.decrypt = RSADecrypt;
+
+nValue="a5261939975948bb7a58dffe5ff54e65f0498f9175f5a09288810b8975871e99af3b5dd94057b0fc07535f5f97444504fa35169d461d0d30cf0192e307727c065168c788771c561a9400fb49175e9e6aa4e23fe11af69e9412dd23b0cb6684c4c2429bce139e848ab26d0829073351f4acd36074eafd036a5eb83359d2a698d3";

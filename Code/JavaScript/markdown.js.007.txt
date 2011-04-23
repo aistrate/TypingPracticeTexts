@@ -1,0 +1,75 @@
+              if ( wanted_depth > stack.length ) {
+                list = make_list( m );
+                last_li.push( list );
+                last_li = list[1] = [ "listitem" ];
+              }
+              else {
+                var found = stack.some(function(s, i) {
+                  if ( s.indent != m[1] ) return false;
+                  list = s.list;
+                  stack.splice(i+1);
+                  return true;
+                });
+
+                if (!found) {
+                  wanted_depth++;
+                  if (wanted_depth <= stack.length) {
+                    stack.splice(wanted_depth);
+                    list = stack[wanted_depth-1].list;
+                  }
+                  else {
+                    list = make_list(m);
+                    last_li.push(list);
+                  }
+                }
+
+                last_li = [ "listitem" ];
+                list.push(last_li);
+              }
+              nl = "";
+            }
+
+            if (l.length > m[0].length) {
+              li_accumulate += nl + l.substr( m[0].length );
+            }
+          }
+
+          if ( li_accumulate.length ) {
+            add( last_li, loose, this.processInline( li_accumulate ), nl );
+            loose = false;
+            li_accumulate = "";
+          }
+
+          var contained = get_contained_blocks( stack.length, next );
+
+          if (contained.length > 0) {
+            stack.forEach( paragraphify, this );
+
+            last_li.push.apply( last_li, this.toTree( contained, [] ) );
+          }
+
+          var next_block = next[0] && next[0].valueOf() || "";
+
+          if ( next_block.match(is_list_re) || next_block.match( /^ / ) ) {
+            block = next.shift();
+
+            var hr = this.dialect.block.horizRule( block, next );
+
+            if (hr) {
+              ret.push.apply(ret, hr);
+              break;
+            }
+
+            stack.forEach( paragraphify , this );
+
+            loose = true;
+            continue loose_search;
+          }
+          break;
+        }
+
+        return ret;
+      }
+    })(),
+
+    blockquote: function blockquote( block, next ) {

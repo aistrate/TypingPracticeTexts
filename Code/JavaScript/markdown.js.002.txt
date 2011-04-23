@@ -1,0 +1,64 @@
+            ", " +
+            uneval(trail) +
+            ", " +
+            uneval(line) +
+            " )"
+  }
+
+  if (line != undefined)
+    s.lineNumber = line;
+
+  return s;
+}
+
+function count_lines( str ) {
+  var n = 0, i = -1;;
+  while ( ( i = str.indexOf('\n', i+1) ) != -1) n++;
+  return n;
+}
+
+Markdown.prototype.split_blocks = function splitBlocks( input, startLine ) {
+  var re = /([\s\S]+?)($|\n(?:\s*\n|$)+)/g,
+      blocks = [],
+      m;
+
+  var line_no = 1;
+
+  if ( ( m = (/^(\s*\n)/)(input) ) != null ) {
+    line_no += count_lines( m[0] );
+    re.lastIndex = m[0].length;
+  }
+
+  while ( ( m = re(input) ) != null ) {
+    blocks.push( mk_block( m[1], m[2], line_no ) );
+    line_no += count_lines( m[0] );
+  }
+
+  return blocks;
+}
+
+Markdown.prototype.processBlock = function processBlock( block, next ) {
+  var cbs = this.dialect.block,
+      ord = cbs.__order__;
+
+  if ( "__call__" in cbs ) {
+    return cvs.__call__.call(this, block, next);
+  }
+
+  for ( var i = 0; i < ord.length; i++ ) {
+    var res = cbs[ ord[i] ].call( this, block, next );
+    if ( res ) {
+      if ( !res instanceof Array || ( res.length > 0 && !( res[0] instanceof Array ) ) )
+        this.debug(ord[i], "didn't return a proper array");
+      return res;
+    }
+  }
+
+  return [];
+}
+
+Markdown.prototype.processInline = function processInline( block ) {
+  return this.dialect.inline.__call__.call( this, String( block ) );
+}
+
+Markdown.prototype.toTree = function toTree( source, custom_root ) {

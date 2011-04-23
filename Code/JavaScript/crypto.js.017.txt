@@ -1,0 +1,50 @@
+function barrettReduce(x) {
+  x.drShiftTo(this.m.t-1,this.r2);
+  if(x.t > this.m.t+1) { x.t = this.m.t+1; x.clamp(); }
+  this.mu.multiplyUpperTo(this.r2,this.m.t+1,this.q3);
+  this.m.multiplyLowerTo(this.q3,this.m.t+1,this.r2);
+  while(x.compareTo(this.r2) < 0) x.dAddOffset(1,this.m.t+1);
+  x.subTo(this.r2,x);
+  while(x.compareTo(this.m) >= 0) x.subTo(this.m,x);
+}
+
+function barrettSqrTo(x,r) { x.squareTo(r); this.reduce(r); }
+
+function barrettMulTo(x,y,r) { x.multiplyTo(y,r); this.reduce(r); }
+
+Barrett.prototype.convert = barrettConvert;
+Barrett.prototype.revert = barrettRevert;
+Barrett.prototype.reduce = barrettReduce;
+Barrett.prototype.mulTo = barrettMulTo;
+Barrett.prototype.sqrTo = barrettSqrTo;
+
+function bnModPow(e,m) {
+  var e_array = e.array;
+  var i = e.bitLength(), k, r = nbv(1), z;
+  if(i <= 0) return r;
+  else if(i < 18) k = 1;
+  else if(i < 48) k = 3;
+  else if(i < 144) k = 4;
+  else if(i < 768) k = 5;
+  else k = 6;
+  if(i < 8)
+    z = new Classic(m);
+  else if(m.isEven())
+    z = new Barrett(m);
+  else
+    z = new Montgomery(m);
+
+  var g = new Array(), n = 3, k1 = k-1, km = (1<<k)-1;
+  g[1] = z.convert(this);
+  if(k > 1) {
+    var g2 = nbi();
+    z.sqrTo(g[1],g2);
+    while(n <= km) {
+      g[n] = nbi();
+      z.mulTo(g2,g[n-2],g[n]);
+      n += 2;
+    }
+  }
+
+  var j = e.t-1, w, is1 = true, r2 = nbi(), t;
+  i = nbits(e_array[j])-1;

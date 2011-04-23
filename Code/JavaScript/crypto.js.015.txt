@@ -1,0 +1,64 @@
+    r_array[i++] = c&BI_DM;
+    c >>= BI_DB;
+  }
+  if(a.t < this.t) {
+    c += a.s;
+    while(i < this.t) {
+      c += this_array[i];
+      r_array[i++] = c&BI_DM;
+      c >>= BI_DB;
+    }
+    c += this.s;
+  }
+  else {
+    c += this.s;
+    while(i < a.t) {
+      c += a_array[i];
+      r_array[i++] = c&BI_DM;
+      c >>= BI_DB;
+    }
+    c += a.s;
+  }
+  r.s = (c<0)?-1:0;
+  if(c > 0) r_array[i++] = c;
+  else if(c < -1) r_array[i++] = BI_DV+c;
+  r.t = i;
+  r.clamp();
+}
+
+function bnAdd(a) { var r = nbi(); this.addTo(a,r); return r; }
+
+function bnSubtract(a) { var r = nbi(); this.subTo(a,r); return r; }
+
+function bnMultiply(a) { var r = nbi(); this.multiplyTo(a,r); return r; }
+
+function bnDivide(a) { var r = nbi(); this.divRemTo(a,r,null); return r; }
+
+function bnRemainder(a) { var r = nbi(); this.divRemTo(a,null,r); return r; }
+
+function bnDivideAndRemainder(a) {
+  var q = nbi(), r = nbi();
+  this.divRemTo(a,q,r);
+  return new Array(q,r);
+}
+
+function bnpDMultiply(n) {
+  var this_array = this.array;
+  this_array[this.t] = this.am(0,n-1,this,0,0,this.t);
+  ++this.t;
+  this.clamp();
+}
+
+function bnpDAddOffset(n,w) {
+  var this_array = this.array;
+  while(this.t <= w) this_array[this.t++] = 0;
+  this_array[w] += n;
+  while(this_array[w] >= BI_DV) {
+    this_array[w] -= BI_DV;
+    if(++w >= this.t) this_array[this.t++] = 0;
+    ++this_array[w];
+  }
+}
+
+function NullExp() {}
+function nNop(x) { return x; }

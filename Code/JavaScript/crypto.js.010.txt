@@ -1,0 +1,40 @@
+  return this.exp(e,z);
+}
+
+BigInteger.prototype.copyTo = bnpCopyTo;
+BigInteger.prototype.fromInt = bnpFromInt;
+BigInteger.prototype.fromString = bnpFromString;
+BigInteger.prototype.clamp = bnpClamp;
+BigInteger.prototype.dlShiftTo = bnpDLShiftTo;
+BigInteger.prototype.drShiftTo = bnpDRShiftTo;
+BigInteger.prototype.lShiftTo = bnpLShiftTo;
+BigInteger.prototype.rShiftTo = bnpRShiftTo;
+BigInteger.prototype.subTo = bnpSubTo;
+BigInteger.prototype.multiplyTo = bnpMultiplyTo;
+BigInteger.prototype.squareTo = bnpSquareTo;
+BigInteger.prototype.divRemTo = bnpDivRemTo;
+BigInteger.prototype.invDigit = bnpInvDigit;
+BigInteger.prototype.isEven = bnpIsEven;
+BigInteger.prototype.exp = bnpExp;
+
+BigInteger.prototype.toString = bnToString;
+BigInteger.prototype.negate = bnNegate;
+BigInteger.prototype.abs = bnAbs;
+BigInteger.prototype.compareTo = bnCompareTo;
+BigInteger.prototype.bitLength = bnBitLength;
+BigInteger.prototype.mod = bnMod;
+BigInteger.prototype.modPowInt = bnModPowInt;
+
+BigInteger.ZERO = nbv(0);
+BigInteger.ONE = nbv(1);
+
+function bnClone() { var r = nbi(); this.copyTo(r); return r; }
+
+function bnIntValue() {
+  var this_array = this.array;
+  if(this.s < 0) {
+    if(this.t == 1) return this_array[0]-BI_DV;
+    else if(this.t == 0) return -1;
+  }
+  else if(this.t == 1) return this_array[0];
+  else if(this.t == 0) return 0;

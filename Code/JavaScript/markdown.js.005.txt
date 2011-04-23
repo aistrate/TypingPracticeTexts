@@ -1,0 +1,53 @@
+      var any_list = "[*+-]|\\d\\.",
+          bullet_list = /[*+-]/,
+          number_list = /\d+\./,
+          is_list_re = new RegExp( "^( {0,3})(" + any_list + ")[ \t]+" ),
+          indent_re = "(?: {0,3}\\t| {4})";
+
+      function regex_for_depth( depth ) {
+
+        return new RegExp(
+          "(?:^(" + indent_re + "{0," + depth + "} {0,3})(" + any_list + ")\\s+)|" +
+          "(^" + indent_re + "{0," + (depth-1) + "}[ ]{0,4})"
+        );
+      }
+      function expand_tab( input ) {
+        return input.replace( / {0,3}\t/g, "    " );
+      }
+
+      function add(li, loose, inline, nl) {
+        if (loose) {
+            li.push( [ "para" ].concat(inline) );
+          return;
+        }
+        var add_to = li[li.length -1] instanceof Array && li[li.length - 1][0] == "para"
+                   ? li[li.length -1]
+                   : li;
+
+        if (nl && li.length > 1) inline.unshift(nl);
+
+        for (var i=0; i < inline.length; i++) {
+          var what = inline[i],
+              is_str = typeof what == "string";
+          if (is_str && add_to.length > 1 && typeof add_to[add_to.length-1] == "string" )
+          {
+            add_to[ add_to.length-1 ] += what;
+          }
+          else {
+            add_to.push( what );
+          }
+        }
+      }
+
+      function get_contained_blocks( depth, blocks ) {
+
+        var re = new RegExp( "^(" + indent_re + "{" + depth + "}.*?\\n?)*$" ),
+            replace = new RegExp("^" + indent_re + "{" + depth + "}", "gm"),
+            ret = [];
+
+        while ( blocks.length > 0 ) {
+          if ( re( blocks[0] ) ) {
+            var b = blocks.shift(),
+                x = b.replace( replace, "");
+
+            ret.push( mk_block( x, b.trailing, b.lineNumber ) );

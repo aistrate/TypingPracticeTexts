@@ -1,0 +1,11 @@
+Stirling engine
+
+A Stirling engine is a heat engine operating by cyclic compression and expansion of air or other gas, the working fluid, at different temperature levels such that there is a net conversion of heat energy to mechanical work.
+
+Like the steam engine, the Stirling engine is traditionally classified as an external combustion engine, as all heat transfers to and from the working fluid take place through the engine wall. This contrasts with an internal combustion engine where heat input is by combustion of a fuel within the body of the working fluid. Unlike a steam engine's (or more generally a Rankine cycle engine's) usage of a working fluid in both its liquid and gaseous phases, the Stirling engine encloses a fixed quantity of permanently gaseous fluid such as air.
+
+Typical of heat engines, the general cycle consists of compressing cool gas, heating the gas, expanding the hot gas, and finally cooling the gas before repeating the cycle. The efficiency of the process is narrowly restricted by the efficiency of the Carnot cycle, which depends on the temperature difference between the hot and cold reservoir.
+
+Originally conceived in 1816 as an industrial prime mover to rival the steam engine, its practical use was largely confined to low-power domestic applications for over a century.
+
+The Stirling engine is noted for its high efficiency compared to steam engines, quiet operation, and the ease with which it can use almost any heat source. This compatibility with alternative and renewable energy sources has become increasingly significant as the price of conventional fuels rises, and also in light of concerns such as peak oil and climate change. This engine is currently exciting interest as the core component of micro combined heat and power (CHP) units, in which it is more efficient and safer than a comparable steam engine.

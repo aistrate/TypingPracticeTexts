@@ -1,0 +1,22 @@
+Notepad++:
+
+Replace: \r\n\r\n\r\n\r\n\r\n
+With:    \r\n\r\n\r\n
+
+Replace: \r\n\r\n\r\n
+With:    \r\n\r\n          (selectively)
+
+Find: *
+
+
+
+VS2008:
+
+Replace: {:Al|:Nu|:Pu}\n{:Al|:Nu|:Pu}
+With:    \1 \2
+
+
+
+Source Code Text Creator:
+
+Split into: 2000 chars per file

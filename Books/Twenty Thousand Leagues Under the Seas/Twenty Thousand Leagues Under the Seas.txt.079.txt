@@ -1,0 +1,19 @@
+"Fine, captain, but now we come to a genuine difficulty. You're able to lie flush with the surface of the ocean, that I understand. But lower down, while diving beneath that surface, isn't your submersible going to encounter a pressure, and consequently undergo an upward thrust, that must be assessed at one atmosphere per every thirty feet of water, hence at about one kilogram per each square centimeter?"
+
+"Precisely, sir."
+
+"Then unless you fill up the whole Nautilus, I don't see how you can force it down into the heart of these liquid masses."
+
+"Professor," Captain Nemo replied, "static objects mustn't be confused with dynamic ones, or we'll be open to serious error. Comparatively little effort is spent in reaching the ocean's lower regions, because all objects have a tendency to become 'sinkers.' Follow my logic here."
+
+"I'm all ears, captain."
+
+"When I wanted to determine what increase in weight the Nautilus needed to be given in order to submerge, I had only to take note of the proportionate reduction in volume that salt water experiences in deeper and deeper strata."
+
+"That's obvious," I replied.
+
+"Now then, if water isn't absolutely incompressible, at least it compresses very little. In fact, according to the most recent calculations, this reduction is only .0000436 per atmosphere, or per every thirty feet of depth. For instance, to go 1,000 meters down, I must take into account the reduction in volume that occurs under a pressure equivalent to that from a 1,000-meter column of water, in other words, under a pressure of 100 atmospheres. In this instance the reduction would be .00436. Consequently, I'd have to increase my weight from 1,507.2 metric tons to 1,513.77. So the added weight would only be 6.57 metric tons."
+
+"That's all?"
+
+"That's all, Professor Aronnax, and the calculation is easy to check. Now then, I have supplementary ballast tanks capable of shipping 100 metric tons of water. So I can descend to considerable depths. When I want to rise again and lie flush with the surface, all I have to do is expel that water; and if I desire that the Nautilus emerge above the waves to one-tenth of its total capacity, I empty all the ballast tanks completely."

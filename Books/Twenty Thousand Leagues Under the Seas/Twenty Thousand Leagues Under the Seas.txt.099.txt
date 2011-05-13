@@ -1,0 +1,19 @@
+"That's perfect, Captain Nemo, but the air you carry must be quickly depleted; and once it contains no more than 15% oxygen, it becomes unfit for breathing."
+
+"Surely, but as I told you, Professor Aronnax, the Nautilus's pumps enable me to store air under considerable pressure, and given this circumstance, the tank on my diving equipment can supply breathable air for nine or ten hours."
+
+"I've no more objections to raise," I replied. "I'll only ask you, captain: how can you light your way at the bottom of the ocean?"
+
+"With the Ruhmkorff device, Professor Aronnax. If the first is carried on the back, the second is fastened to the belt. It consists of a Bunsen battery that I activate not with potassium dichromate but with sodium. An induction coil gathers the electricity generated and directs it to a specially designed lantern. In this lantern one finds a glass spiral that contains only a residue of carbon dioxide gas. When the device is operating, this gas becomes luminous and gives off a continuous whitish light. Thus provided for, I breathe and I see."
+
+"Captain Nemo, to my every objection you give such crushing answers, I'm afraid to entertain a single doubt. However, though I have no choice but to accept both the Rouquayrol and Ruhmkorff devices, I'd like to register some reservations about the rifle with which you'll equip me."
+
+"But it isn't a rifle that uses gunpowder," the captain replied.
+
+"Then it's an air gun?"
+
+"Surely. How can I make gunpowder on my ship when I have no saltpeter, sulfur, or charcoal?"
+
+"Even so," I replied, "to fire underwater in a medium that's 855 times denser than air, you'd have to overcome considerable resistance."
+
+"That doesn't necessarily follow. There are certain Fulton-style guns perfected by the Englishmen Philippe-Coles and Burley, the Frenchman Furcy, and the Italian Landi; they're equipped with a special system of airtight fastenings and can fire in underwater conditions. But I repeat: having no gunpowder, I've replaced it with air at high pressure, which is abundantly supplied me by the Nautilus's pumps."

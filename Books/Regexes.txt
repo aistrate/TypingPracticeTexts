@@ -12,6 +12,34 @@ Find: *
 
 VS2008:
 
+Replace: [באגה]
+With:    a
+
+Replace: [יטךכ]
+With:    e
+
+Replace: [םלמן]
+With:    i
+
+Replace: [ףעפצ]
+With:    o
+
+Replace: [תשûü]
+With:    u
+
+Replace: ח
+With:    c
+
+Find:    [^\x20-\x7E]
+
+
+Replace: '  '    (two spaces)
+With:    ' '
+
+Replace: '-- '
+With:    '--'
+
+
 Replace: {:Al|:Nu|:Pu}\n{:Al|:Nu|:Pu}
 With:    \1 \2
 

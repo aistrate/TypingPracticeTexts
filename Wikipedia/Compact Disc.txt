@@ -1,0 +1,7 @@
+Compact Disc
+
+A Compact Disc (also known as a CD) is an optical disc used to store digital data. It was originally developed to store and playback sound recordings exclusively, but later expanded to encompass data storage (CD-ROM), write-once audio and data storage (CD-R), rewritable media (CD-RW), Video Compact Discs (VCD), Super Video Compact Discs (SVCD), PhotoCD, PictureCD, CD-i, and Enhanced CD. Audio CDs and audio CD players have been commercially available since October 1982.
+
+Standard CDs have a diameter of 120 millimetres (4.7 in) and can hold up to 80 minutes of uncompressed audio (700 MB of data). The Mini CD has various diameters ranging from 60 to 80 millimetres (2.4 to 3.1 in); they are sometimes used for CD singles, storing up to 24 minutes of audio or delivering device drivers.
+
+CD-ROMs and CD-Rs remain widely used technologies in the computer industry. The CD and its extensions are successful: in 2004, worldwide sales of CD audio, CD-ROM, and CD-R reached about 30 billion discs. By 2007, 200 billion CDs had been sold worldwide. Compact Discs are increasingly being replaced or supplemented by other forms of digital distribution and storage, such as downloading and flash drives, with audio CD sales dropping nearly 50% from their peak in 2000.

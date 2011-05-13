@@ -1,0 +1,15 @@
+Hygroscopy
+
+Hygroscopy is the ability of a substance to attract and hold water molecules from the surrounding environment through either absorption or adsorption with the absorbing or adsorbing material becoming physically 'changed,' somewhat: by an increase in volume, stickiness, or other physical characteristic of the material as water molecules become 'suspended' between the material's molecules in the process. While some similar forces are at work here, it is different from capillary attraction, a process where glass or other 'solid' substances attract water, but are not changed in the process, e.g. water molecules becoming suspended between the glass molecules.
+
+Hygroscopic substances include sugar, honey, glycerol, ethanol, methanol, diesel fuel, sulfuric acid, methamphetamine, many salts (including table salt), and a huge variety of other substances.
+
+Zinc chloride and calcium chloride, as well as potassium hydroxide and sodium hydroxide (and many different salts) are so hygroscopic that they readily dissolve in the water they absorb: this property is called deliquescence. Sulfuric acid is not only hygroscopic in high concentrated form, its solutions are hygroscopic down to concentrations of 10 Vol-% or below. More commonly, a hygroscopic material will tend to become damp and "cake" when exposed to moist air (such as salt in salt shakers during humid weather).
+
+Because of their affinity for atmospheric moisture, hygroscopic materials might necessarily be stored in sealed containers. When added to foods or other materials for the express purpose of maintaining moisture content, such substances are known as humectants.
+
+Materials and compounds exhibit different hygroscopic properties, and this difference can lead to detrimental effects, such as stress concentration in composite materials. The amount a particular material or compound is affected by ambient moisture may be considered its coefficient of hygroscopic expansion (CHE) (also referred to as CME, coefficient of moisture expansion) or coefficient of hygroscopic contraction (CHC)--the difference between the two terms being a difference in sign convention and a difference in point of view as to whether the difference in moisture leads to contraction or expansion.
+
+A common example where difference in this hygroscopic property can be seen is in a paperback book cover. Often, in a relatively moist environment, the book cover will curl away from the rest of the book. The unlaminated side of the cover absorbs more moisture than the laminated side and increases in area, causing a stress that curls the cover toward the laminated side. This is similar to the function of a bi-metallic strip. Inexpensive gauge-type hygrometers frequently seen domestically make use of this principle.
+
+The similar-sounding but unrelated word hydroscopic is sometimes used in error for hygroscopic. A hydroscope is an optical device used for making observations deep under water.

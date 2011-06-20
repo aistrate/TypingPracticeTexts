@@ -1,0 +1,50 @@
+            var doneName = done++, checkFn = dirCheck;
+
+            if ( typeof part === "string" && !/\W/.test(part) ) {
+                var nodeCheck = part = isXML ? part : part.toUpperCase();
+                checkFn = dirNodeCheck;
+            }
+
+            checkFn("previousSibling", part, doneName, checkSet, nodeCheck, isXML);
+        }
+    },
+    find: {
+        ID: function(match, context, isXML){
+            if ( typeof context.getElementById !== "undefined" && !isXML ) {
+                var m = context.getElementById(match[1]);
+                return m ? [m] : [];
+            }
+        },
+        NAME: function(match, context, isXML){
+            if ( typeof context.getElementsByName !== "undefined" ) {
+                var ret = [], results = context.getElementsByName(match[1]);
+
+                for ( var i = 0, l = results.length; i < l; i++ ) {
+                    if ( results[i].getAttribute("name") === match[1] ) {
+                        ret.push( results[i] );
+                    }
+                }
+
+                return ret.length === 0 ? null : ret;
+            }
+        },
+        TAG: function(match, context){
+            return context.getElementsByTagName(match[1]);
+        }
+    },
+    preFilter: {
+        CLASS: function(match, curLoop, inplace, result, not, isXML){
+            match = " " + match[1].replace(/\\/g, "") + " ";
+
+            if ( isXML ) {
+                return match;
+            }
+
+            for ( var i = 0, elem; (elem = curLoop[i]) != null; i++ ) {
+                if ( elem ) {
+                    if ( not ^ (elem.className && (" " + elem.className + " ").indexOf(match) >= 0) ) {
+                        if ( !inplace )
+                            result.push( elem );
+                    } else if ( inplace ) {
+                        curLoop[i] = false;
+                    }

@@ -1,0 +1,69 @@
+            checkSet = parts = [];
+        }
+    }
+
+    if ( !checkSet ) {
+        checkSet = set;
+    }
+
+    if ( !checkSet ) {
+        throw "Syntax error, unrecognized expression: " + (cur || selector);
+    }
+
+    if ( toString.call(checkSet) === "[object Array]" ) {
+        if ( !prune ) {
+            results.push.apply( results, checkSet );
+        } else if ( context && context.nodeType === 1 ) {
+            for ( var i = 0; checkSet[i] != null; i++ ) {
+                if ( checkSet[i] && (checkSet[i] === true || checkSet[i].nodeType === 1 && contains(context, checkSet[i])) ) {
+                    results.push( set[i] );
+                }
+            }
+        } else {
+            for ( var i = 0; checkSet[i] != null; i++ ) {
+                if ( checkSet[i] && checkSet[i].nodeType === 1 ) {
+                    results.push( set[i] );
+                }
+            }
+        }
+    } else {
+        makeArray( checkSet, results );
+    }
+
+    if ( extra ) {
+        Sizzle( extra, origContext, results, seed );
+        Sizzle.uniqueSort( results );
+    }
+
+    return results;
+};
+
+Sizzle.uniqueSort = function(results){
+    if ( sortOrder ) {
+        hasDuplicate = baseHasDuplicate;
+        results.sort(sortOrder);
+
+        if ( hasDuplicate ) {
+            for ( var i = 1; i < results.length; i++ ) {
+                if ( results[i] === results[i-1] ) {
+                    results.splice(i--, 1);
+                }
+            }
+        }
+    }
+
+    return results;
+};
+
+Sizzle.matches = function(expr, set){
+    return Sizzle(expr, null, null, set);
+};
+
+Sizzle.find = function(expr, context, isXML){
+    var set, match;
+
+    if ( !expr ) {
+        return [];
+    }
+
+    for ( var i = 0, l = Expr.order.length; i < l; i++ ) {

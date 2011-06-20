@@ -1,0 +1,51 @@
+        if ( parts.length === 2 && Expr.relative[ parts[0] ] ) {
+            set = posProcess( parts[0] + parts[1], context );
+        } else {
+            set = Expr.relative[ parts[0] ] ?
+                [ context ] :
+                Sizzle( parts.shift(), context );
+
+            while ( parts.length ) {
+                selector = parts.shift();
+
+                if ( Expr.relative[ selector ] )
+                    selector += parts.shift();
+
+                set = posProcess( selector, set );
+            }
+        }
+    } else {
+        if ( !seed && parts.length > 1 && context.nodeType === 9 && !contextXML &&
+                Expr.match.ID.test(parts[0]) && !Expr.match.ID.test(parts[parts.length - 1]) ) {
+            var ret = Sizzle.find( parts.shift(), context, contextXML );
+            context = ret.expr ? Sizzle.filter( ret.expr, ret.set )[0] : ret.set[0];
+        }
+
+        if ( context ) {
+            var ret = seed ?
+                { expr: parts.pop(), set: makeArray(seed) } :
+                Sizzle.find( parts.pop(), parts.length === 1 && (parts[0] === "~" || parts[0] === "+") && context.parentNode ? context.parentNode : context, contextXML );
+            set = ret.expr ? Sizzle.filter( ret.expr, ret.set ) : ret.set;
+
+            if ( parts.length > 0 ) {
+                checkSet = makeArray(set);
+            } else {
+                prune = false;
+            }
+
+            while ( parts.length ) {
+                var cur = parts.pop(), pop = cur;
+
+                if ( !Expr.relative[ cur ] ) {
+                    cur = "";
+                } else {
+                    pop = parts.pop();
+                }
+
+                if ( pop == null ) {
+                    pop = context;
+                }
+
+                Expr.relative[ cur ]( checkSet, pop, contextXML );
+            }
+        } else {

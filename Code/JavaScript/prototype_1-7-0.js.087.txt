@@ -1,0 +1,51 @@
+        Expr.attrHandle.href = function(elem){
+            return elem.getAttribute("href", 2);
+        };
+    }
+
+    div = null;
+})();
+
+if ( document.querySelectorAll ) (function(){
+    var oldSizzle = Sizzle, div = document.createElement("div");
+    div.innerHTML = "<p class='TEST'></p>";
+
+    if ( div.querySelectorAll && div.querySelectorAll(".TEST").length === 0 ) {
+        return;
+    }
+
+    Sizzle = function(query, context, extra, seed){
+        context = context || document;
+
+        if ( !seed && context.nodeType === 9 && !isXML(context) ) {
+            try {
+                return makeArray( context.querySelectorAll(query), extra );
+            } catch(e){}
+        }
+
+        return oldSizzle(query, context, extra, seed);
+    };
+
+    for ( var prop in oldSizzle ) {
+        Sizzle[ prop ] = oldSizzle[ prop ];
+    }
+
+    div = null;
+})();
+
+if ( document.getElementsByClassName && document.documentElement.getElementsByClassName ) (function(){
+    var div = document.createElement("div");
+    div.innerHTML = "<div class='test e'></div><div class='test'></div>";
+
+    if ( div.getElementsByClassName("e").length === 0 )
+        return;
+
+    div.lastChild.className = "e";
+
+    if ( div.getElementsByClassName("e").length === 1 )
+        return;
+
+    Expr.order.splice(1, 0, "CLASS");
+    Expr.find.CLASS = function(match, context, isXML) {
+        if ( typeof context.getElementsByClassName !== "undefined" && !isXML ) {
+            return context.getElementsByClassName(match[1]);

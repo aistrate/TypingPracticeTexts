@@ -1,0 +1,56 @@
+                !check ?
+                value && result !== false :
+                type === "!=" ?
+                value != check :
+                type === "^=" ?
+                value.indexOf(check) === 0 :
+                type === "$=" ?
+                value.substr(value.length - check.length) === check :
+                type === "|=" ?
+                value === check || value.substr(0, check.length + 1) === check + "-" :
+                false;
+        },
+        POS: function(elem, match, i, array){
+            var name = match[2], filter = Expr.setFilters[ name ];
+
+            if ( filter ) {
+                return filter( elem, i, match, array );
+            }
+        }
+    }
+};
+
+var origPOS = Expr.match.POS;
+
+for ( var type in Expr.match ) {
+    Expr.match[ type ] = new RegExp( Expr.match[ type ].source + /(?![^\[]*\])(?![^\(]*\))/.source );
+    Expr.leftMatch[ type ] = new RegExp( /(^(?:.|\r|\n)*?)/.source + Expr.match[ type ].source );
+}
+
+var makeArray = function(array, results) {
+    array = Array.prototype.slice.call( array, 0 );
+
+    if ( results ) {
+        results.push.apply( results, array );
+        return results;
+    }
+
+    return array;
+};
+
+try {
+    Array.prototype.slice.call( document.documentElement.childNodes, 0 );
+
+} catch(e){
+    makeArray = function(array, results) {
+        var ret = results || [];
+
+        if ( toString.call(array) === "[object Array]" ) {
+            Array.prototype.push.apply( ret, array );
+        } else {
+            if ( typeof array.length === "number" ) {
+                for ( var i = 0, l = array.length; i < l; i++ ) {
+                    ret.push( array[i] );
+                }
+            } else {
+                for ( var i = 0; array[i]; i++ ) {

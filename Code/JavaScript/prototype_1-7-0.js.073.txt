@@ -1,0 +1,63 @@
+      }
+    }
+  }
+
+  function extendElements(elements) {
+    for (var i = 0, length = elements.length; i < length; i++) {
+      Element.extend(elements[i]);
+    }
+    return elements;
+  }
+
+  var K = Prototype.K;
+
+  return {
+    select: select,
+    match: match,
+    find: find,
+    extendElements: (Element.extend === K) ? K : extendElements,
+    extendElement: Element.extend
+  };
+})();
+Prototype._original_property = window.Sizzle;
+
+(function(){
+
+var chunker = /((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^[\]]*\]|['"][^'"]*['"]|[^[\]'"]+)+\]|\\.|[^ >+~,(\[\\]+)+|[>+~])(\s*,\s*)?((?:.|\r|\n)*)/g,
+    done = 0,
+    toString = Object.prototype.toString,
+    hasDuplicate = false,
+    baseHasDuplicate = true;
+
+[0, 0].sort(function(){
+    baseHasDuplicate = false;
+    return 0;
+});
+
+var Sizzle = function(selector, context, results, seed) {
+    results = results || [];
+    var origContext = context = context || document;
+
+    if ( context.nodeType !== 1 && context.nodeType !== 9 ) {
+        return [];
+    }
+
+    if ( !selector || typeof selector !== "string" ) {
+        return results;
+    }
+
+    var parts = [], m, set, checkSet, check, mode, extra, prune = true, contextXML = isXML(context),
+        soFar = selector;
+
+    while ( (chunker.exec(""), m = chunker.exec(soFar)) !== null ) {
+        soFar = m[3];
+
+        parts.push( m[1] );
+
+        if ( m[2] ) {
+            extra = m[3];
+            break;
+        }
+    }
+
+    if ( parts.length > 1 && origPOS.exec( selector ) ) {

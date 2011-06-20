@@ -1,0 +1,57 @@
+            if ( isTag && !isXML ) {
+                part = part.toUpperCase();
+            }
+
+            for ( var i = 0, l = checkSet.length, elem; i < l; i++ ) {
+                if ( (elem = checkSet[i]) ) {
+                    while ( (elem = elem.previousSibling) && elem.nodeType !== 1 ) {}
+
+                    checkSet[i] = isPartStrNotTag || elem && elem.nodeName === part ?
+                        elem || false :
+                        elem === part;
+                }
+            }
+
+            if ( isPartStrNotTag ) {
+                Sizzle.filter( part, checkSet, true );
+            }
+        },
+        ">": function(checkSet, part, isXML){
+            var isPartStr = typeof part === "string";
+
+            if ( isPartStr && !/\W/.test(part) ) {
+                part = isXML ? part : part.toUpperCase();
+
+                for ( var i = 0, l = checkSet.length; i < l; i++ ) {
+                    var elem = checkSet[i];
+                    if ( elem ) {
+                        var parent = elem.parentNode;
+                        checkSet[i] = parent.nodeName === part ? parent : false;
+                    }
+                }
+            } else {
+                for ( var i = 0, l = checkSet.length; i < l; i++ ) {
+                    var elem = checkSet[i];
+                    if ( elem ) {
+                        checkSet[i] = isPartStr ?
+                            elem.parentNode :
+                            elem.parentNode === part;
+                    }
+                }
+
+                if ( isPartStr ) {
+                    Sizzle.filter( part, checkSet, true );
+                }
+            }
+        },
+        "": function(checkSet, part, isXML){
+            var doneName = done++, checkFn = dirCheck;
+
+            if ( !/\W/.test(part) ) {
+                var nodeCheck = part = isXML ? part : part.toUpperCase();
+                checkFn = dirNodeCheck;
+            }
+
+            checkFn("parentNode", part, doneName, checkSet, nodeCheck, isXML);
+        },
+        "~": function(checkSet, part, isXML){

@@ -1,0 +1,52 @@
+                }
+            }
+
+            return false;
+        },
+        ID: function(match){
+            return match[1].replace(/\\/g, "");
+        },
+        TAG: function(match, curLoop){
+            for ( var i = 0; curLoop[i] === false; i++ ){}
+            return curLoop[i] && isXML(curLoop[i]) ? match[1] : match[1].toUpperCase();
+        },
+        CHILD: function(match){
+            if ( match[1] == "nth" ) {
+                var test = /(-?)(\d*)n((?:\+|-)?\d*)/.exec(
+                    match[2] == "even" && "2n" || match[2] == "odd" && "2n+1" ||
+                    !/\D/.test( match[2] ) && "0n+" + match[2] || match[2]);
+
+                match[2] = (test[1] + (test[2] || 1)) - 0;
+                match[3] = test[3] - 0;
+            }
+
+            match[0] = done++;
+
+            return match;
+        },
+        ATTR: function(match, curLoop, inplace, result, not, isXML){
+            var name = match[1].replace(/\\/g, "");
+
+            if ( !isXML && Expr.attrMap[name] ) {
+                match[1] = Expr.attrMap[name];
+            }
+
+            if ( match[2] === "~=" ) {
+                match[4] = " " + match[4] + " ";
+            }
+
+            return match;
+        },
+        PSEUDO: function(match, curLoop, inplace, result, not){
+            if ( match[1] === "not" ) {
+                if ( ( chunker.exec(match[3]) || "" ).length > 1 || /^\w/.test(match[3]) ) {
+                    match[3] = Sizzle(match[3], null, null, curLoop);
+                } else {
+                    var ret = Sizzle.filter(match[3], curLoop, inplace, true ^ not);
+                    if ( !inplace ) {
+                        result.push.apply( result, ret );
+                    }
+                    return false;
+                }
+            } else if ( Expr.match.POS.test( match[0] ) || Expr.match.CHILD.test( match[0] ) ) {
+                return true;

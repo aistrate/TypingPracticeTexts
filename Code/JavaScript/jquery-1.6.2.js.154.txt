@@ -1,0 +1,69 @@
+            this.queue([]);
+        }
+
+        this.each(function() {
+            var timers = jQuery.timers,
+                i = timers.length;
+            // clear marker counters if we know they won't be
+            if ( !gotoEnd ) {
+                jQuery._unmark( true, this );
+            }
+            while ( i-- ) {
+                if ( timers[i].elem === this ) {
+                    if (gotoEnd) {
+                        // force the next step to be the last
+                        timers[i](true);
+                    }
+
+                    timers.splice(i, 1);
+                }
+            }
+        });
+
+        // start the next in the queue if the last step wasn't forced
+        if ( !gotoEnd ) {
+            this.dequeue();
+        }
+
+        return this;
+    }
+
+});
+
+// Animations created synchronously will run synchronously
+function createFxNow() {
+    setTimeout( clearFxNow, 0 );
+    return ( fxNow = jQuery.now() );
+}
+
+function clearFxNow() {
+    fxNow = undefined;
+}
+
+// Generate parameters to create a standard animation
+function genFx( type, num ) {
+    var obj = {};
+
+    jQuery.each( fxAttrs.concat.apply([], fxAttrs.slice(0,num)), function() {
+        obj[ this ] = type;
+    });
+
+    return obj;
+}
+
+// Generate shortcuts for custom animations
+jQuery.each({
+    slideDown: genFx("show", 1),
+    slideUp: genFx("hide", 1),
+    slideToggle: genFx("toggle", 1),
+    fadeIn: { opacity: "show" },
+    fadeOut: { opacity: "hide" },
+    fadeToggle: { opacity: "toggle" }
+}, function( name, props ) {
+    jQuery.fn[ name ] = function( speed, easing, callback ) {
+        return this.animate( props, speed, easing, callback );
+    };
+});
+
+jQuery.extend({
+    speed: function( speed, easing, fn ) {

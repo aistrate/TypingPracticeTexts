@@ -1,0 +1,50 @@
+            return;
+        }
+
+        data = jQuery._data( elem, "_change_data" );
+        val = getVal(elem);
+
+        // the current data will be also retrieved by beforeactivate
+        if ( e.type !== "focusout" || elem.type !== "radio" ) {
+            jQuery._data( elem, "_change_data", val );
+        }
+
+        if ( data === undefined || val === data ) {
+            return;
+        }
+
+        if ( data != null || val ) {
+            e.type = "change";
+            e.liveFired = undefined;
+            jQuery.event.trigger( e, arguments[1], elem );
+        }
+    };
+
+    jQuery.event.special.change = {
+        filters: {
+            focusout: testChange,
+
+            beforedeactivate: testChange,
+
+            click: function( e ) {
+                var elem = e.target, type = jQuery.nodeName( elem, "input" ) ? elem.type : "";
+
+                if ( type === "radio" || type === "checkbox" || jQuery.nodeName( elem, "select" ) ) {
+                    testChange.call( this, e );
+                }
+            },
+
+            // Change has to be called before submit
+            // Keydown will be called before keypress, which is used in submit-event delegation
+            keydown: function( e ) {
+                var elem = e.target, type = jQuery.nodeName( elem, "input" ) ? elem.type : "";
+
+                if ( (e.keyCode === 13 && !jQuery.nodeName( elem, "textarea" ) ) ||
+                    (e.keyCode === 32 && (type === "checkbox" || type === "radio")) ||
+                    type === "select-multiple" ) {
+                    testChange.call( this, e );
+                }
+            },
+
+            // Beforeactivate happens also before the previous element is blurred
+            // with this event you can't trigger a change event, but you can store

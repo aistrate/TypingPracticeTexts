@@ -1,0 +1,55 @@
+            jqXHR.status = status;
+            jqXHR.statusText = statusText;
+
+            // Success/Error
+            if ( isSuccess ) {
+                deferred.resolveWith( callbackContext, [ success, statusText, jqXHR ] );
+            } else {
+                deferred.rejectWith( callbackContext, [ jqXHR, statusText, error ] );
+            }
+
+            // Status-dependent callbacks
+            jqXHR.statusCode( statusCode );
+            statusCode = undefined;
+
+            if ( fireGlobals ) {
+                globalEventContext.trigger( "ajax" + ( isSuccess ? "Success" : "Error" ),
+                        [ jqXHR, s, isSuccess ? success : error ] );
+            }
+
+            // Complete
+            completeDeferred.resolveWith( callbackContext, [ jqXHR, statusText ] );
+
+            if ( fireGlobals ) {
+                globalEventContext.trigger( "ajaxComplete", [ jqXHR, s] );
+                // Handle the global AJAX counter
+                if ( !( --jQuery.active ) ) {
+                    jQuery.event.trigger( "ajaxStop" );
+                }
+            }
+        }
+
+        // Attach deferreds
+        deferred.promise( jqXHR );
+        jqXHR.success = jqXHR.done;
+        jqXHR.error = jqXHR.fail;
+        jqXHR.complete = completeDeferred.done;
+
+        // Status-dependent callbacks
+        jqXHR.statusCode = function( map ) {
+            if ( map ) {
+                var tmp;
+                if ( state < 2 ) {
+                    for( tmp in map ) {
+                        statusCode[ tmp ] = [ statusCode[tmp], map[tmp] ];
+                    }
+                } else {
+                    tmp = map[ jqXHR.status ];
+                    jqXHR.then( tmp, tmp );
+                }
+            }
+            return this;
+        };
+
+        // Remove hash character (#7531: and string promotion)
+        // Add protocol if not provided (#5866: IE7 issue with protocol-less urls)

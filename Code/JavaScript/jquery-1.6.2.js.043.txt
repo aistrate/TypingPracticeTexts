@@ -1,0 +1,59 @@
+        if ( !elem || nType === 3 || nType === 8 || nType === 2 ) {
+            return undefined;
+        }
+
+        if ( pass && name in jQuery.attrFn ) {
+            return jQuery( elem )[ name ]( value );
+        }
+
+        // Fallback to prop when attributes are not supported
+        if ( !("getAttribute" in elem) ) {
+            return jQuery.prop( elem, name, value );
+        }
+
+        var ret, hooks,
+            notxml = nType !== 1 || !jQuery.isXMLDoc( elem );
+
+        // Normalize the name if needed
+        if ( notxml ) {
+            name = jQuery.attrFix[ name ] || name;
+
+            hooks = jQuery.attrHooks[ name ];
+
+            if ( !hooks ) {
+                // Use boolHook for boolean attributes
+                if ( rboolean.test( name ) ) {
+
+                    hooks = boolHook;
+
+                // Use formHook for forms and if the name contains certain characters
+                } else if ( formHook && name !== "className" &&
+                    (jQuery.nodeName( elem, "form" ) || rinvalidChar.test( name )) ) {
+
+                    hooks = formHook;
+                }
+            }
+        }
+
+        if ( value !== undefined ) {
+
+            if ( value === null ) {
+                jQuery.removeAttr( elem, name );
+                return undefined;
+
+            } else if ( hooks && "set" in hooks && notxml && (ret = hooks.set( elem, value, name )) !== undefined ) {
+                return ret;
+
+            } else {
+                elem.setAttribute( name, "" + value );
+                return value;
+            }
+
+        } else if ( hooks && "get" in hooks && notxml && (ret = hooks.get( elem, name )) !== null ) {
+            return ret;
+
+        } else {
+
+            ret = elem.getAttribute( name );
+
+            // Non-existent attributes return null, we normalize to undefined

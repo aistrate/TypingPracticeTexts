@@ -1,0 +1,69 @@
+                    elem = elem.firstChild;
+                }
+
+                return elem;
+            }).append( this );
+        }
+
+        return this;
+    },
+
+    wrapInner: function( html ) {
+        if ( jQuery.isFunction( html ) ) {
+            return this.each(function(i) {
+                jQuery(this).wrapInner( html.call(this, i) );
+            });
+        }
+
+        return this.each(function() {
+            var self = jQuery( this ),
+                contents = self.contents();
+
+            if ( contents.length ) {
+                contents.wrapAll( html );
+
+            } else {
+                self.append( html );
+            }
+        });
+    },
+
+    wrap: function( html ) {
+        return this.each(function() {
+            jQuery( this ).wrapAll( html );
+        });
+    },
+
+    unwrap: function() {
+        return this.parent().each(function() {
+            if ( !jQuery.nodeName( this, "body" ) ) {
+                jQuery( this ).replaceWith( this.childNodes );
+            }
+        }).end();
+    },
+
+    append: function() {
+        return this.domManip(arguments, true, function( elem ) {
+            if ( this.nodeType === 1 ) {
+                this.appendChild( elem );
+            }
+        });
+    },
+
+    prepend: function() {
+        return this.domManip(arguments, true, function( elem ) {
+            if ( this.nodeType === 1 ) {
+                this.insertBefore( elem, this.firstChild );
+            }
+        });
+    },
+
+    before: function() {
+        if ( this[0] && this[0].parentNode ) {
+            return this.domManip(arguments, false, function( elem ) {
+                this.parentNode.insertBefore( elem, this );
+            });
+        } else if ( arguments.length ) {
+            var set = jQuery(arguments[0]);
+            set.push.apply( set, this.toArray() );
+            return this.pushStack( set, "before", arguments );

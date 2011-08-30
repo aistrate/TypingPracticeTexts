@@ -1,0 +1,51 @@
+    jQuery.fn[ o ] = function( f ){
+        return this.bind( o, f );
+    };
+});
+
+jQuery.each( [ "get", "post" ], function( i, method ) {
+    jQuery[ method ] = function( url, data, callback, type ) {
+        // shift arguments if data argument was omitted
+        if ( jQuery.isFunction( data ) ) {
+            type = type || callback;
+            callback = data;
+            data = undefined;
+        }
+
+        return jQuery.ajax({
+            type: method,
+            url: url,
+            data: data,
+            success: callback,
+            dataType: type
+        });
+    };
+});
+
+jQuery.extend({
+
+    getScript: function( url, callback ) {
+        return jQuery.get( url, undefined, callback, "script" );
+    },
+
+    getJSON: function( url, data, callback ) {
+        return jQuery.get( url, data, callback, "json" );
+    },
+
+    // Creates a full fledged settings object into target
+    // with both ajaxSettings and settings fields.
+    // If target is omitted, writes into ajaxSettings.
+    ajaxSetup: function ( target, settings ) {
+        if ( !settings ) {
+            // Only one parameter, we extend ajaxSettings
+            settings = target;
+            target = jQuery.extend( true, jQuery.ajaxSettings, settings );
+        } else {
+            // target was provided, we extend into it
+            jQuery.extend( true, target, jQuery.ajaxSettings, settings );
+        }
+        // Flatten fields we don't want deep extended
+        for( var field in { context: 1, url: 1 } ) {
+            if ( field in settings ) {
+                target[ field ] = settings[ field ];
+            } else if( field in jQuery.ajaxSettings ) {

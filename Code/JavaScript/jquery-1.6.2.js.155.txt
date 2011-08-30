@@ -1,0 +1,56 @@
+        var opt = speed && typeof speed === "object" ? jQuery.extend({}, speed) : {
+            complete: fn || !fn && easing ||
+                jQuery.isFunction( speed ) && speed,
+            duration: speed,
+            easing: fn && easing || easing && !jQuery.isFunction(easing) && easing
+        };
+
+        opt.duration = jQuery.fx.off ? 0 : typeof opt.duration === "number" ? opt.duration :
+            opt.duration in jQuery.fx.speeds ? jQuery.fx.speeds[opt.duration] : jQuery.fx.speeds._default;
+
+        // Queueing
+        opt.old = opt.complete;
+        opt.complete = function( noUnmark ) {
+            if ( jQuery.isFunction( opt.old ) ) {
+                opt.old.call( this );
+            }
+
+            if ( opt.queue !== false ) {
+                jQuery.dequeue( this );
+            } else if ( noUnmark !== false ) {
+                jQuery._unmark( this );
+            }
+        };
+
+        return opt;
+    },
+
+    easing: {
+        linear: function( p, n, firstNum, diff ) {
+            return firstNum + diff * p;
+        },
+        swing: function( p, n, firstNum, diff ) {
+            return ((-Math.cos(p*Math.PI)/2) + 0.5) * diff + firstNum;
+        }
+    },
+
+    timers: [],
+
+    fx: function( elem, options, prop ) {
+        this.options = options;
+        this.elem = elem;
+        this.prop = prop;
+
+        options.orig = options.orig || {};
+    }
+
+});
+
+jQuery.fx.prototype = {
+    // Simple function for setting a style value
+    update: function() {
+        if ( this.options.step ) {
+            this.options.step.call( this.elem, this.now, this );
+        }
+
+        (jQuery.fx.step[this.prop] || jQuery.fx.step._default)( this );

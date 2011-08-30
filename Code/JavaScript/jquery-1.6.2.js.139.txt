@@ -1,0 +1,43 @@
+                // numeric index to resolve deserialization ambiguity issues.
+                // Note that rack (as of 1.0.0) can't currently deserialize
+                // nested arrays properly, and attempting to do so may cause
+                // a server error. Possible fixes are to modify rack's
+                // deserialization algorithm or to provide an option or flag
+                // to force array serialization to be shallow.
+                buildParams( prefix + "[" + ( typeof v === "object" || jQuery.isArray(v) ? i : "" ) + "]", v, traditional, add );
+            }
+        });
+
+    } else if ( !traditional && obj != null && typeof obj === "object" ) {
+        // Serialize object item.
+        for ( var name in obj ) {
+            buildParams( prefix + "[" + name + "]", obj[ name ], traditional, add );
+        }
+
+    } else {
+        // Serialize scalar item.
+        add( prefix, obj );
+    }
+}
+
+// This is still on the jQuery object... for now
+// Want to move this to jQuery.ajax some day
+jQuery.extend({
+
+    // Counter for holding the number of active queries
+    active: 0,
+
+    // Last-Modified header cache for next request
+    lastModified: {},
+    etag: {}
+
+});
+
+/* Handles responses to an ajax request:
+ * - sets all responseXXX fields accordingly
+ * - finds the right dataType (mediates between content-type and expected dataType)
+ * - returns the corresponding response
+ */
+function ajaxHandleResponses( s, jqXHR, responses ) {
+
+    var contents = s.contents,

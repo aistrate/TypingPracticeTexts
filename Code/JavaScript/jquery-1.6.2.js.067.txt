@@ -1,0 +1,66 @@
+        } else {
+            handler = fn;
+        }
+
+        if ( type === "unload" && name !== "one" ) {
+            this.one( type, data, fn );
+
+        } else {
+            for ( var i = 0, l = this.length; i < l; i++ ) {
+                jQuery.event.add( this[i], type, handler, data );
+            }
+        }
+
+        return this;
+    };
+});
+
+jQuery.fn.extend({
+    unbind: function( type, fn ) {
+        // Handle object literals
+        if ( typeof type === "object" && !type.preventDefault ) {
+            for ( var key in type ) {
+                this.unbind(key, type[key]);
+            }
+
+        } else {
+            for ( var i = 0, l = this.length; i < l; i++ ) {
+                jQuery.event.remove( this[i], type, fn );
+            }
+        }
+
+        return this;
+    },
+
+    delegate: function( selector, types, data, fn ) {
+        return this.live( types, data, fn, selector );
+    },
+
+    undelegate: function( selector, types, fn ) {
+        if ( arguments.length === 0 ) {
+            return this.unbind( "live" );
+
+        } else {
+            return this.die( types, null, fn, selector );
+        }
+    },
+
+    trigger: function( type, data ) {
+        return this.each(function() {
+            jQuery.event.trigger( type, data, this );
+        });
+    },
+
+    triggerHandler: function( type, data ) {
+        if ( this[0] ) {
+            return jQuery.event.trigger( type, data, this[0], true );
+        }
+    },
+
+    toggle: function( fn ) {
+        // Save reference to arguments for access in closure
+        var args = arguments,
+            guid = fn.guid || jQuery.guid++,
+            i = 0,
+            toggler = function( event ) {
+                // Figure out which function to execute

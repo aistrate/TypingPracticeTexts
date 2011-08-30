@@ -1,0 +1,49 @@
+        // purpose in continuing
+        if ( !cache[ id ] ) {
+            return;
+        }
+
+        if ( name ) {
+            var thisCache = pvt ? cache[ id ][ internalKey ] : cache[ id ];
+
+            if ( thisCache ) {
+                delete thisCache[ name ];
+
+                // If there is no data left in the cache, we want to continue
+                // and let the cache object itself get destroyed
+                if ( !isEmptyDataObject(thisCache) ) {
+                    return;
+                }
+            }
+        }
+
+        // See jQuery.data for more information
+        if ( pvt ) {
+            delete cache[ id ][ internalKey ];
+
+            // Don't destroy the parent cache unless the internal data object
+            // had been the only thing left in it
+            if ( !isEmptyDataObject(cache[ id ]) ) {
+                return;
+            }
+        }
+
+        var internalCache = cache[ id ][ internalKey ];
+
+        // Browsers that fail expando deletion also refuse to delete expandos on
+        // the window, but it will allow it on all other JS objects; other browsers
+        // don't care
+        if ( jQuery.support.deleteExpando || cache != window ) {
+            delete cache[ id ];
+        } else {
+            cache[ id ] = null;
+        }
+
+        // We destroyed the entire user cache at once because it's faster than
+        // iterating through each key, but we need to continue to persist internal
+        // data if it existed
+        if ( internalCache ) {
+            cache[ id ] = {};
+            // TODO: This is a hack for 1.5 ONLY. Avoids exposing jQuery
+            // metadata on plain JS objects when the object is serialized using
+            // JSON.stringify

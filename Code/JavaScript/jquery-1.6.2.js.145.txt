@@ -1,0 +1,56 @@
+                        }
+                    }
+                };
+                // Use insertBefore instead of appendChild  to circumvent an IE6 bug.
+                // This arises when a base node is used (#2709 and #4378).
+                head.insertBefore( script, head.firstChild );
+            },
+
+            abort: function() {
+                if ( script ) {
+                    script.onload( 0, 1 );
+                }
+            }
+        };
+    }
+});
+
+
+
+
+var // #5280: Internet Explorer will keep connections alive if we don't abort on unload
+    xhrOnUnloadAbort = window.ActiveXObject ? function() {
+        // Abort all pending requests
+        for ( var key in xhrCallbacks ) {
+            xhrCallbacks[ key ]( 0, 1 );
+        }
+    } : false,
+    xhrId = 0,
+    xhrCallbacks;
+
+// Functions to create xhrs
+function createStandardXHR() {
+    try {
+        return new window.XMLHttpRequest();
+    } catch( e ) {}
+}
+
+function createActiveXHR() {
+    try {
+        return new window.ActiveXObject( "Microsoft.XMLHTTP" );
+    } catch( e ) {}
+}
+
+// Create the request object
+// (This is still attached to ajaxSettings for backward compatibility)
+jQuery.ajaxSettings.xhr = window.ActiveXObject ?
+    /* Microsoft failed to properly
+     * implement the XMLHttpRequest in IE7 (can't request local files),
+     * so we use the ActiveXObject when it is available
+     * Additionally XMLHttpRequest can be disabled in IE7/IE8 so
+     * we need a fallback.
+     */
+    function() {
+        return !this.isLocal && createStandardXHR() || createActiveXHR();
+    } :
+    // For all other browsers, use the standard XMLHttpRequest object

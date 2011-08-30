@@ -1,0 +1,52 @@
+            }
+
+            elem.setAttribute( name, name.toLowerCase() );
+        }
+        return name;
+    }
+};
+
+// IE6/7 do not support getting/setting some attributes with get/setAttribute
+if ( !jQuery.support.getSetAttribute ) {
+
+    // propFix is more comprehensive and contains all fixes
+    jQuery.attrFix = jQuery.propFix;
+    
+    // Use this for any attribute on a form in IE6/7
+    formHook = jQuery.attrHooks.name = jQuery.attrHooks.title = jQuery.valHooks.button = {
+        get: function( elem, name ) {
+            var ret;
+            ret = elem.getAttributeNode( name );
+            // Return undefined if nodeValue is empty string
+            return ret && ret.nodeValue !== "" ?
+                ret.nodeValue :
+                undefined;
+        },
+        set: function( elem, value, name ) {
+            // Check form objects in IE (multiple bugs related)
+            // Only use nodeValue if the attribute node exists on the form
+            var ret = elem.getAttributeNode( name );
+            if ( ret ) {
+                ret.nodeValue = value;
+                return value;
+            }
+        }
+    };
+
+    // Set width and height to auto instead of 0 on empty string( Bug #8150 )
+    // This is for removals
+    jQuery.each([ "width", "height" ], function( i, name ) {
+        jQuery.attrHooks[ name ] = jQuery.extend( jQuery.attrHooks[ name ], {
+            set: function( elem, value ) {
+                if ( value === "" ) {
+                    elem.setAttribute( name, "auto" );
+                    return value;
+                }
+            }
+        });
+    });
+}
+
+
+// Some attributes require a special call on IE
+if ( !jQuery.support.hrefNormalized ) {

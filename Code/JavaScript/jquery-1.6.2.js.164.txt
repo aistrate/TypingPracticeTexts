@@ -1,0 +1,41 @@
+        innerDiv.style.overflow = "hidden";
+        innerDiv.style.position = "relative";
+
+        this.subtractsBorderForOverflowNotVisible = (checkDiv.offsetTop === -5);
+
+        this.doesNotIncludeMarginInBodyOffset = (body.offsetTop !== bodyMarginTop);
+
+        body.removeChild( container );
+        jQuery.offset.initialize = jQuery.noop;
+    },
+
+    bodyOffset: function( body ) {
+        var top = body.offsetTop,
+            left = body.offsetLeft;
+
+        jQuery.offset.initialize();
+
+        if ( jQuery.offset.doesNotIncludeMarginInBodyOffset ) {
+            top  += parseFloat( jQuery.css(body, "marginTop") ) || 0;
+            left += parseFloat( jQuery.css(body, "marginLeft") ) || 0;
+        }
+
+        return { top: top, left: left };
+    },
+
+    setOffset: function( elem, options, i ) {
+        var position = jQuery.css( elem, "position" );
+
+        // set position first, in-case top/left are set even on static elem
+        if ( position === "static" ) {
+            elem.style.position = "relative";
+        }
+
+        var curElem = jQuery( elem ),
+            curOffset = curElem.offset(),
+            curCSSTop = jQuery.css( elem, "top" ),
+            curCSSLeft = jQuery.css( elem, "left" ),
+            calculatePosition = (position === "absolute" || position === "fixed") && jQuery.inArray("auto", [curCSSTop, curCSSLeft]) > -1,
+            props = {}, curPosition = {}, curTop, curLeft;
+
+        // need to be able to calculate position if either top or left is auto and position is either absolute or fixed

@@ -1,0 +1,54 @@
+                var lastToggle = ( jQuery.data( this, "lastToggle" + fn.guid ) || 0 ) % i;
+                jQuery.data( this, "lastToggle" + fn.guid, lastToggle + 1 );
+
+                // Make sure that clicks stop
+                event.preventDefault();
+
+                // and execute the function
+                return args[ lastToggle ].apply( this, arguments ) || false;
+            };
+
+        // link all the functions, so any of them can unbind this click handler
+        toggler.guid = guid;
+        while ( i < args.length ) {
+            args[ i++ ].guid = guid;
+        }
+
+        return this.click( toggler );
+    },
+
+    hover: function( fnOver, fnOut ) {
+        return this.mouseenter( fnOver ).mouseleave( fnOut || fnOver );
+    }
+});
+
+var liveMap = {
+    focus: "focusin",
+    blur: "focusout",
+    mouseenter: "mouseover",
+    mouseleave: "mouseout"
+};
+
+jQuery.each(["live", "die"], function( i, name ) {
+    jQuery.fn[ name ] = function( types, data, fn, origSelector /* Internal Use Only */ ) {
+        var type, i = 0, match, namespaces, preType,
+            selector = origSelector || this.selector,
+            context = origSelector ? this : jQuery( this.context );
+
+        if ( typeof types === "object" && !types.preventDefault ) {
+            for ( var key in types ) {
+                context[ name ]( key, data, types[key], selector );
+            }
+
+            return this;
+        }
+
+        if ( name === "die" && !types &&
+                    origSelector && origSelector.charAt(0) === "." ) {
+
+            context.unbind( origSelector );
+
+            return this;
+        }
+
+        if ( data === false || jQuery.isFunction( data ) ) {

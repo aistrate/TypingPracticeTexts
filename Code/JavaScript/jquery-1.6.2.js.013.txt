@@ -1,0 +1,57 @@
+            } else {
+                for ( ; i < length; ) {
+                    if ( callback.apply( object[ i++ ], args ) === false ) {
+                        break;
+                    }
+                }
+            }
+
+        // A special, fast, case for the most common use of each
+        } else {
+            if ( isObj ) {
+                for ( name in object ) {
+                    if ( callback.call( object[ name ], name, object[ name ] ) === false ) {
+                        break;
+                    }
+                }
+            } else {
+                for ( ; i < length; ) {
+                    if ( callback.call( object[ i ], i, object[ i++ ] ) === false ) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return object;
+    },
+
+    // Use native String.trim function wherever possible
+    trim: trim ?
+        function( text ) {
+            return text == null ?
+                "" :
+                trim.call( text );
+        } :
+
+        // Otherwise use our own trimming functionality
+        function( text ) {
+            return text == null ?
+                "" :
+                text.toString().replace( trimLeft, "" ).replace( trimRight, "" );
+        },
+
+    // results is for internal usage only
+    makeArray: function( array, results ) {
+        var ret = results || [];
+
+        if ( array != null ) {
+            // The window, strings (and functions) also have 'length'
+            // The extra typeof function check is to prevent crashes
+            // in Safari 2 (See: #3039)
+            // Tweaked logic slightly to handle Blackberry 4.7 RegExp issues #6930
+            var type = jQuery.type( array );
+
+            if ( array.length == null || type === "string" || type === "function" || type === "regexp" || jQuery.isWindow( array ) ) {
+                push.call( ret, array );
+            } else {

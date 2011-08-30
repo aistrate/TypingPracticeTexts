@@ -1,0 +1,61 @@
+                return elem.getAttribute("value") === null ? "on" : elem.value;
+            }
+        };
+    });
+}
+jQuery.each([ "radio", "checkbox" ], function() {
+    jQuery.valHooks[ this ] = jQuery.extend( jQuery.valHooks[ this ], {
+        set: function( elem, value ) {
+            if ( jQuery.isArray( value ) ) {
+                return (elem.checked = jQuery.inArray( jQuery(elem).val(), value ) >= 0);
+            }
+        }
+    });
+});
+
+
+
+
+var rnamespaces = /\.(.*)$/,
+    rformElems = /^(?:textarea|input|select)$/i,
+    rperiod = /\./g,
+    rspaces = / /g,
+    rescape = /[^\w\s.|`]/g,
+    fcleanup = function( nm ) {
+        return nm.replace(rescape, "\\$&");
+    };
+
+/*
+ * A number of helper functions used for managing events.
+ * Many of the ideas behind this code originated from
+ * Dean Edwards' addEvent library.
+ */
+jQuery.event = {
+
+    // Bind an event to an element
+    // Original by Dean Edwards
+    add: function( elem, types, handler, data ) {
+        if ( elem.nodeType === 3 || elem.nodeType === 8 ) {
+            return;
+        }
+
+        if ( handler === false ) {
+            handler = returnFalse;
+        } else if ( !handler ) {
+            // Fixes bug #7229. Fix recommended by jdalton
+            return;
+        }
+
+        var handleObjIn, handleObj;
+
+        if ( handler.handler ) {
+            handleObjIn = handler;
+            handler = handleObjIn.handler;
+        }
+
+        // Make sure that the function being executed has a unique ID
+        if ( !handler.guid ) {
+            handler.guid = jQuery.guid++;
+        }
+
+        // Init the element's event structure

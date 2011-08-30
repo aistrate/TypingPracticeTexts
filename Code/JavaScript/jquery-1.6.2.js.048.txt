@@ -1,0 +1,48 @@
+    jQuery.each([ "href", "src", "width", "height" ], function( i, name ) {
+        jQuery.attrHooks[ name ] = jQuery.extend( jQuery.attrHooks[ name ], {
+            get: function( elem ) {
+                var ret = elem.getAttribute( name, 2 );
+                return ret === null ? undefined : ret;
+            }
+        });
+    });
+}
+
+if ( !jQuery.support.style ) {
+    jQuery.attrHooks.style = {
+        get: function( elem ) {
+            // Return undefined in the case of empty string
+            // Normalize to lowercase since IE uppercases css property names
+            return elem.style.cssText.toLowerCase() || undefined;
+        },
+        set: function( elem, value ) {
+            return (elem.style.cssText = "" + value);
+        }
+    };
+}
+
+// Safari mis-reports the default selected property of an option
+// Accessing the parent's selectedIndex property fixes it
+if ( !jQuery.support.optSelected ) {
+    jQuery.propHooks.selected = jQuery.extend( jQuery.propHooks.selected, {
+        get: function( elem ) {
+            var parent = elem.parentNode;
+
+            if ( parent ) {
+                parent.selectedIndex;
+
+                // Make sure that it also works with optgroups, see #5701
+                if ( parent.parentNode ) {
+                    parent.parentNode.selectedIndex;
+                }
+            }
+        }
+    });
+}
+
+// Radios and checkboxes getter/setter
+if ( !jQuery.support.checkOn ) {
+    jQuery.each([ "radio", "checkbox" ], function() {
+        jQuery.valHooks[ this ] = {
+            get: function( elem ) {
+                // Handle the case where in Webkit "" is returned instead of "on" if a value isn't specified

@@ -1,0 +1,55 @@
+            // with an element if you are cloning the body and one of the
+            // elements on the page has a name or id of "length"
+            for ( i = 0; srcElements[i]; ++i ) {
+                cloneFixAttributes( srcElements[i], destElements[i] );
+            }
+        }
+
+        // Copy the events from the original to the clone
+        if ( dataAndEvents ) {
+            cloneCopyEvent( elem, clone );
+
+            if ( deepDataAndEvents ) {
+                srcElements = getAll( elem );
+                destElements = getAll( clone );
+
+                for ( i = 0; srcElements[i]; ++i ) {
+                    cloneCopyEvent( srcElements[i], destElements[i] );
+                }
+            }
+        }
+
+        srcElements = destElements = null;
+
+        // Return the cloned set
+        return clone;
+    },
+
+    clean: function( elems, context, fragment, scripts ) {
+        var checkScriptType;
+
+        context = context || document;
+
+        // !context.createElement fails in IE with an error but returns typeof 'object'
+        if ( typeof context.createElement === "undefined" ) {
+            context = context.ownerDocument || context[0] && context[0].ownerDocument || document;
+        }
+
+        var ret = [], j;
+
+        for ( var i = 0, elem; (elem = elems[i]) != null; i++ ) {
+            if ( typeof elem === "number" ) {
+                elem += "";
+            }
+
+            if ( !elem ) {
+                continue;
+            }
+
+            // Convert html string into DOM nodes
+            if ( typeof elem === "string" ) {
+                if ( !rhtml.test( elem ) ) {
+                    elem = context.createTextNode( elem );
+                } else {
+                    // Fix "XHTML"-style tags in all browsers
+                    elem = elem.replace(rxhtmlTag, "<$1></$2>");

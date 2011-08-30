@@ -1,0 +1,52 @@
+    // And so must :not(positional) so we move all PSEUDOs to the end
+    while ( (match = Expr.match.PSEUDO.exec( selector )) ) {
+        later += match[0];
+        selector = selector.replace( Expr.match.PSEUDO, "" );
+    }
+
+    selector = Expr.relative[selector] ? selector + "*" : selector;
+
+    for ( var i = 0, l = root.length; i < l; i++ ) {
+        Sizzle( selector, root[i], tmpSet );
+    }
+
+    return Sizzle.filter( later, tmpSet );
+};
+
+// EXPOSE
+jQuery.find = Sizzle;
+jQuery.expr = Sizzle.selectors;
+jQuery.expr[":"] = jQuery.expr.filters;
+jQuery.unique = Sizzle.uniqueSort;
+jQuery.text = Sizzle.getText;
+jQuery.isXMLDoc = Sizzle.isXML;
+jQuery.contains = Sizzle.contains;
+
+
+})();
+
+
+var runtil = /Until$/,
+    rparentsprev = /^(?:parents|prevUntil|prevAll)/,
+    // Note: This RegExp should be improved, or likely pulled from Sizzle
+    rmultiselector = /,/,
+    isSimple = /^.[^:#\[\.,]*$/,
+    slice = Array.prototype.slice,
+    POS = jQuery.expr.match.POS,
+    // methods guaranteed to produce a unique set when starting from a unique set
+    guaranteedUnique = {
+        children: true,
+        contents: true,
+        next: true,
+        prev: true
+    };
+
+jQuery.fn.extend({
+    find: function( selector ) {
+        var self = this,
+            i, l;
+
+        if ( typeof selector !== "string" ) {
+            return jQuery( selector ).filter(function() {
+                for ( i = 0, l = self.length; i < l; i++ ) {
+                    if ( jQuery.contains( self[ i ], this ) ) {

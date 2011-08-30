@@ -1,0 +1,43 @@
+    div.style.width = div.style.paddingLeft = "1px";
+
+    body = document.getElementsByTagName( "body" )[ 0 ];
+    // We use our own, invisible, body unless the body is already present
+    // in which case we use a div (#9239)
+    testElement = document.createElement( body ? "div" : "body" );
+    testElementStyle = {
+        visibility: "hidden",
+        width: 0,
+        height: 0,
+        border: 0,
+        margin: 0
+    };
+    if ( body ) {
+        jQuery.extend( testElementStyle, {
+            position: "absolute",
+            left: -1000,
+            top: -1000
+        });
+    }
+    for ( i in testElementStyle ) {
+        testElement.style[ i ] = testElementStyle[ i ];
+    }
+    testElement.appendChild( div );
+    testElementParent = body || documentElement;
+    testElementParent.insertBefore( testElement, testElementParent.firstChild );
+
+    // Check if a disconnected checkbox will retain its checked
+    // value of true after appended to the DOM (IE6/7)
+    support.appendChecked = input.checked;
+
+    support.boxModel = div.offsetWidth === 2;
+
+    if ( "zoom" in div.style ) {
+        // Check if natively block-level elements act like inline-block
+        // elements when setting their display to 'inline' and giving
+        // them layout
+        // (IE < 8 does this)
+        div.style.display = "inline";
+        div.style.zoom = 1;
+        support.inlineBlockNeedsLayout = ( div.offsetWidth === 2 );
+
+        // Check if elements with layout shrink-wrap their children

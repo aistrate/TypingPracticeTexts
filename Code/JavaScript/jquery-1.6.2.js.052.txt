@@ -1,0 +1,60 @@
+        if ( elem.nodeType === 3 || elem.nodeType === 8 ) {
+            return;
+        }
+
+        if ( handler === false ) {
+            handler = returnFalse;
+        }
+
+        var ret, type, fn, j, i = 0, all, namespaces, namespace, special, eventType, handleObj, origType,
+            elemData = jQuery.hasData( elem ) && jQuery._data( elem ),
+            events = elemData && elemData.events;
+
+        if ( !elemData || !events ) {
+            return;
+        }
+
+        // types is actually an event object here
+        if ( types && types.type ) {
+            handler = types.handler;
+            types = types.type;
+        }
+
+        // Unbind all events for the element
+        if ( !types || typeof types === "string" && types.charAt(0) === "." ) {
+            types = types || "";
+
+            for ( type in events ) {
+                jQuery.event.remove( elem, type + types );
+            }
+
+            return;
+        }
+
+        // Handle multiple events separated by a space
+        // jQuery(...).unbind("mouseover mouseout", fn);
+        types = types.split(" ");
+
+        while ( (type = types[ i++ ]) ) {
+            origType = type;
+            handleObj = null;
+            all = type.indexOf(".") < 0;
+            namespaces = [];
+
+            if ( !all ) {
+                // Namespaced event handlers
+                namespaces = type.split(".");
+                type = namespaces.shift();
+
+                namespace = new RegExp("(^|\\.)" +
+                    jQuery.map( namespaces.slice(0).sort(), fcleanup ).join("\\.(?:.*\\.)?") + "(\\.|$)");
+            }
+
+            eventType = events[ type ];
+
+            if ( !eventType ) {
+                continue;
+            }
+
+            if ( !handler ) {
+                for ( j = 0; j < eventType.length; j++ ) {

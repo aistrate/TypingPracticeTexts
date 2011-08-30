@@ -1,0 +1,54 @@
+            }
+        }
+
+        return this;
+    }
+});
+
+function root( elem, cur ) {
+    return jQuery.nodeName(elem, "table") ?
+        (elem.getElementsByTagName("tbody")[0] ||
+        elem.appendChild(elem.ownerDocument.createElement("tbody"))) :
+        elem;
+}
+
+function cloneCopyEvent( src, dest ) {
+
+    if ( dest.nodeType !== 1 || !jQuery.hasData( src ) ) {
+        return;
+    }
+
+    var internalKey = jQuery.expando,
+        oldData = jQuery.data( src ),
+        curData = jQuery.data( dest, oldData );
+
+    // Switch to use the internal data object, if it exists, for the next
+    // stage of data copying
+    if ( (oldData = oldData[ internalKey ]) ) {
+        var events = oldData.events;
+                curData = curData[ internalKey ] = jQuery.extend({}, oldData);
+
+        if ( events ) {
+            delete curData.handle;
+            curData.events = {};
+
+            for ( var type in events ) {
+                for ( var i = 0, l = events[ type ].length; i < l; i++ ) {
+                    jQuery.event.add( dest, type + ( events[ type ][ i ].namespace ? "." : "" ) + events[ type ][ i ].namespace, events[ type ][ i ], events[ type ][ i ].data );
+                }
+            }
+        }
+    }
+}
+
+function cloneFixAttributes( src, dest ) {
+    var nodeName;
+
+    // We do not need to do anything for non-Elements
+    if ( dest.nodeType !== 1 ) {
+        return;
+    }
+
+    // clearAttributes removes the attributes, which we don't want,
+    // but also removes the attachEvent events, which we *do* want
+    if ( dest.clearAttributes ) {

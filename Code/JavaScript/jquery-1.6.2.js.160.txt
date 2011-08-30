@@ -1,0 +1,56 @@
+            // IE and Opera will allow us to reuse the iframeDoc without re-writing the fake HTML
+            // document to it; WebKit & Firefox won't allow reusing the iframe document.
+            if ( !iframeDoc || !iframe.createElement ) {
+                iframeDoc = ( iframe.contentWindow || iframe.contentDocument ).document;
+                iframeDoc.write( ( document.compatMode === "CSS1Compat" ? "<!doctype html>" : "" ) + "<html><body>" );
+                iframeDoc.close();
+            }
+
+            elem = iframeDoc.createElement( nodeName );
+
+            iframeDoc.body.appendChild( elem );
+
+            display = jQuery.css( elem, "display" );
+
+            body.removeChild( iframe );
+        }
+
+        // Store the correct default display
+        elemdisplay[ nodeName ] = display;
+    }
+
+    return elemdisplay[ nodeName ];
+}
+
+
+
+
+var rtable = /^t(?:able|d|h)$/i,
+    rroot = /^(?:body|html)$/i;
+
+if ( "getBoundingClientRect" in document.documentElement ) {
+    jQuery.fn.offset = function( options ) {
+        var elem = this[0], box;
+
+        if ( options ) {
+            return this.each(function( i ) {
+                jQuery.offset.setOffset( this, options, i );
+            });
+        }
+
+        if ( !elem || !elem.ownerDocument ) {
+            return null;
+        }
+
+        if ( elem === elem.ownerDocument.body ) {
+            return jQuery.offset.bodyOffset( elem );
+        }
+
+        try {
+            box = elem.getBoundingClientRect();
+        } catch(e) {}
+
+        var doc = elem.ownerDocument,
+            docElem = doc.documentElement;
+
+        // Make sure we're not dealing with a disconnected DOM node

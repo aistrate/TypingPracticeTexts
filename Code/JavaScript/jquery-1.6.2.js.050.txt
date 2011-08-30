@@ -1,0 +1,49 @@
+        var elemData = jQuery._data( elem );
+
+        // If no elemData is found then we must be trying to bind to one of the
+        // banned noData elements
+        if ( !elemData ) {
+            return;
+        }
+
+        var events = elemData.events,
+            eventHandle = elemData.handle;
+
+        if ( !events ) {
+            elemData.events = events = {};
+        }
+
+        if ( !eventHandle ) {
+            elemData.handle = eventHandle = function( e ) {
+                // Discard the second event of a jQuery.event.trigger() and
+                // when an event is called after a page has unloaded
+                return typeof jQuery !== "undefined" && (!e || jQuery.event.triggered !== e.type) ?
+                    jQuery.event.handle.apply( eventHandle.elem, arguments ) :
+                    undefined;
+            };
+        }
+
+        // Add elem as a property of the handle function
+        // This is to prevent a memory leak with non-native events in IE.
+        eventHandle.elem = elem;
+
+        // Handle multiple events separated by a space
+        // jQuery(...).bind("mouseover mouseout", fn);
+        types = types.split(" ");
+
+        var type, i = 0, namespaces;
+
+        while ( (type = types[ i++ ]) ) {
+            handleObj = handleObjIn ?
+                jQuery.extend({}, handleObjIn) :
+                { handler: handler, data: data };
+
+            // Namespaced event handlers
+            if ( type.indexOf(".") > -1 ) {
+                namespaces = type.split(".");
+                type = namespaces.shift();
+                handleObj.namespace = namespaces.slice(0).sort().join(".");
+
+            } else {
+                namespaces = [];
+                handleObj.namespace = "";

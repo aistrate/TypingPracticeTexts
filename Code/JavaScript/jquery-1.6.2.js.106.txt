@@ -1,0 +1,52 @@
+            // this can help fix replacing a parent with child elements
+            if ( jQuery.isFunction( value ) ) {
+                return this.each(function(i) {
+                    var self = jQuery(this), old = self.html();
+                    self.replaceWith( value.call( this, i, old ) );
+                });
+            }
+
+            if ( typeof value !== "string" ) {
+                value = jQuery( value ).detach();
+            }
+
+            return this.each(function() {
+                var next = this.nextSibling,
+                    parent = this.parentNode;
+
+                jQuery( this ).remove();
+
+                if ( next ) {
+                    jQuery(next).before( value );
+                } else {
+                    jQuery(parent).append( value );
+                }
+            });
+        } else {
+            return this.length ?
+                this.pushStack( jQuery(jQuery.isFunction(value) ? value() : value), "replaceWith", value ) :
+                this;
+        }
+    },
+
+    detach: function( selector ) {
+        return this.remove( selector, true );
+    },
+
+    domManip: function( args, table, callback ) {
+        var results, first, fragment, parent,
+            value = args[0],
+            scripts = [];
+
+        // We can't cloneNode fragments that contain checked, in WebKit
+        if ( !jQuery.support.checkClone && arguments.length === 3 && typeof value === "string" && rchecked.test( value ) ) {
+            return this.each(function() {
+                jQuery(this).domManip( args, table, callback, true );
+            });
+        }
+
+        if ( jQuery.isFunction(value) ) {
+            return this.each(function(i) {
+                var self = jQuery(this);
+                args[0] = value.call(this, i, table ? self.html() : undefined);
+                self.domManip( args, table, callback );

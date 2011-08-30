@@ -1,0 +1,50 @@
+        }
+
+        tmp = xml.documentElement;
+
+        if ( ! tmp || ! tmp.nodeName || tmp.nodeName === "parsererror" ) {
+            jQuery.error( "Invalid XML: " + data );
+        }
+
+        return xml;
+    },
+
+    noop: function() {},
+
+    // Evaluates a script in a global context
+    // Workarounds based on findings by Jim Driscoll
+    // http://weblogs.java.net/blog/driscoll/archive/2009/09/08/eval-javascript-global-context
+    globalEval: function( data ) {
+        if ( data && rnotwhite.test( data ) ) {
+            // We use execScript on Internet Explorer
+            // We use an anonymous function so that context is window
+            // rather than jQuery in Firefox
+            ( window.execScript || function( data ) {
+                window[ "eval" ].call( window, data );
+            } )( data );
+        }
+    },
+
+    // Converts a dashed string to camelCased string;
+    // Used by both the css and data modules
+    camelCase: function( string ) {
+        return string.replace( rdashAlpha, fcamelCase );
+    },
+
+    nodeName: function( elem, name ) {
+        return elem.nodeName && elem.nodeName.toUpperCase() === name.toUpperCase();
+    },
+
+    // args is for internal usage only
+    each: function( object, callback, args ) {
+        var name, i = 0,
+            length = object.length,
+            isObj = length === undefined || jQuery.isFunction( object );
+
+        if ( args ) {
+            if ( isObj ) {
+                for ( name in object ) {
+                    if ( callback.apply( object[ name ], args ) === false ) {
+                        break;
+                    }
+                }

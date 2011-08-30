@@ -1,0 +1,49 @@
+    },
+
+    // Get the current size
+    cur: function() {
+        if ( this.elem[this.prop] != null && (!this.elem.style || this.elem.style[this.prop] == null) ) {
+            return this.elem[ this.prop ];
+        }
+
+        var parsed,
+            r = jQuery.css( this.elem, this.prop );
+        // Empty strings, null, undefined and "auto" are converted to 0,
+        // complex values such as "rotate(1rad)" are returned as is,
+        // simple values such as "10px" are parsed to Float.
+        return isNaN( parsed = parseFloat( r ) ) ? !r || r === "auto" ? 0 : r : parsed;
+    },
+
+    // Start an animation from one number to another
+    custom: function( from, to, unit ) {
+        var self = this,
+            fx = jQuery.fx,
+            raf;
+
+        this.startTime = fxNow || createFxNow();
+        this.start = from;
+        this.end = to;
+        this.unit = unit || this.unit || ( jQuery.cssNumber[ this.prop ] ? "" : "px" );
+        this.now = this.start;
+        this.pos = this.state = 0;
+
+        function t( gotoEnd ) {
+            return self.step(gotoEnd);
+        }
+
+        t.elem = this.elem;
+
+        if ( t() && jQuery.timers.push(t) && !timerId ) {
+            // Use requestAnimationFrame instead of setInterval if available
+            if ( requestAnimationFrame ) {
+                timerId = true;
+                raf = function() {
+                    // When timerId gets set to null at any point, this stops
+                    if ( timerId ) {
+                        requestAnimationFrame( raf );
+                        fx.tick();
+                    }
+                };
+                requestAnimationFrame( raf );
+            } else {
+                timerId = setInterval( fx.tick, fx.interval );

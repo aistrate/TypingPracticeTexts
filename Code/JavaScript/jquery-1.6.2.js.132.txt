@@ -1,0 +1,63 @@
+                        requestHeaders[ name ] = value;
+                    }
+                    return this;
+                },
+
+                // Raw string
+                getAllResponseHeaders: function() {
+                    return state === 2 ? responseHeadersString : null;
+                },
+
+                // Builds headers hashtable if needed
+                getResponseHeader: function( key ) {
+                    var match;
+                    if ( state === 2 ) {
+                        if ( !responseHeaders ) {
+                            responseHeaders = {};
+                            while( ( match = rheaders.exec( responseHeadersString ) ) ) {
+                                responseHeaders[ match[1].toLowerCase() ] = match[ 2 ];
+                            }
+                        }
+                        match = responseHeaders[ key.toLowerCase() ];
+                    }
+                    return match === undefined ? null : match;
+                },
+
+                // Overrides response content-type header
+                overrideMimeType: function( type ) {
+                    if ( !state ) {
+                        s.mimeType = type;
+                    }
+                    return this;
+                },
+
+                // Cancel the request
+                abort: function( statusText ) {
+                    statusText = statusText || "abort";
+                    if ( transport ) {
+                        transport.abort( statusText );
+                    }
+                    done( 0, statusText );
+                    return this;
+                }
+            };
+
+        // Callback for when everything is done
+        // It is defined here because jslint complains if it is declared
+        // at the end of the function (which would be more logical and readable)
+        function done( status, statusText, responses, headers ) {
+
+            // Called once
+            if ( state === 2 ) {
+                return;
+            }
+
+            // State is "done" now
+            state = 2;
+
+            // Clear timeout if it exists
+            if ( timeoutTimer ) {
+                clearTimeout( timeoutTimer );
+            }
+
+            // Dereference transport for early garbage collection

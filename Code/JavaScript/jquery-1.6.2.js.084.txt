@@ -1,0 +1,63 @@
+                        return true;
+                    }
+                    
+                    var doneName = match[0],
+                        parent = elem.parentNode;
+    
+                    if ( parent && (parent.sizcache !== doneName || !elem.nodeIndex) ) {
+                        var count = 0;
+                        
+                        for ( node = parent.firstChild; node; node = node.nextSibling ) {
+                            if ( node.nodeType === 1 ) {
+                                node.nodeIndex = ++count;
+                            }
+                        } 
+
+                        parent.sizcache = doneName;
+                    }
+                    
+                    var diff = elem.nodeIndex - last;
+
+                    if ( first === 0 ) {
+                        return diff === 0;
+
+                    } else {
+                        return ( diff % first === 0 && diff / first >= 0 );
+                    }
+            }
+        },
+
+        ID: function( elem, match ) {
+            return elem.nodeType === 1 && elem.getAttribute("id") === match;
+        },
+
+        TAG: function( elem, match ) {
+            return (match === "*" && elem.nodeType === 1) || elem.nodeName.toLowerCase() === match;
+        },
+        
+        CLASS: function( elem, match ) {
+            return (" " + (elem.className || elem.getAttribute("class")) + " ")
+                .indexOf( match ) > -1;
+        },
+
+        ATTR: function( elem, match ) {
+            var name = match[1],
+                result = Expr.attrHandle[ name ] ?
+                    Expr.attrHandle[ name ]( elem ) :
+                    elem[ name ] != null ?
+                        elem[ name ] :
+                        elem.getAttribute( name ),
+                value = result + "",
+                type = match[2],
+                check = match[4];
+
+            return result == null ?
+                type === "!=" :
+                type === "=" ?
+                value === check :
+                type === "*=" ?
+                value.indexOf(check) >= 0 :
+                type === "~=" ?
+                (" " + value + " ").indexOf(check) >= 0 :
+                !check ?
+                value && result !== false :

@@ -1,0 +1,57 @@
+        }
+        return deferred.promise();
+    }
+});
+
+
+
+jQuery.support = (function() {
+
+    var div = document.createElement( "div" ),
+        documentElement = document.documentElement,
+        all,
+        a,
+        select,
+        opt,
+        input,
+        marginDiv,
+        support,
+        fragment,
+        body,
+        testElementParent,
+        testElement,
+        testElementStyle,
+        tds,
+        events,
+        eventName,
+        i,
+        isSupported;
+
+    // Preliminary tests
+    div.setAttribute("className", "t");
+    div.innerHTML = "   <link/><table></table><a href='/a' style='top:1px;float:left;opacity:.55;'>a</a><input type='checkbox'/>";
+
+    all = div.getElementsByTagName( "*" );
+    a = div.getElementsByTagName( "a" )[ 0 ];
+
+    // Can't get basic test support
+    if ( !all || !all.length || !a ) {
+        return {};
+    }
+
+    // First batch of supports tests
+    select = document.createElement( "select" );
+    opt = select.appendChild( document.createElement("option") );
+    input = div.getElementsByTagName( "input" )[ 0 ];
+
+    support = {
+        // IE strips leading whitespace when .innerHTML is used
+        leadingWhitespace: ( div.firstChild.nodeType === 3 ),
+
+        // Make sure that tbody elements aren't automatically inserted
+        // IE will insert them into empty tables
+        tbody: !div.getElementsByTagName( "tbody" ).length,
+
+        // Make sure that link elements get serialized correctly by innerHTML
+        // This requires a wrapper element in IE
+        htmlSerialize: !!div.getElementsByTagName( "link" ).length,

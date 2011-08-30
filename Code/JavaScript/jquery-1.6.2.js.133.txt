@@ -1,0 +1,62 @@
+            // (no matter how long the jqXHR object will be used)
+            transport = undefined;
+
+            // Cache response headers
+            responseHeadersString = headers || "";
+
+            // Set readyState
+            jqXHR.readyState = status ? 4 : 0;
+
+            var isSuccess,
+                success,
+                error,
+                response = responses ? ajaxHandleResponses( s, jqXHR, responses ) : undefined,
+                lastModified,
+                etag;
+
+            // If successful, handle type chaining
+            if ( status >= 200 && status < 300 || status === 304 ) {
+
+                // Set the If-Modified-Since and/or If-None-Match header, if in ifModified mode.
+                if ( s.ifModified ) {
+
+                    if ( ( lastModified = jqXHR.getResponseHeader( "Last-Modified" ) ) ) {
+                        jQuery.lastModified[ ifModifiedKey ] = lastModified;
+                    }
+                    if ( ( etag = jqXHR.getResponseHeader( "Etag" ) ) ) {
+                        jQuery.etag[ ifModifiedKey ] = etag;
+                    }
+                }
+
+                // If not modified
+                if ( status === 304 ) {
+
+                    statusText = "notmodified";
+                    isSuccess = true;
+
+                // If we have data
+                } else {
+
+                    try {
+                        success = ajaxConvert( s, response );
+                        statusText = "success";
+                        isSuccess = true;
+                    } catch(e) {
+                        // We have a parsererror
+                        statusText = "parsererror";
+                        error = e;
+                    }
+                }
+            } else {
+                // We extract error from statusText
+                // then normalize statusText and status for non-aborts
+                error = statusText;
+                if( !statusText || status ) {
+                    statusText = "error";
+                    if ( status < 0 ) {
+                        status = 0;
+                    }
+                }
+            }
+
+            // Set data for the fake xhr object

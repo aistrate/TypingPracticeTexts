@@ -1,0 +1,60 @@
+            if ( !jQuery.nodeName( this, "form" ) ) {
+                jQuery.event.add(this, "click.specialSubmit", function( e ) {
+                    var elem = e.target,
+                        type = elem.type;
+
+                    if ( (type === "submit" || type === "image") && jQuery( elem ).closest("form").length ) {
+                        trigger( "submit", this, arguments );
+                    }
+                });
+
+                jQuery.event.add(this, "keypress.specialSubmit", function( e ) {
+                    var elem = e.target,
+                        type = elem.type;
+
+                    if ( (type === "text" || type === "password") && jQuery( elem ).closest("form").length && e.keyCode === 13 ) {
+                        trigger( "submit", this, arguments );
+                    }
+                });
+
+            } else {
+                return false;
+            }
+        },
+
+        teardown: function( namespaces ) {
+            jQuery.event.remove( this, ".specialSubmit" );
+        }
+    };
+
+}
+
+// change delegation, happens here so we have bind.
+if ( !jQuery.support.changeBubbles ) {
+
+    var changeFilters,
+
+    getVal = function( elem ) {
+        var type = elem.type, val = elem.value;
+
+        if ( type === "radio" || type === "checkbox" ) {
+            val = elem.checked;
+
+        } else if ( type === "select-multiple" ) {
+            val = elem.selectedIndex > -1 ?
+                jQuery.map( elem.options, function( elem ) {
+                    return elem.selected;
+                }).join("-") :
+                "";
+
+        } else if ( jQuery.nodeName( elem, "select" ) ) {
+            val = elem.selectedIndex;
+        }
+
+        return val;
+    },
+
+    testChange = function testChange( e ) {
+        var elem = e.target, data, val;
+
+        if ( !rformElems.test( elem.nodeName ) || elem.readOnly ) {

@@ -1,0 +1,66 @@
+                        if ( !jQuery.support.inlineBlockNeedsLayout ) {
+                            this.style.display = "inline-block";
+
+                        } else {
+                            display = defaultDisplay( this.nodeName );
+
+                            // inline-level elements accept inline-block;
+                            // block-level elements need to be inline with layout
+                            if ( display === "inline" ) {
+                                this.style.display = "inline-block";
+
+                            } else {
+                                this.style.display = "inline";
+                                this.style.zoom = 1;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ( opt.overflow != null ) {
+                this.style.overflow = "hidden";
+            }
+
+            for ( p in prop ) {
+                e = new jQuery.fx( this, opt, p );
+                val = prop[ p ];
+
+                if ( rfxtypes.test(val) ) {
+                    e[ val === "toggle" ? hidden ? "show" : "hide" : val ]();
+
+                } else {
+                    parts = rfxnum.exec( val );
+                    start = e.cur();
+
+                    if ( parts ) {
+                        end = parseFloat( parts[2] );
+                        unit = parts[3] || ( jQuery.cssNumber[ p ] ? "" : "px" );
+
+                        // We need to compute starting value
+                        if ( unit !== "px" ) {
+                            jQuery.style( this, p, (end || 1) + unit);
+                            start = ((end || 1) / e.cur()) * start;
+                            jQuery.style( this, p, start + unit);
+                        }
+
+                        // If a +=/-= token was provided, we're doing a relative animation
+                        if ( parts[1] ) {
+                            end = ( (parts[ 1 ] === "-=" ? -1 : 1) * end ) + start;
+                        }
+
+                        e.custom( start, end, unit );
+
+                    } else {
+                        e.custom( start, val, "" );
+                    }
+                }
+            }
+
+            // For JS strict compliance
+            return true;
+        });
+    },
+
+    stop: function( clearQueue, gotoEnd ) {
+        if ( clearQueue ) {

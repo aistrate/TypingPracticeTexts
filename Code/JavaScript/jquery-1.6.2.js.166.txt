@@ -1,0 +1,62 @@
+        parentOffset.left += parseFloat( jQuery.css(offsetParent[0], "borderLeftWidth") ) || 0;
+
+        // Subtract the two offsets
+        return {
+            top:  offset.top  - parentOffset.top,
+            left: offset.left - parentOffset.left
+        };
+    },
+
+    offsetParent: function() {
+        return this.map(function() {
+            var offsetParent = this.offsetParent || document.body;
+            while ( offsetParent && (!rroot.test(offsetParent.nodeName) && jQuery.css(offsetParent, "position") === "static") ) {
+                offsetParent = offsetParent.offsetParent;
+            }
+            return offsetParent;
+        });
+    }
+});
+
+
+// Create scrollLeft and scrollTop methods
+jQuery.each( ["Left", "Top"], function( i, name ) {
+    var method = "scroll" + name;
+
+    jQuery.fn[ method ] = function( val ) {
+        var elem, win;
+
+        if ( val === undefined ) {
+            elem = this[ 0 ];
+
+            if ( !elem ) {
+                return null;
+            }
+
+            win = getWindow( elem );
+
+            // Return the scroll offset
+            return win ? ("pageXOffset" in win) ? win[ i ? "pageYOffset" : "pageXOffset" ] :
+                jQuery.support.boxModel && win.document.documentElement[ method ] ||
+                    win.document.body[ method ] :
+                elem[ method ];
+        }
+
+        // Set the scroll offset
+        return this.each(function() {
+            win = getWindow( this );
+
+            if ( win ) {
+                win.scrollTo(
+                    !i ? val : jQuery( win ).scrollLeft(),
+                     i ? val : jQuery( win ).scrollTop()
+                );
+
+            } else {
+                this[ method ] = val;
+            }
+        });
+    };
+});
+
+function getWindow( elem ) {

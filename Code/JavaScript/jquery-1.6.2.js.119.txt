@@ -1,0 +1,56 @@
+                return ret;
+            }
+
+            // Otherwise just get the value from the style object
+            return style[ name ];
+        }
+    },
+
+    css: function( elem, name, extra ) {
+        var ret, hooks;
+
+        // Make sure that we're working with the right name
+        name = jQuery.camelCase( name );
+        hooks = jQuery.cssHooks[ name ];
+        name = jQuery.cssProps[ name ] || name;
+
+        // cssFloat needs a special treatment
+        if ( name === "cssFloat" ) {
+            name = "float";
+        }
+
+        // If a hook was provided get the computed value from there
+        if ( hooks && "get" in hooks && (ret = hooks.get( elem, true, extra )) !== undefined ) {
+            return ret;
+
+        // Otherwise, if a way to get the computed value exists, use that
+        } else if ( curCSS ) {
+            return curCSS( elem, name );
+        }
+    },
+
+    // A method for quickly swapping in/out CSS properties to get correct calculations
+    swap: function( elem, options, callback ) {
+        var old = {};
+
+        // Remember the old values, and insert the new ones
+        for ( var name in options ) {
+            old[ name ] = elem.style[ name ];
+            elem.style[ name ] = options[ name ];
+        }
+
+        callback.call( elem );
+
+        // Revert the old values
+        for ( name in options ) {
+            elem.style[ name ] = old[ name ];
+        }
+    }
+});
+
+// DEPRECATED, Use jQuery.css() instead
+jQuery.curCSS = jQuery.css;
+
+jQuery.each(["height", "width"], function( i, name ) {
+    jQuery.cssHooks[ name ] = {
+        get: function( elem, computed, extra ) {

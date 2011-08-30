@@ -1,0 +1,49 @@
+        }
+
+        // Add which for key events
+        if ( event.which == null && (event.charCode != null || event.keyCode != null) ) {
+            event.which = event.charCode != null ? event.charCode : event.keyCode;
+        }
+
+        // Add metaKey to non-Mac browsers (use ctrl for PC's and Meta for Macs)
+        if ( !event.metaKey && event.ctrlKey ) {
+            event.metaKey = event.ctrlKey;
+        }
+
+        // Add which for click: 1 === left; 2 === middle; 3 === right
+        // Note: button is not normalized, so don't use it
+        if ( !event.which && event.button !== undefined ) {
+            event.which = (event.button & 1 ? 1 : ( event.button & 2 ? 3 : ( event.button & 4 ? 2 : 0 ) ));
+        }
+
+        return event;
+    },
+
+    // Deprecated, use jQuery.guid instead
+    guid: 1E8,
+
+    // Deprecated, use jQuery.proxy instead
+    proxy: jQuery.proxy,
+
+    special: {
+        ready: {
+            // Make sure the ready event is setup
+            setup: jQuery.bindReady,
+            teardown: jQuery.noop
+        },
+
+        live: {
+            add: function( handleObj ) {
+                jQuery.event.add( this,
+                    liveConvert( handleObj.origType, handleObj.selector ),
+                    jQuery.extend({}, handleObj, {handler: liveHandler, guid: handleObj.handler.guid}) );
+            },
+
+            remove: function( handleObj ) {
+                jQuery.event.remove( this, liveConvert( handleObj.origType, handleObj.selector ), handleObj );
+            }
+        },
+
+        beforeunload: {
+            setup: function( data, namespaces, eventHandle ) {
+                // We only want to do this special case on windows

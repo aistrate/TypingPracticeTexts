@@ -1,0 +1,63 @@
+            var val;
+
+            if ( computed ) {
+                if ( elem.offsetWidth !== 0 ) {
+                    return getWH( elem, name, extra );
+                } else {
+                    jQuery.swap( elem, cssShow, function() {
+                        val = getWH( elem, name, extra );
+                    });
+                }
+
+                return val;
+            }
+        },
+
+        set: function( elem, value ) {
+            if ( rnumpx.test( value ) ) {
+                // ignore negative width and height values #1599
+                value = parseFloat( value );
+
+                if ( value >= 0 ) {
+                    return value + "px";
+                }
+
+            } else {
+                return value;
+            }
+        }
+    };
+});
+
+if ( !jQuery.support.opacity ) {
+    jQuery.cssHooks.opacity = {
+        get: function( elem, computed ) {
+            // IE uses filters for opacity
+            return ropacity.test( (computed && elem.currentStyle ? elem.currentStyle.filter : elem.style.filter) || "" ) ?
+                ( parseFloat( RegExp.$1 ) / 100 ) + "" :
+                computed ? "1" : "";
+        },
+
+        set: function( elem, value ) {
+            var style = elem.style,
+                currentStyle = elem.currentStyle;
+
+            // IE has trouble with opacity if it does not have layout
+            // Force it by setting the zoom level
+            style.zoom = 1;
+
+            // Set the alpha filter to set the opacity
+            var opacity = jQuery.isNaN( value ) ?
+                "" :
+                "alpha(opacity=" + value * 100 + ")",
+                filter = currentStyle && currentStyle.filter || style.filter || "";
+
+            style.filter = ralpha.test( filter ) ?
+                filter.replace( ralpha, opacity ) :
+                filter + " " + opacity;
+        }
+    };
+}
+
+jQuery(function() {
+    // This hook cannot be added until DOM ready because the support test

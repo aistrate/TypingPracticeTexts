@@ -1,0 +1,46 @@
+        matches = html.matchesSelector || html.mozMatchesSelector || html.webkitMatchesSelector || html.msMatchesSelector;
+
+    if ( matches ) {
+        // Check to see if it's possible to do matchesSelector
+        // on a disconnected node (IE 9 fails this)
+        var disconnectedMatch = !matches.call( document.createElement( "div" ), "div" ),
+            pseudoWorks = false;
+
+        try {
+            // This should fail with an exception
+            // Gecko does not error, returns false instead
+            matches.call( document.documentElement, "[test!='']:sizzle" );
+    
+        } catch( pseudoError ) {
+            pseudoWorks = true;
+        }
+
+        Sizzle.matchesSelector = function( node, expr ) {
+            // Make sure that attribute selectors are quoted
+            expr = expr.replace(/\=\s*([^'"\]]*)\s*\]/g, "='$1']");
+
+            if ( !Sizzle.isXML( node ) ) {
+                try { 
+                    if ( pseudoWorks || !Expr.match.PSEUDO.test( expr ) && !/!=/.test( expr ) ) {
+                        var ret = matches.call( node, expr );
+
+                        // IE 9's matchesSelector returns false on disconnected nodes
+                        if ( ret || !disconnectedMatch ||
+                                // As well, disconnected nodes are said to be in a document
+                                // fragment in IE 9, so check for that
+                                node.document && node.document.nodeType !== 11 ) {
+                            return ret;
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            return Sizzle(expr, null, null, [node]).length > 0;
+        };
+    }
+})();
+
+(function(){
+    var div = document.createElement("div");
+
+    div.innerHTML = "<div class='test e'></div><div class='test'></div>";

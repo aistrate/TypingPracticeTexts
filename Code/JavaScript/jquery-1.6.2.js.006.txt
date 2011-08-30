@@ -1,0 +1,64 @@
+        if ( name === "find" ) {
+            ret.selector = this.selector + (this.selector ? " " : "") + selector;
+        } else if ( name ) {
+            ret.selector = this.selector + "." + name + "(" + selector + ")";
+        }
+
+        // Return the newly-formed element set
+        return ret;
+    },
+
+    // Execute a callback for every element in the matched set.
+    // (You can seed the arguments with an array of args, but this is
+    // only used internally.)
+    each: function( callback, args ) {
+        return jQuery.each( this, callback, args );
+    },
+
+    ready: function( fn ) {
+        // Attach the listeners
+        jQuery.bindReady();
+
+        // Add the callback
+        readyList.done( fn );
+
+        return this;
+    },
+
+    eq: function( i ) {
+        return i === -1 ?
+            this.slice( i ) :
+            this.slice( i, +i + 1 );
+    },
+
+    first: function() {
+        return this.eq( 0 );
+    },
+
+    last: function() {
+        return this.eq( -1 );
+    },
+
+    slice: function() {
+        return this.pushStack( slice.apply( this, arguments ),
+            "slice", slice.call(arguments).join(",") );
+    },
+
+    map: function( callback ) {
+        return this.pushStack( jQuery.map(this, function( elem, i ) {
+            return callback.call( elem, i, elem );
+        }));
+    },
+
+    end: function() {
+        return this.prevObject || this.constructor(null);
+    },
+
+    // For internal use only.
+    // Behaves like an Array's method, not like a jQuery method.
+    push: push,
+    sort: [].sort,
+    splice: [].splice
+};
+
+// Give the init function the jQuery prototype for later instantiation

@@ -1,0 +1,55 @@
+    rinvalidChar = /\:|^on/,
+    formHook, boolHook;
+
+jQuery.fn.extend({
+    attr: function( name, value ) {
+        return jQuery.access( this, name, value, true, jQuery.attr );
+    },
+
+    removeAttr: function( name ) {
+        return this.each(function() {
+            jQuery.removeAttr( this, name );
+        });
+    },
+    
+    prop: function( name, value ) {
+        return jQuery.access( this, name, value, true, jQuery.prop );
+    },
+    
+    removeProp: function( name ) {
+        name = jQuery.propFix[ name ] || name;
+        return this.each(function() {
+            // try/catch handles cases where IE balks (such as removing a property on window)
+            try {
+                this[ name ] = undefined;
+                delete this[ name ];
+            } catch( e ) {}
+        });
+    },
+
+    addClass: function( value ) {
+        var classNames, i, l, elem,
+            setClass, c, cl;
+
+        if ( jQuery.isFunction( value ) ) {
+            return this.each(function( j ) {
+                jQuery( this ).addClass( value.call(this, j, this.className) );
+            });
+        }
+
+        if ( value && typeof value === "string" ) {
+            classNames = value.split( rspace );
+
+            for ( i = 0, l = this.length; i < l; i++ ) {
+                elem = this[ i ];
+
+                if ( elem.nodeType === 1 ) {
+                    if ( !elem.className && classNames.length === 1 ) {
+                        elem.className = value;
+
+                    } else {
+                        setClass = " " + elem.className + " ";
+
+                        for ( c = 0, cl = classNames.length; c < cl; c++ ) {
+                            if ( !~setClass.indexOf( " " + classNames[ c ] + " " ) ) {
+                                setClass += classNames[ c ] + " ";

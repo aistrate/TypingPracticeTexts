@@ -1,0 +1,41 @@
+        // Get the style information from getAttribute
+        // (IE uses .cssText instead)
+        style: /top/.test( a.getAttribute("style") ),
+
+        // Make sure that URLs aren't manipulated
+        // (IE normalizes it by default)
+        hrefNormalized: ( a.getAttribute( "href" ) === "/a" ),
+
+        // Make sure that element opacity exists
+        // (IE uses filter instead)
+        // Use a regex to work around a WebKit issue. See #5145
+        opacity: /^0.55$/.test( a.style.opacity ),
+
+        // Verify style float existence
+        // (IE uses styleFloat instead of cssFloat)
+        cssFloat: !!a.style.cssFloat,
+
+        // Make sure that if no value is specified for a checkbox
+        // that it defaults to "on".
+        // (WebKit defaults to "" instead)
+        checkOn: ( input.value === "on" ),
+
+        // Make sure that a selected-by-default option has a working selected property.
+        // (WebKit defaults to false instead of true, IE too, if it's in an optgroup)
+        optSelected: opt.selected,
+
+        // Test setAttribute on camelCase class. If it works, we need attrFixes when doing get/setAttribute (ie6/7)
+        getSetAttribute: div.className !== "t",
+
+        // Will be defined later
+        submitBubbles: true,
+        changeBubbles: true,
+        focusinBubbles: false,
+        deleteExpando: true,
+        noCloneEvent: true,
+        inlineBlockNeedsLayout: false,
+        shrinkWrapBlocks: false,
+        reliableMarginRight: true
+    };
+
+    // Make sure checked status is properly cloned

@@ -1,0 +1,42 @@
+            }
+        }
+    };
+}
+
+// Base inspection function for prefilters and transports
+function inspectPrefiltersOrTransports( structure, options, originalOptions, jqXHR,
+        dataType /* internal */, inspected /* internal */ ) {
+
+    dataType = dataType || options.dataTypes[ 0 ];
+    inspected = inspected || {};
+
+    inspected[ dataType ] = true;
+
+    var list = structure[ dataType ],
+        i = 0,
+        length = list ? list.length : 0,
+        executeOnly = ( structure === prefilters ),
+        selection;
+
+    for(; i < length && ( executeOnly || !selection ); i++ ) {
+        selection = list[ i ]( options, originalOptions, jqXHR );
+        // If we got redirected to another dataType
+        // we try there if executing only and not done already
+        if ( typeof selection === "string" ) {
+            if ( !executeOnly || inspected[ selection ] ) {
+                selection = undefined;
+            } else {
+                options.dataTypes.unshift( selection );
+                selection = inspectPrefiltersOrTransports(
+                        structure, options, originalOptions, jqXHR, selection, inspected );
+            }
+        }
+    }
+    // If we're only executing or nothing was selected
+    // we try the catchall dataType if not done already
+    if ( ( executeOnly || !selection ) && !inspected[ "*" ] ) {
+        selection = inspectPrefiltersOrTransports(
+                structure, options, originalOptions, jqXHR, "*", inspected );
+    }
+    // unnecessary when only executing (prefilters)
+    // but it'll be ignored by the caller in that case

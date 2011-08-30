@@ -1,0 +1,68 @@
+        if ( elem ) {
+            var match = false;
+            
+            elem = elem[dir];
+
+            while ( elem ) {
+                if ( elem.sizcache === doneName ) {
+                    match = checkSet[elem.sizset];
+                    break;
+                }
+
+                if ( elem.nodeType === 1 ) {
+                    if ( !isXML ) {
+                        elem.sizcache = doneName;
+                        elem.sizset = i;
+                    }
+
+                    if ( typeof cur !== "string" ) {
+                        if ( elem === cur ) {
+                            match = true;
+                            break;
+                        }
+
+                    } else if ( Sizzle.filter( cur, [elem] ).length > 0 ) {
+                        match = elem;
+                        break;
+                    }
+                }
+
+                elem = elem[dir];
+            }
+
+            checkSet[i] = match;
+        }
+    }
+}
+
+if ( document.documentElement.contains ) {
+    Sizzle.contains = function( a, b ) {
+        return a !== b && (a.contains ? a.contains(b) : true);
+    };
+
+} else if ( document.documentElement.compareDocumentPosition ) {
+    Sizzle.contains = function( a, b ) {
+        return !!(a.compareDocumentPosition(b) & 16);
+    };
+
+} else {
+    Sizzle.contains = function() {
+        return false;
+    };
+}
+
+Sizzle.isXML = function( elem ) {
+    // documentElement is verified for cases where it doesn't yet exist
+    // (such as loading iframes in IE - #4833) 
+    var documentElement = (elem ? elem.ownerDocument || elem : 0).documentElement;
+
+    return documentElement ? documentElement.nodeName !== "HTML" : false;
+};
+
+var posProcess = function( selector, context ) {
+    var match,
+        tmpSet = [],
+        later = "",
+        root = context.nodeType ? [context] : context;
+
+    // Position selectors must be done after the filter

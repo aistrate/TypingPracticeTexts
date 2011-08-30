@@ -1,0 +1,49 @@
+            // information
+            beforeactivate: function( e ) {
+                var elem = e.target;
+                jQuery._data( elem, "_change_data", getVal(elem) );
+            }
+        },
+
+        setup: function( data, namespaces ) {
+            if ( this.type === "file" ) {
+                return false;
+            }
+
+            for ( var type in changeFilters ) {
+                jQuery.event.add( this, type + ".specialChange", changeFilters[type] );
+            }
+
+            return rformElems.test( this.nodeName );
+        },
+
+        teardown: function( namespaces ) {
+            jQuery.event.remove( this, ".specialChange" );
+
+            return rformElems.test( this.nodeName );
+        }
+    };
+
+    changeFilters = jQuery.event.special.change.filters;
+
+    // Handle when the input is .focus()'d
+    changeFilters.focus = changeFilters.beforeactivate;
+}
+
+function trigger( type, elem, args ) {
+    // Piggyback on a donor event to simulate a different one.
+    // Fake originalEvent to avoid donor's stopPropagation, but if the
+    // simulated event prevents default then we do the same on the donor.
+    // Don't pass args or remember liveFired; they apply to the donor event.
+    var event = jQuery.extend( {}, args[ 0 ] );
+    event.type = type;
+    event.originalEvent = {};
+    event.liveFired = undefined;
+    jQuery.event.handle.call( elem, event );
+    if ( event.isDefaultPrevented() ) {
+        args[ 0 ].preventDefault();
+    }
+}
+
+// Create "bubbling" focus and blur events
+if ( !jQuery.support.focusinBubbles ) {

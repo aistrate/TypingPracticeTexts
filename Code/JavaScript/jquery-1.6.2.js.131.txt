@@ -1,0 +1,53 @@
+        if ( typeof url === "object" ) {
+            options = url;
+            url = undefined;
+        }
+
+        // Force options to be an object
+        options = options || {};
+
+        var // Create the final options object
+            s = jQuery.ajaxSetup( {}, options ),
+            // Callbacks context
+            callbackContext = s.context || s,
+            // Context for global events
+            // It's the callbackContext if one was provided in the options
+            // and if it's a DOM node or a jQuery collection
+            globalEventContext = callbackContext !== s &&
+                ( callbackContext.nodeType || callbackContext instanceof jQuery ) ?
+                        jQuery( callbackContext ) : jQuery.event,
+            // Deferreds
+            deferred = jQuery.Deferred(),
+            completeDeferred = jQuery._Deferred(),
+            // Status-dependent callbacks
+            statusCode = s.statusCode || {},
+            // ifModified key
+            ifModifiedKey,
+            // Headers (they are sent all at once)
+            requestHeaders = {},
+            requestHeadersNames = {},
+            // Response headers
+            responseHeadersString,
+            responseHeaders,
+            // transport
+            transport,
+            // timeout handle
+            timeoutTimer,
+            // Cross-domain detection vars
+            parts,
+            // The jqXHR state
+            state = 0,
+            // To know if global events are to be dispatched
+            fireGlobals,
+            // Loop variable
+            i,
+            // Fake xhr
+            jqXHR = {
+
+                readyState: 0,
+
+                // Caches the header
+                setRequestHeader: function( name, value ) {
+                    if ( !state ) {
+                        var lname = name.toLowerCase();
+                        name = requestHeadersNames[ lname ] = requestHeadersNames[ lname ] || name;

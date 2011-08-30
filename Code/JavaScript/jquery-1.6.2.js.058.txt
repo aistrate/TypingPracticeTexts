@@ -1,0 +1,39 @@
+    fix: function( event ) {
+        if ( event[ jQuery.expando ] ) {
+            return event;
+        }
+
+        // store a copy of the original event object
+        // and "clone" to set read-only properties
+        var originalEvent = event;
+        event = jQuery.Event( originalEvent );
+
+        for ( var i = this.props.length, prop; i; ) {
+            prop = this.props[ --i ];
+            event[ prop ] = originalEvent[ prop ];
+        }
+
+        // Fix target property, if necessary
+        if ( !event.target ) {
+            // Fixes #1925 where srcElement might not be defined either
+            event.target = event.srcElement || document;
+        }
+
+        // check if target is a textnode (safari)
+        if ( event.target.nodeType === 3 ) {
+            event.target = event.target.parentNode;
+        }
+
+        // Add relatedTarget, if necessary
+        if ( !event.relatedTarget && event.fromElement ) {
+            event.relatedTarget = event.fromElement === event.target ? event.toElement : event.fromElement;
+        }
+
+        // Calculate pageX/Y if missing and clientX/Y available
+        if ( event.pageX == null && event.clientX != null ) {
+            var eventDocument = event.target.ownerDocument || document,
+                doc = eventDocument.documentElement,
+                body = eventDocument.body;
+
+            event.pageX = event.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
+            event.pageY = event.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) - (doc && doc.clientTop  || body && body.clientTop  || 0);

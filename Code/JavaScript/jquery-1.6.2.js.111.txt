@@ -1,0 +1,56 @@
+        cacheable = true;
+
+        cacheresults = jQuery.fragments[ args[0] ];
+        if ( cacheresults && cacheresults !== 1 ) {
+            fragment = cacheresults;
+        }
+    }
+
+    if ( !fragment ) {
+        fragment = doc.createDocumentFragment();
+        jQuery.clean( args, doc, fragment, scripts );
+    }
+
+    if ( cacheable ) {
+        jQuery.fragments[ args[0] ] = cacheresults ? fragment : 1;
+    }
+
+    return { fragment: fragment, cacheable: cacheable };
+};
+
+jQuery.fragments = {};
+
+jQuery.each({
+    appendTo: "append",
+    prependTo: "prepend",
+    insertBefore: "before",
+    insertAfter: "after",
+    replaceAll: "replaceWith"
+}, function( name, original ) {
+    jQuery.fn[ name ] = function( selector ) {
+        var ret = [],
+            insert = jQuery( selector ),
+            parent = this.length === 1 && this[0].parentNode;
+
+        if ( parent && parent.nodeType === 11 && parent.childNodes.length === 1 && insert.length === 1 ) {
+            insert[ original ]( this[0] );
+            return this;
+
+        } else {
+            for ( var i = 0, l = insert.length; i < l; i++ ) {
+                var elems = (i > 0 ? this.clone(true) : this).get();
+                jQuery( insert[i] )[ original ]( elems );
+                ret = ret.concat( elems );
+            }
+
+            return this.pushStack( ret, name, insert.selector );
+        }
+    };
+});
+
+function getAll( elem ) {
+    if ( "getElementsByTagName" in elem ) {
+        return elem.getElementsByTagName( "*" );
+
+    } else if ( "querySelectorAll" in elem ) {
+        return elem.querySelectorAll( "*" );

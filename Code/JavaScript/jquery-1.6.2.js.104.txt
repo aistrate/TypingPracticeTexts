@@ -1,0 +1,52 @@
+        }
+    },
+
+    after: function() {
+        if ( this[0] && this[0].parentNode ) {
+            return this.domManip(arguments, false, function( elem ) {
+                this.parentNode.insertBefore( elem, this.nextSibling );
+            });
+        } else if ( arguments.length ) {
+            var set = this.pushStack( this, "after", arguments );
+            set.push.apply( set, jQuery(arguments[0]).toArray() );
+            return set;
+        }
+    },
+
+    // keepData is for internal use only--do not document
+    remove: function( selector, keepData ) {
+        for ( var i = 0, elem; (elem = this[i]) != null; i++ ) {
+            if ( !selector || jQuery.filter( selector, [ elem ] ).length ) {
+                if ( !keepData && elem.nodeType === 1 ) {
+                    jQuery.cleanData( elem.getElementsByTagName("*") );
+                    jQuery.cleanData( [ elem ] );
+                }
+
+                if ( elem.parentNode ) {
+                    elem.parentNode.removeChild( elem );
+                }
+            }
+        }
+
+        return this;
+    },
+
+    empty: function() {
+        for ( var i = 0, elem; (elem = this[i]) != null; i++ ) {
+            // Remove element nodes and prevent memory leaks
+            if ( elem.nodeType === 1 ) {
+                jQuery.cleanData( elem.getElementsByTagName("*") );
+            }
+
+            // Remove any remaining nodes
+            while ( elem.firstChild ) {
+                elem.removeChild( elem.firstChild );
+            }
+        }
+
+        return this;
+    },
+
+    clone: function( dataAndEvents, deepDataAndEvents ) {
+        dataAndEvents = dataAndEvents == null ? false : dataAndEvents;
+        deepDataAndEvents = deepDataAndEvents == null ? dataAndEvents : deepDataAndEvents;

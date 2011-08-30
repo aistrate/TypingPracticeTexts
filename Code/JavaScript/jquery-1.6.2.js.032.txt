@@ -1,0 +1,52 @@
+            if ( !isNode ) {
+                cache[ id ].toJSON = jQuery.noop;
+            }
+
+            cache[ id ][ internalKey ] = internalCache;
+
+        // Otherwise, we need to eliminate the expando on the node to avoid
+        // false lookups in the cache for entries that no longer exist
+        } else if ( isNode ) {
+            // IE does not allow us to delete expando properties from nodes,
+            // nor does it have a removeAttribute function on Document nodes;
+            // we must handle all of these cases
+            if ( jQuery.support.deleteExpando ) {
+                delete elem[ jQuery.expando ];
+            } else if ( elem.removeAttribute ) {
+                elem.removeAttribute( jQuery.expando );
+            } else {
+                elem[ jQuery.expando ] = null;
+            }
+        }
+    },
+
+    // For internal use only.
+    _data: function( elem, name, data ) {
+        return jQuery.data( elem, name, data, true );
+    },
+
+    // A method for determining if a DOM node can handle the data expando
+    acceptData: function( elem ) {
+        if ( elem.nodeName ) {
+            var match = jQuery.noData[ elem.nodeName.toLowerCase() ];
+
+            if ( match ) {
+                return !(match === true || elem.getAttribute("classid") !== match);
+            }
+        }
+
+        return true;
+    }
+});
+
+jQuery.fn.extend({
+    data: function( key, value ) {
+        var data = null;
+
+        if ( typeof key === "undefined" ) {
+            if ( this.length ) {
+                data = jQuery.data( this[0] );
+
+                if ( this[0].nodeType === 1 ) {
+                var attr = this[0].attributes, name;
+                    for ( var i = 0, l = attr.length; i < l; i++ ) {

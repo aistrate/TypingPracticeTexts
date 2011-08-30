@@ -1,0 +1,55 @@
+            fn = data || returnFalse;
+            data = undefined;
+        }
+
+        types = (types || "").split(" ");
+
+        while ( (type = types[ i++ ]) != null ) {
+            match = rnamespaces.exec( type );
+            namespaces = "";
+
+            if ( match )  {
+                namespaces = match[0];
+                type = type.replace( rnamespaces, "" );
+            }
+
+            if ( type === "hover" ) {
+                types.push( "mouseenter" + namespaces, "mouseleave" + namespaces );
+                continue;
+            }
+
+            preType = type;
+
+            if ( liveMap[ type ] ) {
+                types.push( liveMap[ type ] + namespaces );
+                type = type + namespaces;
+
+            } else {
+                type = (liveMap[ type ] || type) + namespaces;
+            }
+
+            if ( name === "live" ) {
+                // bind live handler
+                for ( var j = 0, l = context.length; j < l; j++ ) {
+                    jQuery.event.add( context[j], "live." + liveConvert( type, selector ),
+                        { data: data, selector: selector, handler: fn, origType: type, origHandler: fn, preType: preType } );
+                }
+
+            } else {
+                // unbind live handler
+                context.unbind( "live." + liveConvert( type, selector ), fn );
+            }
+        }
+
+        return this;
+    };
+});
+
+function liveHandler( event ) {
+    var stop, maxLevel, related, match, handleObj, elem, j, i, l, data, close, namespace, ret,
+        elems = [],
+        selectors = [],
+        events = jQuery._data( this, "events" );
+
+    // Make sure we avoid non-left-click bubbling in Firefox (#3861) and disabled elements in IE (#6911)
+    if ( event.liveFired === this || !events || !events.live || event.target.disabled || event.button && event.type === "click" ) {

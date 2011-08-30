@@ -1,0 +1,48 @@
+            return ret === null ?
+                undefined :
+                ret;
+        }
+    },
+
+    removeAttr: function( elem, name ) {
+        var propName;
+        if ( elem.nodeType === 1 ) {
+            name = jQuery.attrFix[ name ] || name;
+        
+            if ( jQuery.support.getSetAttribute ) {
+                // Use removeAttribute in browsers that support it
+                elem.removeAttribute( name );
+            } else {
+                jQuery.attr( elem, name, "" );
+                elem.removeAttributeNode( elem.getAttributeNode( name ) );
+            }
+
+            // Set corresponding property to false for boolean attributes
+            if ( rboolean.test( name ) && (propName = jQuery.propFix[ name ] || name) in elem ) {
+                elem[ propName ] = false;
+            }
+        }
+    },
+
+    attrHooks: {
+        type: {
+            set: function( elem, value ) {
+                // We can't allow the type property to be changed (since it causes problems in IE)
+                if ( rtype.test( elem.nodeName ) && elem.parentNode ) {
+                    jQuery.error( "type property can't be changed" );
+                } else if ( !jQuery.support.radioValue && value === "radio" && jQuery.nodeName(elem, "input") ) {
+                    // Setting the type on a radio button after the value resets the value in IE6-9
+                    // Reset value to it's default in case type is set after value
+                    // This is for element creation
+                    var val = elem.value;
+                    elem.setAttribute( "type", value );
+                    if ( val ) {
+                        elem.value = val;
+                    }
+                    return value;
+                }
+            }
+        },
+        tabIndex: {
+            get: function( elem ) {
+                // elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set

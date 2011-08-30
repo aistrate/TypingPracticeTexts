@@ -1,0 +1,60 @@
+                    jQuery.each( [ "", "X", "Y" ], function (index, value) {
+                        elem.style[ "overflow" + value ] = options.overflow[index];
+                    });
+                }
+
+                // Hide the element if the "hide" operation was done
+                if ( options.hide ) {
+                    jQuery(elem).hide();
+                }
+
+                // Reset the properties, if the item has been hidden or shown
+                if ( options.hide || options.show ) {
+                    for ( var p in options.animatedProperties ) {
+                        jQuery.style( elem, p, options.orig[p] );
+                    }
+                }
+
+                // Execute the complete function
+                options.complete.call( elem );
+            }
+
+            return false;
+
+        } else {
+            // classical easing cannot be used with an Infinity duration
+            if ( options.duration == Infinity ) {
+                this.now = t;
+            } else {
+                n = t - this.startTime;
+                this.state = n / options.duration;
+
+                // Perform the easing function, defaults to swing
+                this.pos = jQuery.easing[ options.animatedProperties[ this.prop ] ]( this.state, n, 0, 1, options.duration );
+                this.now = this.start + ((this.end - this.start) * this.pos);
+            }
+            // Perform the next step of the animation
+            this.update();
+        }
+
+        return true;
+    }
+};
+
+jQuery.extend( jQuery.fx, {
+    tick: function() {
+        for ( var timers = jQuery.timers, i = 0 ; i < timers.length ; ++i ) {
+            if ( !timers[i]() ) {
+                timers.splice(i--, 1);
+            }
+        }
+
+        if ( !timers.length ) {
+            jQuery.fx.stop();
+        }
+    },
+
+    interval: 13,
+
+    stop: function() {
+        clearInterval( timerId );

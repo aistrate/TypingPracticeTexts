@@ -1,0 +1,51 @@
+        td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
+        col: [ 2, "<table><tbody></tbody><colgroup>", "</colgroup></table>" ],
+        area: [ 1, "<map>", "</map>" ],
+        _default: [ 0, "", "" ]
+    };
+
+wrapMap.optgroup = wrapMap.option;
+wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+wrapMap.th = wrapMap.td;
+
+// IE can't serialize <link> and <script> tags normally
+if ( !jQuery.support.htmlSerialize ) {
+    wrapMap._default = [ 1, "div<div>", "</div>" ];
+}
+
+jQuery.fn.extend({
+    text: function( text ) {
+        if ( jQuery.isFunction(text) ) {
+            return this.each(function(i) {
+                var self = jQuery( this );
+
+                self.text( text.call(this, i, self.text()) );
+            });
+        }
+
+        if ( typeof text !== "object" && text !== undefined ) {
+            return this.empty().append( (this[0] && this[0].ownerDocument || document).createTextNode( text ) );
+        }
+
+        return jQuery.text( this );
+    },
+
+    wrapAll: function( html ) {
+        if ( jQuery.isFunction( html ) ) {
+            return this.each(function(i) {
+                jQuery(this).wrapAll( html.call(this, i) );
+            });
+        }
+
+        if ( this[0] ) {
+            // The elements to wrap the target around
+            var wrap = jQuery( html, this[0].ownerDocument ).eq(0).clone(true);
+
+            if ( this[0].parentNode ) {
+                wrap.insertBefore( this[0] );
+            }
+
+            wrap.map(function() {
+                var elem = this;
+
+                while ( elem.firstChild && elem.firstChild.nodeType === 1 ) {

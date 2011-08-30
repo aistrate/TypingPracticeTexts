@@ -1,0 +1,56 @@
+                    jqXHR.done(function( r ) {
+                        responseText = r;
+                    });
+                    // See if a selector was specified
+                    self.html( selector ?
+                        // Create a dummy div to hold the results
+                        jQuery("<div>")
+                            // inject the contents of the document in, removing the scripts
+                            // to avoid any 'Permission Denied' errors in IE
+                            .append(responseText.replace(rscript, ""))
+
+                            // Locate the specified elements
+                            .find(selector) :
+
+                        // If not, just inject the full result
+                        responseText );
+                }
+
+                if ( callback ) {
+                    self.each( callback, [ responseText, status, jqXHR ] );
+                }
+            }
+        });
+
+        return this;
+    },
+
+    serialize: function() {
+        return jQuery.param( this.serializeArray() );
+    },
+
+    serializeArray: function() {
+        return this.map(function(){
+            return this.elements ? jQuery.makeArray( this.elements ) : this;
+        })
+        .filter(function(){
+            return this.name && !this.disabled &&
+                ( this.checked || rselectTextarea.test( this.nodeName ) ||
+                    rinput.test( this.type ) );
+        })
+        .map(function( i, elem ){
+            var val = jQuery( this ).val();
+
+            return val == null ?
+                null :
+                jQuery.isArray( val ) ?
+                    jQuery.map( val, function( val, i ){
+                        return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+                    }) :
+                    { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+        }).get();
+    }
+});
+
+// Attach a bunch of functions for handling common AJAX events
+jQuery.each( "ajaxStart ajaxStop ajaxComplete ajaxError ajaxSuccess ajaxSend".split( " " ), function( i, o ){

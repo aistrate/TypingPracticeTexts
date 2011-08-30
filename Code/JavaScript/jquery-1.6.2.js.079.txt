@@ -1,0 +1,63 @@
+            }
+        },
+
+        NAME: function( match, context ) {
+            if ( typeof context.getElementsByName !== "undefined" ) {
+                var ret = [],
+                    results = context.getElementsByName( match[1] );
+
+                for ( var i = 0, l = results.length; i < l; i++ ) {
+                    if ( results[i].getAttribute("name") === match[1] ) {
+                        ret.push( results[i] );
+                    }
+                }
+
+                return ret.length === 0 ? null : ret;
+            }
+        },
+
+        TAG: function( match, context ) {
+            if ( typeof context.getElementsByTagName !== "undefined" ) {
+                return context.getElementsByTagName( match[1] );
+            }
+        }
+    },
+    preFilter: {
+        CLASS: function( match, curLoop, inplace, result, not, isXML ) {
+            match = " " + match[1].replace( rBackslash, "" ) + " ";
+
+            if ( isXML ) {
+                return match;
+            }
+
+            for ( var i = 0, elem; (elem = curLoop[i]) != null; i++ ) {
+                if ( elem ) {
+                    if ( not ^ (elem.className && (" " + elem.className + " ").replace(/[\t\n\r]/g, " ").indexOf(match) >= 0) ) {
+                        if ( !inplace ) {
+                            result.push( elem );
+                        }
+
+                    } else if ( inplace ) {
+                        curLoop[i] = false;
+                    }
+                }
+            }
+
+            return false;
+        },
+
+        ID: function( match ) {
+            return match[1].replace( rBackslash, "" );
+        },
+
+        TAG: function( match, curLoop ) {
+            return match[1].replace( rBackslash, "" ).toLowerCase();
+        },
+
+        CHILD: function( match ) {
+            if ( match[1] === "nth" ) {
+                if ( !match[2] ) {
+                    Sizzle.error( match[0] );
+                }
+
+                match[2] = match[2].replace(/^\+|\s*/g, '');

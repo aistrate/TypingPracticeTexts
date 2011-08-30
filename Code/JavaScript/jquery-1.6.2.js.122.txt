@@ -1,0 +1,47 @@
+            style = elem.style;
+
+        // From the awesome hack by Dean Edwards
+        // http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
+
+        // If we're not dealing with a regular pixel number
+        // but a number that has a weird ending, we need to convert it to pixels
+        if ( !rnumpx.test( ret ) && rnum.test( ret ) ) {
+            // Remember the original values
+            left = style.left;
+
+            // Put in the new values to get a computed value out
+            if ( rsLeft ) {
+                elem.runtimeStyle.left = elem.currentStyle.left;
+            }
+            style.left = name === "fontSize" ? "1em" : (ret || 0);
+            ret = style.pixelLeft + "px";
+
+            // Revert the changed values
+            style.left = left;
+            if ( rsLeft ) {
+                elem.runtimeStyle.left = rsLeft;
+            }
+        }
+
+        return ret === "" ? "auto" : ret;
+    };
+}
+
+curCSS = getComputedStyle || currentStyle;
+
+function getWH( elem, name, extra ) {
+
+    // Start with offset property
+    var val = name === "width" ? elem.offsetWidth : elem.offsetHeight,
+        which = name === "width" ? cssWidth : cssHeight;
+
+    if ( val > 0 ) {
+        if ( extra !== "border" ) {
+            jQuery.each( which, function() {
+                if ( !extra ) {
+                    val -= parseFloat( jQuery.css( elem, "padding" + this ) ) || 0;
+                }
+                if ( extra === "margin" ) {
+                    val += parseFloat( jQuery.css( elem, extra + this ) ) || 0;
+                } else {
+                    val -= parseFloat( jQuery.css( elem, "border" + this + "Width" ) ) || 0;

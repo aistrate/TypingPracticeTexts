@@ -1,0 +1,50 @@
+    // Check for digits
+    rdigit = /\d/,
+
+    // Match a standalone tag
+    rsingleTag = /^<(\w+)\s*\/?>(?:<\/\1>)?$/,
+
+    // JSON RegExp
+    rvalidchars = /^[\],:{}\s]*$/,
+    rvalidescape = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
+    rvalidtokens = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
+    rvalidbraces = /(?:^|:|,)(?:\s*\[)+/g,
+
+    // Useragent RegExp
+    rwebkit = /(webkit)[ \/]([\w.]+)/,
+    ropera = /(opera)(?:.*version)?[ \/]([\w.]+)/,
+    rmsie = /(msie) ([\w.]+)/,
+    rmozilla = /(mozilla)(?:.*? rv:([\w.]+))?/,
+
+    // Matches dashed string for camelizing
+    rdashAlpha = /-([a-z])/ig,
+
+    // Used by jQuery.camelCase as callback to replace()
+    fcamelCase = function( all, letter ) {
+        return letter.toUpperCase();
+    },
+
+    // Keep a UserAgent string for use with jQuery.browser
+    userAgent = navigator.userAgent,
+
+    // For matching the engine and version of the browser
+    browserMatch,
+
+    // The deferred used on DOM ready
+    readyList,
+
+    // The ready event handler
+    DOMContentLoaded,
+
+    // Save a reference to some core methods
+    toString = Object.prototype.toString,
+    hasOwn = Object.prototype.hasOwnProperty,
+    push = Array.prototype.push,
+    slice = Array.prototype.slice,
+    trim = String.prototype.trim,
+    indexOf = Array.prototype.indexOf,
+
+    // [[Class]] -> type pairs
+    class2type = {};
+
+jQuery.fn = jQuery.prototype = {

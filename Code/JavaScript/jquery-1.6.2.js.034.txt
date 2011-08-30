@@ -1,0 +1,50 @@
+        data = elem.getAttribute( name );
+
+        if ( typeof data === "string" ) {
+            try {
+                data = data === "true" ? true :
+                data === "false" ? false :
+                data === "null" ? null :
+                !jQuery.isNaN( data ) ? parseFloat( data ) :
+                    rbrace.test( data ) ? jQuery.parseJSON( data ) :
+                    data;
+            } catch( e ) {}
+
+            // Make sure we set the data so it isn't changed later
+            jQuery.data( elem, key, data );
+
+        } else {
+            data = undefined;
+        }
+    }
+
+    return data;
+}
+
+// TODO: This is a hack for 1.5 ONLY to allow objects with a single toJSON
+// property to be considered empty objects; this property always exists in
+// order to make sure JSON.stringify does not expose internal metadata
+function isEmptyDataObject( obj ) {
+    for ( var name in obj ) {
+        if ( name !== "toJSON" ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+
+
+function handleQueueMarkDefer( elem, type, src ) {
+    var deferDataKey = type + "defer",
+        queueDataKey = type + "queue",
+        markDataKey = type + "mark",
+        defer = jQuery.data( elem, deferDataKey, undefined, true );
+    if ( defer &&
+        ( src === "queue" || !jQuery.data( elem, queueDataKey, undefined, true ) ) &&
+        ( src === "mark" || !jQuery.data( elem, markDataKey, undefined, true ) ) ) {
+        // Give room for hard-coded callbacks to fire first
+        // and eventually mark/queue something else on the element
+        setTimeout( function() {

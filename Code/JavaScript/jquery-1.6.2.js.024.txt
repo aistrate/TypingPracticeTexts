@@ -1,0 +1,43 @@
+    input.checked = true;
+    support.noCloneChecked = input.cloneNode( true ).checked;
+
+    // Make sure that the options inside disabled selects aren't marked as disabled
+    // (WebKit marks them as disabled)
+    select.disabled = true;
+    support.optDisabled = !opt.disabled;
+
+    // Test to see if it's possible to delete an expando from an element
+    // Fails in Internet Explorer
+    try {
+        delete div.test;
+    } catch( e ) {
+        support.deleteExpando = false;
+    }
+
+    if ( !div.addEventListener && div.attachEvent && div.fireEvent ) {
+        div.attachEvent( "onclick", function() {
+            // Cloning a node shouldn't copy over any
+            // bound event handlers (IE does this)
+            support.noCloneEvent = false;
+        });
+        div.cloneNode( true ).fireEvent( "onclick" );
+    }
+
+    // Check if a radio maintains it's value
+    // after being appended to the DOM
+    input = document.createElement("input");
+    input.value = "t";
+    input.setAttribute("type", "radio");
+    support.radioValue = input.value === "t";
+
+    input.setAttribute("checked", "checked");
+    div.appendChild( input );
+    fragment = document.createDocumentFragment();
+    fragment.appendChild( div.firstChild );
+
+    // WebKit doesn't clone checked state correctly in fragments
+    support.checkClone = fragment.cloneNode( true ).cloneNode( true ).lastChild.checked;
+
+    div.innerHTML = "";
+
+    // Figure out if the W3C box model works as expected

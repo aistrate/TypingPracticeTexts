@@ -1,0 +1,60 @@
+                            // and attach the unload handler
+                            if ( !xhrCallbacks ) {
+                                xhrCallbacks = {};
+                                jQuery( window ).unload( xhrOnUnloadAbort );
+                            }
+                            // Add to list of active xhrs callbacks
+                            xhrCallbacks[ handle ] = callback;
+                        }
+                        xhr.onreadystatechange = callback;
+                    }
+                },
+
+                abort: function() {
+                    if ( callback ) {
+                        callback(0,1);
+                    }
+                }
+            };
+        }
+    });
+}
+
+
+
+
+var elemdisplay = {},
+    iframe, iframeDoc,
+    rfxtypes = /^(?:toggle|show|hide)$/,
+    rfxnum = /^([+\-]=)?([\d+.\-]+)([a-z%]*)$/i,
+    timerId,
+    fxAttrs = [
+        // height animations
+        [ "height", "marginTop", "marginBottom", "paddingTop", "paddingBottom" ],
+        // width animations
+        [ "width", "marginLeft", "marginRight", "paddingLeft", "paddingRight" ],
+        // opacity animations
+        [ "opacity" ]
+    ],
+    fxNow,
+    requestAnimationFrame = window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame;
+
+jQuery.fn.extend({
+    show: function( speed, easing, callback ) {
+        var elem, display;
+
+        if ( speed || speed === 0 ) {
+            return this.animate( genFx("show", 3), speed, easing, callback);
+
+        } else {
+            for ( var i = 0, j = this.length; i < j; i++ ) {
+                elem = this[i];
+
+                if ( elem.style ) {
+                    display = elem.style.display;
+
+                    // Reset the inline display of this element to learn if it is
+                    // being hidden by cascaded rules or not
+                    if ( !jQuery._data(elem, "olddisplay") && display === "none" ) {

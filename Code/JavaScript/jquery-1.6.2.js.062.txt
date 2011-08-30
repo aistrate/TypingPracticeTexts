@@ -1,0 +1,55 @@
+};
+
+// Checks if an event happened on an element within another element
+// Used in jQuery.event.special.mouseenter and mouseleave handlers
+var withinElement = function( event ) {
+
+    // Check if mouse(over|out) are still within the same parent element
+    var related = event.relatedTarget,
+        inside = false,
+        eventType = event.type;
+
+    event.type = event.data;
+
+    if ( related !== this ) {
+
+        if ( related ) {
+            inside = jQuery.contains( this, related );
+        }
+
+        if ( !inside ) {
+
+            jQuery.event.handle.apply( this, arguments );
+
+            event.type = eventType;
+        }
+    }
+},
+
+// In case of event delegation, we only need to rename the event.type,
+// liveHandler will take care of the rest.
+delegate = function( event ) {
+    event.type = event.data;
+    jQuery.event.handle.apply( this, arguments );
+};
+
+// Create mouseenter and mouseleave events
+jQuery.each({
+    mouseenter: "mouseover",
+    mouseleave: "mouseout"
+}, function( orig, fix ) {
+    jQuery.event.special[ orig ] = {
+        setup: function( data ) {
+            jQuery.event.add( this, fix, data && data.selector ? delegate : withinElement, orig );
+        },
+        teardown: function( data ) {
+            jQuery.event.remove( this, fix, data && data.selector ? delegate : withinElement );
+        }
+    };
+});
+
+// submit delegation
+if ( !jQuery.support.submitBubbles ) {
+
+    jQuery.event.special.submit = {
+        setup: function( data, namespaces ) {

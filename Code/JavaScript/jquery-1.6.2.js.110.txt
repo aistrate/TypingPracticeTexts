@@ -1,0 +1,33 @@
+    // cloning other types of input fields
+    } else if ( nodeName === "input" || nodeName === "textarea" ) {
+        dest.defaultValue = src.defaultValue;
+    }
+
+    // Event data gets referenced instead of copied if the expando
+    // gets copied too
+    dest.removeAttribute( jQuery.expando );
+}
+
+jQuery.buildFragment = function( args, nodes, scripts ) {
+    var fragment, cacheable, cacheresults, doc;
+
+  // nodes may contain either an explicit document object,
+  // a jQuery collection or context object.
+  // If nodes[0] contains a valid object to assign to doc
+  if ( nodes && nodes[0] ) {
+    doc = nodes[0].ownerDocument || nodes[0];
+  }
+
+  // Ensure that an attr object doesn't incorrectly stand in as a document object
+    // Chrome and Firefox seem to allow this to occur and will throw exception
+    // Fixes #8950
+    if ( !doc.createDocumentFragment ) {
+        doc = document;
+    }
+
+    // Only cache "small" (1/2 KB) HTML strings that are associated with the main document
+    // Cloning options loses the selected state, so don't cache them
+    // IE 6 doesn't like it when you put <object> or <embed> elements in a fragment
+    // Also, WebKit does not clone 'checked' attributes on cloneNode, so don't cache
+    if ( args.length === 1 && typeof args[0] === "string" && args[0].length < 512 && doc === document &&
+        args[0].charAt(0) === "<" && !rnocache.test( args[0] ) && (jQuery.support.checkClone || !rchecked.test( args[0] )) ) {

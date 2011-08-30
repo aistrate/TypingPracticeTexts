@@ -1,0 +1,57 @@
+ *  More information: http://sizzlejs.com/
+ */
+(function(){
+
+var chunker = /((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^\[\]]*\]|['"][^'"]*['"]|[^\[\]'"]+)+\]|\\.|[^ >+~,(\[\\]+)+|[>+~])(\s*,\s*)?((?:.|\r|\n)*)/g,
+    done = 0,
+    toString = Object.prototype.toString,
+    hasDuplicate = false,
+    baseHasDuplicate = true,
+    rBackslash = /\\/g,
+    rNonWord = /\W/;
+
+// Here we check if the JavaScript engine is using some sort of
+// optimization where it does not always call our comparision
+// function. If that is the case, discard the hasDuplicate value.
+//   Thus far that includes Google Chrome.
+[0, 0].sort(function() {
+    baseHasDuplicate = false;
+    return 0;
+});
+
+var Sizzle = function( selector, context, results, seed ) {
+    results = results || [];
+    context = context || document;
+
+    var origContext = context;
+
+    if ( context.nodeType !== 1 && context.nodeType !== 9 ) {
+        return [];
+    }
+    
+    if ( !selector || typeof selector !== "string" ) {
+        return results;
+    }
+
+    var m, set, checkSet, extra, ret, cur, pop, i,
+        prune = true,
+        contextXML = Sizzle.isXML( context ),
+        parts = [],
+        soFar = selector;
+    
+    // Reset the position of the chunker regexp (start from head)
+    do {
+        chunker.exec( "" );
+        m = chunker.exec( soFar );
+
+        if ( m ) {
+            soFar = m[3];
+        
+            parts.push( m[1] );
+        
+            if ( m[2] ) {
+                extra = m[3];
+                break;
+            }
+        }
+    } while ( m );

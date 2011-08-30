@@ -1,0 +1,55 @@
+    jQuery.each({ focus: "focusin", blur: "focusout" }, function( orig, fix ) {
+
+        // Attach a single capturing handler while someone wants focusin/focusout
+        var attaches = 0;
+
+        jQuery.event.special[ fix ] = {
+            setup: function() {
+                if ( attaches++ === 0 ) {
+                    document.addEventListener( orig, handler, true );
+                }
+            },
+            teardown: function() {
+                if ( --attaches === 0 ) {
+                    document.removeEventListener( orig, handler, true );
+                }
+            }
+        };
+
+        function handler( donor ) {
+            // Donor event is always a native one; fix it and switch its type.
+            // Let focusin/out handler cancel the donor focus/blur event.
+            var e = jQuery.event.fix( donor );
+            e.type = fix;
+            e.originalEvent = {};
+            jQuery.event.trigger( e, null, e.target );
+            if ( e.isDefaultPrevented() ) {
+                donor.preventDefault();
+            }
+        }
+    });
+}
+
+jQuery.each(["bind", "one"], function( i, name ) {
+    jQuery.fn[ name ] = function( type, data, fn ) {
+        var handler;
+
+        // Handle object literals
+        if ( typeof type === "object" ) {
+            for ( var key in type ) {
+                this[ name ](key, data, type[key], fn);
+            }
+            return this;
+        }
+
+        if ( arguments.length === 2 || data === false ) {
+            fn = data;
+            data = undefined;
+        }
+
+        if ( name === "one" ) {
+            handler = function( event ) {
+                jQuery( this ).unbind( event, handler );
+                return fn.apply( this, arguments );
+            };
+            handler.guid = fn.guid || jQuery.guid++;

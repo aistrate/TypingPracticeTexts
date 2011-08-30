@@ -1,0 +1,37 @@
+    if ( document.defaultView && document.defaultView.getComputedStyle ) {
+        marginDiv = document.createElement( "div" );
+        marginDiv.style.width = "0";
+        marginDiv.style.marginRight = "0";
+        div.appendChild( marginDiv );
+        support.reliableMarginRight =
+            ( parseInt( ( document.defaultView.getComputedStyle( marginDiv, null ) || { marginRight: 0 } ).marginRight, 10 ) || 0 ) === 0;
+    }
+
+    // Remove the body element we added
+    testElement.innerHTML = "";
+    testElementParent.removeChild( testElement );
+
+    // Technique from Juriy Zaytsev
+    // http://thinkweb2.com/projects/prototype/detecting-event-support-without-browser-sniffing/
+    // We only care about the case where non-standard event systems
+    // are used, namely in IE. Short-circuiting here helps us to
+    // avoid an eval call (in setAttribute) which can cause CSP
+    // to go haywire. See: https://developer.mozilla.org/en/Security/CSP
+    if ( div.attachEvent ) {
+        for( i in {
+            submit: 1,
+            change: 1,
+            focusin: 1
+        } ) {
+            eventName = "on" + i;
+            isSupported = ( eventName in div );
+            if ( !isSupported ) {
+                div.setAttribute( eventName, "return;" );
+                isSupported = ( typeof div[ eventName ] === "function" );
+            }
+            support[ i + "Bubbles" ] = isSupported;
+        }
+    }
+
+    // Null connected elements to avoid leaks in IE
+    testElement = fragment = select = opt = body = marginDiv = div = input = null;

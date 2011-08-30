@@ -1,0 +1,50 @@
+        });
+    },
+    clearQueue: function( type ) {
+        return this.queue( type || "fx", [] );
+    },
+    // Get a promise resolved when queues of a certain type
+    // are emptied (fx is the type by default)
+    promise: function( type, object ) {
+        if ( typeof type !== "string" ) {
+            object = type;
+            type = undefined;
+        }
+        type = type || "fx";
+        var defer = jQuery.Deferred(),
+            elements = this,
+            i = elements.length,
+            count = 1,
+            deferDataKey = type + "defer",
+            queueDataKey = type + "queue",
+            markDataKey = type + "mark",
+            tmp;
+        function resolve() {
+            if ( !( --count ) ) {
+                defer.resolveWith( elements, [ elements ] );
+            }
+        }
+        while( i-- ) {
+            if (( tmp = jQuery.data( elements[ i ], deferDataKey, undefined, true ) ||
+                    ( jQuery.data( elements[ i ], queueDataKey, undefined, true ) ||
+                        jQuery.data( elements[ i ], markDataKey, undefined, true ) ) &&
+                    jQuery.data( elements[ i ], deferDataKey, jQuery._Deferred(), true ) )) {
+                count++;
+                tmp.done( resolve );
+            }
+        }
+        resolve();
+        return defer.promise();
+    }
+});
+
+
+
+
+var rclass = /[\n\t\r]/g,
+    rspace = /\s+/,
+    rreturn = /\r/g,
+    rtype = /^(?:button|input)$/i,
+    rfocusable = /^(?:button|input|object|select|textarea)$/i,
+    rclickable = /^a(?:rea)?$/i,
+    rboolean = /^(?:autofocus|autoplay|async|checked|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped|selected)$/i,

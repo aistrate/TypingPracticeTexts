@@ -1,0 +1,70 @@
+                target[ field ] = jQuery.ajaxSettings[ field ];
+            }
+        }
+        return target;
+    },
+
+    ajaxSettings: {
+        url: ajaxLocation,
+        isLocal: rlocalProtocol.test( ajaxLocParts[ 1 ] ),
+        global: true,
+        type: "GET",
+        contentType: "application/x-www-form-urlencoded",
+        processData: true,
+        async: true,
+        /*
+        timeout: 0,
+        data: null,
+        dataType: null,
+        username: null,
+        password: null,
+        cache: null,
+        traditional: false,
+        headers: {},
+        */
+
+        accepts: {
+            xml: "application/xml, text/xml",
+            html: "text/html",
+            text: "text/plain",
+            json: "application/json, text/javascript",
+            "*": "*/*"
+        },
+
+        contents: {
+            xml: /xml/,
+            html: /html/,
+            json: /json/
+        },
+
+        responseFields: {
+            xml: "responseXML",
+            text: "responseText"
+        },
+
+        // List of data converters
+        // 1) key format is "source_type destination_type" (a single space in-between)
+        // 2) the catchall symbol "*" can be used for source_type
+        converters: {
+
+            // Convert anything to text
+            "* text": window.String,
+
+            // Text to html (true = no transformation)
+            "text html": true,
+
+            // Evaluate text as a json expression
+            "text json": jQuery.parseJSON,
+
+            // Parse text as xml
+            "text xml": jQuery.parseXML
+        }
+    },
+
+    ajaxPrefilter: addToPrefiltersOrTransports( prefilters ),
+    ajaxTransport: addToPrefiltersOrTransports( transports ),
+
+    // Main method
+    ajax: function( url, options ) {
+
+        // If url is an object, simulate pre-1.5 signature

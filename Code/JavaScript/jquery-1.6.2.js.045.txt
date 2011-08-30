@@ -1,0 +1,50 @@
+                // http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
+                var attributeNode = elem.getAttributeNode("tabIndex");
+
+                return attributeNode && attributeNode.specified ?
+                    parseInt( attributeNode.value, 10 ) :
+                    rfocusable.test( elem.nodeName ) || rclickable.test( elem.nodeName ) && elem.href ?
+                        0 :
+                        undefined;
+            }
+        },
+        // Use the value property for back compat
+        // Use the formHook for button elements in IE6/7 (#1954)
+        value: {
+            get: function( elem, name ) {
+                if ( formHook && jQuery.nodeName( elem, "button" ) ) {
+                    return formHook.get( elem, name );
+                }
+                return name in elem ?
+                    elem.value :
+                    null;
+            },
+            set: function( elem, value, name ) {
+                if ( formHook && jQuery.nodeName( elem, "button" ) ) {
+                    return formHook.set( elem, value, name );
+                }
+                // Does not return so that setAttribute is also used
+                elem.value = value;
+            }
+        }
+    },
+
+    propFix: {
+        tabindex: "tabIndex",
+        readonly: "readOnly",
+        "for": "htmlFor",
+        "class": "className",
+        maxlength: "maxLength",
+        cellspacing: "cellSpacing",
+        cellpadding: "cellPadding",
+        rowspan: "rowSpan",
+        colspan: "colSpan",
+        usemap: "useMap",
+        frameborder: "frameBorder",
+        contenteditable: "contentEditable"
+    },
+    
+    prop: function( elem, name, value ) {
+        var nType = elem.nodeType;
+
+        // don't get/set properties on text, comment and attribute nodes

@@ -1,0 +1,52 @@
+    createStandardXHR;
+
+// Determine support properties
+(function( xhr ) {
+    jQuery.extend( jQuery.support, {
+        ajax: !!xhr,
+        cors: !!xhr && ( "withCredentials" in xhr )
+    });
+})( jQuery.ajaxSettings.xhr() );
+
+// Create transport if the browser can provide an xhr
+if ( jQuery.support.ajax ) {
+
+    jQuery.ajaxTransport(function( s ) {
+        // Cross domain only allowed if supported through XMLHttpRequest
+        if ( !s.crossDomain || jQuery.support.cors ) {
+
+            var callback;
+
+            return {
+                send: function( headers, complete ) {
+
+                    // Get a new xhr
+                    var xhr = s.xhr(),
+                        handle,
+                        i;
+
+                    // Open the socket
+                    // Passing null username, generates a login popup on Opera (#2865)
+                    if ( s.username ) {
+                        xhr.open( s.type, s.url, s.async, s.username, s.password );
+                    } else {
+                        xhr.open( s.type, s.url, s.async );
+                    }
+
+                    // Apply custom fields if provided
+                    if ( s.xhrFields ) {
+                        for ( i in s.xhrFields ) {
+                            xhr[ i ] = s.xhrFields[ i ];
+                        }
+                    }
+
+                    // Override mime type if needed
+                    if ( s.mimeType && xhr.overrideMimeType ) {
+                        xhr.overrideMimeType( s.mimeType );
+                    }
+
+                    // X-Requested-With header
+                    // For cross-domain requests, seeing as conditions for a preflight are
+                    // akin to a jigsaw puzzle, we simply never set it to be sure.
+                    // (it can always be set on a per-request basis or even using ajaxSetup)
+                    // For same-domain requests, won't change header if already provided.

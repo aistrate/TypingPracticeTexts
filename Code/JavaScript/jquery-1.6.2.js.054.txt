@@ -1,0 +1,46 @@
+    // Native DOM events should not be added, they may have inline handlers.
+    customEvent: {
+        "getData": true,
+        "setData": true,
+        "changeData": true
+    },
+
+    trigger: function( event, data, elem, onlyHandlers ) {
+        // Event object or event type
+        var type = event.type || event,
+            namespaces = [],
+            exclusive;
+
+        if ( type.indexOf("!") >= 0 ) {
+            // Exclusive events trigger only for the exact event (no namespaces)
+            type = type.slice(0, -1);
+            exclusive = true;
+        }
+
+        if ( type.indexOf(".") >= 0 ) {
+            // Namespaced trigger; create a regexp to match event type in handle()
+            namespaces = type.split(".");
+            type = namespaces.shift();
+            namespaces.sort();
+        }
+
+        if ( (!elem || jQuery.event.customEvent[ type ]) && !jQuery.event.global[ type ] ) {
+            // No jQuery handlers for this event type, and it can't have inline handlers
+            return;
+        }
+
+        // Caller can pass in an Event, Object, or just an event type string
+        event = typeof event === "object" ?
+            // jQuery.Event object
+            event[ jQuery.expando ] ? event :
+            // Object literal
+            new jQuery.Event( type, event ) :
+            // Just the event type (string)
+            new jQuery.Event( type );
+
+        event.type = type;
+        event.exclusive = exclusive;
+        event.namespace = namespaces.join(".");
+        event.namespace_re = new RegExp("(^|\\.)" + namespaces.join("\\.(?:.*\\.)?") + "(\\.|$)");
+        
+        // triggerHandler() and global events don't bubble or run the default action

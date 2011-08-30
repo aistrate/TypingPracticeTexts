@@ -1,0 +1,61 @@
+        }
+        return responses[ finalDataType ];
+    }
+}
+
+// Chain conversions given the request and the original response
+function ajaxConvert( s, response ) {
+
+    // Apply the dataFilter if provided
+    if ( s.dataFilter ) {
+        response = s.dataFilter( response, s.dataType );
+    }
+
+    var dataTypes = s.dataTypes,
+        converters = {},
+        i,
+        key,
+        length = dataTypes.length,
+        tmp,
+        // Current and previous dataTypes
+        current = dataTypes[ 0 ],
+        prev,
+        // Conversion expression
+        conversion,
+        // Conversion function
+        conv,
+        // Conversion functions (transitive conversion)
+        conv1,
+        conv2;
+
+    // For each dataType in the chain
+    for( i = 1; i < length; i++ ) {
+
+        // Create converters map
+        // with lowercased keys
+        if ( i === 1 ) {
+            for( key in s.converters ) {
+                if( typeof key === "string" ) {
+                    converters[ key.toLowerCase() ] = s.converters[ key ];
+                }
+            }
+        }
+
+        // Get the dataTypes
+        prev = current;
+        current = dataTypes[ i ];
+
+        // If current is auto dataType, update it to prev
+        if( current === "*" ) {
+            current = prev;
+        // If no auto and dataTypes are actually different
+        } else if ( prev !== "*" && prev !== current ) {
+
+            // Get the converter
+            conversion = prev + " " + current;
+            conv = converters[ conversion ] || converters[ "* " + current ];
+
+            // If there is no direct converter, search transitively
+            if ( !conv ) {
+                conv2 = undefined;
+                for( conv1 in converters ) {

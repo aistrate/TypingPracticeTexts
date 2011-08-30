@@ -1,0 +1,43 @@
+        }
+
+        // More options handling for requests with no content
+        if ( !s.hasContent ) {
+
+            // If data is available, append data to url
+            if ( s.data ) {
+                s.url += ( rquery.test( s.url ) ? "&" : "?" ) + s.data;
+            }
+
+            // Get ifModifiedKey before adding the anti-cache parameter
+            ifModifiedKey = s.url;
+
+            // Add anti-cache in url if needed
+            if ( s.cache === false ) {
+
+                var ts = jQuery.now(),
+                    // try replacing _= if it is there
+                    ret = s.url.replace( rts, "$1_=" + ts );
+
+                // if nothing was replaced, add timestamp to the end
+                s.url = ret + ( (ret === s.url ) ? ( rquery.test( s.url ) ? "&" : "?" ) + "_=" + ts : "" );
+            }
+        }
+
+        // Set the correct header, if data is being sent
+        if ( s.data && s.hasContent && s.contentType !== false || options.contentType ) {
+            jqXHR.setRequestHeader( "Content-Type", s.contentType );
+        }
+
+        // Set the If-Modified-Since and/or If-None-Match header, if in ifModified mode.
+        if ( s.ifModified ) {
+            ifModifiedKey = ifModifiedKey || s.url;
+            if ( jQuery.lastModified[ ifModifiedKey ] ) {
+                jqXHR.setRequestHeader( "If-Modified-Since", jQuery.lastModified[ ifModifiedKey ] );
+            }
+            if ( jQuery.etag[ ifModifiedKey ] ) {
+                jqXHR.setRequestHeader( "If-None-Match", jQuery.etag[ ifModifiedKey ] );
+            }
+        }
+
+        // Set the Accepts header for the server, depending on the dataType
+        jqXHR.setRequestHeader(

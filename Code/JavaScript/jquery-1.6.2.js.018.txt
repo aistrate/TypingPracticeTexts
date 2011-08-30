@@ -1,0 +1,64 @@
+    };
+
+} else if ( document.attachEvent ) {
+    DOMContentLoaded = function() {
+        // Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
+        if ( document.readyState === "complete" ) {
+            document.detachEvent( "onreadystatechange", DOMContentLoaded );
+            jQuery.ready();
+        }
+    };
+}
+
+// The DOM ready check for Internet Explorer
+function doScrollCheck() {
+    if ( jQuery.isReady ) {
+        return;
+    }
+
+    try {
+        // If IE is used, use the trick by Diego Perini
+        // http://javascript.nwbox.com/IEContentLoaded/
+        document.documentElement.doScroll("left");
+    } catch(e) {
+        setTimeout( doScrollCheck, 1 );
+        return;
+    }
+
+    // and execute any waiting functions
+    jQuery.ready();
+}
+
+return jQuery;
+
+})();
+
+
+var // Promise methods
+    promiseMethods = "done fail isResolved isRejected promise then always pipe".split( " " ),
+    // Static reference to slice
+    sliceDeferred = [].slice;
+
+jQuery.extend({
+    // Create a simple deferred (one callbacks list)
+    _Deferred: function() {
+        var // callbacks list
+            callbacks = [],
+            // stored [ context , args ]
+            fired,
+            // to avoid firing when already doing so
+            firing,
+            // flag to know if the deferred has been cancelled
+            cancelled,
+            // the deferred itself
+            deferred  = {
+
+                // done( f1, f2, ...)
+                done: function() {
+                    if ( !cancelled ) {
+                        var args = arguments,
+                            i,
+                            length,
+                            elem,
+                            type,
+                            _fired;

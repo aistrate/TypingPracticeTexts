@@ -1,0 +1,49 @@
+    _toggle: jQuery.fn.toggle,
+
+    toggle: function( fn, fn2, callback ) {
+        var bool = typeof fn === "boolean";
+
+        if ( jQuery.isFunction(fn) && jQuery.isFunction(fn2) ) {
+            this._toggle.apply( this, arguments );
+
+        } else if ( fn == null || bool ) {
+            this.each(function() {
+                var state = bool ? fn : jQuery(this).is(":hidden");
+                jQuery(this)[ state ? "show" : "hide" ]();
+            });
+
+        } else {
+            this.animate(genFx("toggle", 3), fn, fn2, callback);
+        }
+
+        return this;
+    },
+
+    fadeTo: function( speed, to, easing, callback ) {
+        return this.filter(":hidden").css("opacity", 0).show().end()
+                    .animate({opacity: to}, speed, easing, callback);
+    },
+
+    animate: function( prop, speed, easing, callback ) {
+        var optall = jQuery.speed(speed, easing, callback);
+
+        if ( jQuery.isEmptyObject( prop ) ) {
+            return this.each( optall.complete, [ false ] );
+        }
+
+        // Do not change referenced properties as per-property easing will be lost
+        prop = jQuery.extend( {}, prop );
+
+        return this[ optall.queue === false ? "each" : "queue" ](function() {
+            // XXX 'this' does not always have a nodeName when running the
+            // test suite
+
+            if ( optall.queue === false ) {
+                jQuery._mark( this );
+            }
+
+            var opt = jQuery.extend( {}, optall ),
+                isElement = this.nodeType === 1,
+                hidden = isElement && jQuery(this).is(":hidden"),
+                name, val, p,
+                display, e,

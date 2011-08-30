@@ -1,0 +1,51 @@
+                while ( (className = classNames[ i++ ]) ) {
+                    // check each className given, space seperated list
+                    state = isBool ? state : !self.hasClass( className );
+                    self[ state ? "addClass" : "removeClass" ]( className );
+                }
+
+            } else if ( type === "undefined" || type === "boolean" ) {
+                if ( this.className ) {
+                    // store className if set
+                    jQuery._data( this, "__className__", this.className );
+                }
+
+                // toggle whole className
+                this.className = this.className || value === false ? "" : jQuery._data( this, "__className__" ) || "";
+            }
+        });
+    },
+
+    hasClass: function( selector ) {
+        var className = " " + selector + " ";
+        for ( var i = 0, l = this.length; i < l; i++ ) {
+            if ( (" " + this[i].className + " ").replace(rclass, " ").indexOf( className ) > -1 ) {
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    val: function( value ) {
+        var hooks, ret,
+            elem = this[0];
+        
+        if ( !arguments.length ) {
+            if ( elem ) {
+                hooks = jQuery.valHooks[ elem.nodeName.toLowerCase() ] || jQuery.valHooks[ elem.type ];
+
+                if ( hooks && "get" in hooks && (ret = hooks.get( elem, "value" )) !== undefined ) {
+                    return ret;
+                }
+
+                ret = elem.value;
+
+                return typeof ret === "string" ? 
+                    // handle most common string cases
+                    ret.replace(rreturn, "") : 
+                    // handle cases where value is null/undef or number
+                    ret == null ? "" : ret;
+            }
+
+            return undefined;

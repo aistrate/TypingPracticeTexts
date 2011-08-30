@@ -1,0 +1,40 @@
+                parts, start, end, unit;
+
+            // will store per property easing and be used to determine when an animation is complete
+            opt.animatedProperties = {};
+
+            for ( p in prop ) {
+
+                // property name normalization
+                name = jQuery.camelCase( p );
+                if ( p !== name ) {
+                    prop[ name ] = prop[ p ];
+                    delete prop[ p ];
+                }
+
+                val = prop[ name ];
+
+                // easing resolution: per property > opt.specialEasing > opt.easing > 'swing' (default)
+                if ( jQuery.isArray( val ) ) {
+                    opt.animatedProperties[ name ] = val[ 1 ];
+                    val = prop[ name ] = val[ 0 ];
+                } else {
+                    opt.animatedProperties[ name ] = opt.specialEasing && opt.specialEasing[ name ] || opt.easing || 'swing';
+                }
+
+                if ( val === "hide" && hidden || val === "show" && !hidden ) {
+                    return opt.complete.call( this );
+                }
+
+                if ( isElement && ( name === "height" || name === "width" ) ) {
+                    // Make sure that nothing sneaks out
+                    // Record all 3 overflow attributes because IE does not
+                    // change the overflow attribute when overflowX and
+                    // overflowY are set to the same value
+                    opt.overflow = [ this.style.overflow, this.style.overflowX, this.style.overflowY ];
+
+                    // Set display property to inline-block for height/width
+                    // animations on inline elements that are having width/height
+                    // animated
+                    if ( jQuery.css( this, "display" ) === "inline" &&
+                            jQuery.css( this, "float" ) === "none" ) {

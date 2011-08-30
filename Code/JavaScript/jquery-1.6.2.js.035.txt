@@ -1,0 +1,58 @@
+            if ( !jQuery.data( elem, queueDataKey, undefined, true ) &&
+                !jQuery.data( elem, markDataKey, undefined, true ) ) {
+                jQuery.removeData( elem, deferDataKey, true );
+                defer.resolve();
+            }
+        }, 0 );
+    }
+}
+
+jQuery.extend({
+
+    _mark: function( elem, type ) {
+        if ( elem ) {
+            type = (type || "fx") + "mark";
+            jQuery.data( elem, type, (jQuery.data(elem,type,undefined,true) || 0) + 1, true );
+        }
+    },
+
+    _unmark: function( force, elem, type ) {
+        if ( force !== true ) {
+            type = elem;
+            elem = force;
+            force = false;
+        }
+        if ( elem ) {
+            type = type || "fx";
+            var key = type + "mark",
+                count = force ? 0 : ( (jQuery.data( elem, key, undefined, true) || 1 ) - 1 );
+            if ( count ) {
+                jQuery.data( elem, key, count, true );
+            } else {
+                jQuery.removeData( elem, key, true );
+                handleQueueMarkDefer( elem, type, "mark" );
+            }
+        }
+    },
+
+    queue: function( elem, type, data ) {
+        if ( elem ) {
+            type = (type || "fx") + "queue";
+            var q = jQuery.data( elem, type, undefined, true );
+            // Speed up dequeue by getting out quickly if this is just a lookup
+            if ( data ) {
+                if ( !q || jQuery.isArray(data) ) {
+                    q = jQuery.data( elem, type, jQuery.makeArray(data), true );
+                } else {
+                    q.push( data );
+                }
+            }
+            return q || [];
+        }
+    },
+
+    dequeue: function( elem, type ) {
+        type = type || "fx";
+
+        var queue = jQuery.queue( elem, type ),
+            fn = queue.shift(),

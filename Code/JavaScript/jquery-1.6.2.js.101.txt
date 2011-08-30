@@ -1,0 +1,46 @@
+        return jQuery.grep(elements, function( elem, i ) {
+            var retVal = !!qualifier.call( elem, i, elem );
+            return retVal === keep;
+        });
+
+    } else if ( qualifier.nodeType ) {
+        return jQuery.grep(elements, function( elem, i ) {
+            return (elem === qualifier) === keep;
+        });
+
+    } else if ( typeof qualifier === "string" ) {
+        var filtered = jQuery.grep(elements, function( elem ) {
+            return elem.nodeType === 1;
+        });
+
+        if ( isSimple.test( qualifier ) ) {
+            return jQuery.filter(qualifier, filtered, !keep);
+        } else {
+            qualifier = jQuery.filter( qualifier, filtered );
+        }
+    }
+
+    return jQuery.grep(elements, function( elem, i ) {
+        return (jQuery.inArray( elem, qualifier ) >= 0) === keep;
+    });
+}
+
+
+
+
+var rinlinejQuery = / jQuery\d+="(?:\d+|null)"/g,
+    rleadingWhitespace = /^\s+/,
+    rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
+    rtagName = /<([\w:]+)/,
+    rtbody = /<tbody/i,
+    rhtml = /<|&#?\w+;/,
+    rnocache = /<(?:script|object|embed|option|style)/i,
+    // checked="checked" or checked
+    rchecked = /checked\s*(?:[^=]|=\s*.checked.)/i,
+    rscriptType = /\/(java|ecma)script/i,
+    rcleanScript = /^\s*<!(?:\[CDATA\[|\-\-)/,
+    wrapMap = {
+        option: [ 1, "<select multiple='multiple'>", "</select>" ],
+        legend: [ 1, "<fieldset>", "</fieldset>" ],
+        thead: [ 1, "<table>", "</table>" ],
+        tr: [ 2, "<table><tbody>", "</tbody></table>" ],

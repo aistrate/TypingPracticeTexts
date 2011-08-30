@@ -1,0 +1,54 @@
+        if ( !elem || nType === 3 || nType === 8 || nType === 2 ) {
+            return undefined;
+        }
+
+        var ret, hooks,
+            notxml = nType !== 1 || !jQuery.isXMLDoc( elem );
+
+        if ( notxml ) {
+            // Fix name and attach hooks
+            name = jQuery.propFix[ name ] || name;
+            hooks = jQuery.propHooks[ name ];
+        }
+
+        if ( value !== undefined ) {
+            if ( hooks && "set" in hooks && (ret = hooks.set( elem, value, name )) !== undefined ) {
+                return ret;
+
+            } else {
+                return (elem[ name ] = value);
+            }
+
+        } else {
+            if ( hooks && "get" in hooks && (ret = hooks.get( elem, name )) !== undefined ) {
+                return ret;
+
+            } else {
+                return elem[ name ];
+            }
+        }
+    },
+    
+    propHooks: {}
+});
+
+// Hook for boolean attributes
+boolHook = {
+    get: function( elem, name ) {
+        // Align boolean attributes with corresponding properties
+        return jQuery.prop( elem, name ) ?
+            name.toLowerCase() :
+            undefined;
+    },
+    set: function( elem, value, name ) {
+        var propName;
+        if ( value === false ) {
+            // Remove boolean attributes when set to false
+            jQuery.removeAttr( elem, name );
+        } else {
+            // value is true since we know at this point it's type boolean and not false
+            // Set boolean attributes to the same name and set the DOM property
+            propName = jQuery.propFix[ name ] || name;
+            if ( propName in elem ) {
+                // Only set the IDL specifically if it already exists on the element
+                elem[ propName ] = true;

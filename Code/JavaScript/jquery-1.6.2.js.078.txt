@@ -1,0 +1,62 @@
+                for ( ; i < l; i++ ) {
+                    elem = checkSet[i];
+
+                    if ( elem ) {
+                        var parent = elem.parentNode;
+                        checkSet[i] = parent.nodeName.toLowerCase() === part ? parent : false;
+                    }
+                }
+
+            } else {
+                for ( ; i < l; i++ ) {
+                    elem = checkSet[i];
+
+                    if ( elem ) {
+                        checkSet[i] = isPartStr ?
+                            elem.parentNode :
+                            elem.parentNode === part;
+                    }
+                }
+
+                if ( isPartStr ) {
+                    Sizzle.filter( part, checkSet, true );
+                }
+            }
+        },
+
+        "": function(checkSet, part, isXML){
+            var nodeCheck,
+                doneName = done++,
+                checkFn = dirCheck;
+
+            if ( typeof part === "string" && !rNonWord.test( part ) ) {
+                part = part.toLowerCase();
+                nodeCheck = part;
+                checkFn = dirNodeCheck;
+            }
+
+            checkFn( "parentNode", part, doneName, checkSet, nodeCheck, isXML );
+        },
+
+        "~": function( checkSet, part, isXML ) {
+            var nodeCheck,
+                doneName = done++,
+                checkFn = dirCheck;
+
+            if ( typeof part === "string" && !rNonWord.test( part ) ) {
+                part = part.toLowerCase();
+                nodeCheck = part;
+                checkFn = dirNodeCheck;
+            }
+
+            checkFn( "previousSibling", part, doneName, checkSet, nodeCheck, isXML );
+        }
+    },
+
+    find: {
+        ID: function( match, context, isXML ) {
+            if ( typeof context.getElementById !== "undefined" && !isXML ) {
+                var m = context.getElementById(match[1]);
+                // Check parentNode to catch when Blackberry 4.6 returns
+                // nodes that are no longer in the document #6963
+                return m && m.parentNode ? [m] : [];

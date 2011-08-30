@@ -1,0 +1,53 @@
+            }
+        }
+    },
+
+    // Simple 'show' function
+    show: function() {
+        // Remember where we started, so that we can go back to it later
+        this.options.orig[this.prop] = jQuery.style( this.elem, this.prop );
+        this.options.show = true;
+
+        // Begin the animation
+        // Make sure that we start at a small width/height to avoid any
+        // flash of content
+        this.custom(this.prop === "width" || this.prop === "height" ? 1 : 0, this.cur());
+
+        // Start by showing the element
+        jQuery( this.elem ).show();
+    },
+
+    // Simple 'hide' function
+    hide: function() {
+        // Remember where we started, so that we can go back to it later
+        this.options.orig[this.prop] = jQuery.style( this.elem, this.prop );
+        this.options.hide = true;
+
+        // Begin the animation
+        this.custom(this.cur(), 0);
+    },
+
+    // Each step of an animation
+    step: function( gotoEnd ) {
+        var t = fxNow || createFxNow(),
+            done = true,
+            elem = this.elem,
+            options = this.options,
+            i, n;
+
+        if ( gotoEnd || t >= options.duration + this.startTime ) {
+            this.now = this.end;
+            this.pos = this.state = 1;
+            this.update();
+
+            options.animatedProperties[ this.prop ] = true;
+
+            for ( i in options.animatedProperties ) {
+                if ( options.animatedProperties[i] !== true ) {
+                    done = false;
+                }
+            }
+
+            if ( done ) {
+                // Reset the overflow
+                if ( options.overflow != null && !jQuery.support.shrinkWrapBlocks ) {

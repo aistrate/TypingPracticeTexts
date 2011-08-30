@@ -1,0 +1,53 @@
+                    ret = rsingleTag.exec( selector );
+
+                    if ( ret ) {
+                        if ( jQuery.isPlainObject( context ) ) {
+                            selector = [ document.createElement( ret[1] ) ];
+                            jQuery.fn.attr.call( selector, context, true );
+
+                        } else {
+                            selector = [ doc.createElement( ret[1] ) ];
+                        }
+
+                    } else {
+                        ret = jQuery.buildFragment( [ match[1] ], [ doc ] );
+                        selector = (ret.cacheable ? jQuery.clone(ret.fragment) : ret.fragment).childNodes;
+                    }
+
+                    return jQuery.merge( this, selector );
+
+                // HANDLE: $("#id")
+                } else {
+                    elem = document.getElementById( match[2] );
+
+                    // Check parentNode to catch when Blackberry 4.6 returns
+                    // nodes that are no longer in the document #6963
+                    if ( elem && elem.parentNode ) {
+                        // Handle the case where IE and Opera return items
+                        // by name instead of ID
+                        if ( elem.id !== match[2] ) {
+                            return rootjQuery.find( selector );
+                        }
+
+                        // Otherwise, we inject the element directly into the jQuery object
+                        this.length = 1;
+                        this[0] = elem;
+                    }
+
+                    this.context = document;
+                    this.selector = selector;
+                    return this;
+                }
+
+            // HANDLE: $(expr, $(...))
+            } else if ( !context || context.jquery ) {
+                return (context || rootjQuery).find( selector );
+
+            // HANDLE: $(expr, context)
+            // (which is just equivalent to: $(context).find(expr)
+            } else {
+                return this.constructor( context ).find( selector );
+            }
+
+        // HANDLE: $(function)
+        // Shortcut for document ready

@@ -1,0 +1,67 @@
+                        result.push.apply( result, ret );
+                    }
+
+                    return false;
+                }
+
+            } else if ( Expr.match.POS.test( match[0] ) || Expr.match.CHILD.test( match[0] ) ) {
+                return true;
+            }
+            
+            return match;
+        },
+
+        POS: function( match ) {
+            match.unshift( true );
+
+            return match;
+        }
+    },
+    
+    filters: {
+        enabled: function( elem ) {
+            return elem.disabled === false && elem.type !== "hidden";
+        },
+
+        disabled: function( elem ) {
+            return elem.disabled === true;
+        },
+
+        checked: function( elem ) {
+            return elem.checked === true;
+        },
+        
+        selected: function( elem ) {
+            // Accessing this property makes selected-by-default
+            // options in Safari work properly
+            if ( elem.parentNode ) {
+                elem.parentNode.selectedIndex;
+            }
+            
+            return elem.selected === true;
+        },
+
+        parent: function( elem ) {
+            return !!elem.firstChild;
+        },
+
+        empty: function( elem ) {
+            return !elem.firstChild;
+        },
+
+        has: function( elem, i, match ) {
+            return !!Sizzle( match[3], elem ).length;
+        },
+
+        header: function( elem ) {
+            return (/h\d/i).test( elem.nodeName );
+        },
+
+        text: function( elem ) {
+            var attr = elem.getAttribute( "type" ), type = elem.type;
+            // IE6 and 7 will map elem.type to 'text' for new HTML5 types (search, etc) 
+            // use getAttribute instead to test this case
+            return elem.nodeName.toLowerCase() === "input" && "text" === type && ( attr === type || attr === null );
+        },
+
+        radio: function( elem ) {

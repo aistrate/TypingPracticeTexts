@@ -1,0 +1,66 @@
+// Provide a fallback method if it does not work
+} catch( e ) {
+    makeArray = function( array, results ) {
+        var i = 0,
+            ret = results || [];
+
+        if ( toString.call(array) === "[object Array]" ) {
+            Array.prototype.push.apply( ret, array );
+
+        } else {
+            if ( typeof array.length === "number" ) {
+                for ( var l = array.length; i < l; i++ ) {
+                    ret.push( array[i] );
+                }
+
+            } else {
+                for ( ; array[i]; i++ ) {
+                    ret.push( array[i] );
+                }
+            }
+        }
+
+        return ret;
+    };
+}
+
+var sortOrder, siblingCheck;
+
+if ( document.documentElement.compareDocumentPosition ) {
+    sortOrder = function( a, b ) {
+        if ( a === b ) {
+            hasDuplicate = true;
+            return 0;
+        }
+
+        if ( !a.compareDocumentPosition || !b.compareDocumentPosition ) {
+            return a.compareDocumentPosition ? -1 : 1;
+        }
+
+        return a.compareDocumentPosition(b) & 4 ? -1 : 1;
+    };
+
+} else {
+    sortOrder = function( a, b ) {
+        // The nodes are identical, we can exit early
+        if ( a === b ) {
+            hasDuplicate = true;
+            return 0;
+
+        // Fallback to using sourceIndex (in IE) if it's available on both nodes
+        } else if ( a.sourceIndex && b.sourceIndex ) {
+            return a.sourceIndex - b.sourceIndex;
+        }
+
+        var al, bl,
+            ap = [],
+            bp = [],
+            aup = a.parentNode,
+            bup = b.parentNode,
+            cur = aup;
+
+        // If the nodes are siblings (or identical) we can do a quick check
+        if ( aup === bup ) {
+            return siblingCheck( a, b );
+
+        // If no parents were found then the nodes are disconnected

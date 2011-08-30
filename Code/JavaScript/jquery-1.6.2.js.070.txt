@@ -1,0 +1,47 @@
+        return;
+    }
+
+    if ( event.namespace ) {
+        namespace = new RegExp("(^|\\.)" + event.namespace.split(".").join("\\.(?:.*\\.)?") + "(\\.|$)");
+    }
+
+    event.liveFired = this;
+
+    var live = events.live.slice(0);
+
+    for ( j = 0; j < live.length; j++ ) {
+        handleObj = live[j];
+
+        if ( handleObj.origType.replace( rnamespaces, "" ) === event.type ) {
+            selectors.push( handleObj.selector );
+
+        } else {
+            live.splice( j--, 1 );
+        }
+    }
+
+    match = jQuery( event.target ).closest( selectors, event.currentTarget );
+
+    for ( i = 0, l = match.length; i < l; i++ ) {
+        close = match[i];
+
+        for ( j = 0; j < live.length; j++ ) {
+            handleObj = live[j];
+
+            if ( close.selector === handleObj.selector && (!namespace || namespace.test( handleObj.namespace )) && !close.elem.disabled ) {
+                elem = close.elem;
+                related = null;
+
+                // Those two events require additional checking
+                if ( handleObj.preType === "mouseenter" || handleObj.preType === "mouseleave" ) {
+                    event.type = handleObj.preType;
+                    related = jQuery( event.relatedTarget ).closest( handleObj.selector )[0];
+
+                    // Make sure not to accidentally match a child element with the same selector
+                    if ( related && jQuery.contains( elem, related ) ) {
+                        related = elem;
+                    }
+                }
+
+                if ( !related || related !== elem ) {
+                    elems.push({ elem: elem, handleObj: handleObj, level: close.level });

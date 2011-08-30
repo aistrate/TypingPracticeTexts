@@ -1,0 +1,62 @@
+    return Sizzle( expr, null, null, set );
+};
+
+Sizzle.matchesSelector = function( node, expr ) {
+    return Sizzle( expr, null, null, [node] ).length > 0;
+};
+
+Sizzle.find = function( expr, context, isXML ) {
+    var set;
+
+    if ( !expr ) {
+        return [];
+    }
+
+    for ( var i = 0, l = Expr.order.length; i < l; i++ ) {
+        var match,
+            type = Expr.order[i];
+        
+        if ( (match = Expr.leftMatch[ type ].exec( expr )) ) {
+            var left = match[1];
+            match.splice( 1, 1 );
+
+            if ( left.substr( left.length - 1 ) !== "\\" ) {
+                match[1] = (match[1] || "").replace( rBackslash, "" );
+                set = Expr.find[ type ]( match, context, isXML );
+
+                if ( set != null ) {
+                    expr = expr.replace( Expr.match[ type ], "" );
+                    break;
+                }
+            }
+        }
+    }
+
+    if ( !set ) {
+        set = typeof context.getElementsByTagName !== "undefined" ?
+            context.getElementsByTagName( "*" ) :
+            [];
+    }
+
+    return { set: set, expr: expr };
+};
+
+Sizzle.filter = function( expr, set, inplace, not ) {
+    var match, anyFound,
+        old = expr,
+        result = [],
+        curLoop = set,
+        isXMLFilter = set && set[0] && Sizzle.isXML( set[0] );
+
+    while ( expr && set.length ) {
+        for ( var type in Expr.filter ) {
+            if ( (match = Expr.leftMatch[ type ].exec( expr )) != null && match[2] ) {
+                var found, item,
+                    filter = Expr.filter[ type ],
+                    left = match[1];
+
+                anyFound = false;
+
+                match.splice(1,1);
+
+                if ( left.substr( left.length - 1 ) === "\\" ) {

@@ -1,0 +1,31 @@
+        // (IE 6 does this)
+        div.style.display = "";
+        div.innerHTML = "<div style='width:4px;'></div>";
+        support.shrinkWrapBlocks = ( div.offsetWidth !== 2 );
+    }
+
+    div.innerHTML = "<table><tr><td style='padding:0;border:0;display:none'></td><td>t</td></tr></table>";
+    tds = div.getElementsByTagName( "td" );
+
+    // Check if table cells still have offsetWidth/Height when they are set
+    // to display:none and there are still other visible table cells in a
+    // table row; if so, offsetWidth/Height are not reliable for use when
+    // determining if an element has been hidden directly using
+    // display:none (it is still safe to use offsets if a parent element is
+    // hidden; don safety goggles and see bug #4512 for more information).
+    // (only IE 8 fails this test)
+    isSupported = ( tds[ 0 ].offsetHeight === 0 );
+
+    tds[ 0 ].style.display = "";
+    tds[ 1 ].style.display = "none";
+
+    // Check if empty table cells still have offsetWidth/Height
+    // (IE < 8 fail this test)
+    support.reliableHiddenOffsets = isSupported && ( tds[ 0 ].offsetHeight === 0 );
+    div.innerHTML = "";
+
+    // Check if div with explicit width and no margin-right incorrectly
+    // gets computed margin-right based on width of container. For more
+    // info see bug #3333
+    // Fails in WebKit before Feb 2011 nightlies
+    // WebKit Bug 13343 - getComputedStyle returns wrong value for margin-right

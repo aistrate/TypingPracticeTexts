@@ -1,0 +1,46 @@
+    // for it is not run until after DOM ready
+    if ( !jQuery.support.reliableMarginRight ) {
+        jQuery.cssHooks.marginRight = {
+            get: function( elem, computed ) {
+                // WebKit Bug 13343 - getComputedStyle returns wrong value for margin-right
+                // Work around by temporarily setting element display to inline-block
+                var ret;
+                jQuery.swap( elem, { "display": "inline-block" }, function() {
+                    if ( computed ) {
+                        ret = curCSS( elem, "margin-right", "marginRight" );
+                    } else {
+                        ret = elem.style.marginRight;
+                    }
+                });
+                return ret;
+            }
+        };
+    }
+});
+
+if ( document.defaultView && document.defaultView.getComputedStyle ) {
+    getComputedStyle = function( elem, name ) {
+        var ret, defaultView, computedStyle;
+
+        name = name.replace( rupper, "-$1" ).toLowerCase();
+
+        if ( !(defaultView = elem.ownerDocument.defaultView) ) {
+            return undefined;
+        }
+
+        if ( (computedStyle = defaultView.getComputedStyle( elem, null )) ) {
+            ret = computedStyle.getPropertyValue( name );
+            if ( ret === "" && !jQuery.contains( elem.ownerDocument.documentElement, elem ) ) {
+                ret = jQuery.style( elem, name );
+            }
+        }
+
+        return ret;
+    };
+}
+
+if ( document.documentElement.currentStyle ) {
+    currentStyle = function( elem, name ) {
+        var left,
+            ret = elem.currentStyle && elem.currentStyle[ name ],
+            rsLeft = elem.runtimeStyle && elem.runtimeStyle[ name ],

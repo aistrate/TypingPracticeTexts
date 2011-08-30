@@ -1,0 +1,52 @@
+            return elem.nodeName.toLowerCase() === "input" && "radio" === elem.type;
+        },
+
+        checkbox: function( elem ) {
+            return elem.nodeName.toLowerCase() === "input" && "checkbox" === elem.type;
+        },
+
+        file: function( elem ) {
+            return elem.nodeName.toLowerCase() === "input" && "file" === elem.type;
+        },
+
+        password: function( elem ) {
+            return elem.nodeName.toLowerCase() === "input" && "password" === elem.type;
+        },
+
+        submit: function( elem ) {
+            var name = elem.nodeName.toLowerCase();
+            return (name === "input" || name === "button") && "submit" === elem.type;
+        },
+
+        image: function( elem ) {
+            return elem.nodeName.toLowerCase() === "input" && "image" === elem.type;
+        },
+
+        reset: function( elem ) {
+            var name = elem.nodeName.toLowerCase();
+            return (name === "input" || name === "button") && "reset" === elem.type;
+        },
+
+        button: function( elem ) {
+            var name = elem.nodeName.toLowerCase();
+            return name === "input" && "button" === elem.type || name === "button";
+        },
+
+        input: function( elem ) {
+            return (/input|select|textarea|button/i).test( elem.nodeName );
+        },
+
+        focus: function( elem ) {
+            return elem === elem.ownerDocument.activeElement;
+        }
+    },
+    setFilters: {
+        first: function( elem, i ) {
+            return i === 0;
+        },
+
+        last: function( elem, i, match, array ) {
+            return i === array.length - 1;
+        },
+
+        even: function( elem, i ) {

@@ -1,0 +1,66 @@
+                        return true;
+                    }
+                }
+            });
+        }
+
+        var ret = this.pushStack( "", "find", selector ),
+            length, n, r;
+
+        for ( i = 0, l = this.length; i < l; i++ ) {
+            length = ret.length;
+            jQuery.find( selector, this[i], ret );
+
+            if ( i > 0 ) {
+                // Make sure that the results are unique
+                for ( n = length; n < ret.length; n++ ) {
+                    for ( r = 0; r < length; r++ ) {
+                        if ( ret[r] === ret[n] ) {
+                            ret.splice(n--, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return ret;
+    },
+
+    has: function( target ) {
+        var targets = jQuery( target );
+        return this.filter(function() {
+            for ( var i = 0, l = targets.length; i < l; i++ ) {
+                if ( jQuery.contains( this, targets[i] ) ) {
+                    return true;
+                }
+            }
+        });
+    },
+
+    not: function( selector ) {
+        return this.pushStack( winnow(this, selector, false), "not", selector);
+    },
+
+    filter: function( selector ) {
+        return this.pushStack( winnow(this, selector, true), "filter", selector );
+    },
+
+    is: function( selector ) {
+        return !!selector && ( typeof selector === "string" ?
+            jQuery.filter( selector, this ).length > 0 :
+            this.filter( selector ).length > 0 );
+    },
+
+    closest: function( selectors, context ) {
+        var ret = [], i, l, cur = this[0];
+        
+        // Array
+        if ( jQuery.isArray( selectors ) ) {
+            var match, selector,
+                matches = {},
+                level = 1;
+
+            if ( cur && selectors.length ) {
+                for ( i = 0, l = selectors.length; i < l; i++ ) {
+                    selector = selectors[i];

@@ -1,0 +1,62 @@
+                    handleObj = eventType[ j ];
+
+                    if ( all || namespace.test( handleObj.namespace ) ) {
+                        jQuery.event.remove( elem, origType, handleObj.handler, j );
+                        eventType.splice( j--, 1 );
+                    }
+                }
+
+                continue;
+            }
+
+            special = jQuery.event.special[ type ] || {};
+
+            for ( j = pos || 0; j < eventType.length; j++ ) {
+                handleObj = eventType[ j ];
+
+                if ( handler.guid === handleObj.guid ) {
+                    // remove the given handler for the given type
+                    if ( all || namespace.test( handleObj.namespace ) ) {
+                        if ( pos == null ) {
+                            eventType.splice( j--, 1 );
+                        }
+
+                        if ( special.remove ) {
+                            special.remove.call( elem, handleObj );
+                        }
+                    }
+
+                    if ( pos != null ) {
+                        break;
+                    }
+                }
+            }
+
+            // remove generic event handler if no more handlers exist
+            if ( eventType.length === 0 || pos != null && eventType.length === 1 ) {
+                if ( !special.teardown || special.teardown.call( elem, namespaces ) === false ) {
+                    jQuery.removeEvent( elem, type, elemData.handle );
+                }
+
+                ret = null;
+                delete events[ type ];
+            }
+        }
+
+        // Remove the expando if it's no longer used
+        if ( jQuery.isEmptyObject( events ) ) {
+            var handle = elemData.handle;
+            if ( handle ) {
+                handle.elem = null;
+            }
+
+            delete elemData.events;
+            delete elemData.handle;
+
+            if ( jQuery.isEmptyObject( elemData ) ) {
+                jQuery.removeData( elem, undefined, true );
+            }
+        }
+    },
+    
+    // Events that are safe to short-circuit if no handlers are attached.

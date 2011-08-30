@@ -1,0 +1,54 @@
+                if ( jQuery.isWindow( this ) ) {
+                    this.onbeforeunload = eventHandle;
+                }
+            },
+
+            teardown: function( namespaces, eventHandle ) {
+                if ( this.onbeforeunload === eventHandle ) {
+                    this.onbeforeunload = null;
+                }
+            }
+        }
+    }
+};
+
+jQuery.removeEvent = document.removeEventListener ?
+    function( elem, type, handle ) {
+        if ( elem.removeEventListener ) {
+            elem.removeEventListener( type, handle, false );
+        }
+    } :
+    function( elem, type, handle ) {
+        if ( elem.detachEvent ) {
+            elem.detachEvent( "on" + type, handle );
+        }
+    };
+
+jQuery.Event = function( src, props ) {
+    // Allow instantiation without the 'new' keyword
+    if ( !this.preventDefault ) {
+        return new jQuery.Event( src, props );
+    }
+
+    // Event object
+    if ( src && src.type ) {
+        this.originalEvent = src;
+        this.type = src.type;
+
+        // Events bubbling up the document may have been marked as prevented
+        // by a handler lower down the tree; reflect the correct value.
+        this.isDefaultPrevented = (src.defaultPrevented || src.returnValue === false ||
+            src.getPreventDefault && src.getPreventDefault()) ? returnTrue : returnFalse;
+
+    // Event type
+    } else {
+        this.type = src;
+    }
+
+    // Put explicitly provided properties onto the event object
+    if ( props ) {
+        jQuery.extend( this, props );
+    }
+
+    // timeStamp is buggy for some events on Firefox(#3843)
+    // So we won't rely on the native value

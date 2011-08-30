@@ -1,0 +1,44 @@
+            if ( handle ) {
+                handle.apply( cur, data );
+            }
+
+            // Trigger an inline bound script
+            if ( ontype && jQuery.acceptData( cur ) && cur[ ontype ] && cur[ ontype ].apply( cur, data ) === false ) {
+                event.result = false;
+                event.preventDefault();
+            }
+
+            // Bubble up to document, then to window
+            cur = cur.parentNode || cur.ownerDocument || cur === event.target.ownerDocument && window;
+        } while ( cur && !event.isPropagationStopped() );
+
+        // If nobody prevented the default action, do it now
+        if ( !event.isDefaultPrevented() ) {
+            var old,
+                special = jQuery.event.special[ type ] || {};
+
+            if ( (!special._default || special._default.call( elem.ownerDocument, event ) === false) &&
+                !(type === "click" && jQuery.nodeName( elem, "a" )) && jQuery.acceptData( elem ) ) {
+
+                // Call a native DOM method on the target with the same name name as the event.
+                // Can't use an .isFunction)() check here because IE6/7 fails that test.
+                // IE<9 dies on focus to hidden element (#1486), may want to revisit a try/catch.
+                try {
+                    if ( ontype && elem[ type ] ) {
+                        // Don't re-trigger an onFOO event when we call its FOO() method
+                        old = elem[ ontype ];
+
+                        if ( old ) {
+                            elem[ ontype ] = null;
+                        }
+
+                        jQuery.event.triggered = type;
+                        elem[ type ]();
+                    }
+                } catch ( ieError ) {}
+
+                if ( old ) {
+                    elem[ ontype ] = old;
+                }
+
+                jQuery.event.triggered = undefined;

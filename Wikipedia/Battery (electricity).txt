@@ -1,0 +1,5 @@
+Battery (electricity)
+
+An electrical battery is one or more electrochemical cells that convert stored chemical energy into electrical energy. Since the invention of the first battery (or "voltaic pile") in 1800 by Alessandro Volta, batteries have become a common power source for many household and industrial applications. According to a 2005 estimate, the worldwide battery industry generates US$48 billion in sales each year, with 6% annual growth.
+
+There are two types of batteries: primary batteries (disposable batteries), which are designed to be used once and discarded, and secondary batteries (rechargeable batteries), which are designed to be recharged and used multiple times. Batteries come in many sizes, from miniature cells used to power hearing aids and wristwatches to battery banks the size of rooms that provide standby power for telephone exchanges and computer data centers.

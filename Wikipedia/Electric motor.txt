@@ -1,0 +1,11 @@
+Electric motor
+
+An electric motor converts electrical energy into mechanical energy.
+
+Most electric motors operate through the interaction of magnetic fields and current-carrying conductors to generate force. The reverse process, producing electrical energy from mechanical energy, is done by generators such as an alternator or a dynamo; some electric motors can also be used as generators, for example, a traction motor on a vehicle may perfom both tasks. Electric motors and generators are commonly referred to as electric machines.
+
+Electric motors are found in applications as diverse as industrial fans, blowers and pumps, machine tools, household appliances, power tools, and disk drives. They may be powered by direct current (e.g., a battery powered portable device or motor vehicle), or by alternating current from a central electrical distribution grid or inverter. The smallest motors may be found in electric wristwatches. Medium-size motors of highly standardized dimensions and characteristics provide convenient mechanical power for industrial uses. The very largest electric motors are used for propulsion of ships, pipeline compressors, and water pumps with ratings in the millions of watts. Electric motors may be classified by the source of electric power, by their internal construction, by their application, or by the type of motion they give.
+
+The physical principle of production of mechanical force by the interactions of an electric current and a magnetic field was known as early as 1821. Electric motors of increasing efficiency were constructed throughout the 19th century, but commercial exploitation of electric motors on a large scale required efficient electrical generators and electrical distribution networks.
+
+Some devices convert electricity into motion but do not generate usable mechanical power as a primary objective and so are not generally referred to as electric motors. For example, magnetic solenoids and loudspeakers are usually described as actuators and transducers, respectively, instead of motors. Some electric motors are used to produce torque or force.

@@ -1,0 +1,7 @@
+Hiragana
+
+Hiragana is a Japanese syllabary, one basic component of the Japanese writing system, along with katakana, kanji, and the Latin alphabet (romaji). Hiragana and katakana are both kana systems, in which each character represents one mora. Each kana is either a vowel such as "a"; a consonant followed by a vowel such as "ka"; or "n", a nasal sonorant which, depending on the context, sounds either like English m, n, or ng, or like the nasal vowels of French.
+
+Hiragana is used to write native words for which there are no kanji, including particles such as kara "from", and suffixes such as ~san "Mr., Mrs., Miss, Ms." Likewise, hiragana is used in words for which the kanji form is obscure, not known to the writer or readers, or too formal for the writing purpose. Verb and adjective inflections, as, for example, be-ma-shi-ta in tabemashita ("ate"), are written in hiragana, often following a verb or adjective root that is written in kanji. Hiragana is also used to give the pronunciation of kanji in a reading aid called furigana. The article Japanese writing system discusses in detail how the various systems of writing are used.
+
+There are two main systems of ordering hiragana, the old-fashioned iroha ordering, and the more prevalent gojuon ordering.

@@ -1,0 +1,5 @@
+Braille
+
+The Braille system is a method that is widely used by blind people to read and write, and was the first digital form of writing.
+
+Braille was devised in 1825 by Louis Braille, a blind Frenchman. Each Braille character, or cell, is made up of six dot positions, arranged in a rectangle containing two columns of three dots each. A dot may be raised at any of the six positions to form sixty-four (2^6) possible subsets, including the arrangement in which no dots are raised. For reference purposes, a particular permutation may be described by naming the positions where dots are raised, the positions being universally numbered 1 to 3, from top to bottom, on the left, and 4 to 6, from top to bottom, on the right. For example, dots 1-3-4 would describe a cell with three dots raised, at the top and bottom in the left column and on top of the right column, i.e., the letter m. The lines of horizontal Braille text are separated by a space, much like visible printed text, so that the dots of one line can be differentiated from the Braille text above and below. Punctuation is represented by its own unique set of characters.

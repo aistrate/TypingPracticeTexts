@@ -1,0 +1,9 @@
+Font
+
+In typography, a font is traditionally defined as a quantity of sorts composing a complete character set of a single size and style of a particular typeface. For example, the complete set of all the characters for "9-point Bulmer" is called a font, and the "10-point Bulmer" would be another separate font, but part of the same font family, whereas "9-point Bulmer boldface" would be another font in a different font family of the same typeface. One individual font character might be referred to as a "piece of font" or a "piece of type".
+
+Font nowadays is frequently used synonymously with the term typeface, although they had clearly understood different meanings before the advent of digital typography and desktop publishing.
+
+Beginning in the 1980s, with the introduction of computer fonts, a broader definition for the term "font" evolved, because different sizes of a single style--separate fonts in metal type--are now generated from a single computer font, because vector shapes can be scaled freely. "Bulmer", the typeface, may include the fonts "Bulmer roman", "Bulmer italic", "Bulmer bold" and "Bulmer extended", but there is no separate font for "9-point Bulmer italic" as opposed to "10-point Bulmer italic".
+
+There are thousands of typefaces.

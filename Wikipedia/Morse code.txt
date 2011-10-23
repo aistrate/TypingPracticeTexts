@@ -1,0 +1,17 @@
+Morse code
+
+Morse code is a method of transmitting textual information as a series of on-off tones, lights, or clicks that can be directly understood by a skilled listener or observer without special equipment. The International Morse Code encodes the Roman alphabet, the Arabic numerals and a small set of punctuation and procedural signals as standardized sequences of short and long signals called "dots" and "dashes" respectively, or "dits" and "dahs". Because many non-English natural languages use more than the 26 Roman letters, extensions to the Morse alphabet exist for those languages.
+
+Each character (letter or numeral) is represented by a unique sequence of dots and dashes. The duration of a dash is three times the duration of a dot. Each dot or dash is followed by a short silence, equal to the dot duration. The dot duration is the basic unit of time measurement in code transmission.
+
+Morse code speed is measured in words per minute (wpm). Characters have differing lengths because they contain differing numbers of dots and dashes. Consequently words also have different lengths in terms of dot duration, even when they contain the same number of characters. For this reason licencing bodies, such as the Federal Communications Commission (FCC) in the US, choose a standard word to measure operator transmission speed. "PARIS" and "CODEX" are two such standard words.
+
+One important feature of Morse code is coding efficiency. The length of each character in Morse is approximately inversely proportional to its frequency of occurrence in English. Thus, the most common letter in English, the letter "E," has the shortest code, a single dot.
+
+A related but different code was originally created for Samuel F. B. Morse's electric telegraph by Alfred Vail in the early 1840s. This code was the forerunner on which modern International Morse code is based. In the 1890s it began to be extensively used for early radio communication before it was possible to transmit voice. In the late nineteenth and early twentieth century, most high-speed international communication used Morse code on telegraph lines, undersea cables and radio circuits.
+
+Morse code is most popular among amateur radio operators although it is no longer required for licensing in most countries, including the US. Pilots and air traffic controllers are usually familiar with Morse code and require a basic understanding. Aeronautical navigational aids, such as VORs and NDBs, constantly identify in Morse code. An advantage of Morse code for transmitting over radio waves is that it is able to be received over poor signal conditions that would make voice communications impossible.
+
+Because it can be read by humans without a decoding device, Morse is sometimes a useful alternative to synthesized speech for sending automated digital data to skilled listeners on voice channels. Many amateur radio repeaters, for example, identify with Morse even though they are used for voice communications.
+
+For emergency signals, Morse code can be sent by way of improvised sources that can be easily "keyed" on and off, making it one of the simplest and most versatile methods of telecommunication.

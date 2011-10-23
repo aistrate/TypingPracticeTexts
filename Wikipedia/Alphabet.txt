@@ -1,0 +1,9 @@
+Alphabet
+
+An alphabet is a standard set of letters--basic written symbols or graphemes--each of which represents a phoneme in a spoken language, either as it exists now or as it was in the past. There are other systems, such as logographies, in which each character represents a word, morpheme, or semantic unit, and syllabaries, in which each character represents a syllable. Alphabets are classified according to how they indicate vowels:
+
+- the same way as consonants, as in Greek (true alphabet)
+- diacritics or modification of consonants, as in Hindi (abugida)
+- not at all, as in Phoenician (abjad)
+
+The word "alphabet" came into Middle English from the Late Latin word Alphabetum, which in turn originated in the Ancient Greek (alphabetos), from alpha and beta, the first two letters of the Greek alphabet. Alpha and beta in turn came from the first two letters of the Phoenician alphabet, and meant ox and house respectively. There are dozens of alphabets in use today, the most common being Latin, deriving from the first true alphabet, Greek. Most of them are composed of lines (linear writing); notable exceptions are Braille, fingerspelling, and Morse code.

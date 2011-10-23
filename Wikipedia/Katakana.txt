@@ -1,0 +1,7 @@
+Katakana
+
+Katakana is a Japanese syllabary, one component of the Japanese writing system along with hiragana, kanji, and in some cases the Latin alphabet (romaji). The word katakana means "fragmentary kana", as the katakana scripts are derived from components of more complex kanji. Each kana represents one mora. Each kana is either a vowel such as "a"; a consonant followed by a vowel such as "ka"; or "n", a nasal sonorant which, depending on the context, sounds either like English m, n, or ng, or like the nasal vowels of French.
+
+Unlike the hiragana syllabary which is used for Japanese language words and grammatical inflections which kanji does not cover, the katakana syllabary is primarily used for transcription of foreign language words into Japanese and the writing of loan words (collectively gairaigo), as well as to represent onomatopoeia, technical and scientific terms, and the names of plants, animals, and minerals. Names of Japanese companies as well as certain Japanese language words are also written in katakana rather than the other systems.
+
+Katakana are characterized by short, straight strokes and angular corners, and are the simplest of the Japanese scripts. There are two main systems of ordering katakana: the old-fashioned iroha ordering, and the more prevalent gojuon ordering.

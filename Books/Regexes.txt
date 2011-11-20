@@ -44,6 +44,11 @@ Replace: {:Al|:Nu|:Pu}\n{:Al|:Nu|:Pu}
 With:    \1 \2
 
 
+[
+Reminder:
+^n       n occurrences
+]
+
 
 Source Code Text Creator:
 

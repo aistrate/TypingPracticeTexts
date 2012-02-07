@@ -1,0 +1,64 @@
+                }
+            }
+        }
+    }
+
+    for ( i = 0, l = elems.length; i < l; i++ ) {
+        match = elems[i];
+
+        if ( maxLevel && match.level > maxLevel ) {
+            break;
+        }
+
+        event.currentTarget = match.elem;
+        event.data = match.handleObj.data;
+        event.handleObj = match.handleObj;
+
+        ret = match.handleObj.origHandler.apply( match.elem, arguments );
+
+        if ( ret === false || event.isPropagationStopped() ) {
+            maxLevel = match.level;
+
+            if ( ret === false ) {
+                stop = false;
+            }
+            if ( event.isImmediatePropagationStopped() ) {
+                break;
+            }
+        }
+    }
+
+    return stop;
+}
+
+function liveConvert( type, selector ) {
+    return (type && type !== "*" ? type + "." : "") + selector.replace(rperiod, "`").replace(rspaces, "&");
+}
+
+jQuery.each( ("blur focus focusin focusout load resize scroll unload click dblclick " +
+    "mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
+    "change select submit keydown keypress keyup error").split(" "), function( i, name ) {
+
+    // Handle event binding
+    jQuery.fn[ name ] = function( data, fn ) {
+        if ( fn == null ) {
+            fn = data;
+            data = null;
+        }
+
+        return arguments.length > 0 ?
+            this.bind( name, data, fn ) :
+            this.trigger( name );
+    };
+
+    if ( jQuery.attrFn ) {
+        jQuery.attrFn[ name ] = true;
+    }
+});
+
+
+
+/*!
+ * Sizzle CSS Selector Engine
+ *  Copyright 2011, The Dojo Foundation
+ *  Released under the MIT, BSD, and GPL Licenses.

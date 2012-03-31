@@ -16,3 +16,7 @@ git push
 echo
 echo Status After:
 git status
+
+echo; echo; echo
+echo Log:
+git log -3

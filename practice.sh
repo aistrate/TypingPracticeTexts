@@ -19,4 +19,4 @@ git status
 
 echo; echo; echo
 echo Log:
-git log -3
+git log -7
